@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="sidebar-container" [ngClass]="{'active': isMenuOpen}">
+        <div class="menu-toogle-height pr-3 pt-2">
+            <div class="pull-right" (click)="onSidebarToggle()">
+                <i *ngIf="!isMenuOpen" class="fa fa-angle-double-right menu-toggle-control"></i>
+                <i *ngIf="isMenuOpen" class="fa fa-angle-double-left menu-toggle-control"></i>
+            </div>
+        </div>
+        <app-side-bar-menu> </app-side-bar-menu>
+    </div>
+    <div class="main-container" [ngClass]="{'active': !isMenuOpen}">
+        <!-- <app-organization></app-organization> -->
+        <router-outlet></router-outlet>
+    </div>
+</div>

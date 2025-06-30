@@ -1,0 +1,59 @@
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.sidebar {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.main-container {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+// *********** For Datatables starts ***********
+mat-header-row {
+    background-color: #bbd4e3;
+}
+::ng-deep .mat-sort-header-container .mat-sort-header-button {
+    color: #121212 !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+}
+::ng-deep .mat-header-cell {
+    flex-direction: column;
+    justify-content: center;
+    // border-right: 1px solid #dee2e6 !important;
+    padding: 0px 10px;
+    // min-height: 25vh !important;
+}
+:host ::ng-deep .mat-sort-header-container {
+    display: flex;
+    justify-content: center;
+}
+::ng-deep .mat-cell {
+    text-align: center;
+    justify-content:center;
+    // border-right: 1px solid #dee2e6 !important;
+    padding: 0px 10px;
+    // min-height: 30vh !important;
+}
+::ng-deep mat-cell:first-of-type, ::ng-deep mat-header-cell:first-of-type {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+    max-width: 75px !important;
+}
+::ng-deep mat-cell:last-of-type, ::ng-deep mat-header-cell:last-of-type {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+    max-width: 75px !important;
+}
+// *********** For Datatables ends ***********
+.fa.fa-eye{
+    color: #04578d;
+}
+.fa.fa-times.fa-xs.pl-2{
+    color: #DA5945;
+}

@@ -1,4 +1,47 @@
-/* You can add global styles to this file, and also import other style files */
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.row {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0;
+  }
+  
+  .sidebar-container {
+    width: 250px;
+    background-color: #04578D;
+    transition: width 0.3s ease; /* Animation for width change */
+    height: 100vh;
+    position: fixed; /* Prevents occupying row space */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+  
+  .sidebar-container.active {
+    width: 60px; /* Collapsed state */
+  }
+  
+  .main-container {
+    margin-left: 250px; /* Matches open sidebar width */
+    width: calc(100% - 250px);
+    transition: all 0.3s ease; /* Animation for margin and width */
+    padding: 10px;
+  }
+  
+  .main-container.active {
+    margin-left: 60px; /* Matches collapsed sidebar */
+    width: calc(100% - 60px);
+  }
+  
+  .menu-toogle-height {
+    padding: 10px 15px;
+  }
+  
+  .menu-toggle-control {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ffffff;
+  }
+  
+  .pull-right {
+    float: right;
+  }
