@@ -12,4 +12,5 @@ import { Footer } from "./page-template/footer/footer";
 })
 export class App {
   protected title = 'swaagat_2';
+
 }
