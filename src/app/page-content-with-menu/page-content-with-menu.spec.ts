@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PageContentWithMenu } from './page-content-with-menu';
+import { PageContentWithMenu } from './page-content-with-menu.component';
 
 describe('PageContentWithMenu', () => {
   let component: PageContentWithMenu;
@@ -10,7 +10,7 @@ describe('PageContentWithMenu', () => {
     await TestBed.configureTestingModule({
       imports: [PageContentWithMenu]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(PageContentWithMenu);
     component = fixture.componentInstance;

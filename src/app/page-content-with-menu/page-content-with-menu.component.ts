@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
-import { SideBarMenu } from "./side-bar-menu/side-bar-menu";
+import { SideBarMenuComponent } from "./side-bar-menu/side-bar-menu.component";
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-page-content-with-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule, SideBarMenu],
-  templateUrl: './page-content-with-menu.html',
-  styleUrl: './page-content-with-menu.scss'
+  imports: [CommonModule, RouterModule, SideBarMenuComponent],
+  templateUrl: './page-content-with-menu.component.html',
+  styleUrl: './page-content-with-menu.component.scss'
 })
-export class PageContentWithMenu {
+export class PageContentWithMenuComponent {
   isMenuOpen: boolean = true;
 
   constructor(

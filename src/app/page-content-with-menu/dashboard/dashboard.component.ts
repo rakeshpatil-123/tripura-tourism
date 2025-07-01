@@ -12,10 +12,10 @@ interface ChartData {
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.scss']
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
-export class Dashboard {
+export class DashboardComponent {
 
   @Input() title: string = 'Application Status (Count)';
   @Input() data: ChartData[] = [];
