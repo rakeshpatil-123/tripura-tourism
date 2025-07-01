@@ -19,16 +19,11 @@ interface DonutData {
 
 
 @Component({
-
   selector: 'app-donut-chart',
-
   standalone: true,
-
   imports: [CommonModule],
-
   templateUrl: './donut-chart.component.html',
-
-  styleUrls: ['./donut-chart.component.css']
+  styleUrls: ['./donut-chart.component.scss']
 })
 
 export class DonutChartComponent implements OnInit {
