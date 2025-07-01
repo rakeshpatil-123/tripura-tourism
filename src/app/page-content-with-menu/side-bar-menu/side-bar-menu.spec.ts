@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SideBarMenu } from './side-bar-menu';
+import { SideBarMenu } from './side-bar-menu.component';
 
 describe('SideBarMenu', () => {
   let component: SideBarMenu;
@@ -10,7 +10,7 @@ describe('SideBarMenu', () => {
     await TestBed.configureTestingModule({
       imports: [SideBarMenu]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(SideBarMenu);
     component = fixture.componentInstance;
