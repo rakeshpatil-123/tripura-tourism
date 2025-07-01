@@ -1,0 +1,149 @@
+.claim-status-table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      overflow-x: auto; 
+    }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+    }
+    .table-title {
+      font-size: 18px; 
+      font-weight: 600;
+      color: #212529;
+      margin: 0;
+    }
+    .export-button {
+      background-color: #e9ecef;
+      color: #495057;
+      border: 1px solid #ced4da;
+      padding: 8px 16px; 
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px; 
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      flex-shrink: 0; 
+    }
+    .export-button:hover {
+      background-color: #dee2e6;
+      border-color: #adb5bd;
+    }
+    
+    .table-responsive-wrapper {
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch; 
+    }
+    table {
+      width: 100%;
+      min-width: 600px; 
+      border-collapse: collapse;
+      margin-top: 0; 
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 16px; 
+      border-bottom: 1px solid #e9ecef;
+      font-size: 14px; 
+      color: #495057;
+      white-space: nowrap; 
+    }
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #212529;
+      text-transform: uppercase;
+      font-size: 12px; 
+    }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .action-button {
+      background: none;
+      border: none;
+      color: #6c757d;
+      font-size: 16px; 
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+    .action-button:hover {
+      background-color: #e9ecef;
+    }
+    
+    
+    
+    @media (max-width: 768px) {
+      .claim-status-table-container {
+        padding: 16px; 
+      }
+      .table-header {
+        flex-direction: column; 
+        align-items: flex-start; 
+        margin-bottom: 16px; 
+      }
+      .table-title {
+        font-size: 16px; 
+      }
+      .export-button {
+        padding: 6px 12px; 
+        font-size: 13px; 
+        width: 100%; 
+        justify-content: center; 
+      }
+      
+      
+      table {
+        min-width: 500px; 
+      }
+      th, td {
+        padding: 10px 12px; 
+        font-size: 13px; 
+      }
+      th {
+        font-size: 11px; 
+      }
+      .action-button {
+        font-size: 14px; 
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .claim-status-table-container {
+        padding: 12px;
+      }
+      .table-header {
+        margin-bottom: 12px;
+      }
+      .table-title {
+        font-size: 14px;
+      }
+      .export-button {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+      table {
+        min-width: 400px; 
+      }
+      th, td {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      th {
+        font-size: 10px;
+      }
+      .action-button {
+        font-size: 12px;
+      }
+    }

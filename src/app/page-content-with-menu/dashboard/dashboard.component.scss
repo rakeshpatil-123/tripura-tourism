@@ -1,161 +1,109 @@
-.chart-container {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e9ecef;
-    height: 100%; 
-    display: flex;
-    flex-direction: column;
-  }
-
-  .chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-
-  .chart-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #212529;
-  }
-
-  .chart-legend {
-    display: flex;
-    gap: 20px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .legend-color {
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
-  }
-
-  .legend-color--approved {
-    background: #0d6efd;
-  }
-
-  .legend-color--rejected {
-    background: #fd7e14;
-  }
-
-  .legend-label {
-    font-size: 14px;
-    color: #6c757d;
-  }
-
-  .chart-content {
-    flex-grow: 1;
-    display: flex;
-    padding-bottom: 20px;
-  }
-
-  .chart-y-axis {
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: space-between;
-    margin-right: 16px;
-    width: 30px;
-    padding-bottom: 20px;
-  }
-
-  .y-axis-label {
-    font-size: 12px;
-    color: #6c757d;
-    text-align: right;
-  }
-
-  .chart-bars {
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    border-left: 2px solid #e9ecef;
-    border-bottom: 2px solid #e9ecef;
-    padding: 0 16px;
-    position: relative;
-  }
-
-  .bar-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    max-width: 80px;
-  }
-
-  .bar-container {
-    display: flex;
-    align-items: flex-end;
-    gap: 4px;
-    height: 100%;
-    margin-bottom: 12px;
-  }
-
-  .bar {
-    width: 24px;
-    border-radius: 4px 4px 0 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    position: relative;
-    min-height: 0;
-    transition: all 0.3s ease;
-  }
-
-  .bar:hover {
-    transform: translateY(-2px);
-    opacity: 0.8;
-  }
-
-  .bar--approved {
-    background: #0d6efd;
-  }
-
-  .bar--rejected {
-    background: #fd7e14;
-  }
-
-  .bar-value {
-    position: absolute;
-    top: -20px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #212529;
-  }
-
-  .bar-label {
-    font-size: 12px;
-    color: #6c757d;
-    text-align: center;
-    font-weight: 500;
-  }
-
-  /**  examples 
- * 
- *  barChartData = [
-    { label: 'CFO', approved: 3.5, rejected: 1 },
-    { label: 'CTO', approved: 5, rejected: 0 },
-    { label: 'Panchayat', approved: 0, rejected: 1 },
-    { label: 'Electrical', approved: 0, rejected: 0 },
-    { label: 'Other', approved: 2.5, rejected: 0 }
-  ];
-
-
-  .bar-chart-item app-bar-chart {
-      height: 100%;
+ .dashboard-container {
+      padding: 24px;
+      background-color: #f8f9fa; 
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif; 
+    }
+    .dashboard-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #212529;
+      margin-bottom: 32px;
+    }
+    .stats-cards-grid {
+      display: grid;
+      /* Default: Auto-fit columns, min 250px, max 1fr for wider screens */
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr; 
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .bar-chart-item app-bar-chart {
+      height: 100%; 
       display: flex;
       flex-direction: column;
     }
-
- * 
- */
+    .donut-chart-item app-donut-chart {
+      height: 100%; 
+      display: flex;
+      flex-direction: column;
+    }
+    
+    app-claim-status-table,
+    app-clarification-required-table {
+        display: block; 
+        margin-bottom: 32px;
+    }
+    /* --------------------------------------------------- */
+    /* Mobile Responsiveness */
+    
+    /* Adjust styles for screens smaller than 992px (typical laptop/larger tablet breakpoint) */
+    @media (max-width: 992px) {
+      .charts-grid {
+        grid-template-columns: 1fr; /* Stack charts vertically on smaller laptops/tablets */
+        gap: 20px;
+      }
+    }
+    /* Adjust styles for screens smaller than 768px (typical tablet breakpoint) */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 16px; /* Reduced padding for container */
+      }
+      .dashboard-header h1 {
+        font-size: 24px; /* Smaller font size for header */
+        margin-bottom: 24px;
+      }
+      .stats-cards-grid {
+        /* Adjust min-width for cards to potentially show 2 per row on tablets */
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      
+      .charts-grid {
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      app-claim-status-table,
+      app-clarification-required-table {
+          margin-bottom: 24px;
+      }
+    }
+    /* Further adjustments for smaller tablets / larger phones (e.g., max-width: 576px) */
+    @media (max-width: 576px) {
+      .stats-cards-grid {
+        /* Allow for smaller card sizes, potentially 2-3 per row if space permits */
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+    }
+    /* Further adjustments for very small screens (e.g., mobile phones, max-width: 480px) */
+    @media (max-width: 480px) {
+      .dashboard-container {
+        padding: 12px; /* Even smaller padding */
+      }
+      .dashboard-header h1 {
+        font-size: 20px; /* Even smaller font size for header */
+        margin-bottom: 16px;
+      }
+      .stats-cards-grid {
+        grid-template-columns: 1fr; /* Stack stats cards on top of each other */
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      
+      .charts-grid {
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      app-claim-status-table,
+      app-clarification-required-table {
+          margin-bottom: 16px;
+      }
+    }
