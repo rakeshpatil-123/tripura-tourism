@@ -1,59 +1,60 @@
-import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
-interface ChartData {
-  label: string;
-  approved: number;
-  rejected: number;
-}
+import { BarChartComponent } from './bar-chart/bar-chart.component';
+import { ClarificationRequiredTableComponent } from './cartification-required-table/certification-required-table.component';
+import { ClaimStatusTableComponent } from './claim-status-table/claim-status-table.component';
+import { DonutChartComponent } from './donut-chart/donut-chart.component';
+import { StatsCardComponent } from './stats-card/stats-card.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule, 
+    StatsCardComponent, 
+    BarChartComponent, 
+    DonutChartComponent,
+    ClaimStatusTableComponent, 
+    ClarificationRequiredTableComponent 
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
+  barChartData = [
+    { label: 'CFO', approved: 3.5, rejected: 1 },
+    { label: 'CTO', approved: 5, rejected: 0 },
+    { label: 'Panchayat', approved: 0, rejected: 1 },
+    { label: 'Electrical', approved: 0, rejected: 0 },
+    { label: 'Other', approved: 2.5, rejected: 0 }
+  ];
 
-  @Input() title: string = 'Application Status (Count)';
-  @Input() data: ChartData[] = [];
+  donutChartData = [
+    { label: 'Approved', value: 86, color: '#198754' }, 
+    { label: 'Pending', value: 28, color: '#ffc107' }, 
+    { label: 'Rejected', value: 10, color: '#dc3545' }  
+  ];
 
-  yAxisTicks: number[] = [];
-  maxValue: number = 0;
+  claimStatusData = [
+    { type: 'Proforma I', submitted: 0, approved: 0, received: 0, pending: 0 },
+    { type: 'Proforma II', submitted: 0, approved: 0, received: 0, pending: 0 },
+    { type: 'Proforma III', submitted: 0, approved: 0, received: 0, pending: 0 }
+  ];
 
-  ngOnInit() {
-    this.calculateMaxValue();
-    this.generateYAxisTicks();
-  }
-
-  ngOnChanges() {
-
-    this.calculateMaxValue();
-    this.generateYAxisTicks();
-  }
-
-  private calculateMaxValue() {
-    const allValues = this.data.flatMap(item => [item.approved, item.rejected]);
-    this.maxValue = Math.max(...allValues, 5);
-  }
-
-  private generateYAxisTicks() {
-    const tickCount = 6;
-    const maxVal = Math.ceil(this.maxValue / 0.5) * 0.5;
-    const step = maxVal / (tickCount - 1);
-    this.yAxisTicks = Array.from({ length: tickCount }, (_, i) =>
-      parseFloat((i * step).toFixed(1))
-    );
-  }
-
-  getBarHeight(value: number): number {
-    if (this.maxValue === 0) return 0;
-    return (value / this.maxValue) * 100;
-  }
-
+  clarificationRequiredData = [
+    { 
+      applicationId: 'CFO-SA-000111', 
+      department: 'Electrical Inspectorate', 
+      noc: 'Application for NOC from Electrical Inspectorate', 
+      clarification: '', 
+      isDocumentMissing: true 
+    },
+    { 
+      applicationId: 'PFR-94-000187', 
+      department: 'Partnership Firm Registration (L & C)', 
+      noc: 'Application for Partnership Firm Registration', 
+      clarification: 'Kindly upload all the documents properly as mentioned in the portal.', 
+      isDocumentMissing: false 
+    }
+  ];
 }
-
-
-

@@ -6,10 +6,11 @@ import { LoaderComponent } from './page-template/loader/loader.component';
 import { FooterComponent } from './page-template/footer/footer.component';
 import { LoaderService } from './_service/loader/loader.service';
 import { ExternalServicesRedirectionTrackingComponent } from './page-content-with-menu/external-services-redirection-tracking/external-services-redirection-tracking.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, LoaderComponent, FooterComponent],
+  imports: [CommonModule,RouterOutlet, HeaderComponent, LoaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

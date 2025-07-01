@@ -1,0 +1,230 @@
+
+    .chart-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      height: 100%; 
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px; 
+      flex-wrap: wrap; 
+    }
+    .chart-title {
+      margin: 0;
+      font-size: 18px; 
+      font-weight: 600;
+      color: #212529;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 20px; 
+      flex-wrap: wrap; 
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+    }
+    .legend-color--approved {
+      background: #0d6efd;
+    }
+    .legend-color--rejected {
+      background: #fd7e14;
+    }
+    .legend-label {
+      font-size: 14px; 
+      color: #6c757d;
+    }
+    .chart-content {
+      flex-grow: 1;
+      display: flex;
+      padding-bottom: 20px;
+    }
+    .chart-y-axis {
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: space-between;
+      margin-right: 16px; 
+      width: 30px; 
+      padding-bottom: 20px;
+      flex-shrink: 0; 
+    }
+    .y-axis-label {
+      font-size: 12px; 
+      color: #6c757d;
+      text-align: right;
+    }
+    .chart-bars {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      border-left: 2px solid #e9ecef;
+      border-bottom: 2px solid #e9ecef;
+      padding: 0 16px; 
+      position: relative;
+    }
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 80px; 
+      min-width: 30px; 
+    }
+    .bar-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 100%;
+      margin-bottom: 12px;
+    }
+    .bar {
+      width: 24px; 
+      border-radius: 4px 4px 0 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      position: relative;
+      min-height: 0;
+      transition: all 0.3s ease;
+    }
+    .bar:hover {
+      transform: translateY(-2px);
+      opacity: 0.8;
+    }
+    .bar--approved {
+      background: #0d6efd;
+    }
+    .bar--rejected {
+      background: #fd7e14;
+    }
+    .bar-value {
+      position: absolute;
+      top: -20px; 
+      font-size: 12px; 
+      font-weight: 600;
+      color: #212529;
+      white-space: nowrap; 
+    }
+    .bar-label {
+      font-size: 12px; 
+      color: #6c757d;
+      text-align: center;
+      font-weight: 500;
+      word-break: break-word; 
+    }
+    
+    
+    
+    @media (max-width: 768px) {
+      .chart-container {
+        padding: 16px; 
+      }
+      .chart-header {
+        flex-direction: column; 
+        align-items: flex-start; 
+        margin-bottom: 16px; 
+        gap: 10px; 
+      }
+      .chart-title {
+        font-size: 16px; 
+      }
+      .chart-legend {
+        gap: 12px; 
+      }
+      .legend-label {
+        font-size: 13px; 
+      }
+      .chart-y-axis {
+        margin-right: 10px; 
+        width: 25px; 
+      }
+      .y-axis-label {
+        font-size: 10px; 
+      }
+      .chart-bars {
+        padding: 0 8px; 
+      }
+      .bar-group {
+        max-width: 60px; 
+        min-width: 25px; 
+      }
+      .bar {
+        width: 18px; 
+      }
+      .bar-value {
+        font-size: 10px; 
+        top: -18px; 
+      }
+      .bar-label {
+        font-size: 11px; 
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .chart-container {
+        padding: 12px;
+      }
+      .chart-header {
+        margin-bottom: 12px;
+      }
+      .chart-title {
+        font-size: 14px;
+      }
+      .chart-legend {
+        gap: 8px;
+        justify-content: center; 
+        width: 100%; 
+      }
+      .legend-item {
+        gap: 6px;
+      }
+      .legend-color {
+        width: 14px;
+        height: 14px;
+      }
+      .legend-label {
+        font-size: 12px;
+      }
+      .chart-y-axis {
+        margin-right: 5px;
+        width: 20px;
+        padding-bottom: 15px; 
+      }
+      .y-axis-label {
+        font-size: 9px;
+      }
+      .chart-bars {
+        padding: 0 4px;
+      }
+      .bar-group {
+        max-width: 45px; 
+        min-width: 20px; 
+      }
+      .bar {
+        width: 14px; 
+      }
+      .bar-container {
+        gap: 2px; 
+      }
+      .bar-value {
+        font-size: 9px;
+        top: -15px;
+      }
+      .bar-label {
+        font-size: 10px;
+      }
+    }
