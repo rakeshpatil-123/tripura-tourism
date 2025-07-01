@@ -1,0 +1,73 @@
+<div class="donut-chart-container">
+
+      <div class="chart-header">
+
+        <h4 class="chart-title">{{ title }}</h4>
+
+      </div>
+
+      <div class="donut-chart-content">
+
+        <div class="donut-chart-wrapper">
+
+          <svg class="donut-chart" [attr.width]="size" [attr.height]="size" [attr.viewBox]="'0 0 ' + size + ' ' + size">
+
+            <g [attr.transform]="'translate(' + (size/2) + ',' + (size/2) + ')'">
+
+              <path *ngFor="let segment of segments; trackBy: trackByIndex"
+
+                    [attr.d]="segment.path"
+
+                    [attr.fill]="segment.color"
+
+                    [attr.stroke]="'white'"
+
+                    [attr.stroke-width]="2"
+
+                    class="donut-segment"
+
+                    (mouseenter)="onSegmentHover(segment)"
+
+                    (mouseleave)="onSegmentLeave()">
+
+              </path>
+
+            </g>
+
+          </svg>
+
+          <div class="donut-center">
+
+            <div class="donut-total">{{ total }}</div>
+
+            <div class="donut-total-label">Total</div>
+
+          </div>
+
+        </div>
+
+        <div class="donut-legend">
+
+          <div *ngFor="let item of data; trackBy: trackByLabel" 
+
+               class="legend-item"
+
+               [class.legend-item--active]="hoveredItem === item.label">
+
+            <div class="legend-color" [style.background-color]="item.color"></div>
+
+            <div class="legend-content">
+
+              <div class="legend-label">{{ item.label }}</div>
+
+              <div class="legend-value">{{ getPercentage(item.value) }}%</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>

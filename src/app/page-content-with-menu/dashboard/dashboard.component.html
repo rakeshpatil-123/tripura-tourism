@@ -1,33 +1,21 @@
-<div class="chart-container">
-    <div class="chart-header">
-        <h4 class="chart-title">{{ title }}</h4>
-        <div class="chart-legend">
-            <div class="legend-item">
-                <span class="legend-color legend-color--approved"></span>
-                <span class="legend-label">Approved</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color legend-color--rejected"></span>
-                <span class="legend-label">Rejected</span>
-            </div>
+<div class="dashboard-container">
+      <div class="dashboard-header">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="stats-cards-grid">
+        <app-stats-card title="Total Applications" value="124" type="total" iconClass="fas fa-file-alt"></app-stats-card>
+        <app-stats-card title="Approved" value="86" type="approved" iconClass="fas fa-check-circle"></app-stats-card>
+        <app-stats-card title="Pending" value="28" type="pending" iconClass="fas fa-hourglass-half"></app-stats-card>
+        <app-stats-card title="Rejected" value="10" type="rejected" iconClass="fas fa-times-circle"></app-stats-card>
+      </div>
+      <div class="charts-grid">
+        <div class="bar-chart-item">
+          <app-bar-chart [data]="barChartData"></app-bar-chart>
         </div>
+        <div class="chart-item donut-chart-item">
+          <app-donut-chart [data]="donutChartData"></app-donut-chart>
+        </div>
+      </div>
+      <app-claim-status-table [data]="claimStatusData"></app-claim-status-table>
+      <app-clarification-required-table [data]="clarificationRequiredData"></app-clarification-required-table>
     </div>
-    <div class="chart-content">
-        <div class="chart-y-axis">
-            <div class="y-axis-label" *ngFor="let tick of yAxisTicks">{{ tick }}</div>
-        </div>
-        <div class="chart-bars">
-            <div class="bar-group" *ngFor="let item of data">
-                <div class="bar-container">
-                    <div class="bar bar--approved" [style.height.%]="getBarHeight(item.approved)">
-                        <span class="bar-value" *ngIf="item.approved > 0">{{ item.approved }}</span>
-                    </div>
-                    <div class="bar bar--rejected" [style.height.%]="getBarHeight(item.rejected)">
-                        <span class="bar-value" *ngIf="item.rejected > 0">{{ item.rejected }}</span>
-                    </div>
-                </div>
-                <div class="bar-label">{{ item.label }}</div>
-            </div>
-        </div>
-    </div>
-</div>

@@ -48,3 +48,171 @@
   app-page-content-with-menu .footer-height {
     min-height: 377px !important;
   }
+
+
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.css');
+:root {
+  /* Base Colors */
+  --color-primary-bg: hsl(0, 0%, 100%); // #ffffff - Main white background
+  --color-card-bg: hsl(0, 0%, 100%); // #ffffff - Card background
+  --color-surface: hsl(0, 0%, 98%); // #fafafa - Light surface for subtle sections
+
+  /* Brand & Accent Colors (Deep Red Theme) */
+  --color-brand-primary: hsl(348, 99%, 33%); // Deep red for primary actions
+  --color-brand-secondary: hsl(348, 85%, 45%); // Medium red for secondary elements
+  --color-brand-accent: hsl(348, 100%, 40%); // Vibrant red for highlights
+  --color-brand-light: hsl(348, 100%, 95%); // Very light pink for hover states
+  --color-brand-dark: hsl(348, 99%, 25%); // Darker red for pressed states
+
+  /* Complementary Colors (Teal accents) */
+  --color-complementary-primary: hsl(168, 99%, 33%); // Complementary teal-green
+  --color-complementary-secondary: hsl(168, 85%, 45%); // Medium teal
+  --color-complementary-light: hsl(168, 100%, 95%); // Light teal background
+
+  /* Semantic Colors */
+  --color-success: hsl(142, 76%, 45%); // Green for success states
+  --color-warning: hsl(45, 100%, 55%); // Amber for warnings
+  --color-error: hsl(348, 99%, 33%); // Using brand red for errors
+  --color-info: hsl(200, 100%, 50%); // Cyan for information
+
+  /* Text Colors */
+  --color-text-primary: hsl(0, 0%, 13%); // Near black for main text
+  --color-text-secondary: hsl(0, 0%, 40%); // Medium gray for secondary text
+  --color-text-muted: hsl(0, 0%, 60%); // Light gray for muted text
+  --color-text-inverse: hsl(0, 0%, 100%); // White text for dark backgrounds
+  --color-text-link: hsl(348, 99%, 33%); // Red for links
+  --color-text-link-hover: hsl(348, 99%, 25%); // Darker red for link hover
+
+  /* Button Colors */
+  /* Primary Button (Red) */
+  --color-btn-primary-bg: hsl(348, 99%, 33%);
+  --color-btn-primary-hover: hsl(348, 99%, 25%);
+  --color-btn-primary-active: hsl(348, 99%, 20%);
+  --color-btn-primary-text: hsl(0, 0%, 100%);
+
+  /* Secondary Button (White with Red border) */
+  --color-btn-secondary-bg: hsl(0, 0%, 100%);
+  --color-btn-secondary-hover: hsl(348, 100%, 98%);
+  --color-btn-secondary-active: hsl(348, 100%, 95%);
+  --color-btn-secondary-text: hsl(348, 99%, 33%);
+  --color-btn-secondary-border: hsl(348, 99%, 33%);
+
+  /* Outline Button */
+  --color-btn-outline-bg: transparent;
+  --color-btn-outline-hover: hsl(348, 100%, 98%);
+  --color-btn-outline-active: hsl(348, 100%, 95%);
+  --color-btn-outline-text: hsl(348, 99%, 33%);
+  --color-btn-outline-border: hsl(348, 99%, 33%);
+
+  /* Ghost Button */
+  --color-btn-ghost-bg: transparent;
+  --color-btn-ghost-hover: hsl(348, 100%, 98%);
+  --color-btn-ghost-active: hsl(348, 100%, 95%);
+  --color-btn-ghost-text: hsl(348, 99%, 33%);
+
+  /* Danger Button (Same as primary for consistency) */
+  --color-btn-danger-bg: hsl(348, 99%, 33%);
+  --color-btn-danger-hover: hsl(348, 99%, 25%);
+  --color-btn-danger-active: hsl(348, 99%, 20%);
+  --color-btn-danger-text: hsl(0, 0%, 100%);
+
+  /* Border Colors */
+  --color-border-light: hsl(0, 0%, 90%); // Light gray borders
+  --color-border-medium: hsl(0, 0%, 80%); // Medium gray borders
+  --color-border-dark: hsl(0, 0%, 70%); // Dark gray borders
+  --color-border-focus: hsl(348, 99%, 33%); // Red focus ring color
+
+  /* Form Colors */
+  --color-form-input-bg: hsl(0, 0%, 100%);
+  --color-form-input-border: hsl(0, 0%, 85%);
+  --color-form-input-border-hover: hsl(0, 0%, 75%);
+  --color-form-input-border-focus: hsl(348, 99%, 33%);
+  --color-form-input-text: hsl(0, 0%, 13%);
+  --color-form-input-placeholder: hsl(0, 0%, 60%);
+
+  /* Form Validation States */
+  --color-form-input-success: hsl(142, 76%, 45%);
+  --color-form-input-warning: hsl(45, 100%, 55%);
+  --color-form-input-error: hsl(348, 99%, 33%);
+
+  /* Navigation Colors */
+  --color-nav-bg: hsl(0, 0%, 100%);
+  --color-nav-border: hsl(0, 0%, 90%);
+  --color-nav-link-text: hsl(0, 0%, 40%);
+  --color-nav-link-hover: hsl(348, 99%, 33%);
+  --color-nav-link-active: hsl(348, 99%, 33%);
+  --color-nav-link-active-bg: hsl(348, 100%, 97%);
+
+  /* Table Colors */
+  --color-table-header-bg: hsl(0, 0%, 98%);
+  --color-table-header-text: hsl(0, 0%, 13%);
+  --color-table-row-even: hsl(0, 0%, 100%);
+  --color-table-row-odd: hsl(0, 0%, 99%);
+  --color-table-row-hover: hsl(348, 100%, 98%);
+  --color-table-border: hsl(0, 0%, 90%);
+
+  /* Status Colors */
+  --color-status-online: hsl(142, 76%, 45%);
+  --color-status-pending: hsl(45, 100%, 55%);
+  --color-status-offline: hsl(0, 0%, 60%);
+  --color-status-draft: hsl(348, 99%, 33%);
+
+  /* Shadow Colors */
+  --shadow-light: hsla(0, 0%, 0%, 0.05);
+  --shadow-medium: hsla(0, 0%, 0%, 0.1);
+  --shadow-dark: hsla(0, 0%, 0%, 0.15);
+  --shadow-focus: hsla(348, 99%, 33%, 0.25);
+
+  /* Overlay Colors */
+  --color-overlay-light: hsla(0, 0%, 0%, 0.3);
+  --color-overlay-medium: hsla(0, 0%, 0%, 0.5);
+  --color-overlay-dark: hsla(0, 0%, 0%, 0.7);
+
+  /* Notification Colors */
+  --color-notification-success-bg: hsl(142, 76%, 95%);
+  --color-notification-success-border: hsl(142, 76%, 45%);
+  --color-notification-success-text: hsl(142, 76%, 30%);
+
+  --color-notification-warning-bg: hsl(45, 100%, 95%);
+  --color-notification-warning-border: hsl(45, 100%, 55%);
+  --color-notification-warning-text: hsl(45, 100%, 35%);
+
+  --color-notification-error-bg: hsl(348, 100%, 95%);
+  --color-notification-error-border: hsl(348, 99%, 33%);
+  --color-notification-error-text: hsl(348, 99%, 25%);
+
+  --color-notification-info-bg: hsl(200, 100%, 95%);
+  --color-notification-info-border: hsl(200, 100%, 50%);
+  --color-notification-info-text: hsl(200, 100%, 35%);
+
+  /* Utility Colors */
+  --color-utility-disabled: hsl(0, 0%, 85%);
+  --color-utility-disabled-text: hsl(0, 0%, 60%);
+  --color-utility-backdrop: hsla(0, 0%, 0%, 0.4);
+  --color-utility-selection: hsla(348, 99%, 33%, 0.2);
+
+  /* Additional Red Theme Variants */
+  --color-red-50: hsl(348, 100%, 97%);
+  --color-red-100: hsl(348, 100%, 95%);
+  --color-red-200: hsl(348, 96%, 89%);
+  --color-red-300: hsl(348, 94%, 80%);
+  --color-red-400: hsl(348, 91%, 69%);
+  --color-red-500: hsl(348, 85%, 55%);
+  --color-red-600: hsl(348, 99%, 33%); // Your main color
+  --color-red-700: hsl(348, 99%, 25%);
+  --color-red-800: hsl(348, 99%, 20%);
+  --color-red-900: hsl(348, 99%, 15%);
+
+  /* Gray Scale */
+  --color-gray-50: hsl(0, 0%, 98%);
+  --color-gray-100: hsl(0, 0%, 95%);
+  --color-gray-200: hsl(0, 0%, 90%);
+  --color-gray-300: hsl(0, 0%, 80%);
+  --color-gray-400: hsl(0, 0%, 70%);
+  --color-gray-500: hsl(0, 0%, 60%);
+  --color-gray-600: hsl(0, 0%, 40%);
+  --color-gray-700: hsl(0, 0%, 30%);
+  --color-gray-800: hsl(0, 0%, 20%);
+  --color-gray-900: hsl(0, 0%, 13%);
+}

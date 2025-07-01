@@ -1,0 +1,139 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+  transition: all 250ms ease;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(66, 111, 243, 0.2);
+  }
+
+  // Sizes
+  &--small {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  &--medium {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  &--large {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  &--full-width {
+    width: 100%;
+  }
+
+  // Primary Button
+  &--primary {
+    background-color: var(--button-primary-bg, hsl(220, 85%, 52%));
+    color: var(--button-primary-text, hsl(0, 0%, 100%));
+    border-color: var(--button-primary-bg, hsl(220, 85%, 52%));
+
+    &:hover:not(.btn--disabled) {
+      background-color: var(--button-primary-hover, hsl(220, 85%, 45%));
+      border-color: var(--button-primary-hover, hsl(220, 85%, 45%));
+    }
+
+    &:active:not(.btn--disabled) {
+      background-color: var(--button-primary-active, hsl(220, 85%, 40%));
+      border-color: var(--button-primary-active, hsl(220, 85%, 40%));
+    }
+  }
+
+  // Secondary Button
+  &--secondary {
+    background-color: var(--button-secondary-bg, hsl(220, 25%, 98%));
+    color: var(--button-secondary-text, hsl(220, 85%, 52%));
+    border-color: var(--button-secondary-border, hsl(220, 85%, 52%));
+
+    &:hover:not(.btn--disabled) {
+      background-color: var(--button-secondary-hover, hsl(220, 25%, 94%));
+    }
+
+    &:active:not(.btn--disabled) {
+      background-color: var(--button-secondary-active, hsl(220, 25%, 88%));
+    }
+  }
+
+  // Outline Button
+  &--outline {
+    background-color: var(--button-outline-bg, transparent);
+    color: var(--button-outline-text, hsl(220, 85%, 52%));
+    border-color: var(--button-outline-border, hsl(220, 85%, 52%));
+
+    &:hover:not(.btn--disabled) {
+      background-color: var(--button-outline-hover, hsl(220, 100%, 98%));
+    }
+
+    &:active:not(.btn--disabled) {
+      background-color: var(--button-outline-active, hsl(220, 100%, 95%));
+    }
+  }
+
+  // Ghost Button
+  &--ghost {
+    background-color: var(--button-ghost-bg, transparent);
+    color: var(--button-ghost-text, hsl(220, 85%, 52%));
+    border-color: transparent;
+
+    &:hover:not(.btn--disabled) {
+      background-color: var(--button-ghost-hover, hsl(220, 100%, 98%));
+    }
+
+    &:active:not(.btn--disabled) {
+      background-color: var(--button-ghost-active, hsl(220, 100%, 95%));
+    }
+  }
+
+  // Danger Button
+  &--danger {
+    background-color: var(--button-danger-bg, hsl(0, 84%, 60%));
+    color: var(--button-danger-text, hsl(0, 0%, 100%));
+    border-color: var(--button-danger-bg, hsl(0, 84%, 60%));
+
+    &:hover:not(.btn--disabled) {
+      background-color: var(--button-danger-hover, hsl(0, 84%, 55%));
+      border-color: var(--button-danger-hover, hsl(0, 84%, 55%));
+    }
+
+    &:active:not(.btn--disabled) {
+      background-color: var(--button-danger-active, hsl(0, 84%, 50%));
+      border-color: var(--button-danger-active, hsl(0, 84%, 50%));
+    }
+  }
+
+  // Disabled state
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Icon spacing
+  i + span {
+    margin-left: 0.5rem;
+  }
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
