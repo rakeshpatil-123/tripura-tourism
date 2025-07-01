@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
-import { ClarificationRequiredTableComponent } from './cartification-required-table/certification-required-table.component';
+import { ClarificationRequiredTableComponent } from './certification-required-table/certification-required-table.component';
 import { ClaimStatusTableComponent } from './claim-status-table/claim-status-table.component';
 import { DonutChartComponent } from './donut-chart/donut-chart.component';
 import { StatsCardComponent } from './stats-card/stats-card.component';
@@ -10,12 +10,12 @@ import { StatsCardComponent } from './stats-card/stats-card.component';
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule, 
-    StatsCardComponent, 
-    BarChartComponent, 
+    CommonModule,
+    StatsCardComponent,
+    BarChartComponent,
     DonutChartComponent,
-    ClaimStatusTableComponent, 
-    ClarificationRequiredTableComponent 
+    ClaimStatusTableComponent,
+    ClarificationRequiredTableComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -30,9 +30,9 @@ export class DashboardComponent {
   ];
 
   donutChartData = [
-    { label: 'Approved', value: 86, color: '#198754' }, 
-    { label: 'Pending', value: 28, color: '#ffc107' }, 
-    { label: 'Rejected', value: 10, color: '#dc3545' }  
+    { label: 'Approved', value: 86, color: '#198754' },
+    { label: 'Pending', value: 28, color: '#ffc107' },
+    { label: 'Rejected', value: 10, color: '#dc3545' }
   ];
 
   claimStatusData = [
@@ -42,19 +42,19 @@ export class DashboardComponent {
   ];
 
   clarificationRequiredData = [
-    { 
-      applicationId: 'CFO-SA-000111', 
-      department: 'Electrical Inspectorate', 
-      noc: 'Application for NOC from Electrical Inspectorate', 
-      clarification: '', 
-      isDocumentMissing: true 
+    {
+      applicationId: 'CFO-SA-000111',
+      department: 'Electrical Inspectorate',
+      noc: 'Application for NOC from Electrical Inspectorate',
+      clarification: '',
+      isDocumentMissing: true
     },
-    { 
-      applicationId: 'PFR-94-000187', 
-      department: 'Partnership Firm Registration (L & C)', 
-      noc: 'Application for Partnership Firm Registration', 
-      clarification: 'Kindly upload all the documents properly as mentioned in the portal.', 
-      isDocumentMissing: false 
+    {
+      applicationId: 'PFR-94-000187',
+      department: 'Partnership Firm Registration (L & C)',
+      noc: 'Application for Partnership Firm Registration',
+      clarification: 'Kindly upload all the documents properly as mentioned in the portal.',
+      isDocumentMissing: false
     }
   ];
 }

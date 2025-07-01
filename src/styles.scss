@@ -216,3 +216,73 @@
   --color-gray-800: hsl(0, 0%, 20%);
   --color-gray-900: hsl(0, 0%, 13%);
 }
+
+
+
+
+
+
+
+//Old style
+
+
+// ***************** Side Menu Starts*********************
+.menu-toogle-height {
+  height: 35px;
+}
+
+.sidebar-container {
+  width: 5%;
+  transition: 0.5s;
+  background-color: #04578d;
+  min-height: 477px;
+}
+
+.sidebar-container.active {
+  width: 17%;
+  transition: 0.5s;
+  background-color: #04578d;
+}
+
+.sidebar-container .sidebar li a .nav-label,
+.sidebar-container .sidebar li a .nav-label-sub,
+.sidebar-container.active .sidebar li a i {
+  display: none !important;
+}
+
+.sidebar-container.active .sidebar li a .nav-label,
+.sidebar-container.active .sidebar li a .nav-label-sub,
+.sidebar-container .sidebar li a i {
+  display: inline-block !important;
+}
+
+.main-container {
+  width: 83%;
+  transition: 0.5s;
+}
+
+.main-container.active {
+  width: 95%;
+  transition: 0.5s;
+}
+
+.menu-toggle-control {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+.sidebar-container .sub-menu li a {
+  padding: 5px 10px !important;
+}
+
+.form-group {
+  margin-bottom: 1rem !important;
+}
+
+.mb-5 {
+  margin-bottom: 3rem !important;
+}
+
+// ****************** Side Menu End ********************
