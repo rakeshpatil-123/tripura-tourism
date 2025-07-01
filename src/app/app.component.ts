@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule,RouterOutlet, HeaderComponent, LoaderComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, LoaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -26,6 +26,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ) { }
   ngOnInit() {
     this.loaderSubscription = this.loaderService.getLoaderStatus().subscribe((status) => {
+      console.log('Loader status:', status); // Debug log
       this.showLoader = status;
       this.cdRef.detectChanges();
     });
