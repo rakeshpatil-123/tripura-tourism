@@ -19,6 +19,6 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
 
   ngOnInit() {
     this.loaderService.showLoader();
-    setTimeout(() => this.loaderService.hideLoader(), 2000);
+    setTimeout(() => this.loaderService.hideLoader(), 8000);
   }
 }
