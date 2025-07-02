@@ -5,7 +5,7 @@ import { ClarificationRequiredTableComponent } from './certification-required-ta
 import { ClaimStatusTableComponent } from './claim-status-table/claim-status-table.component';
 import { DonutChartComponent } from './donut-chart/donut-chart.component';
 import { StatsCardComponent } from './stats-card/stats-card.component';
-import { ButtonComponent } from "../../shared/component/button-component/button.component";
+import { ButtonComponent } from '../../shared/component/button-component/button.component';
 
 @Component({
   selector: 'app-dashboard',
