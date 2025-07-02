@@ -18,4 +18,9 @@
       </div>
       <app-claim-status-table [data]="claimStatusData"></app-claim-status-table>
       <app-clarification-required-table [data]="clarificationRequiredData"></app-clarification-required-table>
+      <div class="flex ">
+        <app-button [type]="'primary'" [size]="'small'" route="/">View All</app-button>
+        <app-button [type]="'danger'" [size]="'small'" >Delete All</app-button>
+        <app-button [type]="'ghost'" [size]="'small'" >ghost</app-button>
+      </div>
     </div>
