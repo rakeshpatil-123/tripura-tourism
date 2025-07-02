@@ -8,7 +8,4 @@ export const routes: Routes = [
             import('./page-content-with-menu/page-content-with-menu.routes')
                 .then(m => m.PAGE_CONTENT_WITH_MENU_ROUTES)
     },
-
-
-
 ];
