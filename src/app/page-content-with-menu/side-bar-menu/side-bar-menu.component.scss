@@ -1,54 +1,81 @@
-.sidebar{ 
-    background-color:#04578D;
-    transition: all 0.5s  ease-in-out;
+.sidebar { 
+  background-color: var(--color-primary-bg);
+  transition: all 0.5s ease-in-out;
 }
-.sidebar ul{ 
-    list-style:none;
-    margin:0px;
-    padding:0px;
+
+.sidebar ul { 
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
-.sidebar li a,.sidebar li a.collapsed.active{
-    display:block;
-    padding:10px 12px; color:#fff;
-    border-left:0px solid #dedede;
-    text-decoration:none;
-    cursor: pointer;
+
+.sidebar li a,
+.sidebar li a.collapsed.active {
+  display: block;
+  padding: 10px 12px;
+  color: var(--color-btn-primary-text); // white text color from your variables
+  border-left: 0 solid var(--color-border-light);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
 }
-.sub-menu li a, .sub-menu li a.collapsed.active {
-    display: block;
-    padding: 6px 12px;
+
+.sub-menu li a,
+.sub-menu li a.collapsed.active {
+  display: block;
+  padding: 6px 12px;
+  color: var(--color-btn-primary-text);
+  transition: all 0.5s ease-in-out;
 }
-.sidebar li a.active{
-    background-color:#f28b2f;
-    // border-left:5px solid #dedede;
-    transition: all 0.5s  ease-in-out;
+
+.sidebar li a.active {
+  background-color: var(--color-btn-secondary-bg); // #f28b2f equivalent from your variables
+  // border-left: 5px solid var(--color-border-light);
+  transition: all 0.5s ease-in-out;
 }
-.sidebar li a i{
-    padding-right:5px;
+
+.sidebar li a i {
+  padding-right: 5px;
+  color: var(--color-btn-primary-text);
 }
-.sidebar ul li .sub-menu li a{
-    position:relative;
-    font-size:80%;
-    font-weight: 400;
+
+.sidebar ul li .sub-menu li a {
+  position: relative;
+  font-size: 80%;
+  font-weight: 400;
+  color: var(--color-btn-primary-text);
 }
-.sidebar ul li .sub-menu li a:before{
-    border-left:2px solid #dedede; 
+
+.sidebar ul li .sub-menu li a:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-left: 2px solid var(--color-border-light);
 }
-.sidebar ul li .sub-menu li a:hover{
-    background-color:#04578D;
-    padding-left:20px;
-    transition: all 0.5s  ease-in-out
+
+.sidebar ul li .sub-menu li a:hover {
+  background-color: var(--color-primary-bg);
+  padding-left: 20px;
+  transition: all 0.5s ease-in-out;
 }
+
 .sidebar ul li .sub-menu li.active {
-    background-color: #4A667D;
-    border-left: 3px solid #f28b2f;
+  background-color: var(--color-btn-primary-bg); // #4A667D approximate replaced by primary button bg
+  border-left: 3px solid var(--color-btn-secondary-bg);
 }
+
 .sub-menu {
-    padding: 10px 8px !important;
+  padding: 10px 8px !important;
 }
-.sidebar li a .nav-label,.sidebar li a .nav-label+span{
-    transition: all 0.5s  ease-in-out;
+
+.sidebar li a .nav-label,
+.sidebar li a .nav-label + span {
+  transition: all 0.5s ease-in-out;
 }
+
 .fa.pull-right {
-    margin-top: .3em;
+  margin-top: 0.3em;
+  color: var(--color-btn-primary-text);
 }

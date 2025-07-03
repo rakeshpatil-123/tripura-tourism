@@ -1,1 +1,36 @@
 <p>header works!</p>
+<header class="app-header">
+  <div class="container">
+    <div class="header-wrapper">
+      <div class="brand">
+        <a href="#" class="logo">
+          <!-- You can replace the text with an image logo -->
+          <span class="logo-text">Brand</span>
+        </a>
+      </div>
+      
+      <!-- Mobile menu toggle button -->
+      <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen" aria-label="Toggle Navigation">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+      
+      <!-- Navigation menu -->
+      <nav class="nav-menu" [class.open]="isMenuOpen">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#" class="nav-link active">Home</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Services</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Projects</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Optional: Header actions (search, login, etc.) -->
+      <div class="header-actions">
+        <a href="#" class="action-button">Login</a>
+      </div>
+    </div>
+  </div>
+</header>
