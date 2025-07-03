@@ -12,7 +12,9 @@
           "/index.html",
           "/manifest.webmanifest",
           "/*.css",
-          "/*.js"
+          "/*.js",
+           "/shared/form-input/**",
+          "/customInputComponents/ilogi-input/**"
         ]
       }
     },

@@ -3,4 +3,14 @@
 
 <div class="container-fluid">
     <h2>Application Status</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="col-md-12 form-group-margin">
+            <app-ilogi-input type="text" [submitted]="submitted" maxlength="255" [readonly]="true" [mandatory]="true"
+                fieldLabel="Registration Certificate No." placeholder="Enter" fieldId="registrationCertificateNo"
+                [errorMessages]="errorMessages.registrationCertificateNo"
+                formControlName="registrationCertificateNo"></app-ilogi-input>
+        </div>
+        <button type="submit" [disabled]="loading">Submit</button>
+    </form>
 </div>
