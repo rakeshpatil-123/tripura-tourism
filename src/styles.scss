@@ -1,53 +1,3 @@
-.row {
-    display: flex;
-    flex-wrap: nowrap;
-    margin: 0;
-  }
-  
-  .sidebar-container {
-    width: 250px;
-    background-color: #04578D;
-    transition: width 0.3s ease; /* Animation for width change */
-    height: 100vh;
-    position: fixed; /* Prevents occupying row space */
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    overflow-y: auto;
-  }
-  
-  .sidebar-container.active {
-    width: 60px; /* Collapsed state */
-  }
-  
-  .main-container {
-    margin-left: 250px; /* Matches open sidebar width */
-    width: calc(100% - 250px);
-    transition: all 0.3s ease; /* Animation for margin and width */
-    padding: 10px;
-  }
-  
-  .main-container.active {
-    margin-left: 60px; /* Matches collapsed sidebar */
-    width: calc(100% - 60px);
-  }
-  
-  .menu-toogle-height {
-    padding: 10px 15px;
-  }
-  
-  .menu-toggle-control {
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #ffffff;
-  }
-  
-  .pull-right {
-    float: right;
-  }
-  app-page-content-with-menu .footer-height {
-    min-height: 377px !important;
-  }
 
 
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
@@ -219,31 +169,80 @@
 
 
 
-
-
-
-
-//Old style
-
-
-// ***************** Side Menu Starts*********************
-.menu-toogle-height {
-  height: 35px;
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  margin: 0;
 }
 
 .sidebar-container {
+  width: 250px;
+  background-color: var(--color-brand-primary);
+  transition: width 0.3s ease; /* Animation for width change */
+  height: 100vh;
+  position: fixed; /* Prevents occupying row space */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar-container.active {
+  width: 60px; /* Collapsed state */
+  background-color: var(--color-brand-primary);
+}
+
+.main-container {
+  margin-left: 250px; /* Matches open sidebar width */
+  width: calc(100% - 250px);
+  transition: all 0.3s ease; /* Animation for margin and width */
+  padding: 10px;
+  background-color: var(--color-primary-bg);
+  color: var(--color-text-primary);
+}
+
+.main-container.active {
+  margin-left: 60px; /* Matches collapsed sidebar */
+  width: calc(100% - 60px);
+}
+
+.menu-toogle-height {
+  padding: 10px 15px;
+  height: 35px;
+}
+
+.menu-toggle-control {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--color-text-inverse);
+  font-weight: 700;
+}
+
+.pull-right {
+  float: right;
+}
+
+app-page-content-with-menu .footer-height {
+  min-height: 377px !important;
+}
+
+/* Old style */
+
+/* ***************** Side Menu Starts********************* */
+.sidebar-container {
   width: 5%;
   transition: 0.5s;
-  background-color: #04578d;
+  background-color: var(--color-brand-primary);
   min-height: 477px;
 }
 
 .sidebar-container.active {
   width: 17%;
   transition: 0.5s;
-  background-color: #04578d;
+  background-color: var(--color-brand-primary);
 }
 
+/* Hide and show nav labels/icons */
 .sidebar-container .sidebar li a .nav-label,
 .sidebar-container .sidebar li a .nav-label-sub,
 .sidebar-container.active .sidebar li a i {
@@ -259,22 +258,27 @@
 .main-container {
   width: 83%;
   transition: 0.5s;
+  background-color: var(--color-primary-bg);
+  color: var(--color-text-primary);
 }
 
 .main-container.active {
   width: 95%;
   transition: 0.5s;
+  background-color: var(--color-primary-bg);
+  color: var(--color-text-primary);
 }
 
 .menu-toggle-control {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-inverse);
   cursor: pointer;
 }
 
 .sidebar-container .sub-menu li a {
   padding: 5px 10px !important;
+  color: var(--color-text-primary);
 }
 
 .form-group {
@@ -284,5 +288,3 @@
 .mb-5 {
   margin-bottom: 3rem !important;
 }
-
-// ****************** Side Menu End ********************

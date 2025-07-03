@@ -1,86 +1,86 @@
-section {
-  padding: 60px 0;
-
-  .section-title {
-    text-align: center;
-    color: #023d5b;
-    margin-bottom: 50px;
-    text-transform: uppercase;
-  }
-}
-
-#footer {
-  background: #023d5b !important;
-  color: #ffffff;
+.footer {
+  background-color: var(--color-red-900);
+  color: var(--color-text-inverse);
+  padding: 3rem 1rem;
+  font-size: 0.95rem;
 
   h5 {
-    padding-left: 10px;
-    border-left: 3px solid #eeeeee;
-    padding-bottom: 6px;
-    margin-bottom: 20px;
-    color: #ffffff;
+    color: var(--color-red-100);
+    font-weight: 600;
+    margin-bottom: 1rem;
   }
 
-  a {
-    color: #ffffff;
-    text-decoration: none !important;
-    background-color: transparent;
-  }
-
-  ul.social {
+  .quick-links {
     li {
-      padding: 3px 0;
+      margin-bottom: 0.5rem;
 
       a {
+        color: var(--color-text-inverse);
+        text-decoration: none;
+        transition: color 0.3s;
+
         i {
-          margin-right: 5px;
-          font-size: 25px;
-          transition: .5s all ease;
+          margin-right: 0.5rem;
+          color: var(--color-red-500);
         }
 
         &:hover {
+          color: var(--color-brand-light);
           i {
-            font-size: 30px;
-            margin-top: -10px;
+            color: var(--color-red-400);
           }
-          color: #eeeeee;
         }
       }
     }
   }
 
-  ul.quick-links {
+  .social {
+    padding: 0;
+    margin: 2rem 0;
+
     li {
-      padding: 3px 0;
-      transition: .5s all ease;
+      display: inline-block;
+      margin: 0 0.5rem;
 
       a {
-        i {
-          margin-right: 5px;
-        }
-      }
+        color: var(--color-red-200);
+        font-size: 1.25rem;
+        transition: color 0.3s;
 
-      &:hover {
-        margin-left: 5px;
-        font-weight: 700;
-
-        a {
-          i {
-            font-weight: 700;
-          }
+        &:hover {
+          color: var(--color-red-100);
         }
       }
     }
   }
-}
 
-@media (max-width: 767px) {
-  #footer {
-    h5 {
-      padding-left: 0;
-      border-left: transparent;
-      padding-bottom: 0px;
-      margin-bottom: 10px;
+  a {
+    color: var(--color-red-100);
+
+    &:hover {
+      text-decoration: underline;
+      color: var(--color-brand-accent);
+    }
+  }
+
+  .h6 {
+    margin-top: 0.5rem;
+    color: var(--color-red-300);
+    font-size: 0.9rem;
+  }
+
+  p {
+    margin: 0.5rem 0;
+    color: var(--color-red-200);
+  }
+
+  @media (max-width: 576px) {
+    .text-sm-start {
+      text-align: center !important;
+    }
+
+    .mb-4 {
+      margin-bottom: 2rem !important;
     }
   }
 }
