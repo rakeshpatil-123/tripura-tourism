@@ -1,14 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-side-bar-menu',
-  imports: [],
+  selector: 'app-sidebar',
   templateUrl: './side-bar-menu.component.html',
-  styleUrl: './side-bar-menu.component.scss'
+  styleUrls: ['./side-bar-menu.component.scss']
 })
-export class SideBarMenuComponent {
+export class SidebarComponent implements OnInit {
+  isSidebarOpen = false;
+  
+  constructor() { }
 
+  ngOnInit(): void {
+  }
 
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
-
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
+  }
 }

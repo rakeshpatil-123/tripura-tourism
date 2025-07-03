@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent implements OnInit, OnDestroy {
   protected title = 'swaagat_2';
-  showLoader: boolean = false;
+  showLoader: boolean = true;
   private loaderSubscription!: Subscription;
 
   constructor(

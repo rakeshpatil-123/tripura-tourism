@@ -26,6 +26,7 @@
 
         &:hover {
           color: var(--color-brand-light);
+
           i {
             color: var(--color-red-400);
           }
@@ -37,6 +38,7 @@
   .social {
     padding: 0;
     margin: 2rem 0;
+    text-align: center;
 
     li {
       display: inline-block;
@@ -74,13 +76,42 @@
     color: var(--color-red-200);
   }
 
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .footer-columns {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-column {
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+  }
+
   @media (max-width: 576px) {
+    padding: 2rem 1rem;
+
     .text-sm-start {
       text-align: center !important;
     }
 
     .mb-4 {
       margin-bottom: 2rem !important;
+    }
+
+    h5 {
+      font-size: 1.1rem;
+    }
+
+    .social {
+      margin: 1.5rem 0;
+
+      li {
+        margin: 0 0.25rem;
+      }
     }
   }
 }

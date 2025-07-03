@@ -166,12 +166,13 @@
   --color-gray-800: hsl(0, 0%, 20%);
   --color-gray-900: hsl(0, 0%, 13%);
 }
-
-
-
 .row {
   display: flex;
-  flex-wrap: nowrap;
+  // REMOVE flex-wrap: nowrap; here if you want content to wrap.
+  // If the intent is a purely horizontal layout for the sidebar and main content,
+  // then the issue is how widths are calculated, not wrapping.
+  // Given the mobile issue, removing or modifying this is key.
+  flex-wrap: wrap; // CHANGE: Allow content to wrap if needed, especially on smaller screens.
   margin: 0;
 }
 
@@ -180,7 +181,7 @@
   background-color: var(--color-brand-primary);
   transition: width 0.3s ease; /* Animation for width change */
   height: 100vh;
-  position: fixed; /* Prevents occupying row space */
+  position: fixed; /* Prevents occupying row space on desktop */
   top: 0;
   left: 0;
   z-index: 1000;
@@ -193,8 +194,8 @@
 }
 
 .main-container {
-  margin-left: 250px; /* Matches open sidebar width */
-  width: calc(100% - 250px);
+  margin-left: 250px; /* Matches open sidebar width for desktop */
+  width: calc(100% - 250px); /* Desktop calculation */
   transition: all 0.3s ease; /* Animation for margin and width */
   padding: 10px;
   background-color: var(--color-primary-bg);
@@ -202,33 +203,15 @@
 }
 
 .main-container.active {
-  margin-left: 60px; /* Matches collapsed sidebar */
-  width: calc(100% - 60px);
+  margin-left: 60px; /* Matches collapsed sidebar for desktop */
+  width: calc(100% - 60px); /* Desktop calculation */
 }
 
-.menu-toogle-height {
-  padding: 10px 15px;
-  height: 35px;
-}
+// ... other styles (menu-toggle-height, etc.)
 
-.menu-toggle-control {
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: var(--color-text-inverse);
-  font-weight: 700;
-}
-
-.pull-right {
-  float: right;
-}
-
-app-page-content-with-menu .footer-height {
-  min-height: 377px !important;
-}
-
-/* Old style */
-
+/* REMOVE OR COMMENT OUT THIS "Old style" block entirely. It's conflicting. */
 /* ***************** Side Menu Starts********************* */
+/*
 .sidebar-container {
   width: 5%;
   transition: 0.5s;
@@ -242,7 +225,7 @@ app-page-content-with-menu .footer-height {
   background-color: var(--color-brand-primary);
 }
 
-/* Hide and show nav labels/icons */
+// Hide and show nav labels/icons
 .sidebar-container .sidebar li a .nav-label,
 .sidebar-container .sidebar li a .nav-label-sub,
 .sidebar-container.active .sidebar li a i {
@@ -269,22 +252,72 @@ app-page-content-with-menu .footer-height {
   color: var(--color-text-primary);
 }
 
-.menu-toggle-control {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--color-text-inverse);
-  cursor: pointer;
-}
+// ... rest of old styles
+*/
 
-.sidebar-container .sub-menu li a {
-  padding: 5px 10px !important;
-  color: var(--color-text-primary);
-}
 
-.form-group {
-  margin-bottom: 1rem !important;
-}
+@media (max-width: 768px) {
+  .sidebar-container {
+    // These values from page-content-with-menu.scss are better for mobile
+    position: fixed;
+    top: 0;
+    left: -250px; /* Hidden initially */
+    height: 100vh;
+    z-index: 1050;
+    background-color: var(--color-primary-bg);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    width: 250px; /* Full width when open */
+    transition: left 0.3s ease; // Transition for sliding
+    // Ensure overflow-x: hidden is applied if not already on body/html
+    overflow-x: hidden; // Prevents horizontal scroll from sidebar itself
+  }
 
-.mb-5 {
-  margin-bottom: 3rem !important;
+  .sidebar-container.active {
+    left: 0; /* Slide in when active */
+  }
+
+  .main-container {
+    width: 100%; /* Main content always takes full width on mobile */
+    margin-left: 0; /* No margin from sidebar on mobile - crucial for off-canvas */
+    transition: margin 0.3s ease, width 0.3s ease; // Keep transition for smoother feel
+    padding-top: 70px; /* Example: To prevent content from going under a fixed header */
+  }
+
+  .main-container.active {
+    // On mobile, the main-container *does not* change its margin-left or width
+    // when the sidebar opens. The sidebar overlays it.
+    // So, remove or comment out these lines for mobile.
+    /* margin-left: 200px; */
+    /* width: calc(100% - 200px); */
+  }
+
+  // Ensure this is properly placed in your main layout or header
+  .menu-toggle-control {
+    display: block; // Make sure it's visible to toggle the menu
+    position: fixed; // Fixed position for easy access
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    background-color: var(--color-brand-primary);
+    padding: 8px;
+    border-radius: 5px;
+    color: var(--color-text-inverse); // Ensure it's visible
+  }
+
+  // Overlay when sidebar is open
+  body.menu-open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 1040; /* Below sidebar, above content */
+  }
+
+  // To prevent horizontal scrolling when the sidebar is open on mobile
+  body.menu-open {
+    overflow-x: hidden;
+  }
 }
