@@ -1,5 +1,6 @@
 <div class="form-group">
     <label *ngIf="fieldLabel" for="{{fieldId}}">{{fieldLabel}} <span *ngIf="mandatory" class="red-font">*</span></label>
+    <!-- Form validation errors -->
     <div *ngIf="submitted && errors" class="invalid-input" [id]="errorFieldId" [ngClass]="{ 'show-error': isHovered }">
         <ng-container *ngFor="let item of (errors || {} | keyvalue); let i = index">
             <div *ngIf="i === 0" class="error-msg-text">{{ errorMessages[item.key] || item.value?.message }}</div>
@@ -8,15 +9,29 @@
             <div *ngIf="errors['custom']?.status" class="error-msg-text">{{ errors['custom'].message }}</div>
         </ng-container>
     </div>
+    <!-- Date range validation error -->
+    <div *ngIf="dateRangeError" class="invalid-input">
+        <div class="error-msg-text">{{ dateRangeError }}</div>
+    </div>
     <div class="date-input-container">
-        <input matInput [matDatepicker]="picker" [value]="displayValue" (dateChange)="onDateChange($event.value)"
-            [placeholder]="placeholder" [id]="fieldId" [readonly]="readonly" (click)="picker.open()"
-            (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()"
+        <input matInput 
+            [matDatepicker]="picker" 
+            [value]="value"
+            (dateChange)="onDateChange($event.value)"
+            [placeholder]="placeholder" 
+            [id]="fieldId" 
+            [readonly]="readonly" 
+            (click)="picker.open()"
+            (mouseenter)="showErrorOnFieldHover()" 
+            (mouseleave)="hideErrorOnFieldHoverOut()"
             class="form-control date-input"
-            [ngClass]="{ 'is-invalid date-input-invalid': submitted && errors, 'date-input': !submitted || !errors }"
-            [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
-            [disabled]="isDisabled" />
+            [ngClass]="{ 'is-invalid date-input-invalid': (submitted && errors) || dateRangeError, 'date-input': !submitted || !errors }"
+            [attr.aria-invalid]="(submitted && errors) || dateRangeError ? 'true' : 'false'" 
+            [attr.aria-describedby]="errorFieldId"
+            [disabled]="isDisabled"
+            [min]="minDate"
+            [max]="maxDate" />
         <mat-icon matSuffix class="calendar-icon" (click)="picker.open()">calendar_today</mat-icon>
     </div>
-    <mat-datepicker #picker></mat-datepicker>
+    <mat-datepicker [startAt]="maxDate" class="date-picker" #picker></mat-datepicker>
 </div>
