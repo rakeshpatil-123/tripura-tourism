@@ -1,32 +1,85 @@
 .form-group {
-    margin-bottom: 1rem;
-  }
-  .form-control.date-input {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    background: rgba(233, 236, 239, 0.1);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    color: #333;
-    padding: 0.5rem;
-  }
-  .is-invalid.date-input-invalid {
-    border-color: #dc3545;
-  }
-  .invalid-input {
-    display: none;
-    color: #dc3545;
-    font-size: 0.875rem;
-  }
-  .invalid-input.show-error {
-    display: block;
-  }
-  .red-font {
-    color: #dc3545;
-  }
-  .show-data {
-    margin-bottom: 0.5rem;
-  }
-  .x-error-msg-text {
-    font-size: 0.875rem;
-  }
+  margin-bottom: 1rem;
+}
+
+.form-control.date-input {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(233, 236, 239, 0.1);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: #333;
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem; /* Increased right padding for icon */
+  width: 100%; /* Full width for input */
+  box-sizing: border-box;
+}
+
+.is-invalid.date-input-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-input {
+  display: none;
+  color: #dc3545;
+  font-size: 0.875rem;
+}
+
+.invalid-input.show-error {
+  display: block;
+}
+
+.red-font {
+  color: #dc3545;
+}
+
+.show-data {
+  margin-bottom: 0.5rem;
+}
+
+.x-error-msg-text {
+  font-size: 0.875rem;
+}
+
+.date-input-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.calendar-icon {
+  position: absolute;
+  right: 0.75rem; /* Adjusted for better alignment inside input */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #333; /* Match input text color */
+  font-size: 1.2rem;
+}
+
+/* Override global datepicker styles */
+:host ::ng-deep .mat-datepicker-content {
+  background-color: #ffffff !important;
+  color: #333 !important;
+  border-radius: 8px !important;
+}
+
+:host ::ng-deep .mat-calendar {
+  background-color: #ffffff !important;
+}
+
+:host ::ng-deep .mat-calendar-body-cell-content {
+  color: #333 !important;
+}
+
+:host ::ng-deep .mat-calendar-body-today {
+  border-color: #333 !important;
+}
+
+:host ::ng-deep .mat-calendar-body-selected {
+  background-color: var(--color-brand-primary, #a11220) !important;
+  color: #ffffff !important;
+}
+
+:host ::ng-deep .mat-calendar-body-cell:hover .mat-calendar-body-cell-content {
+  background-color: var(--color-red-100, #f9e1e6) !important;
+}
