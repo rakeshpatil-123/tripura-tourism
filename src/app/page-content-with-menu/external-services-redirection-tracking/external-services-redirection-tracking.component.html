@@ -8,11 +8,18 @@
                 formControlName="registrationCertificateNo"></app-ilogi-input>
         </div>
         <div class="col-md-12 form-group-margin">
-            <app-ilogi-input-date [submitted]="submitted" [mandatory]="true" [readonly]="false"
-                fieldLabel="Date of Issue" placeholder="DD/MM/YYYY" fieldId="dateOfIssue"
-                [errorMessages]="errorMessages.dateOfIssue" formControlName="dateOfIssue"
-                [errors]="dateOfIssueErrors"></app-ilogi-input-date>
-        </div>
+    <app-ilogi-input-date 
+        [submitted]="submitted" 
+        [mandatory]="true" 
+        [readonly]="false"
+        fieldLabel="Date of Issue" 
+        placeholder="DD-MM-YYYY" 
+        fieldId="dateOfIssue"
+        [errorMessages]="errorMessages.dateOfIssue" 
+        formControlName="dateOfIssue"
+        [errors]="dateOfIssueErrors">
+    </app-ilogi-input-date>
+</div>
         <button type="submit" [disabled]="loading">Submit</button>
     </form>
     <div class="example-box" cdkDrag>
