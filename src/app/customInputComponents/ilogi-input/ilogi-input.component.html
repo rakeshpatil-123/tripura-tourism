@@ -1,34 +1,29 @@
 <div class="form-group">
     <label *ngIf="!hideLabel" for="{{fieldId}}">{{fieldLabel}} <span *ngIf="mandatory" class="red-font">*</span></label>
-    <div *ngIf="submitted && formControlDirective?.control?.errors" class="invalid-input" [id]="errorFieldId"
-        [ngClass]="{ 'show-error': isHovered }">
-        <ng-container *ngFor="let item of (formControlDirective?.control?.errors || {} | keyvalue); let i = index">
+    <div *ngIf="submitted && errors" class="invalid-input" [id]="errorFieldId" [ngClass]="{ 'show-error': isHovered }">
+        <ng-container *ngFor="let item of (errors || {} | keyvalue); let i = index">
             <div *ngIf="i === 0" class="x-error-msg-text">{{ errorMessages[item.key] || item.value?.message }}</div>
         </ng-container>
-        <ng-container *ngIf="formControlDirective?.control?.errors as errors">
+        <ng-container *ngIf="errors as errors">
             <div *ngIf="errors['custom']?.status" class="x-error-msg-text">{{ errors['custom'].message }}</div>
         </ng-container>
     </div>
-    <ng-container *ngIf="formControlDirective?.control as control">
-        <div class="show-data" *ngIf="pipe === 'currency'">
-            {{ fieldExactVal ?? (checkIsNan(control.value) ? control.value : (control.value | currency:'INR')) }}
-        </div>
-        <div class="show-data" *ngIf="pipe !== 'currency'">
-            {{ fieldExactVal ?? control.value }}
-        </div>
-    </ng-container>
+    <div class="show-data" *ngIf="pipe === 'currency'">
+        {{ fieldExactVal ?? (checkIsNan(value) ? value : (value | currency:'INR')) }}
+    </div>
+    <div class="show-data" *ngIf="pipe !== 'currency'">
+        {{ fieldExactVal ?? value }}
+    </div>
     <input matInput *ngIf="type !== 'textarea'" appBlockCopyPaste [blockCopyPaste]="appBlockCopyPaste" [type]="type"
-        [placeholder]="placeholder" [id]="fieldId" [formControlName]="formControlName" [attr.maxlength]="maxlength"
-        [readonly]="readonly"
-        [attr.aria-invalid]="submitted && formControlDirective?.control?.errors ? 'true' : 'false'"
+        [placeholder]="placeholder" [id]="fieldId" [value]="value" (input)="onInputChange($event)"
+        [attr.maxlength]="maxlength" [readonly]="readonly" [disabled]="isDisabled"
+        [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
+        (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control"
+        [ngClass]="{ 'is-invalid': submitted && errors }" (blur)="changeBlur($event)" />
+    <textarea matInput *ngIf="type === 'textarea'" [value]="value" (input)="onInputChange($event)"
+        [attr.maxlength]="maxlength" [placeholder]="placeholder" [id]="fieldId" [rows]="rows" [readonly]="readonly"
+        [disabled]="isDisabled" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
         [attr.aria-describedby]="errorFieldId" (mouseenter)="showErrorOnFieldHover()"
-        (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control"
-        [ngClass]="{ 'is-invalid': submitted && formControlDirective?.control?.errors }" (blur)="changeBlur($event)" />
-    <textarea matInput *ngIf="type === 'textarea'" [formControlName]="formControlName" [attr.maxlength]="maxlength"
-        [placeholder]="placeholder" [id]="fieldId" [rows]="rows" [readonly]="readonly"
-        [attr.aria-invalid]="submitted && formControlDirective?.control?.errors ? 'true' : 'false'"
-        [attr.aria-describedby]="errorFieldId" (mouseenter)="showErrorOnFieldHover()"
-        (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control"
-        [ngClass]="{ 'is-invalid': submitted && formControlDirective?.control?.errors }"
+        (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control" [ngClass]="{ 'is-invalid': submitted && errors }"
         (blur)="changeBlur($event)"></textarea>
 </div>

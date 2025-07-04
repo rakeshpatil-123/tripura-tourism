@@ -1,0 +1,32 @@
+.form-group {
+    margin-bottom: 1rem;
+  }
+  .form-control.date-input {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(233, 236, 239, 0.1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 0.5rem;
+  }
+  .is-invalid.date-input-invalid {
+    border-color: #dc3545;
+  }
+  .invalid-input {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+  }
+  .invalid-input.show-error {
+    display: block;
+  }
+  .red-font {
+    color: #dc3545;
+  }
+  .show-data {
+    margin-bottom: 0.5rem;
+  }
+  .x-error-msg-text {
+    font-size: 0.875rem;
+  }
