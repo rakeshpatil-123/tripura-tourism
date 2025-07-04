@@ -6,14 +6,14 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-page-content-with-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SidebarComponent],
   templateUrl: './page-content-with-menu.component.html',
   styleUrl: './page-content-with-menu.component.scss'
 })
 export class PageContentWithMenuComponent {
   isMenuOpen: boolean = false; // Default to collapsed on desktop, or closed on mobile
 
-  constructor(private renderer: Renderer2, private el: ElementRef) {} // Inject Renderer2 and ElementRef
+  constructor(private renderer: Renderer2, private el: ElementRef) { } // Inject Renderer2 and ElementRef
 
   ngOnInit(): void {
     // You might want to initialize isMenuOpen based on screen width
