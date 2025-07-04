@@ -56,9 +56,9 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
     this.submitted = true;
     this.cdr.detectChanges();
     if (this.form.valid) {
-      console.log('Form submitted with value:', this.form.value);
+      //  console.log('Form submitted with value:', this.form.value);
     } else {
-      console.log('Form is invalid');
+      // console.log('Form is invalid');
     }
   }
 }

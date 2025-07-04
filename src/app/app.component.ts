@@ -26,7 +26,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ) { }
   ngOnInit() {
     this.loaderSubscription = this.loaderService.getLoaderStatus().subscribe((status) => {
-      console.log('Loader status:', status); // Debug log
+      //  console.log('Loader status:', status); // Debug log
       this.showLoader = status;
       this.cdRef.detectChanges();
     });
