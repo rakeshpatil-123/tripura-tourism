@@ -1,0 +1,20 @@
+<div class="form-group">
+    <label *ngIf="fieldLabel" for="{{fieldId}}">{{fieldLabel}} <span *ngIf="mandatory" class="red-font">*</span></label>
+    <div *ngIf="submitted && errors" class="invalid-input" [id]="errorFieldId" [ngClass]="{ 'show-error': isHovered }">
+        <ng-container *ngFor="let item of (errors || {} | keyvalue); let i = index">
+            <div *ngIf="i === 0" class="x-error-msg-text">{{ errorMessages[item.key] || item.value?.message }}</div>
+        </ng-container>
+        <ng-container *ngIf="errors as errors">
+            <div *ngIf="errors['custom']?.status" class="x-error-msg-text">{{ errors['custom'].message }}</div>
+        </ng-container>
+    </div>
+    <div class="show-data">{{ value | date: 'dd/MM/yyyy' }}</div>
+    <input matInput [matDatepicker]="picker" [value]="value" (dateChange)="onDateChange($event.value)"
+        [placeholder]="placeholder" [id]="fieldId" [readonly]="readonly" (click)="picker.open()"
+        (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control date-input"
+        [ngClass]="{ 'is-invalid date-input-invalid': submitted && errors, 'date-input': !submitted || !errors }"
+        [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
+        [disabled]="isDisabled" />
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+</div>

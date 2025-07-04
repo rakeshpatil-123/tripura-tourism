@@ -1,6 +1,21 @@
-<!-- src/app/external-services-redirection-tracking/external-services-redirection-tracking.html -->
-<!-- <app-loader *ngIf="loading"></app-loader> -->
-
 <div class="container-fluid">
     <h2>Application Status</h2>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="col-md-12 form-group-margin">
+            <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255" [readonly]="false" [mandatory]="true"
+                fieldLabel="Registration Certificate No." placeholder="Enter" fieldId="registrationCertificateNo"
+                [errorMessages]="errorMessages.registrationCertificateNo"
+                formControlName="registrationCertificateNo"></app-ilogi-input>
+        </div>
+        <div class="col-md-12 form-group-margin">
+            <app-ilogi-input-date [submitted]="submitted" [mandatory]="true" [readonly]="false"
+                fieldLabel="Date of Issue" placeholder="DD/MM/YYYY" fieldId="dateOfIssue"
+                [errorMessages]="errorMessages.dateOfIssue" formControlName="dateOfIssue"
+                [errors]="dateOfIssueErrors"></app-ilogi-input-date>
+        </div>
+        <button type="submit" [disabled]="loading">Submit</button>
+    </form>
+    <div class="example-box" cdkDrag>
+        Drag me around
+    </div>
 </div>

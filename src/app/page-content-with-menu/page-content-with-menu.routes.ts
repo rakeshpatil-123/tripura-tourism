@@ -2,11 +2,13 @@ import { Routes } from '@angular/router';
 import { PageContentWithMenuComponent } from './page-content-with-menu.component';
 
 
+
 export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
     {
         path: '',
         component: PageContentWithMenuComponent,
         canActivate: [],
+
         children: [
             {
                 path: 'home',
