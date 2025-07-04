@@ -131,3 +131,62 @@
         gap: 12px;
       }
     }
+
+    .stats-card {
+  background: var(--color-card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px var(--shadow-medium);
+  border: 1px solid var(--color-border-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--shadow-dark);
+}
+
+.stats-card__title {
+  color: var(--color-text-secondary);
+}
+
+.stats-card__value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+// Color overrides by type
+.stats-card--approved .stats-card__value {
+  color: var(--color-success);
+}
+.stats-card--pending .stats-card__value {
+  color: var(--color-warning);
+}
+.stats-card--rejected .stats-card__value {
+  color: var(--color-error);
+}
+.stats-card--total .stats-card__value {
+  color: var(--color-brand-primary);
+}
+
+// Icons
+.stats-card__icon--total {
+  background: var(--color-red-100);
+  color: var(--color-brand-primary);
+}
+.stats-card__icon--approved {
+  background: hsl(142, 76%, 95%);
+  color: var(--color-success);
+}
+.stats-card__icon--pending {
+  background: hsl(45, 100%, 95%);
+  color: var(--color-warning);
+}
+.stats-card__icon--rejected {
+  background: var(--color-notification-error-bg);
+  color: var(--color-error);
+}

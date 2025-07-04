@@ -1,16 +1,40 @@
 .row {
   margin-right: 0;
   margin-left: 0;
+  display: flex; /* Ensure .row uses flexbox */
+  width: 100%; /* Ensure it takes full width */
 }
 
-.sidebar {
-  padding-right: 0;
-  padding-left: 0;
+.sidebar-container {
+  /* Default desktop state */
+  width: 250px; /* Or whatever your default sidebar width is */
+  flex-shrink: 0; /* Prevent sidebar from shrinking */
+  transition: width 0.3s ease; /* Smooth transition for width change */
+  // Adjust background/shadows here if needed
+}
+
+.sidebar-container.active {
+  /* When menu is open (on desktop/larger screens) */
+  width: 250px; // Keep open width
+}
+
+.sidebar-container:not(.active) {
+  /* When menu is closed (on desktop/larger screens) */
+  width: 60px; /* Or a smaller width for collapsed state */
 }
 
 .main-container {
+  flex-grow: 1; /* Allow main content to take remaining space */
   padding-right: 0;
   padding-left: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll from content inside main-container if possible */
+  transition: margin-left 0.3s ease; /* Smooth transition when sidebar toggles */
+  width: calc(100% - 250px); /* Default width when sidebar is open */
+}
+
+.main-container.active {
+  /* When sidebar is collapsed (on desktop/larger screens), main content expands */
+  width: calc(100% - 60px); /* Adjust based on collapsed sidebar width */
 }
 
 // *********** For Datatables starts ***********
@@ -66,4 +90,127 @@ mat-header-row {
 
 .fa.fa-times.fa-xs.pl-2 {
   color: var(--color-error, #DA5945); // red from your variables with fallback
+}
+
+/* Mobile adjustments for the overall layout */
+@media (max-width: 768px) {
+  .sidebar-container {
+    position: fixed; /* Fix sidebar to the side */
+    top: 0;
+    left: -250px; /* Hide off-screen initially */
+    height: 100vh;
+    z-index: 1050; /* Ensure it's above main content */
+    background-color: var(--color-primary-bg); /* Match header/body background */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    width: 250px; /* Full width when open */
+    transition: left 0.3s ease;
+  }
+
+  .sidebar-container.active {
+    left: 0; /* Slide in when active */
+  }
+
+  .main-container {
+    width: 100%; /* Main content always takes full width */
+    margin-left: 0; /* No margin from sidebar */
+    padding-top: 70px; /* To prevent content from going under fixed header */
+  }
+
+  /* Overlay when sidebar is open */
+  body.menu-open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 1040; /* Below sidebar, above content */
+  }
+
+  /* Adjust menu toggle position if it's part of the main header */
+  .menu-toogle-height {
+    display: block; /* Ensure it's visible on mobile */
+    // You might want to move this toggle to the header component
+    // or position it absolutely on mobile if it's fixed to the sidebar.
+  }
+}
+
+
+.row {
+  margin-right: 0;
+  margin-left: 0;
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap; // Added for safety to ensure wrapping, if needed.
+}
+
+.sidebar-container {
+  width: 250px;
+  flex-shrink: 0;
+  transition: width 0.3s ease;
+}
+
+.sidebar-container.active {
+  width: 60px; // When collapsed on desktop
+}
+
+.sidebar-container:not(.active) {
+  width: 250px; // When open on desktop
+}
+
+.main-container {
+  flex-grow: 1;
+  padding-right: 0;
+  padding-left: 0;
+  overflow-x: hidden;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  width: calc(100% - 250px); /* Default width when sidebar is open on desktop */
+  margin-left: 250px; /* Corresponding margin for desktop */
+}
+
+.main-container.active {
+  width: calc(100% - 60px); /* Adjust based on collapsed sidebar width on desktop */
+  margin-left: 60px; /* Corresponding margin for desktop */
+}
+
+// ... Datatable styles
+
+/* Mobile adjustments for the overall layout */
+@media (max-width: 768px) {
+  .sidebar-container {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Hide off-screen initially */
+    height: 100vh;
+    z-index: 1050;
+    background-color: var(--color-primary-bg);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    width: 250px;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar-container.active {
+    left: 0; /* Slide in when active */
+  }
+
+  .main-container {
+    width: 100%; /* Main content always takes full width */
+    margin-left: 0; /* No margin from sidebar - crucial for mobile overlay */
+    padding-top: 70px; /* To prevent content from going under fixed header */
+    transition: none; // No need for transition on margin-left/width changes here,
+                      // as sidebar slides *over* the content.
+  }
+
+  // Overlay when sidebar is open - this should ideally be handled by JS adding a class to body
+  body.menu-open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+  }
 }

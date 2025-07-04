@@ -1,8 +1,9 @@
- .dashboard-container {
+.dashboard-container {
       padding: 24px;
-      background-color: #f8f9fa; 
+      background-color: #f8f9fa;
       min-height: 100vh;
-      font-family: 'Inter', sans-serif; 
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box; // Ensure consistent box model
     }
     .dashboard-header h1 {
       font-size: 28px;
@@ -12,59 +13,72 @@
     }
     .stats-cards-grid {
       display: grid;
-      /* Default: Auto-fit columns, min 250px, max 1fr for wider screens */
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+      
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 24px;
       margin-bottom: 32px;
     }
     .charts-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr; 
+      grid-template-columns: 2fr 1fr;
       gap: 24px;
       margin-bottom: 32px;
     }
-    .bar-chart-item app-bar-chart {
-      height: 100%; 
-      display: flex;
-      flex-direction: column;
-    }
+    .bar-chart-item app-bar-chart,
     .donut-chart-item app-donut-chart {
-      height: 100%; 
+      height: 100%;
       display: flex;
       flex-direction: column;
+      
+      width: 100%;
+      max-width: 100%;
     }
-    
+
     app-claim-status-table,
     app-clarification-required-table {
-        display: block; 
+        display: block;
         margin-bottom: 32px;
+        
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; 
     }
-    /* --------------------------------------------------- */
-    /* Mobile Responsiveness */
+
     
-    /* Adjust styles for screens smaller than 992px (typical laptop/larger tablet breakpoint) */
+    ::ng-deep app-claim-status-table .mat-table,
+    ::ng-deep app-clarification-required-table .mat-table {
+      width: 100%; 
+      min-width: max-content; 
+    }
+
+    
+    
+
+    
     @media (max-width: 992px) {
       .charts-grid {
-        grid-template-columns: 1fr; /* Stack charts vertically on smaller laptops/tablets */
+        grid-template-columns: 1fr; 
         gap: 20px;
       }
+      .dashboard-container{
+        padding-top: 16px;
+      }
     }
-    /* Adjust styles for screens smaller than 768px (typical tablet breakpoint) */
+    
     @media (max-width: 768px) {
       .dashboard-container {
-        padding: 16px; /* Reduced padding for container */
+        padding: 6px; 
       }
       .dashboard-header h1 {
-        font-size: 24px; /* Smaller font size for header */
+        font-size: 24px; 
         margin-bottom: 24px;
       }
       .stats-cards-grid {
-        /* Adjust min-width for cards to potentially show 2 per row on tablets */
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+        
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 16px;
         margin-bottom: 24px;
       }
-      
+
       .charts-grid {
         gap: 16px;
         margin-bottom: 24px;
@@ -74,30 +88,30 @@
           margin-bottom: 24px;
       }
     }
-    /* Further adjustments for smaller tablets / larger phones (e.g., max-width: 576px) */
+    
     @media (max-width: 576px) {
       .stats-cards-grid {
-        /* Allow for smaller card sizes, potentially 2-3 per row if space permits */
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+        
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 12px;
         margin-bottom: 20px;
       }
     }
-    /* Further adjustments for very small screens (e.g., mobile phones, max-width: 480px) */
+    
     @media (max-width: 480px) {
       .dashboard-container {
-        padding: 12px; /* Even smaller padding */
+        padding: 12px; 
       }
       .dashboard-header h1 {
-        font-size: 20px; /* Even smaller font size for header */
+        font-size: 20px; 
         margin-bottom: 16px;
       }
       .stats-cards-grid {
-        grid-template-columns: 1fr; /* Stack stats cards on top of each other */
+        grid-template-columns: 1fr; 
         gap: 12px;
         margin-bottom: 16px;
       }
-      
+
       .charts-grid {
         gap: 12px;
         margin-bottom: 16px;
