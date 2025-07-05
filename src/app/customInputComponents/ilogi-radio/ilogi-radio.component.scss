@@ -1,0 +1,61 @@
+.form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .red-font {
+    color: var(--color-error, #dc3545);
+  }
+  
+  .invalid-input {
+    visibility: hidden;
+    opacity: 0;
+    color: var(--color-error, #dc3545);
+    font-size: 0.875rem;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  }
+  
+  .invalid-input.show-error {
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+  }
+  
+  .x-error-msg-text {
+    color: var(--color-error, #dc3545);
+  }
+  
+  .show-data {
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary, #333);
+  }
+  
+  mat-radio-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem;
+  }
+  
+  mat-radio-button.mr-2 {
+    margin-right: 0.5rem;
+  }
+  
+  mat-radio-group.is-invalid {
+    border: 1px solid var(--color-error, #dc3545);
+    border-radius: 4px;
+    transition: none;
+  }
+  
+  :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-outer-circle {
+    border-color: var(--color-brand-primary, #a11220);
+  }
+  
+  :host ::ng-deep .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+    background-color: var(--color-brand-primary, #a11220);
+  }
+  
+  :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
+    background-color: var(--color-brand-primary, #a11220);
+  }

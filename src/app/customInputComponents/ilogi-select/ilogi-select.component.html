@@ -1,0 +1,25 @@
+<div class="form-group">
+    <label *ngIf="!hideLabel" for="{{fieldId}}">{{fieldLabel}} <span *ngIf="mandatory" class="red-font">*</span></label>
+    <div *ngIf="submitted && errors" class="invalid-input" [id]="errorFieldId" [ngClass]="{ 'show-error': isHovered }">
+        <ng-container *ngFor="let item of (errors || {} | keyvalue); let i = index">
+            <div *ngIf="i === 0" class="error-msg-text">{{ errorMessages[item.key] || item.value?.message }}</div>
+        </ng-container>
+        <ng-container *ngIf="errors as errors">
+            <div *ngIf="errors['custom']?.status" class="error-msg-text">{{ errors['custom'].message }}</div>
+        </ng-container>
+    </div>
+    <div class="show-data" *ngIf="!fieldExactVal">{{ getDisplayName(value) }}</div>
+    <div class="show-data" *ngIf="fieldExactVal">{{ fieldExactVal }}</div>
+    <mat-form-field appearance="outline" class="w-100">
+        <mat-label *ngIf="placeholder">{{ placeholder }}</mat-label>
+        <mat-select [id]="fieldId" [value]="value" (selectionChange)="onChangeControl($event.value)"
+            (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()"
+            [ngClass]="{ 'is-invalid': submitted && errors }" [disabled]="readonly || isDisabled"
+            aria-label="Select an option" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+            [attr.aria-describedby]="errorFieldId">
+            <mat-option *ngFor="let option of selectOptions" [value]="option.id" [title]="option.name">
+                {{ option.name.length > 70 ? option.name.substring(0, 70) + '...' : option.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
