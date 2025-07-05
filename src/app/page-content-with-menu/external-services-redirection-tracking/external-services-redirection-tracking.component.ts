@@ -10,7 +10,7 @@ import { IlogiSelectComponent } from '../../customInputComponents/ilogi-select/i
 @Component({
   selector: 'app-external-services-redirection-tracking',
   standalone: true,
-  imports: [...SHARED_IMPORTS, CdkDrag, IlogiInputComponent, IlogiInputDateComponent, IlogiSelectComponent],
+  imports: [...SHARED_IMPORTS, CdkDrag, IlogiInputComponent, IlogiInputDateComponent],
   templateUrl: './external-services-redirection-tracking.component.html',
   styleUrls: ['./external-services-redirection-tracking.component.scss']
 })

@@ -1,0 +1,61 @@
+.form-container {
+  background: linear-gradient(135deg, var(--color-brand-light), var(--color-surface));
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.form-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  
+  .form-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    
+    h1 {
+      color: var(--color-text-primary);
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    
+    p {
+      color: var(--color-text-secondary);
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+}
+
+.form-actions-demo {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.form-data-preview {
+  background-color: var(--color-card-bg);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px var(--shadow-light);
+  margin-top: 2rem;
+  
+  h3 {
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+  }
+  
+  pre {
+    background-color: var(--color-surface);
+    padding: 1rem;
+    border-radius: 0.375rem;
+    overflow-x: auto;
+    color: var(--color-text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+}
