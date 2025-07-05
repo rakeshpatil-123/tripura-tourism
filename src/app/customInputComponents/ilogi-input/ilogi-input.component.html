@@ -8,19 +8,19 @@
             <div *ngIf="errors['custom']?.status" class="x-error-msg-text">{{ errors['custom'].message }}</div>
         </ng-container>
     </div>
-    <div class="show-data" *ngIf="pipe === 'currency'">
+    <div class="show-data" *ngIf="pipe === 'currency' && readonly">
         {{ fieldExactVal ?? (checkIsNan(value) ? value : (value | currency:'INR')) }}
     </div>
-    <div class="show-data" *ngIf="pipe !== 'currency'">
+    <div class="show-data" *ngIf="pipe !== 'currency' && readonly">
         {{ fieldExactVal ?? value }}
     </div>
-    <input matInput *ngIf="type !== 'textarea'" appBlockCopyPaste [blockCopyPaste]="appBlockCopyPaste" [type]="type"
-        [placeholder]="placeholder" [id]="fieldId" [value]="value" (input)="onInputChange($event)"
+    <input matInput *ngIf="type !== 'textarea' && !readonly" appBlockCopyPaste [blockCopyPaste]="appBlockCopyPaste"
+        [type]="type" [placeholder]="placeholder" [id]="fieldId" [value]="value" (input)="onInputChange($event)"
         [attr.maxlength]="maxlength" [readonly]="readonly" [disabled]="isDisabled"
         [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
         (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control"
         [ngClass]="{ 'is-invalid': submitted && errors }" (blur)="changeBlur($event)" />
-    <textarea matInput *ngIf="type === 'textarea'" [value]="value" (input)="onInputChange($event)"
+    <textarea matInput *ngIf="type === 'textarea' && !readonly" [value]="value" (input)="onInputChange($event)"
         [attr.maxlength]="maxlength" [placeholder]="placeholder" [id]="fieldId" [rows]="rows" [readonly]="readonly"
         [disabled]="isDisabled" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
         [attr.aria-describedby]="errorFieldId" (mouseenter)="showErrorOnFieldHover()"

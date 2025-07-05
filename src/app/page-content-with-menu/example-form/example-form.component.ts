@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
           <p>A scalable form component with validation and custom fields</p>
         </div>
         
-        <app-dynamic-form 
+        <app-dynamic-form  row=2
           [config]="formConfig"
           class="fade-in">
         </app-dynamic-form>
@@ -67,6 +67,7 @@ export class ExampleFormComponent implements OnInit  {
         label: 'Full Name',
         placeholder: 'Enter your full name',
         mandatory: true,
+        priority: 5, // Highest priority
         validations: [
           {
             type: 'required',
@@ -85,6 +86,7 @@ export class ExampleFormComponent implements OnInit  {
         label: 'Email Address',
         placeholder: 'Enter your email address',
         mandatory: true,
+        priority: 4, // Second priority
         validations: [
           {
             type: 'required',
@@ -97,42 +99,11 @@ export class ExampleFormComponent implements OnInit  {
         ]
       },
       {
-        id: 'phone',
-        type: 'text',
-        label: 'Phone Number',
-        placeholder: 'Enter your phone number',
-        mandatory: false,
-        validations: [
-          {
-            type: 'pattern',
-            value: /^\+?[\d\s\-()]+$/,
-            message: 'Please enter a valid phone number'
-          }
-        ]
-      },
-      {
-        id: 'father-number',
-        type: 'text',
-        label: 'Father Phone Number',
-        placeholder: 'Enter your father phone number',
-        mandatory: true,
-        validations: [
-          {
-            type: 'pattern',
-            value: /^\+?[\d\s\-()]+$/,
-            message: 'Please enter a valid phone number',
-            customValidator: (value: string) => {
-              if (!value) return true;
-              return /^\+?[\d\s\-()]+$/.test(value);
-            }
-          }
-        ]
-      },
-      {
         id: 'birthDate',
         type: 'date',
         label: 'Date of Birth',
         mandatory: true,
+        priority: 3, // Third priority
         validations: [
           {
             type: 'required',
@@ -148,6 +119,59 @@ export class ExampleFormComponent implements OnInit  {
               const age = today.getFullYear() - birthDate.getFullYear();
               return age >= 18;
             }
+          }
+        ]
+      },
+      {
+        id: 'father-number',
+        type: 'text',
+        label: 'Father Phone Number',
+        placeholder: 'Enter your father phone number',
+        mandatory: true,
+        priority: 2, // Fourth priority
+        validations: [
+          {
+            type: 'pattern',
+            value: /^\+?[\d\s\-()]+$/,
+            message: 'Please enter a valid phone number',
+            customValidator: (value: string) => {
+              if (!value) return true;
+              return /^\+?[\d\s\-()]+$/.test(value);
+            }
+          }
+        ]
+      },
+      {
+        id: 'phone',
+        type: 'text',
+        label: 'Phone Number',
+        placeholder: 'Enter your phone number',
+        mandatory: false,
+        priority: 1, // Fifth priority
+        validations: [
+          {
+            type: 'pattern',
+            value: /^\+?[\d\s\-()]+$/,
+            message: 'Please enter a valid phone number'
+          }
+        ]
+      },
+      {
+        id: 'sdfj',
+        type: 'text',
+        label: 'Full Name',
+        placeholder: 'Enter your fulsdfsfdl name',
+        mandatory: true,
+        priority: 6, // Sixth priority
+        validations: [
+          {
+            type: 'required',
+            message: 'Name is required'
+          },
+          {
+            type: 'minLength',
+            value: 2,
+            message: 'Name must be at least 2 characters long'
           }
         ]
       }
@@ -179,19 +203,18 @@ export class ExampleFormComponent implements OnInit  {
       type: 'text',
       label: `Dynamic Field ${this.fieldCounter}`,
       placeholder: `Enter value for field ${this.fieldCounter}`,
-      mandatory: false
+      mandatory: false,
+      priority: this.getNextPriority() // Auto-assign next priority
     };
     
     this.formConfig.fields.push(newField);
-    // If you have a reference to the dynamic form component, you can call addField method
-    // this.dynamicFormRef.addField(newField);
+    // Sort fields by priority after adding
+    this.sortFieldsByPriority();
   }
 
   removeLastField() {
     if (this.formConfig.fields.length > 4) { // Keep the original 4 fields
       this.formConfig.fields.pop();
-      // If you have a reference to the dynamic form component, you can call removeField method
-      // this.dynamicFormRef.removeField(fieldId);
     }
   }
 
@@ -199,5 +222,20 @@ export class ExampleFormComponent implements OnInit  {
     this.formData = null;
     // If you have a reference to the dynamic form component, you can call resetForm method
     // this.dynamicFormRef.resetForm();
+  }
+
+  // Helper method to get the next priority number
+  private getNextPriority(): number {
+    const maxPriority = Math.max(...this.formConfig.fields.map(f => f.priority || 0));
+    return maxPriority + 1;
+  }
+
+  // Helper method to sort fields by priority
+  private sortFieldsByPriority(): void {
+    this.formConfig.fields.sort((a, b) => {
+      const priorityA = a.priority || Number.MAX_SAFE_INTEGER;
+      const priorityB = b.priority || Number.MAX_SAFE_INTEGER;
+      return priorityA - priorityB;
+    });
   }
 }
