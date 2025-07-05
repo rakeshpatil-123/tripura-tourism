@@ -179,7 +179,11 @@
   flex-wrap: wrap; // CHANGE: Allow content to wrap if needed, especially on smaller screens.
   margin: 0;
 }
-
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
 .sidebar-container {
   width: 250px;
   background-color: var(--color-brand-primary);

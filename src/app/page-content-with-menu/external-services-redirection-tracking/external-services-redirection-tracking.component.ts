@@ -5,11 +5,12 @@ import { LoaderService } from '../../_service/loader/loader.service';
 import { CdkDrag } from '@angular/cdk/drag-drop';
 import { IlogiInputDateComponent } from '../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
+import { IlogiSelectComponent } from '../../customInputComponents/ilogi-select/ilogi-select.component';
 
 @Component({
   selector: 'app-external-services-redirection-tracking',
   standalone: true,
-  imports: [...SHARED_IMPORTS, CdkDrag, IlogiInputDateComponent, IlogiInputComponent],
+  imports: [...SHARED_IMPORTS, CdkDrag, IlogiInputComponent, IlogiInputDateComponent, IlogiSelectComponent],
   templateUrl: './external-services-redirection-tracking.component.html',
   styleUrls: ['./external-services-redirection-tracking.component.scss']
 })

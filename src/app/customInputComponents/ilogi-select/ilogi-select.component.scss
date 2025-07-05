@@ -1,0 +1,71 @@
+.form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .red-font {
+    color: var(--color-error, #dc3545);
+  }
+  
+  .invalid-input {
+    visibility: hidden;
+    opacity: 0;
+    color: var(--color-error, #dc3545);
+    font-size: 0.875rem;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  }
+  
+  .invalid-input.show-error {
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+  }
+  
+  .error-msg-text {
+    color: var(--color-error, #dc3545);
+  }
+  
+  .show-data {
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary, #333);
+  }
+  
+  .w-100 {
+    width: 100%;
+  }
+  
+  :host ::ng-deep mat-form-field.is-invalid .mat-form-field-outline {
+    border-color: var(--color-error, #dc3545) !important;
+  }
+  
+  :host ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+    border: 1px solid var(--color-border-light, rgba(255, 255, 255, 0.3));
+    border-radius: 8px;
+  }
+  
+  :host ::ng-deep .mat-select-value {
+    color: var(--color-text-primary, #333);
+  }
+  
+  :host ::ng-deep .mat-select-arrow {
+    color: var(--color-text-primary, #333);
+  }
+  
+  :host ::ng-deep .mat-select-panel {
+    background-color: #ffffff !important;
+    border-radius: 8px !important;
+  }
+  
+  :host ::ng-deep .mat-option {
+    color: var(--color-text-primary, #333);
+  }
+  
+  :host ::ng-deep .mat-option.mat-selected:not(.mat-option-disabled) {
+    background-color: var(--color-brand-primary, #a11220) !important;
+    color: #ffffff !important;
+  }
+  
+  :host ::ng-deep .mat-option:hover:not(.mat-option-disabled) {
+    background-color: var(--color-red-100, #f9e1e6) !important;
+  }

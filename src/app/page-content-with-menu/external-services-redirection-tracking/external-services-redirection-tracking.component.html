@@ -8,84 +8,53 @@
                 formControlName="registrationCertificateNo"></app-ilogi-input>
         </div>
         <div class="col-md-12 form-group-margin">
-  <app-ilogi-input-date
-  fieldLabel="Transaction Date"
-  fieldId="transactionDate"
-  [monthsRange]="6"
-  placeholder="DD-MM-YYYY"
-  [mandatory]="true">
-</app-ilogi-input-date>
+            <app-ilogi-input-date fieldLabel="Transaction Date" fieldId="transactionDate" [monthsRange]="6"
+                placeholder="DD-MM-YYYY" [mandatory]="true">
+            </app-ilogi-input-date>
 
 
-<app-ilogi-input-date
-  fieldLabel="Employment Start Date"
-  fieldId="employmentDate"
-  [monthsRange]="12"
-  futureDateErrorMessage="Employment date cannot be in the future. Please select a valid date."
-  pastDateErrorMessage="Employment date must be within the last 12 months. Please select a more recent date."
-  placeholder="DD-MM-YYYY"
-  [mandatory]="true">
-</app-ilogi-input-date>
+            <app-ilogi-input-date fieldLabel="Employment Start Date" fieldId="employmentDate" [monthsRange]="12"
+                futureDateErrorMessage="Employment date cannot be in the future. Please select a valid date."
+                pastDateErrorMessage="Employment date must be within the last 12 months. Please select a more recent date."
+                placeholder="DD-MM-YYYY" [mandatory]="true">
+            </app-ilogi-input-date>
 
 
-<app-ilogi-input-date
-  fieldLabel="Event Date"
-  fieldId="eventDate"
-  [monthsRange]="3"
-  [allowFutureDates]="true"
-  [futureMonthsRange]="2"
-  futureDateErrorMessage="Event date cannot be more than 2 months in the future."
-  pastDateErrorMessage="Event date must be within the last 3 months."
-  placeholder="DD-MM-YYYY"
-  [mandatory]="true">
-</app-ilogi-input-date>
+            <app-ilogi-input-date fieldLabel="Event Date" fieldId="eventDate" [monthsRange]="3"
+                [allowFutureDates]="true" [futureMonthsRange]="2"
+                futureDateErrorMessage="Event date cannot be more than 2 months in the future."
+                pastDateErrorMessage="Event date must be within the last 3 months." placeholder="DD-MM-YYYY"
+                [mandatory]="true">
+            </app-ilogi-input-date>
 
 
-<app-ilogi-input-date
-  fieldLabel="Invoice Date"
-  fieldId="invoiceDate"
-  [monthsRange]="1"
-  futureDateErrorMessage="Invoice date cannot be in the future. Please select today or a past date."
-  pastDateErrorMessage="Invoice date must be within the last month. Older invoices require special approval."
-  placeholder="DD-MM-YYYY"
-  [mandatory]="true">
-</app-ilogi-input-date>
+            <app-ilogi-input-date fieldLabel="Invoice Date" fieldId="invoiceDate" [monthsRange]="1"
+                futureDateErrorMessage="Invoice date cannot be in the future. Please select today or a past date."
+                pastDateErrorMessage="Invoice date must be within the last month. Older invoices require special approval."
+                placeholder="DD-MM-YYYY" [mandatory]="true">
+            </app-ilogi-input-date>
 
 
-<app-ilogi-input-date
-  fieldLabel="Previous Job End Date"
-  fieldId="previousJobDate"
-  [monthsRange]="18"
-  futureDateErrorMessage="Previous job end date cannot be in the future."
-  pastDateErrorMessage="Previous job end date must be within the last 18 months for this application."
-  placeholder="DD-MM-YYYY"
-  [mandatory]="false">
-</app-ilogi-input-date>
+            <app-ilogi-input-date fieldLabel="Previous Job End Date" fieldId="previousJobDate" [monthsRange]="18"
+                futureDateErrorMessage="Previous job end date cannot be in the future."
+                pastDateErrorMessage="Previous job end date must be within the last 18 months for this application."
+                placeholder="DD-MM-YYYY" [mandatory]="false">
+            </app-ilogi-input-date>
 
 
-<app-ilogi-input-date
-  fieldLabel="Date of Birth"
-  fieldId="birthDate"
-  [monthsRange]="1200"
-  futureDateErrorMessage="Date of birth cannot be in the future."
-  pastDateErrorMessage="Please enter a valid date of birth."
-  placeholder="DD-MM-YYYY"
-  [mandatory]="true">
-</app-ilogi-input-date>
+            <app-ilogi-input-date fieldLabel="Date of Birth" fieldId="birthDate" [monthsRange]="1200"
+                futureDateErrorMessage="Date of birth cannot be in the future."
+                pastDateErrorMessage="Please enter a valid date of birth." placeholder="DD-MM-YYYY" [mandatory]="true">
+            </app-ilogi-input-date>
 
 
-<app-ilogi-input-date
-  fieldLabel="Meeting Date"
-  fieldId="meetingDate"
-  [monthsRange]="0.25"
-  [allowFutureDates]="true"
-  [futureMonthsRange]="3"
-  futureDateErrorMessage="Meeting cannot be scheduled more than 3 months in advance."
-  pastDateErrorMessage="Meeting date must be within the last week or in the future."
-  placeholder="DD-MM-YYYY"
-  [mandatory]="true">
-</app-ilogi-input-date>
-</div>
+            <app-ilogi-input-date fieldLabel="Meeting Date" fieldId="meetingDate" [monthsRange]="0.25"
+                [allowFutureDates]="true" [futureMonthsRange]="3"
+                futureDateErrorMessage="Meeting cannot be scheduled more than 3 months in advance."
+                pastDateErrorMessage="Meeting date must be within the last week or in the future."
+                placeholder="DD-MM-YYYY" [mandatory]="true">
+            </app-ilogi-input-date>
+        </div>
         <button type="submit" [disabled]="loading">Submit</button>
     </form>
     <div class="example-box" cdkDrag>
