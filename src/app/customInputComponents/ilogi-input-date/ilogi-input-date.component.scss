@@ -1,31 +1,50 @@
 .form-group {
   margin-bottom: 1rem;
 }
+label {
+  margin-bottom: 0.5rem; /* Controls space between label and input */
+}
+.bold-label {
+  font-weight: 500 !important; /* Bold when readonly */
+}
 
 .form-control.date-input {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  background: rgba(233, 236, 239, 0.1);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  color: #333;
-  padding: 0.5rem 2.5rem 0.5rem 0.5rem; /* Increased right padding for icon */
-  width: 100%; /* Full width for input */
-  box-sizing: border-box;
+  border: 1px solid var(--color-border, #ced4da);
+  border-radius: 6px;
+  background-color: var(--color-background, #ffffff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: var(--color-text-primary, #333333);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control.date-input:focus {
+  outline: none;
+  border-color: var(--color-info, #0a54c4); /* Highlight on focus */
+  box-shadow: 0 0 0 3px rgba(6, 41, 236, 0.2); /* Subtle glow effect */
 }
 
 .is-invalid.date-input-invalid {
-  border-color: #dc3545;
+  border-color: var(--color-error, #dc3545);
+}
+.is-invalid.date-input-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
 }
 
+
 .invalid-input {
-  display: none;
-  color: #dc3545;
+  opacity: 0;
+  color: var(--color-error, #dc3545);
   font-size: 0.875rem;
+  margin-top: 0.25rem;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .invalid-input.show-error {
-  display: block;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .red-font {
@@ -99,69 +118,5 @@
 
 
 
-.invalid-input {
-  display: block;
-  width: 100%;
-  margin-top: 5px;
-}
 
-.error-msg-text {
-  color: #dc3545;
-  font-size: 12px;
-  font-weight: 400;
-  margin-top: 2px;
-  display: block;
-}
 
-.red-font {
-  color: #dc3545;
-}
-
-.date-input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.date-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.date-input.is-invalid,
-.date-input.date-input-invalid {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-}
-
-.calendar-icon {
-  position: absolute;
-  right: 10px;
-  cursor: pointer;
-  color: #6c757d;
-}
-
-.calendar-icon:hover {
-  color: #007bff;
-}
-
-.form-control {
-  display: block;
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.show-error {
-  display: block !important;
-}

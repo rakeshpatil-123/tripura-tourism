@@ -1,63 +1,279 @@
-<div class="container-fluid">
-    <h2>Application Status</h2>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="col-md-12 form-group-margin">
-            <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255" [readonly]="false" [mandatory]="true"
-                fieldLabel="Registration Certificate No." placeholder="Enter" fieldId="registrationCertificateNo"
-                [errorMessages]="errorMessages.registrationCertificateNo"
-                formControlName="registrationCertificateNo"></app-ilogi-input>
+<div class="container-fluid top-space">
+    <div class="row">
+        <div class="col-md-12 main-container top-space">
+            <span class="font-weight-bold theme-blue-color-text">Dashboard</span> >
+            <span class="font-weight-bold theme-blue-color-text">List of Schemes</span> > Application
+            <span class="pull-right">All <span class="red-text-color">*</span> marked fields are mandatory</span>
+            <hr />
+            <form [formGroup]="form" [ngClass]="{ 'disabled-form-fields': isViewMode }" (ngSubmit)="onSubmit()">
+                <div class="mt-4">
+                    <span class="heder-color">Application For Scheme For Funeral Assistance In Case Of Death Of
+                        Registered Construction Worker</span>
+                </div>
+                <div class="row mt-4">
+                    <!-- Registration Certificate No. -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Registration No." placeholder="Enter"
+                                    fieldId="registrationCertificateNo"
+                                    [errorMessages]="errorMessages.registrationCertificateNo"
+                                    formControlName="registrationCertificateNo" [readonly]="isViewMode"
+                                    [errors]="registrationCertificateNoErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- District -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="District" placeholder="Enter" fieldId="district"
+                                    [errorMessages]="errorMessages.district" formControlName="district"
+                                    [readonly]="isViewMode" [errors]="districtErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Sub Division -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Sub Division" placeholder="Enter"
+                                    fieldId="subDivision" [errorMessages]="errorMessages.subDivision"
+                                    formControlName="subDivision" [readonly]="isViewMode"
+                                    [errors]="subDivisionErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Block -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Block" placeholder="Enter" fieldId="block"
+                                    [errorMessages]="errorMessages.block" formControlName="block"
+                                    [readonly]="isViewMode" [errors]="blockErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pin Code -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="6" [mandatory]="true"
+                                    fieldLabel="Pin Code" placeholder="Enter" fieldId="pinCode"
+                                    [errorMessages]="errorMessages.pinCode" formControlName="pinCode"
+                                    [readonly]="isViewMode" [errors]="pinCodeErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Address -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="textarea" [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Address" placeholder="Enter" fieldId="address"
+                                    [errorMessages]="errorMessages.address" formControlName="address"
+                                    [readonly]="isViewMode" [errors]="addressErrors" rows="4"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Name of Deceased Worker -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Name of Deceased Worker" placeholder="Enter"
+                                    fieldId="name_of_deceased_worker"
+                                    [errorMessages]="errorMessages.name_of_deceased_worker"
+                                    formControlName="name_of_deceased_worker" [readonly]="isViewMode"
+                                    [errors]="nameOfDeceasedWorkerErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Present Address -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="textarea" [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Present Address" placeholder="Enter" fieldId="present_address"
+                                    [errorMessages]="errorMessages.present_address" formControlName="present_address"
+                                    [readonly]="isViewMode" [errors]="presentAddressErrors" rows="4"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Is Married -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-select [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Whether the worker is married" placeholder="Select"
+                                    [selectOptions]="typeOptions" fieldId="isMarried"
+                                    [errorMessages]="errorMessages.isMarried" formControlName="isMarried"
+                                    [readonly]="isViewMode" [errors]="isMarriedErrors"></app-ilogi-select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Type of Beneficiary -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-select [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Type of Beneficiary" placeholder="Select"
+                                    [selectOptions]="typeBeneficiaryOptions" fieldId="type_beneficiary"
+                                    [errorMessages]="errorMessages.type_beneficiary" formControlName="type_beneficiary"
+                                    [readonly]="isViewMode" [errors]="typeBeneficiaryErrors"></app-ilogi-select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Dependent Beneficiary -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="form.get('type_beneficiary')?.value === 'Dependent'"
+                                    fieldLabel="Dependent Beneficiary" placeholder="Enter"
+                                    fieldId="dependent_beneficiary"
+                                    [errorMessages]="errorMessages.dependent_beneficiary"
+                                    formControlName="dependent_beneficiary" [readonly]="isViewMode"
+                                    [errors]="dependentBeneficiaryErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Other Beneficiary Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="form.get('type_beneficiary')?.value === 'Other'"
+                                    fieldLabel="Other Beneficiary Name" placeholder="Enter"
+                                    fieldId="other_beneficiary_name"
+                                    [errorMessages]="errorMessages.other_beneficiary_name"
+                                    formControlName="other_beneficiary_name" [readonly]="isViewMode"
+                                    [errors]="otherBeneficiaryNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Date of Death -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input-date [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Date of Death" placeholder="DD-MM-YYYY" fieldId="date_of_death"
+                                    [errorMessages]="errorMessages.date_of_death" formControlName="date_of_death"
+                                    [errors]="dateOfDeathErrors" [monthsRange]="6"
+                                    [futureDateErrorMessage]="'Date of death cannot be in the future.'"
+                                    [pastDateErrorMessage]="'Date of death must be within the last 6 months.'"
+                                    [readonly]="isViewMode"></app-ilogi-input-date>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mother Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Mother Name" placeholder="Enter"
+                                    fieldId="mother_name" [errorMessages]="errorMessages.mother_name"
+                                    formControlName="mother_name" [readonly]="isViewMode"
+                                    [errors]="motherNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Guardian Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Guardian Name" placeholder="Enter"
+                                    fieldId="guardian_name" [errorMessages]="errorMessages.guardian_name"
+                                    formControlName="guardian_name" [readonly]="isViewMode"
+                                    [errors]="guardianNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Bank Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Bank Name" placeholder="Enter" fieldId="bankName"
+                                    [errorMessages]="errorMessages.bankName" formControlName="bankName"
+                                    [readonly]="isViewMode" [errors]="bankNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- IFSC Code -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="11" [mandatory]="true"
+                                    fieldLabel="IFSC Code" placeholder="Enter" fieldId="ifscCode"
+                                    [errorMessages]="errorMessages.ifscCode" formControlName="ifscCode"
+                                    [readonly]="isViewMode" [errors]="ifscCodeErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Account Number -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="20" [mandatory]="true"
+                                    fieldLabel="Account Number" placeholder="Enter" fieldId="accountNumber"
+                                    [errorMessages]="errorMessages.accountNumber" formControlName="accountNumber"
+                                    [readonly]="isViewMode" [errors]="accountNumberErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Name on Passbook -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Name on Passbook" placeholder="Enter"
+                                    fieldId="nameOnPassbook" [errorMessages]="errorMessages.nameOnPassbook"
+                                    formControlName="nameOnPassbook" [readonly]="isViewMode"
+                                    [errors]="nameOnPassbookErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Death Certificate Number -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Death Certificate Number" placeholder="Enter"
+                                    fieldId="death_certificate_number"
+                                    [errorMessages]="errorMessages.death_certificate_number"
+                                    formControlName="death_certificate_number" [readonly]="isViewMode"
+                                    [errors]="deathCertificateNumberErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Nature of Death -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-select [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Nature of Death" placeholder="Select"
+                                    [selectOptions]="typeOptionsNatureOfDeath" fieldId="nature_of_death"
+                                    [errorMessages]="errorMessages.nature_of_death" formControlName="nature_of_death"
+                                    [readonly]="isViewMode" [errors]="natureOfDeathErrors"></app-ilogi-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-4 mb-5 text-center">
+                    <button *ngIf="!isViewMode" type="submit" class="btn save-btn ml-2 pl-4 pr-4">
+                        Submit
+                    </button>
+                    <button *ngIf="isViewMode" (click)="backClicked()" class="btn save-btn ml-2 pl-4 pr-4">
+                        Back
+                    </button>
+                </div>
+            </form>
         </div>
-        <div class="col-md-12 form-group-margin">
-            <app-ilogi-input-date fieldLabel="Transaction Date" fieldId="transactionDate" [monthsRange]="6"
-                placeholder="DD-MM-YYYY" [mandatory]="true">
-            </app-ilogi-input-date>
-
-
-            <app-ilogi-input-date fieldLabel="Employment Start Date" fieldId="employmentDate" [monthsRange]="12"
-                futureDateErrorMessage="Employment date cannot be in the future. Please select a valid date."
-                pastDateErrorMessage="Employment date must be within the last 12 months. Please select a more recent date."
-                placeholder="DD-MM-YYYY" [mandatory]="true">
-            </app-ilogi-input-date>
-
-
-            <app-ilogi-input-date fieldLabel="Event Date" fieldId="eventDate" [monthsRange]="3"
-                [allowFutureDates]="true" [futureMonthsRange]="2"
-                futureDateErrorMessage="Event date cannot be more than 2 months in the future."
-                pastDateErrorMessage="Event date must be within the last 3 months." placeholder="DD-MM-YYYY"
-                [mandatory]="true">
-            </app-ilogi-input-date>
-
-
-            <app-ilogi-input-date fieldLabel="Invoice Date" fieldId="invoiceDate" [monthsRange]="1"
-                futureDateErrorMessage="Invoice date cannot be in the future. Please select today or a past date."
-                pastDateErrorMessage="Invoice date must be within the last month. Older invoices require special approval."
-                placeholder="DD-MM-YYYY" [mandatory]="true">
-            </app-ilogi-input-date>
-
-
-            <app-ilogi-input-date fieldLabel="Previous Job End Date" fieldId="previousJobDate" [monthsRange]="18"
-                futureDateErrorMessage="Previous job end date cannot be in the future."
-                pastDateErrorMessage="Previous job end date must be within the last 18 months for this application."
-                placeholder="DD-MM-YYYY" [mandatory]="false">
-            </app-ilogi-input-date>
-
-
-            <app-ilogi-input-date fieldLabel="Date of Birth" fieldId="birthDate" [monthsRange]="1200"
-                futureDateErrorMessage="Date of birth cannot be in the future."
-                pastDateErrorMessage="Please enter a valid date of birth." placeholder="DD-MM-YYYY" [mandatory]="true">
-            </app-ilogi-input-date>
-
-
-            <app-ilogi-input-date fieldLabel="Meeting Date" fieldId="meetingDate" [monthsRange]="0.25"
-                [allowFutureDates]="true" [futureMonthsRange]="3"
-                futureDateErrorMessage="Meeting cannot be scheduled more than 3 months in advance."
-                pastDateErrorMessage="Meeting date must be within the last week or in the future."
-                placeholder="DD-MM-YYYY" [mandatory]="true">
-            </app-ilogi-input-date>
-        </div>
-        <button type="submit" [disabled]="loading">Submit</button>
-    </form>
-    <div class="example-box" cdkDrag>
-        Drag me around
     </div>
 </div>
