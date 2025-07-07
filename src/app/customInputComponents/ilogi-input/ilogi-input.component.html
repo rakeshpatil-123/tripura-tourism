@@ -17,7 +17,9 @@
     </div>
     <input matInput *ngIf="type !== 'textarea' && !readonly" appBlockCopyPaste [blockCopyPaste]="appBlockCopyPaste"
         [type]="type" [placeholder]="placeholder" [id]="fieldId" [value]="value" (input)="onInputChange($event)"
+
         [attr.maxlength]="maxlength" [readonly]="readonly" [disabled]="readonly || isDisabled"
+
         [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
         (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control"
         [ngClass]="{ 'is-invalid': submitted && errors }" (blur)="changeBlur($event)" />
