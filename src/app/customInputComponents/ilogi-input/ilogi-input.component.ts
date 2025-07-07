@@ -33,13 +33,14 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
   @Input() readonly = false;
   @Input() maxlength: string | number = '255';
   @Input() rows: string = '2';
+  @Input() errors: { [key: string]: any } | null = null;
   @Output() blur = new EventEmitter<Event>();
 
   errorFieldId = '';
   isHovered = false;
   value: any;
   isDisabled = false;
-  errors: { [key: string]: any } | null = null;
+  // errors: { [key: string]: any } | null = null;
 
   private onChange: (value: any) => void = () => { };
   private onTouched: () => void = () => { };

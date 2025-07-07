@@ -44,7 +44,7 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
   @Input() appBlockCopyPaste = false;
   @Input() readonly = true;
   @Input() errors: { [key: string]: any } | null = null;
-  
+
   // New inputs for dynamic date range and custom messages
   @Input() monthsRange: number = 6; // Default to 6 months
   @Input() futureDateErrorMessage: string = 'Future dates are not allowed. Please select a date within the allowed range.';
@@ -76,7 +76,7 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
     if (this.fieldId) {
       this.errorFieldId = `invalid-input-${this.fieldId}`;
     }
-    
+
     // Set up date range based on inputs
     this.setupDateRange();
   }
@@ -87,7 +87,7 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
 
   private setupDateRange(): void {
     const today = new Date();
-    
+
     // Set max date
     if (this.allowFutureDates && this.futureMonthsRange > 0) {
       this.maxDate = new Date();
@@ -95,11 +95,11 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
     } else {
       this.maxDate = new Date(); // Today
     }
-    
+
     // Set min date
     this.minDate = new Date();
     this.minDate.setMonth(this.minDate.getMonth() - this.monthsRange);
-    
+
     // Update error messages with dynamic range
     this.updateErrorMessages();
   }
@@ -112,7 +112,7 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
         this.futureDateErrorMessage = `Future dates are not allowed. Please select a date within the last ${this.monthsRange} months.`;
       }
     }
-    
+
     if (this.pastDateErrorMessage.includes('allowed range')) {
       this.pastDateErrorMessage = `Date must be within the last ${this.monthsRange} months. Please select a more recent date.`;
     }
@@ -150,7 +150,7 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
       const selectedDate = moment(value).toDate();
       const today = new Date();
       today.setHours(23, 59, 59, 999); // Set to end of day for comparison
-      
+
       const pastLimitDate = new Date();
       pastLimitDate.setMonth(pastLimitDate.getMonth() - this.monthsRange);
       pastLimitDate.setHours(0, 0, 0, 0); // Set to start of day for comparison
@@ -168,7 +168,7 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
         const futureLimitDate = new Date();
         futureLimitDate.setMonth(futureLimitDate.getMonth() + this.futureMonthsRange);
         futureLimitDate.setHours(23, 59, 59, 999);
-        
+
         if (selectedDate > futureLimitDate) {
           this.dateRangeError = this.futureDateErrorMessage;
           this.value = null;
