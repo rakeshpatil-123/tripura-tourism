@@ -7,6 +7,7 @@
     calendar-body-label-text-color: var(--color-warning),
     calendar-container-background-color: var(--color-brand-dark),
   ));
+
   /* Base Colors */
   --color-primary-bg: hsl(0, 0%, 100%); // #ffffff - Main white background
   --color-card-bg: hsl(0, 0%, 100%); // #ffffff - Card background
@@ -215,53 +216,6 @@ body {
   width: calc(100% - 60px); /* Desktop calculation */
 }
 
-// ... other styles (menu-toggle-height, etc.)
-
-/* REMOVE OR COMMENT OUT THIS "Old style" block entirely. It's conflicting. */
-/* ***************** Side Menu Starts********************* */
-/*
-.sidebar-container {
-  width: 5%;
-  transition: 0.5s;
-  background-color: var(--color-brand-primary);
-  min-height: 477px;
-}
-
-.sidebar-container.active {
-  width: 17%;
-  transition: 0.5s;
-  background-color: var(--color-brand-primary);
-}
-
-// Hide and show nav labels/icons
-.sidebar-container .sidebar li a .nav-label,
-.sidebar-container .sidebar li a .nav-label-sub,
-.sidebar-container.active .sidebar li a i {
-  display: none !important;
-}
-
-.sidebar-container.active .sidebar li a .nav-label,
-.sidebar-container.active .sidebar li a .nav-label-sub,
-.sidebar-container .sidebar li a i {
-  display: inline-block !important;
-}
-
-.main-container {
-  width: 83%;
-  transition: 0.5s;
-  background-color: var(--color-primary-bg);
-  color: var(--color-text-primary);
-}
-
-.main-container.active {
-  width: 95%;
-  transition: 0.5s;
-  background-color: var(--color-primary-bg);
-  color: var(--color-text-primary);
-}
-
-// ... rest of old styles
-*/
 
 
 @media (max-width: 768px) {
@@ -328,4 +282,8 @@ body {
   body.menu-open {
     overflow-x: hidden;
   }
+
+
+  
+  
 }

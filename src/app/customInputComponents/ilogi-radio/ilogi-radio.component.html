@@ -1,47 +1,25 @@
 <div class="form-group">
-  <label *ngIf="!hideLabel" for="{{ fieldId }}"
-    >{{ fieldLabel }} <span *ngIf="mandatory" class="red-font">*</span></label
-  >
-  <div
-    *ngIf="submitted && errors"
-    class="invalid-input"
-    [id]="errorFieldId"
-    [ngClass]="{ 'show-error': isHovered }"
-  >
-    <ng-container *ngFor="let item of errors || {} | keyvalue; let i = index">
-      <div *ngIf="i === 0" class="x-error-msg-text">
-        {{ errorMessages[item.key] || item.value?.message }}
-      </div>
-    </ng-container>
-    <ng-container *ngIf="errors as errors">
-      <div *ngIf="errors['custom']?.status" class="x-error-msg-text">
-        {{ errors["custom"].message }}
-      </div>
-    </ng-container>
-  </div>
-  <div class="show-data" *ngIf="!fieldExactVal">
-    {{ value === "1" ? "Yes" : value === "0" ? "No" : value }}
-  </div>
-  <div class="show-data" *ngIf="fieldExactVal">{{ fieldExactVal }}</div>
-  <mat-radio-group
-    [id]="fieldId"
-    [value]="value"
-    (change)="onChangeControl($event.value)"
-    (mouseenter)="showErrorOnFieldHover()"
-    (mouseleave)="hideErrorOnFieldHoverOut()"
-    [ngClass]="{ 'is-invalid mat-input-invalid': submitted && errors }"
-    [disabled]="readonly || isDisabled"
-    color="accent"
-    aria-label="Select an option"
-    [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
-    [attr.aria-describedby]="errorFieldId"
-  >
-    <mat-radio-button
-      *ngFor="let radio of radioOptions"
-      [value]="radio.value"
-      class="mr-2"
-    >
-      {{ radio.name }}
-    </mat-radio-button>
-  </mat-radio-group>
+
+    <label *ngIf="!hideLabel" for="{{fieldId}}" [class.bold-label]="readonly">{{fieldLabel}} <span *ngIf="mandatory"
+            class="red-font">*</span></label>
+    <div *ngIf="submitted && errors" class="invalid-input" [id]="errorFieldId" [ngClass]="{ 'show-error': isHovered }">
+        <ng-container *ngFor="let item of (errors || {} | keyvalue); let i = index">
+            <div *ngIf="i === 0" class="x-error-msg-text">{{ errorMessages[item.key] || item.value?.message }}</div>
+        </ng-container>
+        <ng-container *ngIf="errors as errors">
+            <div *ngIf="errors['custom']?.status" class="x-error-msg-text">{{ errors['custom'].message }}</div>
+        </ng-container>
+    </div>
+    <div class="show-data" *ngIf="!fieldExactVal">{{ value === '1' ? 'Yes' : (value === '0' ? 'No' : value) }}</div>
+    <div class="show-data" *ngIf="fieldExactVal">{{ fieldExactVal }}</div>
+    <mat-radio-group *ngIf="!readonly" [id]="fieldId" [value]="value" (change)="onChangeControl($event.value)"
+        (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()"
+        [ngClass]="{ 'is-invalid mat-input-invalid': submitted && errors }" [disabled]="readonly || isDisabled"
+        color="accent" aria-label="Select an option" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+        [attr.aria-describedby]="errorFieldId">
+        <mat-radio-button *ngFor="let radio of radioOptions" [value]="radio.value" class="mr-2">
+            {{ radio.name }}
+        </mat-radio-button>
+    </mat-radio-group>
 </div>
+

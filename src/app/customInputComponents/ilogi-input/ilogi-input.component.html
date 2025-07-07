@@ -1,5 +1,6 @@
 <div class="form-group">
-    <label *ngIf="!hideLabel" for="{{fieldId}}">{{fieldLabel}} <span *ngIf="mandatory" class="red-font">*</span></label>
+    <label *ngIf="!hideLabel" for="{{fieldId}}" [class.bold-label]="readonly">{{fieldLabel}} <span *ngIf="mandatory"
+            class="red-font">*</span></label>
     <div *ngIf="submitted && errors" class="invalid-input" [id]="errorFieldId" [ngClass]="{ 'show-error': isHovered }">
         <ng-container *ngFor="let item of (errors || {} | keyvalue); let i = index">
             <div *ngIf="i === 0" class="x-error-msg-text">{{ errorMessages[item.key] || item.value?.message }}</div>
@@ -16,13 +17,15 @@
     </div>
     <input matInput *ngIf="type !== 'textarea' && !readonly" appBlockCopyPaste [blockCopyPaste]="appBlockCopyPaste"
         [type]="type" [placeholder]="placeholder" [id]="fieldId" [value]="value" (input)="onInputChange($event)"
-        [attr.maxlength]="maxlength" [readonly]="readonly" [disabled]="isDisabled"
+
+        [attr.maxlength]="maxlength" [readonly]="readonly" [disabled]="readonly || isDisabled"
+
         [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
         (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control"
         [ngClass]="{ 'is-invalid': submitted && errors }" (blur)="changeBlur($event)" />
     <textarea matInput *ngIf="type === 'textarea' && !readonly" [value]="value" (input)="onInputChange($event)"
         [attr.maxlength]="maxlength" [placeholder]="placeholder" [id]="fieldId" [rows]="rows" [readonly]="readonly"
-        [disabled]="isDisabled" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+        [disabled]="readonly || isDisabled" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
         [attr.aria-describedby]="errorFieldId" (mouseenter)="showErrorOnFieldHover()"
         (mouseleave)="hideErrorOnFieldHoverOut()" class="form-control" [ngClass]="{ 'is-invalid': submitted && errors }"
         (blur)="changeBlur($event)"></textarea>
