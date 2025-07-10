@@ -7,6 +7,10 @@
     calendar-body-label-text-color: var(--color-warning),
     calendar-container-background-color: var(--color-brand-dark),
   ));
+  @include mat.form-field-overrides((
+    disabled-input-text-placeholder-color:var(--color-warning),
+    disabled-leading-icon-color: var(--color-brand-dark),
+  ));
 
   /* Base Colors */
   --color-primary-bg: hsl(0, 0%, 100%); // #ffffff - Main white background
