@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared-imports';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { LoaderService } from '../../_service/loader/loader.service';
+import { GenericService } from '../../_service/generic/generic.service'; // Updated import path
 import { CdkDrag } from '@angular/cdk/drag-drop';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiInputDateComponent } from '../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
@@ -99,6 +100,7 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
     private router: Router,
     private loaderService: LoaderService,
     private cdr: ChangeDetectorRef,
+    private genericService: GenericService,
     private location: Location
   ) {
     this.router.events.subscribe(event => {
@@ -143,7 +145,28 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
     });
 
     this.getSavedData();
+    this.getSavedData1();
   }
+
+  getSavedData1(): void {
+    this.loaderService.showLoader();
+    this.genericService.getByConditions({}, 'api/get-static-content').subscribe({
+      next: (res) => {
+        if (res['status_code'] === 1) {
+          this.commonApplicationFormContractLabourDetails = res['result'] || {};
+          this.patchFormData();
+        }
+        this.loaderService.hideLoader();
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.loaderService.hideLoader();
+        this.genericService.removeSessionAndReturn(error);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
 
   getSavedData() {
     // Simulate fetching data (replace with actual service call)
