@@ -13,7 +13,7 @@ import { Location } from '@angular/common';
   selector: 'app-external-services-redirection-tracking',
   standalone: true,
 
-  imports: [SHARED_IMPORTS, CdkDrag, IlogiInputComponent, IlogiInputDateComponent, IlogiSelectComponent],
+  imports: [SHARED_IMPORTS, IlogiInputComponent, IlogiInputDateComponent, IlogiSelectComponent],
   templateUrl: './external-services-redirection-tracking.component.html',
   styleUrls: ['./external-services-redirection-tracking.component.scss']
 })
