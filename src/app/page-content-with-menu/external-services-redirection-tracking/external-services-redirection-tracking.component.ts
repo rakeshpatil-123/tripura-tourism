@@ -143,9 +143,9 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
       otherControl?.updateValueAndValidity();
       this.cdr.detectChanges();
     });
-
-    this.getSavedData();
     this.getSavedData1();
+    this.getSavedData();
+
   }
 
   getSavedData1(): void {
