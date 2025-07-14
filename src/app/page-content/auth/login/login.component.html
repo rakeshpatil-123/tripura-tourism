@@ -20,7 +20,7 @@
           />
           <div *ngIf="email?.invalid && email?.touched" class="error-message">
             <span *ngIf="email?.errors?.['required']">Email is required</span>
-            <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+            <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>   
           </div>
         </div>
 
@@ -73,7 +73,7 @@
         </button>
 
         <div class="signup-link">
-          <p>Don't have an account? <a href="#" class="signup-text">Sign up here</a></p>
+          <p>Don't have an account? <a [routerLink]="['/auth/registration']"  class="signup-text">Sign up here</a></p>
         </div>
       </form>
     </div>
