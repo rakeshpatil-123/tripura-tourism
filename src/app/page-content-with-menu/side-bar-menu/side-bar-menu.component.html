@@ -1,12 +1,12 @@
-<aside class="sidebar" [class.collapsed]="isCollapsed" [class.desktop-only]="true">
+<aside class="sidebar" [class.collapsed]="isCollapsed" [class.visible-mobile]="isVisible">
   <div class="sidebar-header">
     <div class="brand-section" *ngIf="!isCollapsed">
       <div class="brand-logo">
-        <!-- <span class="logo-icon">⚡</span> -->
         <span class="brand-name">Swaagat</span>
       </div>
     </div>
-    <button class="toggle-btn" (click)="onToggleSidebar()" 
+    <button class="toggle-btn" 
+            (click)="onToggle.emit()" 
             [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
       <span class="material-icons">
         {{ isCollapsed ? 'menu' : 'menu_open' }}
@@ -15,9 +15,6 @@
   </div>
 
   <div class="user-profile" *ngIf="!isCollapsed">
-    <!-- <div class="user-avatar">
-      <img src="/assets/images/default-avatar.png" alt="User Avatar" />
-    </div> -->
     <div class="user-info">
       <div class="user-name">Joydeep Debnath</div>
       <div class="user-role">{{ currentUser.role | titlecase }}</div>
@@ -33,7 +30,7 @@
         <div class="nav-link" 
              *ngIf="!hasChildren(item)"
              [class.active]="item.isActive"
-             (click)="navigateToRoute(item.route!)"
+             (click)="handleNavigation(item.route)"
              [attr.title]="isCollapsed ? item.title : null">
           <span class="nav-icon material-icons">{{ item.icon }}</span>
           <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
@@ -59,7 +56,7 @@
           <li class="submenu-item" *ngFor="let child of item.children">
             <div class="submenu-link" 
                  [class.active]="child.isActive"
-                 (click)="navigateToRoute(child.route!)"
+                 (click)="handleNavigation(child.route)"
                  [attr.title]="child.title">
               <span class="submenu-icon material-icons">{{ child.icon }}</span>
               <span class="submenu-text">{{ child.title }}</span>
@@ -93,7 +90,3 @@
     </button>
   </div>
 </aside>
-
-<div class="sidebar-backdrop" 
-     *ngIf="!isCollapsed" 
-     (click)="onToggleSidebar()"></div>
