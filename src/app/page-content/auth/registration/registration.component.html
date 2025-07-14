@@ -1,0 +1,97 @@
+<div class="registration-container">
+  <mat-card class="registration-card">
+    <mat-card-header>
+      <mat-card-title class="registration-title">
+        <mat-icon>person_add</mat-icon>
+        New User Registration
+      </mat-card-title>
+    </mat-card-header>
+
+      <mat-card-content>
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
+        <div class="form-grid">
+          
+          <ng-container *ngFor="let field of formFields">
+            
+            
+            <mat-form-field *ngIf="field.type === 'text' || field.type === 'email' || field.type === 'tel'" 
+                           class="form-field" 
+                           [ngClass]="{'half-width': field.name !== 'registeredEnterpriseAddress'}">
+              <mat-label>
+                {{ field.label }}
+                <span class="required-asterisk" *ngIf="field.required">*</span>
+              </mat-label>
+              <input matInput 
+                     [type]="field.type"
+                     [formControlName]="field.name"
+                     [placeholder]="field.placeholder || ''"
+                     [required]="field.required">
+              <mat-error *ngIf="hasError(field.name)">
+                {{ getErrorMessage(field) }}
+              </mat-error>
+            </mat-form-field>
+
+            
+            <mat-form-field *ngIf="field.type === 'textarea'" 
+                           class="form-field full-width">
+              <mat-label>
+                {{ field.label }}
+                <span class="required-asterisk" *ngIf="field.required">*</span>
+              </mat-label>
+              <textarea matInput 
+                       [formControlName]="field.name"
+                       [placeholder]="field.placeholder || ''"
+                       [rows]="field.rows || 3"
+                       [required]="field.required"></textarea>
+              <mat-error *ngIf="hasError(field.name)">
+                {{ getErrorMessage(field) }}
+              </mat-error>
+            </mat-form-field>
+
+            
+            <div *ngIf="field.type === 'radio'" class="form-field radio-group">
+              <label class="field-label">
+                {{ field.label }}
+                <span class="required-asterisk" *ngIf="field.required">*</span>
+              </label>
+              <mat-radio-group [formControlName]="field.name" class="radio-buttons">
+                <mat-radio-button *ngFor="let option of field.options" 
+                                 [value]="option.value"
+                                 class="radio-option">
+                  {{ option.label }}
+                </mat-radio-button>
+              </mat-radio-group>
+              <mat-error *ngIf="hasError(field.name)" class="radio-error">
+                {{ getErrorMessage(field) }}
+              </mat-error>
+            </div>
+
+          </ng-container>
+        </div>
+
+        
+        <div class="form-actions">
+          <button mat-raised-button 
+                  type="button" 
+                  color="basic" 
+                  (click)="onReset()"
+                  [disabled]="isSubmitting"
+                  class="reset-button">
+            <mat-icon>refresh</mat-icon>
+            Reset
+          </button>
+          
+          <button mat-raised-button 
+                  type="submit" 
+                  color="primary"
+                  [disabled]="isSubmitting"
+                  class="submit-button">
+            <mat-icon *ngIf="!isSubmitting">how_to_reg</mat-icon>
+            <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+            {{ isSubmitting ? 'Registering...' : 'Register' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,24 @@
+import { Routes } from "@angular/router";
+import { PageContentComponent } from "./page-content.component";
+import { LoginComponent } from "./auth/login/login.component";
+
+
+
+
+
+export const PAGE_CONTENT_ROUTES: Routes = [
+    {
+        path: '',
+        component:LoginComponent ,
+        canActivate: [],
+
+        children: [
+            {
+                path: 'login',
+                loadComponent: () =>
+                    import('./auth/login/login.component').then(m => m.LoginComponent)
+            },
+            
+        ]
+    }
+];
