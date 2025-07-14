@@ -14,8 +14,8 @@ import { LayoutService } from '../_service/layout.service';
 })
 export class PageContentWithMenuComponent implements OnInit, OnDestroy {
   isDesktopMenuOpen = true;   // Manages desktop collapsed state
-  isMobileMenuVisible = false; // Manages mobile overlay visibility
-  isMobile = false;
+  isMobileMenuVisible = true; // Manages mobile overlay visibility
+  isMobile = true;
   private layoutSub: Subscription | undefined;
 
   constructor(private layoutService: LayoutService) {}

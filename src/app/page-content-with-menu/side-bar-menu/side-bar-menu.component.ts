@@ -57,8 +57,8 @@ interface UserRole {
   ],
 })
 export class SidebarComponent implements OnInit, OnChanges {
-  @Input() isCollapsed = false;
-  @Input() isVisible = false; 
+  @Input() isCollapsed = true;
+  @Input() isVisible = true; 
   @Input() currentUser: UserRole = { role: 'admin', permissions: [] };
 
   @Output() onToggle = new EventEmitter<void>();
