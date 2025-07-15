@@ -2,7 +2,7 @@
 
 $sidebar-width-expanded: 280px;
 $sidebar-width-collapsed: 70px;
-$top-navbar-height: 40px; // Match header height
+$top-navbar-height: 70px; // Match header height
 $transition-speed: 0.3s;
 $mobile-breakpoint: 1024px;
 
@@ -61,22 +61,21 @@ $mobile-breakpoint: 1024px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 16px;
+  padding: 15px 16px;
   border-bottom: 1px solid var(--color-border-light, #e9ecef);
-  background-color: var(--color-surface, #f8f9fa);
-  position: relative;
+  background-color: #c10e21; // Match the red color from screenshots
+  color: white;
 }
 
 .sidebar-header .brand-section .brand-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
 .sidebar-header .brand-section .brand-name {
   font-size: 18px;
   font-weight: 600;
-  color: var(--color-text-primary, #212529);
+  color: white;
 }
 
 .sidebar-header .toggle-btn {
@@ -85,7 +84,7 @@ $mobile-breakpoint: 1024px;
   cursor: pointer;
   padding: 8px;
   border-radius: 8px;
-  color: var(--color-text-secondary, #6c757d);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,8 +92,7 @@ $mobile-breakpoint: 1024px;
 }
 
 .sidebar-header .toggle-btn:hover {
-  background-color: var(--color-brand-light, #eef5ff);
-  color: var(--color-brand-primary, #0d6efd);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-header .toggle-btn .material-icons {

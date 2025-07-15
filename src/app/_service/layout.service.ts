@@ -7,6 +7,9 @@ import { BehaviorSubject } from 'rxjs';
 export class LayoutService {
   private sidebarOpenSubject = new BehaviorSubject<boolean>(false);
   sidebarOpen$ = this.sidebarOpenSubject.asObservable();
+  
+  private sidebarCollapsedSubject = new BehaviorSubject<boolean>(false);
+  sidebarCollapsed$ = this.sidebarCollapsedSubject.asObservable();
 
   constructor() {}
 
@@ -27,5 +30,9 @@ export class LayoutService {
     } else {
       this.openSidebar();
     }
+  }
+  
+  setSidebarCollapsed(isCollapsed: boolean): void {
+    this.sidebarCollapsedSubject.next(isCollapsed);
   }
 }
