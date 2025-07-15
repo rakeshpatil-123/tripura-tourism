@@ -1,5 +1,5 @@
-$sidebar-width-expanded: 135px;
-$sidebar-width-collapsed: 70px;
+$sidebar-width-expanded: 0px;
+$sidebar-width-collapsed: 0px;
 $top-navbar-height: 40px; /* Matches your header's height */
 $transition-speed: 0.3s;
 $mobile-breakpoint: 1024px;
@@ -57,4 +57,11 @@ $mobile-breakpoint: 1024px;
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Prevent scrolling when sidebar is open on mobile */
+body.sidebar-open {
+  @media (max-width: $mobile-breakpoint) {
+    overflow: hidden;
+  }
 }

@@ -5,18 +5,27 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class LayoutService {
-  private sidebarOpen = new BehaviorSubject<boolean>(false);
-  sidebarOpen$ = this.sidebarOpen.asObservable();
+  private sidebarOpenSubject = new BehaviorSubject<boolean>(false);
+  sidebarOpen$ = this.sidebarOpenSubject.asObservable();
 
-  constructor() { }
+  constructor() {}
 
-  toggleSidebar(): void {
-    this.sidebarOpen.next(!this.sidebarOpen.value);
+  openSidebar(): void {
+    this.sidebarOpenSubject.next(true);
+    document.body.classList.add('sidebar-open');
   }
 
   closeSidebar(): void {
-    if (this.sidebarOpen.value) {
-      this.sidebarOpen.next(false);
+    this.sidebarOpenSubject.next(false);
+    document.body.classList.remove('sidebar-open');
+  }
+
+  toggleSidebar(): void {
+    const isOpen = this.sidebarOpenSubject.getValue();
+    if (isOpen) {
+      this.closeSidebar();
+    } else {
+      this.openSidebar();
     }
   }
 }
