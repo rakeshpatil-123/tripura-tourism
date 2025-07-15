@@ -13,9 +13,9 @@ import { LayoutService } from '../_service/layout.service';
   styleUrl: './page-content-with-menu.component.scss'
 })
 export class PageContentWithMenuComponent implements OnInit, OnDestroy {
-  isDesktopMenuOpen = true;   // Manages desktop collapsed state
-  isMobileMenuVisible = true; // Manages mobile overlay visibility
-  isMobile = true;
+  isDesktopMenuOpen = true;   // Manages desktop collapsed state - default expanded
+  isMobileMenuVisible = false; // Manages mobile overlay visibility
+  isMobile = false;
   private layoutSub: Subscription | undefined;
 
   constructor(private layoutService: LayoutService) {}
@@ -38,7 +38,7 @@ export class PageContentWithMenuComponent implements OnInit, OnDestroy {
     
     if (wasMobile !== this.isMobile) {
       this.layoutService.closeSidebar();
-      this.isDesktopMenuOpen = !this.isMobile;
+      this.isDesktopMenuOpen = !this.isMobile; // Expanded on desktop, collapsed on mobile
     }
   }
 
@@ -53,7 +53,9 @@ export class PageContentWithMenuComponent implements OnInit, OnDestroy {
 
   // Called when a nav link is clicked or backdrop is clicked
   closeMobileSidebar(): void {
+    if (this.isMobile) {
       this.layoutService.closeSidebar();
+    }
   }
 
   ngOnDestroy(): void {
