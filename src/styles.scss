@@ -191,8 +191,8 @@ html {
    Main Content Container
 ====================== */
 .main-container {
-  margin-left: 135px; /* Default for open sidebar on desktop */
-  width: calc(100% - 135px);
+  margin-left: 240px; /* Default for open sidebar on desktop - matches sidebar width */
+  width: calc(100% - 240px);
   min-height: calc(100vh - 70px);
   padding: 30px 40px;
   background-color: var(--color-primary-bg);
@@ -204,16 +204,22 @@ html {
 
 /* Sidebar collapsed on desktop */
 .sidebar-collapsed .main-container {
-  margin-left: 60px; /* Adjust for collapsed sidebar */
-  width: calc(100% - 60px);
+  margin-left: 70px; /* Adjust for collapsed sidebar - matches collapsed sidebar width */
+  width: calc(100% - 70px);
 }
 
-/* Tablet (landscape and portrait) */
+/* Tablet and Mobile: sidebar becomes overlay, so container takes full width */
 @media (max-width: 1024px) {
   .main-container {
-    margin-left: 0; /* Sidebar might be hidden or overlaid */
-    width: 100%;
+    margin-left: 0 !important; /* Important to override any other margin settings */
+    width: 100% !important; /* Important to override any other width settings */
     padding: 25px 30px;
+  }
+  
+  /* When sidebar is visible on mobile, add slight blur/dim effect to main content */
+  body.sidebar-mobile-open .main-container {
+    filter: blur(1px);
+    opacity: 0.8;
   }
 }
 
@@ -228,5 +234,31 @@ html {
 @media (max-width: 480px) {
   .main-container {
     padding: 15px 15px;
+  }
+}
+
+
+.page-layout {
+  position: relative;
+  min-height: 100vh;
+}
+
+.main-content {
+  min-height: 100vh;
+  background-color: var(--color-surface, #f8f9fa);
+  
+  .content-wrapper {
+    padding: 1.5rem;
+  }
+}
+
+/* Prevent scrolling when sidebar is open */
+body.sidebar-open {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .main-content .content-wrapper {
+    padding: 1rem;
   }
 }
