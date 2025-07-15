@@ -1,0 +1,3404 @@
+Directory: page-content-with-menu
+
+Directory Structure:
+```
+.
+.
+├── ./dashboard
+│   ├── ./dashboard/bar-chart
+│   │   ├── ./dashboard/bar-chart/bar-chart.component.html
+│   │   ├── ./dashboard/bar-chart/bar-chart.component.scss
+│   │   └── ./dashboard/bar-chart/bar-chart.component.ts
+│   ├── ./dashboard/certification-required-table
+│   │   ├── ./dashboard/certification-required-table/certification-required-table.component.html
+│   │   ├── ./dashboard/certification-required-table/certification-required-table.component.scss
+│   │   └── ./dashboard/certification-required-table/certification-required-table.component.ts
+│   ├── ./dashboard/claim-status-table
+│   │   ├── ./dashboard/claim-status-table/claim-status-table.component.html
+│   │   ├── ./dashboard/claim-status-table/claim-status-table.component.scss
+│   │   ├── ./dashboard/claim-status-table/claim-status-table.component.spec.ts
+│   │   └── ./dashboard/claim-status-table/claim-status-table.component.ts
+│   ├── ./dashboard/dashboard.component.html
+│   ├── ./dashboard/dashboard.component.scss
+│   ├── ./dashboard/dashboard.component.ts
+│   ├── ./dashboard/donut-chart
+│   │   ├── ./dashboard/donut-chart/donut-chart.component.html
+│   │   ├── ./dashboard/donut-chart/donut-chart.component.scss
+│   │   └── ./dashboard/donut-chart/donut-chart.component.ts
+│   └── ./dashboard/stats-card
+│       ├── ./dashboard/stats-card/stats-card.component.html
+│       ├── ./dashboard/stats-card/stats-card.component.scss
+│       ├── ./dashboard/stats-card/stats-card.component.spec.ts
+│       └── ./dashboard/stats-card/stats-card.component.ts
+├── ./example-form
+│   ├── ./example-form/example-form.component.scss
+│   └── ./example-form/example-form.component.ts
+├── ./external-services-redirection-tracking
+│   ├── ./external-services-redirection-tracking/external-services-redirection-tracking.component.html
+│   ├── ./external-services-redirection-tracking/external-services-redirection-tracking.component.scss
+│   ├── ./external-services-redirection-tracking/external-services-redirection-tracking.component.spec.ts
+│   └── ./external-services-redirection-tracking/external-services-redirection-tracking.component.ts
+├── ./page-content-with-menu.component.html
+├── ./page-content-with-menu.component.scss
+├── ./page-content-with-menu.component.ts
+├── ./page-content-with-menu.routes.ts
+└── ./side-bar-menu
+    ├── ./side-bar-menu/side-bar-menu.component.html
+    ├── ./side-bar-menu/side-bar-menu.component.scss
+    └── ./side-bar-menu/side-bar-menu.component.ts
+
+```
+
+Contents of page-content-with-menu.component.ts:
+```
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { SidebarComponent } from "./side-bar-menu/side-bar-menu.component";
+import { LayoutService } from '../_service/layout.service';
+
+@Component({
+  selector: 'app-page-content-with-menu',
+  standalone: true,
+  imports: [CommonModule, RouterModule, SidebarComponent],
+  templateUrl: './page-content-with-menu.component.html',
+  styleUrl: './page-content-with-menu.component.scss'
+})
+export class PageContentWithMenuComponent implements OnInit, OnDestroy {
+  isDesktopMenuOpen = false;   // Manages desktop collapsed state
+  isMobileMenuVisible = false; // Manages mobile overlay visibility
+  isMobile = false;
+  private layoutSub: Subscription | undefined;
+
+  constructor(private layoutService: LayoutService) {}
+
+  ngOnInit(): void {
+    this.checkScreenSize();
+    
+    this.layoutSub = this.layoutService.sidebarOpen$.subscribe(isOpen => {
+      if (this.isMobile) {
+        this.isMobileMenuVisible = isOpen;
+      }
+    });
+
+    window.addEventListener('resize', this.checkScreenSize.bind(this));
+  }
+
+  private checkScreenSize(): void {
+    const wasMobile = this.isMobile;
+    this.isMobile = window.innerWidth <= 1024;
+    
+    if (wasMobile !== this.isMobile) {
+      this.layoutService.closeSidebar();
+      this.isDesktopMenuOpen = !this.isMobile;
+    }
+  }
+
+  // Called by the sidebar's internal button
+  handleSidebarToggle(): void {
+    if (this.isMobile) {
+      this.layoutService.closeSidebar();
+    } else {
+      this.isDesktopMenuOpen = !this.isDesktopMenuOpen;
+    }
+  }
+
+  // Called when a nav link is clicked or backdrop is clicked
+  closeMobileSidebar(): void {
+      this.layoutService.closeSidebar();
+  }
+
+  ngOnDestroy(): void {
+    if (this.layoutSub) this.layoutSub.unsubscribe();
+    window.removeEventListener('resize', this.checkScreenSize.bind(this));
+  }
+}
+```
+
+Contents of page-content-with-menu.component.scss:
+```
+$sidebar-width-expanded: 135px;
+$sidebar-width-collapsed: 70px;
+$top-navbar-height: 40px; /* Matches your header's height */
+$transition-speed: 0.3s;
+$mobile-breakpoint: 1024px;
+
+.page-layout {
+  position: relative;
+  transition: padding-left $transition-speed ease-in-out;
+  /* This creates space for your fixed header */
+  padding-top: $top-navbar-height;
+
+  /* Desktop: content is pushed by the sidebar */
+  padding-left: $sidebar-width-expanded;
+
+  &.sidebar-collapsed {
+    padding-left: $sidebar-width-collapsed;
+  }
+}
+
+.main-content {
+  width: 100%;
+  min-height: calc(100vh - #{$top-navbar-height});
+  background-color: var(--color-surface, #f8f9fa);
+  
+  .content-wrapper {
+    padding: 1.5rem;
+  }
+}
+
+/* Mobile: content takes full width as sidebar is an overlay */
+@media (max-width: $mobile-breakpoint) {
+  .page-layout {
+    padding-left: 0;
+    
+    &.sidebar-collapsed {
+      padding-left: 0;
+    }
+    
+    .content-wrapper {
+      padding: 1rem;
+    }
+  }
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999; /* Below sidebar, above content */
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+```
+
+Contents of page-content-with-menu.routes.ts:
+```
+import { Routes } from '@angular/router';
+import { PageContentWithMenuComponent } from './page-content-with-menu.component';
+
+
+
+export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
+    {
+        path: '',
+        component: PageContentWithMenuComponent,
+        canActivate: [],
+
+        children: [
+            {
+                path: 'home',
+                loadComponent: () =>
+                    import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+            },
+            {
+                path: 'external-services-tracking',
+                loadComponent: () =>
+                    import('./external-services-redirection-tracking/external-services-redirection-tracking.component').then(m => m.ExternalServicesRedirectionTrackingComponent)
+            },
+            {
+                path: 'example-form',
+                loadComponent: () =>
+                    import('./example-form/example-form.component').then(m => m.ExampleFormComponent)
+            },
+        ]
+    }
+];
+```
+
+Contents of page-content-with-menu.component.html:
+```
+<div class="page-layout" [class.sidebar-collapsed]="!isDesktopMenuOpen && !isMobile">
+  
+    <div>Icon</div>
+  <app-sidebar 
+    [isCollapsed]="!isDesktopMenuOpen && !isMobile"
+    [isVisible]="isMobileMenuVisible"
+    (onToggle)="handleSidebarToggle()"
+    (onNavigate)="closeMobileSidebar()">
+  </app-sidebar>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- Backdrop for mobile overlay menu -->
+  <div 
+    class="sidebar-backdrop" 
+    *ngIf="isMobileMenuVisible" 
+    (click)="closeMobileSidebar()">
+  </div>
+</div>
+```
+
+Contents of dashboard/dashboard.component.ts:
+```
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { BarChartComponent } from './bar-chart/bar-chart.component';
+import { ClarificationRequiredTableComponent } from './certification-required-table/certification-required-table.component';
+import { ClaimStatusTableComponent } from './claim-status-table/claim-status-table.component';
+import { DonutChartComponent } from './donut-chart/donut-chart.component';
+import { StatsCardComponent } from './stats-card/stats-card.component';
+import { ButtonComponent } from '../../shared/component/button-component/button.component';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [
+    CommonModule,
+    StatsCardComponent,
+    BarChartComponent,
+    DonutChartComponent,
+    ClaimStatusTableComponent,
+    ClarificationRequiredTableComponent,
+    ButtonComponent
+],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
+})
+export class DashboardComponent {
+  barChartData = [
+    { label: 'CFO', approved: 3.5, rejected: 1 },
+    { label: 'CTO', approved: 5, rejected: 0 },
+    { label: 'Panchayat', approved: 0, rejected: 1 },
+    { label: 'Electrical', approved: 0, rejected: 0 },
+    { label: 'Other', approved: 2.5, rejected: 0 }
+  ];
+
+  donutChartData = [
+    { label: 'Approved', value: 86, color: '#198754' },
+    { label: 'Pending', value: 28, color: '#ffc107' },
+    { label: 'Rejected', value: 10, color: '#dc3545' }
+  ];
+
+  claimStatusData = [
+    { type: 'Proforma I', submitted: 0, approved: 0, received: 0, pending: 0 },
+    { type: 'Proforma II', submitted: 0, approved: 0, received: 0, pending: 0 },
+    { type: 'Proforma III', submitted: 0, approved: 0, received: 0, pending: 0 }
+  ];
+
+  clarificationRequiredData = [
+    {
+      applicationId: 'CFO-SA-000111',
+      department: 'Electrical Inspectorate',
+      noc: 'Application for NOC from Electrical Inspectorate',
+      clarification: '',
+      isDocumentMissing: true
+    },
+    {
+      applicationId: 'PFR-94-000187',
+      department: 'Partnership Firm Registration (L & C)',
+      noc: 'Application for Partnership Firm Registration',
+      clarification: 'Kindly upload all the documents properly as mentioned in the portal.',
+      isDocumentMissing: false
+    }
+  ];
+}
+
+```
+
+Contents of dashboard/dashboard.component.scss:
+```
+.dashboard-container {
+      padding: 24px;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box; // Ensure consistent box model
+    }
+    .dashboard-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #212529;
+      margin-bottom: 32px;
+    }
+    .stats-cards-grid {
+      display: grid;
+      
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .bar-chart-item app-bar-chart,
+    .donut-chart-item app-donut-chart {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      
+      width: 100%;
+      max-width: 100%;
+    }
+
+    app-claim-status-table,
+    app-clarification-required-table {
+        display: block;
+        margin-bottom: 32px;
+        
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; 
+    }
+
+    
+    ::ng-deep app-claim-status-table .mat-table,
+    ::ng-deep app-clarification-required-table .mat-table {
+      width: 100%; 
+      min-width: max-content; 
+    }
+
+    
+    
+
+    
+    @media (max-width: 992px) {
+      .charts-grid {
+        grid-template-columns: 1fr; 
+        gap: 20px;
+      }
+      .dashboard-container{
+        padding-top: 16px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 6px; 
+      }
+      .dashboard-header h1 {
+        font-size: 24px; 
+        margin-bottom: 24px;
+      }
+      .stats-cards-grid {
+        
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .charts-grid {
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      app-claim-status-table,
+      app-clarification-required-table {
+          margin-bottom: 24px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .stats-cards-grid {
+        
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .dashboard-container {
+        padding: 12px; 
+      }
+      .dashboard-header h1 {
+        font-size: 20px; 
+        margin-bottom: 16px;
+      }
+      .stats-cards-grid {
+        grid-template-columns: 1fr; 
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .charts-grid {
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      app-claim-status-table,
+      app-clarification-required-table {
+          margin-bottom: 16px;
+      }
+    }
+```
+
+Contents of dashboard/dashboard.component.html:
+```
+<div class="dashboard-container">
+      <div class="dashboard-header">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="stats-cards-grid">
+        <app-stats-card title="Total Applications" value="124" type="total" iconClass="fas fa-file-alt"></app-stats-card>
+        <app-stats-card title="Approved" value="86" type="approved" iconClass="fas fa-check-circle"></app-stats-card>
+        <app-stats-card title="Pending" value="28" type="pending" iconClass="fas fa-hourglass-half"></app-stats-card>
+        <app-stats-card title="Rejected" value="10" type="rejected" iconClass="fas fa-times-circle"></app-stats-card>
+      </div>
+      <div class="charts-grid">
+        <div class="bar-chart-item">
+          <app-bar-chart [data]="barChartData"></app-bar-chart>
+        </div>
+        <div class="chart-item donut-chart-item">
+          <app-donut-chart [data]="donutChartData"></app-donut-chart>
+        </div>
+      </div>
+      <app-claim-status-table [data]="claimStatusData"></app-claim-status-table>
+      <app-clarification-required-table [data]="clarificationRequiredData"></app-clarification-required-table>
+      <div class="flex ">
+        <app-button [type]="'primary'" [size]="'small'" route="/">View All</app-button>
+        <app-button [type]="'danger'" [size]="'small'" >Delete All</app-button>
+        <app-button [type]="'ghost'" [size]="'small'" >ghost</app-button>
+      </div>
+    </div>
+```
+
+Contents of dashboard/bar-chart/bar-chart.component.ts:
+```
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+interface ChartData {
+  label: string;
+  approved: number;
+  rejected: number;
+}
+
+@Component({
+  selector: 'app-bar-chart',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './bar-chart.component.html',
+  styleUrls: ['./bar-chart.component.scss']
+})
+export class BarChartComponent implements OnInit, OnChanges {
+  @Input() title: string = 'Application Status (Count)';
+  @Input() data: ChartData[] = [];
+
+  yAxisTicks: number[] = [];
+  maxValue: number = 0;
+
+  ngOnInit() {
+    this.calculateAndGenerateTicks();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['data']) {
+      this.calculateAndGenerateTicks();
+    }
+  }
+
+  private calculateAndGenerateTicks() {
+    this.calculateMaxValue();
+    this.generateYAxisTicks();
+  }
+
+  private calculateMaxValue() {
+
+    const allValues = this.data.flatMap(item => [item.approved, item.rejected]);
+
+    this.maxValue = Math.max(...allValues, 5); 
+  }
+
+  private generateYAxisTicks() {
+    const tickCount = 6; 
+
+    const maxVal = Math.ceil(this.maxValue / 0.5) * 0.5; 
+    const step = maxVal / (tickCount - 1); 
+
+
+    this.yAxisTicks = Array.from({ length: tickCount }, (_, i) => 
+      parseFloat((i * step).toFixed(1)) 
+    );
+  }
+
+  /*
+   * Calculates the height of a bar as a percentage of the chart's total height.
+   * @param value The value for the bar.
+   * @returns The height of the bar in percentage.
+   */
+  getBarHeight(value: number): number {
+    if (this.maxValue === 0) return 0; 
+    return (value / this.maxValue) * 100;
+  }
+}
+```
+
+Contents of dashboard/bar-chart/bar-chart.component.html:
+```
+ <div class="chart-container">
+      <div class="chart-header">
+        <h4 class="chart-title">{{ title }}</h4>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <span class="legend-color legend-color--approved"></span>
+            <span class="legend-label">Approved</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-color--rejected"></span>
+            <span class="legend-label">Rejected</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <div class="chart-y-axis">
+          <div class="y-axis-label" *ngFor="let tick of yAxisTicks">{{ tick }}</div>
+        </div>
+        <div class="chart-bars">
+          <div class="bar-group" *ngFor="let item of data">
+            <div class="bar-container">
+              <div class="bar bar--approved" 
+                   [style.height.%]="getBarHeight(item.approved)">
+                <span class="bar-value" *ngIf="item.approved > 0">{{ item.approved }}</span>
+              </div>
+              <div class="bar bar--rejected" 
+                   [style.height.%]="getBarHeight(item.rejected)">
+                <span class="bar-value" *ngIf="item.rejected > 0">{{ item.rejected }}</span>
+              </div>
+            </div>
+            <div class="bar-label">{{ item.label }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+```
+
+Contents of dashboard/bar-chart/bar-chart.component.scss:
+```
+
+    .chart-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      height: 100%; 
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px; 
+      flex-wrap: wrap; 
+    }
+    .chart-title {
+      margin: 0;
+      font-size: 18px; 
+      font-weight: 600;
+      color: #212529;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 20px; 
+      flex-wrap: wrap; 
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+    }
+    .legend-color--approved {
+      background: #0d6efd;
+    }
+    .legend-color--rejected {
+      background: #fd7e14;
+    }
+    .legend-label {
+      font-size: 14px; 
+      color: #6c757d;
+    }
+    .chart-content {
+      flex-grow: 1;
+      display: flex;
+      padding-bottom: 20px;
+    }
+    .chart-y-axis {
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: space-between;
+      margin-right: 16px; 
+      width: 30px; 
+      padding-bottom: 20px;
+      flex-shrink: 0; 
+    }
+    .y-axis-label {
+      font-size: 12px; 
+      color: #6c757d;
+      text-align: right;
+    }
+    .chart-bars {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      border-left: 2px solid #e9ecef;
+      border-bottom: 2px solid #e9ecef;
+      padding: 0 16px; 
+      position: relative;
+    }
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 80px; 
+      min-width: 30px; 
+    }
+    .bar-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 100%;
+      margin-bottom: 12px;
+    }
+    .bar {
+      width: 24px; 
+      border-radius: 4px 4px 0 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      position: relative;
+      min-height: 0;
+      transition: all 0.3s ease;
+    }
+    .bar:hover {
+      transform: translateY(-2px);
+      opacity: 0.8;
+    }
+    .bar--approved {
+      background: #0d6efd;
+    }
+    .bar--rejected {
+      background: #fd7e14;
+    }
+    .bar-value {
+      position: absolute;
+      top: -20px; 
+      font-size: 12px; 
+      font-weight: 600;
+      color: #212529;
+      white-space: nowrap; 
+    }
+    .bar-label {
+      font-size: 12px; 
+      color: #6c757d;
+      text-align: center;
+      font-weight: 500;
+      word-break: break-word; 
+    }
+    
+    
+    
+    @media (max-width: 768px) {
+      .chart-container {
+        padding: 16px; 
+      }
+      .chart-header {
+        flex-direction: column; 
+        align-items: flex-start; 
+        margin-bottom: 16px; 
+        gap: 10px; 
+      }
+      .chart-title {
+        font-size: 16px; 
+      }
+      .chart-legend {
+        gap: 12px; 
+      }
+      .legend-label {
+        font-size: 13px; 
+      }
+      .chart-y-axis {
+        margin-right: 10px; 
+        width: 25px; 
+      }
+      .y-axis-label {
+        font-size: 10px; 
+      }
+      .chart-bars {
+        padding: 0 8px; 
+      }
+      .bar-group {
+        max-width: 60px; 
+        min-width: 25px; 
+      }
+      .bar {
+        width: 18px; 
+      }
+      .bar-value {
+        font-size: 10px; 
+        top: -18px; 
+      }
+      .bar-label {
+        font-size: 11px; 
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .chart-container {
+        padding: 12px;
+      }
+      .chart-header {
+        margin-bottom: 12px;
+      }
+      .chart-title {
+        font-size: 14px;
+      }
+      .chart-legend {
+        gap: 8px;
+        justify-content: center; 
+        width: 100%; 
+      }
+      .legend-item {
+        gap: 6px;
+      }
+      .legend-color {
+        width: 14px;
+        height: 14px;
+      }
+      .legend-label {
+        font-size: 12px;
+      }
+      .chart-y-axis {
+        margin-right: 5px;
+        width: 20px;
+        padding-bottom: 15px; 
+      }
+      .y-axis-label {
+        font-size: 9px;
+      }
+      .chart-bars {
+        padding: 0 4px;
+      }
+      .bar-group {
+        max-width: 45px; 
+        min-width: 20px; 
+      }
+      .bar {
+        width: 14px; 
+      }
+      .bar-container {
+        gap: 2px; 
+      }
+      .bar-value {
+        font-size: 9px;
+        top: -15px;
+      }
+      .bar-label {
+        font-size: 10px;
+      }
+    }
+```
+
+Contents of dashboard/stats-card/stats-card.component.ts:
+```
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AnimationCounterService } from '../../../shared/utils/animated-counter';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-stats-card',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './stats-card.component.html',
+  styleUrls: ['./stats-card.component.scss'],
+})
+export class StatsCardComponent implements OnInit {
+  @Input() title: string = 'Full';
+  @Input() value: string = '50';
+  @Input() type: 'total' | 'approved' | 'pending' | 'rejected' = 'total';
+  @Input() iconClass: string = 'fas fa-file-alt';
+
+  constructor(private animationService: AnimationCounterService) {}
+  animatedValue: number = 0;
+  private animationSubscription: Subscription | undefined;
+  private duration: number = 1000; // Animation duration in ms
+
+  ngOnInit(): void {
+    this.startAnimation(0, parseInt(this.value, 10), this.duration);
+  }
+
+  startAnimation(start: number, target: number, duration: number): void {
+    if (this.animationSubscription) {
+      this.animationSubscription.unsubscribe();
+    }
+
+    this.animationSubscription = this.animationService
+      .animateValue(start, target, duration)
+      .subscribe((value) => {
+        this.animatedValue = value;
+      });
+  }
+}
+
+```
+
+Contents of dashboard/stats-card/stats-card.component.scss:
+```
+ 
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      height: 120px;
+      display: flex;
+      align-items: center;
+    }
+    .stats-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+    .stats-card__content {
+      width: 100%;
+    }
+    .stats-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .stats-card__title {
+      margin: 0;
+      font-size: 14px; 
+      font-weight: 500;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stats-card__icon {
+      width: 40px; 
+      height: 40px; 
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px; 
+    }
+    
+    .stats-card__icon--total {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0d6efd;
+    }
+    .stats-card__icon--approved {
+      background: rgba(25, 135, 84, 0.1);
+      color: #198754;
+    }
+    .stats-card__icon--pending {
+      background: rgba(255, 193, 7, 0.1);
+      color: #ffc107;
+    }
+    .stats-card__icon--rejected {
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+    }
+    .stats-card__value {
+      font-size: 36px; 
+      font-weight: 700;
+      color: #212529;
+      line-height: 1;
+    }
+    
+    .stats-card--approved .stats-card__value {
+      color: #198754;
+    }
+    .stats-card--pending .stats-card__value {
+      color: #ffc107;
+    }
+    .stats-card--rejected .stats-card__value {
+      color: #dc3545;
+    }
+    .stats-card--total .stats-card__value {
+      color: #0d6efd;
+    }
+    
+    
+    
+    @media (max-width: 768px) {
+      .stats-card {
+        padding: 16px; 
+        height: 100px; 
+      }
+      .stats-card__header {
+        margin-bottom: 8px; 
+      }
+      .stats-card__title {
+        font-size: 12px; 
+      }
+      .stats-card__icon {
+        width: 32px; 
+        height: 32px; 
+        font-size: 16px; 
+      }
+      .stats-card__value {
+        font-size: 28px; 
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .stats-card {
+        padding: 12px;
+        height: 90px;
+      }
+      .stats-card__title {
+        font-size: 11px;
+      }
+      .stats-card__icon {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+      }
+      .stats-card__value {
+        font-size: 24px;
+      }
+    }
+    
+    
+    .stats-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 576px) {
+      .stats-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+    }
+
+    .stats-card {
+  background: var(--color-card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px var(--shadow-medium);
+  border: 1px solid var(--color-border-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--shadow-dark);
+}
+
+.stats-card__title {
+  color: var(--color-text-secondary);
+}
+
+.stats-card__value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+// Color overrides by type
+.stats-card--approved .stats-card__value {
+  color: var(--color-success);
+}
+.stats-card--pending .stats-card__value {
+  color: var(--color-warning);
+}
+.stats-card--rejected .stats-card__value {
+  color: var(--color-error);
+}
+.stats-card--total .stats-card__value {
+  color: var(--color-brand-primary);
+}
+
+// Icons
+.stats-card__icon--total {
+  background: var(--color-red-100);
+  color: var(--color-brand-primary);
+}
+.stats-card__icon--approved {
+  background: hsl(142, 76%, 95%);
+  color: var(--color-success);
+}
+.stats-card__icon--pending {
+  background: hsl(45, 100%, 95%);
+  color: var(--color-warning);
+}
+.stats-card__icon--rejected {
+  background: var(--color-notification-error-bg);
+  color: var(--color-error);
+}
+
+```
+
+Contents of dashboard/stats-card/stats-card.component.spec.ts:
+```
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { StatsCardComponent } from './stats-card.component';
+
+describe('StatsCardComponent', () => {
+  let component: StatsCardComponent;
+  let fixture: ComponentFixture<StatsCardComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [StatsCardComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(StatsCardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+```
+
+Contents of dashboard/stats-card/stats-card.component.html:
+```
+ <div class="stats-card" [ngClass]="'stats-card--' + type">
+      <div class="stats-card__content">
+        <div class="stats-card__header">
+          <h3 class="stats-card__title">{{ title }}</h3>
+          <div class="stats-card__icon" [ngClass]="'stats-card__icon--' + type">
+            <i [class]="iconClass"></i>
+          </div>
+        </div>
+        <div class="stats-card__value">{{ animatedValue }}</div>
+      </div>
+    </div>
+```
+
+Contents of dashboard/donut-chart/donut-chart.component.scss:
+```
+.donut-chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.chart-header {
+  margin-bottom: 24px;
+}
+.chart-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+}
+.donut-chart-content {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-direction: row;
+}
+.donut-chart-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.donut-chart {
+  max-width: 200px;
+  max-height: 200px;
+}
+.donut-segment {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.donut-segment:hover {
+  opacity: 0.8;
+}
+.donut-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.donut-total {
+  font-size: 32px;
+  font-weight: 700;
+  color: #212529;
+  line-height: 1;
+}
+.donut-total-label {
+  font-size: 14px;
+  color: #6c757d;
+  margin-top: 4px;
+}
+.donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-left: 40px;
+  min-width: 200px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+.legend-item:hover,
+.legend-item--active {
+  background-color: #f8f9fa;
+}
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.legend-content {
+  flex: 1;
+}
+.legend-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #212529;
+  margin-bottom: 2px;
+}
+.legend-value {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+@media (max-width: 768px) {
+  .donut-chart-content {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .donut-legend {
+    margin-left: 0;
+    margin-top: 24px;
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+```
+
+Contents of dashboard/donut-chart/donut-chart.component.html:
+```
+<div class="donut-chart-container">
+  <div class="chart-header">
+    <h4 class="chart-title">{{ title }}</h4>
+  </div>
+  <div class="donut-chart-content">
+    <div class="donut-chart-wrapper">
+      <svg
+        class="donut-chart"
+        [attr.width]="size"
+        [attr.height]="size"
+        [attr.viewBox]="'0 0 ' + size + ' ' + size"
+      >
+        <g [attr.transform]="'translate(' + size / 2 + ',' + size / 2 + ')'">
+          <path
+            *ngFor="let segment of segments; trackBy: trackByIndex"
+            [attr.d]="segment.path"
+            [attr.fill]="segment.color"
+            [attr.stroke]="'white'"
+            [attr.stroke-width]="2"
+            class="donut-segment"
+            (mouseenter)="onSegmentHover(segment)"
+            (mouseleave)="onSegmentLeave()"
+          ></path>
+        </g>
+      </svg>
+      <div class="donut-center">
+        <div class="donut-total">{{ total }}</div>
+        <div class="donut-total-label">Total</div>
+      </div>
+    </div>
+    <div class="donut-legend">
+      <div
+        *ngFor="let item of data; trackBy: trackByLabel"
+        class="legend-item"
+        [class.legend-item--active]="hoveredItem === item.label"
+      >
+        <div class="legend-color" [style.background-color]="item.color"></div>
+        <div class="legend-content">
+          <div class="legend-label">{{ item.label }}</div>
+          <div class="legend-value">{{ getPercentage(item.value) }}%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+```
+
+Contents of dashboard/donut-chart/donut-chart.component.ts:
+```
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AnimationCounterService } from '../../../shared/utils/animated-counter';
+interface DonutData {
+  label: string;
+  value: number;
+  color: string;
+}
+@Component({
+  selector: 'app-donut-chart',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './donut-chart.component.html',
+  styleUrls: ['./donut-chart.component.scss'],
+})
+export class DonutChartComponent implements OnInit {
+  constructor(protected animationService: AnimationCounterService) {}
+  @Input() title: string = 'Status Distribution';
+  @Input() data: DonutData[] = [
+    { label: 'Approved', value: 50, color: '#0d6efd' },
+    { label: 'Pending', value: 30, color: '#ffc107' },
+    { label: 'Rejected', value: 20, color: '#dc3545' },
+  ];
+  @Input() size: number = 200;
+  segments: any[] = [];
+  total: number = 0;
+  hoveredItem: string | null = null;
+  ngOnInit() {
+    this.calculateTotal();
+    this.generateSegments();
+  }
+  ngOnChanges() {
+    this.calculateTotal();
+    this.generateSegments();
+  }
+  private calculateTotal() {
+    this.total = this.data.reduce((sum, item) => sum + item.value, 0);
+  }
+  private generateSegments() {
+    if (this.total === 0) {
+      this.segments = [];
+      return;
+    }
+    const radius = this.size / 2 - 20;
+    const innerRadius = radius * 0.6;
+    let currentAngle = 0;
+    this.segments = this.data.map((item) => {
+      const percentage = item.value / this.total;
+      const angle = percentage * 2 * Math.PI;
+      const startAngle = currentAngle;
+      const endAngle = currentAngle + angle;
+      const x1 = Math.cos(startAngle) * radius;
+      const y1 = Math.sin(startAngle) * radius;
+      const x2 = Math.cos(endAngle) * radius;
+      const y2 = Math.sin(endAngle) * radius;
+      const x3 = Math.cos(endAngle) * innerRadius;
+      const y3 = Math.sin(endAngle) * innerRadius;
+      const x4 = Math.cos(startAngle) * innerRadius;
+      const y4 = Math.sin(startAngle) * innerRadius;
+      const largeArcFlag = angle > Math.PI ? 1 : 0;
+      const path = `
+          M ${x1} ${y1}
+        A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
+        L ${x3} ${y3}
+        A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4}
+        Z
+      `;
+      currentAngle += angle;
+      return {
+        path: path.trim(),
+        color: item.color,
+        label: item.label,
+        value: item.value,
+      };
+    });
+  }
+  getPercentage(value: number): number {
+    if (this.total === 0) return 0;
+    return Math.round((value / this.total) * 100);
+  }
+  onSegmentHover(segment: any) {
+    this.hoveredItem = segment.label;
+  }
+  onSegmentLeave() {
+    this.hoveredItem = null;
+  }
+  trackByIndex(index: number): number {
+    return index;
+  }
+  trackByLabel(index: number, item: DonutData): string {
+    return item.label;
+  }
+}
+
+```
+
+Contents of dashboard/certification-required-table/certification-required-table.component.ts:
+```
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+interface ClarificationItem {
+  applicationId: string;
+  department: string;
+  noc: string;
+  clarification: string;
+  isDocumentMissing: boolean;
+}
+
+@Component({
+  selector: 'app-clarification-required-table',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: "./certification-required-table.component.html",
+  styleUrls: ["./certification-required-table.component.scss"]
+})
+export class ClarificationRequiredTableComponent {
+  @Input() title: string = 'Clarification Required';
+  @Input() data: ClarificationItem[] = [
+    { 
+      applicationId: 'CFO-SA-000111', 
+      department: 'Electrical Inspectorate', 
+      noc: 'Application for NOC from Electrical Inspectorate', 
+      clarification: '', 
+      isDocumentMissing: true 
+    },
+    { 
+      applicationId: 'PFR-94-000187', 
+      department: 'Partnership Firm Registration (L & C)', 
+      noc: 'Application for Partnership Firm Registration', 
+      clarification: 'Kindly upload all the documents properly as mentioned in the portal.', 
+      isDocumentMissing: false 
+    }
+  ];
+}
+```
+
+Contents of dashboard/certification-required-table/certification-required-table.component.html:
+```
+<div class="clarification-required-container">
+      <h4 class="table-title">{{ title }}</h4>
+      
+      <div class="table-responsive-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Application Id</th>
+              <th>Department</th>
+              <th>NOC</th>
+              <th>Clarification</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of data">
+              <td>{{ item.applicationId }}</td>
+              <td>{{ item.department }}</td>
+              <td>{{ item.noc }}</td>
+              <td>
+                <span *ngIf="item.isDocumentMissing" class="document-missing-tag">DOCUMENT MISSING</span>
+                <span *ngIf="!item.isDocumentMissing">{{ item.clarification }}</span>
+              </td>
+              <td><button class="upload-button"><i class="fas fa-upload"></i> Upload</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+```
+
+Contents of dashboard/certification-required-table/certification-required-table.component.scss:
+```
+.clarification-required-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      overflow-x: auto; 
+    }
+    .table-title {
+      font-size: 18px; 
+      font-weight: 600;
+      color: #212529;
+      margin: 0 0 20px 0; 
+    }
+    
+    .table-responsive-wrapper {
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch; 
+    }
+    table {
+      width: 100%;
+      min-width: 650px; 
+      border-collapse: collapse;
+      margin-top: 0; 
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 16px; 
+      border-bottom: 1px solid #e9ecef;
+      font-size: 14px; 
+      color: #495057;
+      white-space: nowrap; 
+    }
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #212529;
+      text-transform: uppercase;
+      font-size: 12px; 
+    }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .document-missing-tag {
+      background-color: #dc3545;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: inline-block; 
+      white-space: nowrap; 
+    }
+    .upload-button {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      padding: 8px 16px; 
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px; 
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      flex-shrink: 0; 
+    }
+    .upload-button:hover {
+      background-color: #0a58ca;
+    }
+    
+    
+    
+    @media (max-width: 768px) {
+      .clarification-required-container {
+        padding: 16px; 
+      }
+      .table-title {
+        font-size: 16px; 
+        margin-bottom: 16px; 
+      }
+      
+      
+      table {
+        min-width: 550px; 
+      }
+      th, td {
+        padding: 10px 12px; 
+        font-size: 13px; 
+      }
+      th {
+        font-size: 11px; 
+      }
+      .document-missing-tag {
+        font-size: 10px; 
+        padding: 3px 6px;
+      }
+      .upload-button {
+        padding: 6px 12px; 
+        font-size: 13px; 
+        gap: 6px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .clarification-required-container {
+        padding: 12px;
+      }
+      .table-title {
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+      table {
+        min-width: 450px; 
+      }
+      th, td {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      th {
+        font-size: 10px;
+      }
+      .document-missing-tag {
+        font-size: 9px;
+        padding: 2px 5px;
+      }
+      .upload-button {
+        padding: 5px 10px;
+        font-size: 12px;
+        gap: 5px;
+      }
+    }
+```
+
+Contents of dashboard/claim-status-table/claim-status-table.component.scss:
+```
+.claim-status-table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      overflow-x: auto; 
+    }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+    }
+    .table-title {
+      font-size: 18px; 
+      font-weight: 600;
+      color: #212529;
+      margin: 0;
+    }
+    .export-button {
+      background-color: #e9ecef;
+      color: #495057;
+      border: 1px solid #ced4da;
+      padding: 8px 16px; 
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px; 
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      flex-shrink: 0; 
+    }
+    .export-button:hover {
+      background-color: #dee2e6;
+      border-color: #adb5bd;
+    }
+    
+    .table-responsive-wrapper {
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch; 
+    }
+    table {
+      width: 100%;
+      min-width: 600px; 
+      border-collapse: collapse;
+      margin-top: 0; 
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 16px; 
+      border-bottom: 1px solid #e9ecef;
+      font-size: 14px; 
+      color: #495057;
+      white-space: nowrap; 
+    }
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #212529;
+      text-transform: uppercase;
+      font-size: 12px; 
+    }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .action-button {
+      background: none;
+      border: none;
+      color: #6c757d;
+      font-size: 16px; 
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+    .action-button:hover {
+      background-color: #e9ecef;
+    }
+    
+    
+    
+    @media (max-width: 768px) {
+      .claim-status-table-container {
+        padding: 16px; 
+      }
+      .table-header {
+        flex-direction: column; 
+        align-items: flex-start; 
+        margin-bottom: 16px; 
+      }
+      .table-title {
+        font-size: 16px; 
+      }
+      .export-button {
+        padding: 6px 12px; 
+        font-size: 13px; 
+        width: 100%; 
+        justify-content: center; 
+      }
+      
+      
+      table {
+        min-width: 500px; 
+      }
+      th, td {
+        padding: 10px 12px; 
+        font-size: 13px; 
+      }
+      th {
+        font-size: 11px; 
+      }
+      .action-button {
+        font-size: 14px; 
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .claim-status-table-container {
+        padding: 12px;
+      }
+      .table-header {
+        margin-bottom: 12px;
+      }
+      .table-title {
+        font-size: 14px;
+      }
+      .export-button {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+      table {
+        min-width: 400px; 
+      }
+      th, td {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      th {
+        font-size: 10px;
+      }
+      .action-button {
+        font-size: 12px;
+      }
+    }
+```
+
+Contents of dashboard/claim-status-table/claim-status-table.component.spec.ts:
+```
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ClaimStatusTableComponent } from './claim-status-table.component';
+
+describe('ClaimStatusTableComponent', () => {
+  let component: ClaimStatusTableComponent;
+  let fixture: ComponentFixture<ClaimStatusTableComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ClaimStatusTableComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ClaimStatusTableComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+```
+
+Contents of dashboard/claim-status-table/claim-status-table.component.ts:
+```
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+interface ClaimStatus {
+  type: string;
+  submitted: number;
+  approved: number;
+  received: number;
+  pending: number;
+}
+
+@Component({
+  selector: 'app-claim-status-table',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './claim-status-table.component.html',
+  styleUrls: ['./claim-status-table.component.scss'],
+})
+export class ClaimStatusTableComponent {
+  @Input() title: string = 'Claim Status';
+  @Input() data: ClaimStatus[] = [
+    { type: 'Proforma I', submitted: 0, approved: 0, received: 0, pending: 0 },
+    { type: 'Proforma II', submitted: 0, approved: 0, received: 0, pending: 0 },
+    { type: 'Proforma III', submitted: 0, approved: 0, received: 0, pending: 0 }
+  ];
+}
+```
+
+Contents of dashboard/claim-status-table/claim-status-table.component.html:
+```
+ <div class="claim-status-table-container">
+      <div class="table-header">
+        <h4 class="table-title">{{ title }}</h4>
+        <button class="export-button">
+          <i class="fas fa-download"></i> Export
+        </button>
+      </div>
+      <!-- Added a wrapper div for horizontal scrolling on small screens -->
+      <div class="table-responsive-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Claim Submitted</th>
+              <th>Approved Claim</th>
+              <th>Claim Received</th>
+              <th>Pending</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of data">
+              <td>{{ item.type }}</td>
+              <td>{{ item.submitted }}</td>
+              <td>{{ item.approved }}</td>
+              <td>{{ item.received }}</td>
+              <td>{{ item.pending }}</td>
+              <td><button class="action-button"><i class="fas fa-ellipsis-h"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+```
+
+Contents of side-bar-menu/side-bar-menu.component.html:
+```
+<aside class="sidebar" [class.collapsed]="isCollapsed" [class.visible-mobile]="isVisible">
+  <div class="sidebar-header">
+    <div class="brand-section" *ngIf="!isCollapsed">
+      <div class="brand-logo">
+        <span class="brand-name">Swaagat</span>
+      </div>
+    </div>
+    <button class="toggle-btn" 
+            (click)="onToggle.emit()" 
+            [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+      <span class="material-icons">
+        {{ isCollapsed ? 'menu' : 'menu_open' }}
+      </span>
+    </button>
+  </div>
+
+  <div class="user-profile" *ngIf="!isCollapsed">
+    <div class="user-info">
+      <div class="user-name">Joydeep Debnath</div>
+      <div class="user-role">{{ currentUser.role | titlecase }}</div>
+    </div>
+    <div class="user-status">
+      <span class="status-indicator online"></span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item" *ngFor="let item of filteredMenuItems">
+        <div class="nav-link" 
+             *ngIf="!hasChildren(item)"
+             [class.active]="item.isActive"
+             (click)="handleNavigation(item.route)"
+             [attr.title]="isCollapsed ? item.title : null">
+          <span class="nav-icon material-icons">{{ item.icon }}</span>
+          <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
+          <span class="nav-badge" *ngIf="item.badge && !isCollapsed">{{ item.badge }}</span>
+        </div>
+
+        <div class="nav-link has-children" 
+             *ngIf="hasChildren(item)"
+             [class.expanded]="isMenuExpanded(item.id)"
+             (click)="toggleMenuItem(item.id)"
+             [attr.title]="isCollapsed ? item.title : null">
+          <span class="nav-icon material-icons">{{ item.icon }}</span>
+          <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
+          <span class="nav-badge" *ngIf="item.badge && !isCollapsed">{{ item.badge }}</span>
+          <span class="expand-icon material-icons" *ngIf="!isCollapsed">
+            {{ isMenuExpanded(item.id) ? 'expand_less' : 'expand_more' }}
+          </span>
+        </div>
+
+        <ul class="submenu" 
+            *ngIf="hasChildren(item) && isMenuExpanded(item.id) && !isCollapsed"
+            [@slideInOut]>
+          <li class="submenu-item" *ngFor="let child of item.children">
+            <div class="submenu-link" 
+                 [class.active]="child.isActive"
+                 (click)="handleNavigation(child.route)"
+                 [attr.title]="child.title">
+              <span class="submenu-icon material-icons">{{ child.icon }}</span>
+              <span class="submenu-text">{{ child.title }}</span>
+              <span class="submenu-badge" *ngIf="child.badge">{{ child.badge }}</span>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer" *ngIf="!isCollapsed">
+    <div class="footer-actions">
+      <button class="footer-btn" title="Help & Support">
+        <span class="material-icons">help</span>
+        <span>Help</span>
+      </button>
+      <button class="footer-btn" title="Logout">
+        <span class="material-icons">logout</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar-footer collapsed" *ngIf="isCollapsed">
+    <button class="footer-btn-collapsed" title="Help & Support">
+      <span class="material-icons">help</span>
+    </button>
+    <button class="footer-btn-collapsed" title="Logout">
+      <span class="material-icons">logout</span>
+    </button>
+  </div>
+</aside>
+```
+
+Contents of side-bar-menu/side-bar-menu.component.ts:
+```
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
+
+
+interface MenuItem {
+  id: string;
+  title: string;
+  icon: string;
+  route?: string;
+  children?: MenuItem[];
+  roles: string[];
+  badge?: string;
+  isActive?: boolean;
+}
+
+interface UserRole {
+  role: 'admin' | 'user' | 'moderator' | 'guest';
+  permissions: string[];
+}
+
+@Component({
+  selector: 'app-sidebar',
+  standalone: true,
+  imports: [CommonModule, TitleCasePipe],
+  templateUrl: './side-bar-menu.component.html',
+  styleUrls: ['./side-bar-menu.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('slideInOut', [
+      state('in', style({ height: '*', opacity: 1 })),
+      transition(':enter', [
+        style({ height: '0', opacity: 0 }),
+        animate('200ms ease-in'),
+      ]),
+      transition(':leave', [
+        animate('200ms ease-out', style({ height: '0', opacity: 0 })),
+      ]),
+    ]),
+  ],
+})
+export class SidebarComponent implements OnInit, OnChanges {
+  @Input() isCollapsed = false;
+  @Input() isVisible = false; 
+  @Input() currentUser: UserRole = { role: 'admin', permissions: [] };
+
+  @Output() onToggle = new EventEmitter<void>();
+  @Output() onNavigate = new EventEmitter<void>();
+
+  menuItems: MenuItem[] = [
+    {
+      id: 'dashboard',
+      title: 'Dashboard',
+      icon: 'dashboard',
+      route: 'home',
+      roles: ['admin', 'user', 'moderator', 'guest'],
+    },
+    {
+      id: 'external-tracking',
+      title: 'External Services',
+      icon: 'track_changes',
+      route: 'external-services-tracking',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 'example-form',
+      title: 'Dynamic Form',
+      icon: 'dynamic_form',
+      route: 'example-form',
+      roles: ['admin'],
+    },
+    {
+      id: 'reports',
+      title: 'Reports',
+      icon: 'assessment',
+      roles: ['admin', 'moderator'],
+      children: [
+        {
+          id: 'sales-report',
+          title: 'Usage Report',
+          icon: 'trending_up',
+          route: '/reports/sales',
+          roles: ['admin', 'moderator'],
+        },
+        {
+          id: 'user-report',
+          title: 'Engagement',
+          icon: 'people_outline',
+          route: '/reports/users',
+          roles: ['admin'],
+        },
+      ],
+    },
+  ];
+
+  filteredMenuItems: MenuItem[] = [];
+  expandedItems = new Set<string>();
+
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    this.filterMenuByRole();
+
+    
+    this.router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd
+        )
+      )
+      .subscribe((event: NavigationEnd) => {
+        this.updateActiveState(event.urlAfterRedirects);
+      });
+
+    
+    this.updateActiveState(this.router.url);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    
+    if (changes['isCollapsed'] && this.isCollapsed) {
+      this.expandedItems.clear();
+    }
+  }
+
+  filterMenuByRole(): void {
+    this.filteredMenuItems = this.menuItems
+      .filter((item) => item.roles.includes(this.currentUser.role))
+      .map((item) => ({
+        ...item,
+        children: item.children?.filter((child) =>
+          child.roles.includes(this.currentUser.role)
+        ),
+      }));
+  }
+
+  updateActiveState(currentUrl: string): void {
+    const setActive = (items: MenuItem[]): boolean => {
+      let isParentActive = false;
+      for (const item of items) {
+        
+        item.isActive = item.route
+          ? currentUrl.endsWith('/' + item.route)
+          : false;
+
+        if (this.hasChildren(item)) {
+          if (setActive(item.children!)) {
+            item.isActive = true; 
+            if (!this.isCollapsed) {
+              this.expandedItems.add(item.id); 
+            }
+            isParentActive = true;
+          }
+        } else if (item.isActive) {
+          isParentActive = true;
+        }
+      }
+      return isParentActive;
+    };
+    setActive(this.filteredMenuItems);
+  }
+
+  
+  handleNavigation(route: string | undefined): void {
+    if (route) {
+      this.router.navigate([route]);
+      
+      this.onNavigate.emit();
+    }
+  }
+
+  
+  toggleMenuItem(itemId: string): void {
+    if (this.isCollapsed) return; 
+
+    if (this.expandedItems.has(itemId)) {
+      this.expandedItems.delete(itemId);
+    } else {
+      this.expandedItems.add(itemId);
+    }
+  }
+
+  
+
+  get toggleIcon(): string {
+    if (this.isVisible) return 'close';
+    if (this.isCollapsed) return 'menu';
+    return 'menu_open';
+  }
+
+  hasChildren = (item: MenuItem): boolean =>
+    !!item.children && item.children.length > 0;
+  isMenuExpanded = (itemId: string): boolean => this.expandedItems.has(itemId);
+}
+
+```
+
+Contents of side-bar-menu/side-bar-menu.component.scss:
+```
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+$sidebar-width-expanded: 280px;
+$sidebar-width-collapsed: 70px;
+$top-navbar-height: 70px;
+$transition-speed: 0.3s;
+$mobile-breakpoint: 1024px;
+
+/* ======================
+   Sidebar Base Styles
+====================== */
+.sidebar {
+  position: fixed;
+  top: $top-navbar-height;
+  left: 0;
+  width: $sidebar-width-expanded;
+  height: calc(100vh - #{$top-navbar-height});
+  background-color: var(--color-primary-bg, #ffffff);
+  border-right: 1px solid var(--color-border-light, #e9ecef);
+  z-index: 1000;
+  transition: width $transition-speed ease-in-out, left $transition-speed ease-in-out;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: var(--color-surface, #f8f9fa); }
+  &::-webkit-scrollbar-thumb { background: var(--color-border-medium, #ced4da); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb:hover { background: var(--color-border-dark, #adb5bd); }
+
+  &.collapsed {
+    width: $sidebar-width-collapsed;
+  }
+}
+
+/* ======================
+   Mobile View Behavior
+====================== */
+@media (max-width: $mobile-breakpoint) {
+  .sidebar {
+    left: -$sidebar-width-expanded;
+    box-shadow: 0 0 25px rgba(0,0,0,0.2);
+
+    &.visible-mobile {
+      left: 0;
+    }
+
+    // On mobile, the sidebar is never in a "collapsed" visual state, it's either open or closed.
+    &.collapsed {
+      width: $sidebar-width-expanded;
+    }
+  }
+}
+
+/* ======================
+   Sidebar Header, User Profile, Navigation, Footer...
+   (The rest of your original SCSS is mostly fine and can be pasted here,
+   excluding the old media queries and animation keyframes)
+====================== */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--color-border-light, #e9ecef);
+  background-color: var(--color-surface, #f8f9fa);
+  position: relative;
+}
+
+.sidebar-header .brand-section .brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-header .brand-section .brand-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #212529);
+}
+
+.sidebar-header .toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--color-text-secondary, #6c757d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.sidebar-header .toggle-btn:hover {
+  background-color: var(--color-brand-light, #eef5ff);
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.sidebar-header .toggle-btn .material-icons {
+  font-size: 20px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 20px 16px;
+  background: linear-gradient(135deg, var(--color-brand-light, #eef5ff), var(--color-surface, #f8f9fa));
+  border-bottom: 1px solid var(--color-border-light, #e9ecef);
+  margin-bottom: 8px;
+}
+
+.user-profile .user-info {
+  flex: 1;
+}
+
+.user-profile .user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #212529);
+  margin-bottom: 2px;
+}
+
+.user-profile .user-role {
+  font-size: 12px;
+  color: var(--color-text-secondary, #6c757d);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-profile .user-status .status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.user-profile .user-status .status-indicator.online {
+  background-color: var(--color-status-online, #198754);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0 8px;
+}
+
+.sidebar-nav .nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav .nav-item {
+  margin-bottom: 4px;
+}
+
+.sidebar-nav .nav-item .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: var(--color-text-secondary, #6c757d);
+  text-decoration: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.sidebar-nav .nav-item .nav-link:hover {
+  background-color: var(--color-brand-light, #eef5ff);
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.sidebar-nav .nav-item .nav-link:hover .nav-icon {
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.sidebar-nav .nav-item .nav-link.active {
+  background-color: var(--color-brand-primary, #0d6efd);
+  color: var(--color-text-inverse, #ffffff);
+}
+
+.sidebar-nav .nav-item .nav-link.active .nav-icon,
+.sidebar-nav .nav-item .nav-link.active .nav-badge {
+  color: var(--color-text-inverse, #ffffff);
+}
+
+.sidebar-nav .nav-item .nav-link.active .nav-badge {
+  background-color: var(--color-text-inverse, #ffffff);
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.sidebar-nav .nav-item .nav-link.has-children.expanded {
+  background-color: var(--color-brand-light, #eef5ff);
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.sidebar-nav .nav-item .nav-link.has-children.expanded .nav-icon {
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.sidebar-nav .nav-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  color: var(--color-text-muted, #adb5bd);
+  min-width: 20px;
+  transition: color 0.2s ease;
+}
+
+.sidebar-nav .nav-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sidebar-nav .nav-badge {
+  background-color: var(--color-brand-primary, #0d6efd);
+  color: var(--color-text-inverse, #ffffff);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.sidebar-nav .expand-icon {
+  font-size: 18px;
+  margin-left: 8px;
+  color: var(--color-text-muted, #adb5bd);
+  transition: transform 0.2s ease;
+}
+
+.sidebar-nav .nav-link.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  list-style: none;
+  padding-left: 20px;
+  margin: 4px 0 4px 12px;
+  border-left: 2px solid var(--color-border-light, #e9ecef);
+}
+
+.submenu-item .submenu-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: var(--color-text-secondary, #6c757d);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  margin: 2px 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.submenu-item .submenu-link:hover {
+  background-color: var(--color-brand-light, #eef5ff);
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.submenu-item .submenu-link:hover .submenu-icon {
+  color: var(--color-brand-primary, #0d6efd);
+}
+
+.submenu-item .submenu-link.active {
+  background-color: var(--color-brand-secondary, #6c757d);
+  color: var(--color-text-inverse, #ffffff);
+}
+
+.submenu-item .submenu-link.active .submenu-icon {
+  color: var(--color-text-inverse, #ffffff);
+}
+
+.submenu-icon {
+  font-size: 16px;
+  margin-right: 12px;
+  color: var(--color-text-muted, #adb5bd);
+  transition: color 0.2s ease;
+}
+
+.submenu-text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sidebar-footer {
+  border-top: 1px solid var(--color-border-light, #e9ecef);
+  padding: 16px;
+  background-color: var(--color-surface, #f8f9fa);
+  margin-top: auto;
+}
+
+.sidebar-footer .footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sidebar-footer .footer-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--color-btn-secondary-bg, #f8f9fa);
+  border: 1px solid var(--color-btn-secondary-border, #ced4da);
+  border-radius: 6px;
+  color: var(--color-btn-secondary-text, #495057);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-footer .footer-btn:hover {
+  background-color: var(--color-btn-secondary-hover, #e9ecef);
+}
+
+.sidebar-footer .footer-btn .material-icons {
+  font-size: 16px;
+}
+
+.sidebar-footer.collapsed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-footer.collapsed .footer-btn-collapsed {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-btn-secondary-bg, #f8f9fa);
+  border: 1px solid var(--color-btn-secondary-border, #ced4da);
+  border-radius: 6px;
+  color: var(--color-btn-secondary-text, #495057);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-footer.collapsed .footer-btn-collapsed:hover {
+  background-color: var(--color-btn-secondary-hover, #e9ecef);
+}
+
+.sidebar-footer.collapsed .footer-btn-collapsed .material-icons {
+  font-size: 16px;
+}
+
+
+
+```
+
+Contents of external-services-redirection-tracking/external-services-redirection-tracking.component.scss:
+```
+.container-fluid {
+    padding: 1rem;
+  }
+  .col-md-12 {
+    margin-bottom: 1rem;
+  }
+  button {
+    padding: 0.5rem 1rem;
+    background: rgba(233, 236, 239, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #333;
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .example-box {
+    width: 200px;
+    height: 200px;
+    border: solid 1px #ccc;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: move;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: #fff;
+    border-radius: 4px;
+    position: relative;
+    z-index: 1;
+    transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+                0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  }
+  .example-box:active {
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+```
+
+Contents of external-services-redirection-tracking/external-services-redirection-tracking.component.spec.ts:
+```
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ExternalServicesRedirectionTrackingComponent } from './external-services-redirection-tracking.component';
+
+describe('ExternalServicesRedirectionTrackingComponent', () => {
+  let component: ExternalServicesRedirectionTrackingComponent;
+  let fixture: ComponentFixture<ExternalServicesRedirectionTrackingComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ExternalServicesRedirectionTrackingComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ExternalServicesRedirectionTrackingComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+```
+
+Contents of external-services-redirection-tracking/external-services-redirection-tracking.component.ts:
+```
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { SHARED_IMPORTS } from '../../shared/shared-imports';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { GenericService } from '../../_service/generic/generic.service'; // Updated import path
+import { CdkDrag } from '@angular/cdk/drag-drop';
+import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
+import { IlogiInputDateComponent } from '../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
+import { IlogiSelectComponent } from '../../customInputComponents/ilogi-select/ilogi-select.component';
+import { Router, NavigationEnd } from '@angular/router';
+import { Location } from '@angular/common';
+
+@Component({
+  selector: 'app-external-services-redirection-tracking',
+  standalone: true,
+
+  imports: [SHARED_IMPORTS, IlogiInputComponent, IlogiInputDateComponent, IlogiSelectComponent],
+  templateUrl: './external-services-redirection-tracking.component.html',
+  styleUrls: ['./external-services-redirection-tracking.component.scss']
+})
+export class ExternalServicesRedirectionTrackingComponent implements OnInit {
+  form = new FormGroup({
+    registrationCertificateNo: new FormControl<string>('', [Validators.required]),
+    district: new FormControl<string>('', [Validators.required]),
+    subDivision: new FormControl<string>('', [Validators.required]),
+    block: new FormControl<string>('', [Validators.required]),
+    pinCode: new FormControl<string>('', [Validators.required, Validators.pattern(/^\d{6}$/)]),
+    address: new FormControl<string>('', [Validators.required]),
+    name_of_deceased_worker: new FormControl<string>('', [Validators.required]),
+    present_address: new FormControl<string>('', [Validators.required]),
+    isMarried: new FormControl<string>('', [Validators.required]),
+    type_beneficiary: new FormControl<string>('', [Validators.required]),
+    dependent_beneficiary: new FormControl<string | null>(null),
+    other_beneficiary_name: new FormControl<string | null>(null),
+    date_of_death: new FormControl<Date | null>(null, [
+      Validators.required,
+      (control) => {
+        if (control.value && control.value instanceof Date && control.value < new Date()) {
+          return null;
+        }
+        return { custom: { status: true, message: 'Date of death must be in the past' } };
+      }
+    ]),
+    mother_name: new FormControl<string>('', [Validators.required]),
+    guardian_name: new FormControl<string>('', [Validators.required]),
+    bankName: new FormControl<string>('', [Validators.required]),
+    ifscCode: new FormControl<string>('', [Validators.required]),
+    accountNumber: new FormControl<string>('', [Validators.required]),
+    nameOnPassbook: new FormControl<string>('', [Validators.required]),
+    death_certificate_number: new FormControl<string>('', [Validators.required]),
+    nature_of_death: new FormControl<string>('', [Validators.required])
+  });
+
+  submitted = false;
+  isViewMode = false;
+  today = new Date();
+  commonApplicationFormContractLabourDetails: any = {};
+  typeOptions = [
+    { id: '', name: 'Select' },
+    { id: 'Married', name: 'Married' },
+    { id: 'Unmarried', name: 'Unmarried' }
+  ];
+  typeOptionsNatureOfDeath = [
+    { id: '', name: 'Select' },
+    { id: 'Natural', name: 'Natural' },
+    { id: 'Accidental', name: 'Accidental' }
+  ];
+  typeBeneficiaryOptions = [
+    { id: '', name: 'Select' },
+    { id: 'Dependent', name: 'Dependent' },
+    { id: 'Other', name: 'Other' }
+  ];
+
+  errorMessages = {
+    registrationCertificateNo: { required: 'Registration No. is required' },
+    district: { required: 'District is required' },
+    subDivision: { required: 'Sub Division is required' },
+    block: { required: 'Block is required' },
+    pinCode: { required: 'Pin Code is required', pattern: 'Please provide a valid 6-digit pin code' },
+    address: { required: 'Address is required' },
+    name_of_deceased_worker: { required: 'Name of deceased worker is required' },
+    present_address: { required: 'Present address is required' },
+    isMarried: { required: 'Please select marital status' },
+    type_beneficiary: { required: 'Please select beneficiary type' },
+    dependent_beneficiary: { required: 'Dependent beneficiary is required' },
+    other_beneficiary_name: { required: 'Other beneficiary name is required' },
+    date_of_death: { required: 'Date of death is required', custom: 'Date of death must be in the past' },
+    mother_name: { required: 'Mother name is required' },
+    guardian_name: { required: 'Guardian name is required' },
+    bankName: { required: 'Bank name is required' },
+    ifscCode: { required: 'IFSC code is required' },
+    accountNumber: { required: 'Account number is required' },
+    nameOnPassbook: { required: 'Name on passbook is required' },
+    death_certificate_number: { required: 'Death certificate number is required' },
+    nature_of_death: { required: 'Nature of death is required' }
+  };
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private loaderService: LoaderService,
+    private cdr: ChangeDetectorRef,
+    private genericService: GenericService,
+    private location: Location
+  ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        const urlArr = event.url.replace(/^\/|\/$/g, '').split('/');
+        if (urlArr[0] + '/' + urlArr[1] === 'other-services/view-labour-marriage-scheme') {
+          this.isViewMode = true;
+        }
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    this.loaderService.showLoader();
+    setTimeout(() => {
+      this.loaderService.hideLoader();
+      this.cdr.detectChanges();
+    }, 2000);
+
+    // Subscribe to type_beneficiary changes
+    this.form.get('type_beneficiary')?.valueChanges.subscribe(value => {
+      const dependentControl = this.form.get('dependent_beneficiary');
+      const otherControl = this.form.get('other_beneficiary_name');
+
+      if (value === 'Dependent') {
+        dependentControl?.setValidators([Validators.required]);
+        otherControl?.clearValidators();
+        otherControl?.setValue('');
+      } else if (value === 'Other') {
+        otherControl?.setValidators([Validators.required]);
+        dependentControl?.clearValidators();
+        dependentControl?.setValue('');
+      } else {
+        dependentControl?.clearValidators();
+        otherControl?.clearValidators();
+        dependentControl?.setValue('');
+        otherControl?.setValue('');
+      }
+      dependentControl?.updateValueAndValidity();
+      otherControl?.updateValueAndValidity();
+      this.cdr.detectChanges();
+    });
+    this.getSavedData1();
+    this.getSavedData();
+
+  }
+
+  getSavedData1(): void {
+    this.loaderService.showLoader();
+    this.genericService.getByConditions({}, 'api/get-static-content').subscribe({
+      next: (res) => {
+        if (res['status_code'] === 1) {
+          this.commonApplicationFormContractLabourDetails = res['result'] || {};
+          this.patchFormData();
+        }
+        this.loaderService.hideLoader();
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.loaderService.hideLoader();
+        this.genericService.removeSessionAndReturn(error);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+
+  getSavedData() {
+    // Simulate fetching data (replace with actual service call)
+    this.commonApplicationFormContractLabourDetails = {
+      scheme_specific_section_beneficiary_registration_number: 'REG123',
+      address_section_district: '123~District Name',
+      address_section_sub_division: '456~Sub Division Name',
+      address_section_block: '789~Block Name',
+      address_section_pin_code: '123456',
+      present_address_of_the_applicant: '123 Main St',
+      scheme_specific_section_name_of_deceased_worker: 'John Doe',
+      date_of_death: '2023-09-15',
+
+
+
+    };
+    this.patchFormData();
+  }
+
+  patchFormData() {
+    this.form.patchValue({
+      registrationCertificateNo: this.commonApplicationFormContractLabourDetails.scheme_specific_section_beneficiary_registration_number || '',
+      district: this.commonApplicationFormContractLabourDetails.address_section_district?.split('~')[1] || '',
+      subDivision: this.commonApplicationFormContractLabourDetails.address_section_sub_division?.split('~')[1] || '',
+      block: this.commonApplicationFormContractLabourDetails.address_section_block?.split('~')[1] || '',
+      pinCode: this.commonApplicationFormContractLabourDetails.address_section_pin_code || '',
+      address: this.commonApplicationFormContractLabourDetails.present_address_of_the_applicant || '',
+      name_of_deceased_worker: this.commonApplicationFormContractLabourDetails.scheme_specific_section_name_of_deceased_worker || '',
+      present_address: this.commonApplicationFormContractLabourDetails.present_address_of_the_applicant || '',
+      date_of_death: this.commonApplicationFormContractLabourDetails.date_of_death ? new Date(this.commonApplicationFormContractLabourDetails.date_of_death) : null,
+    });
+  }
+
+  // Getters for errors
+  get registrationCertificateNoErrors() { return this.form.get('registrationCertificateNo')?.errors || null; }
+  get districtErrors() { return this.form.get('district')?.errors || null; }
+  get subDivisionErrors() { return this.form.get('subDivision')?.errors || null; }
+  get blockErrors() { return this.form.get('block')?.errors || null; }
+  get pinCodeErrors() { return this.form.get('pinCode')?.errors || null; }
+  get addressErrors() { return this.form.get('address')?.errors || null; }
+  get nameOfDeceasedWorkerErrors() { return this.form.get('name_of_deceased_worker')?.errors || null; }
+  get presentAddressErrors() { return this.form.get('present_address')?.errors || null; }
+  get isMarriedErrors() { return this.form.get('isMarried')?.errors || null; }
+  get typeBeneficiaryErrors() { return this.form.get('type_beneficiary')?.errors || null; }
+  get dependentBeneficiaryErrors() { return this.form.get('dependent_beneficiary')?.errors || null; }
+  get otherBeneficiaryNameErrors() { return this.form.get('other_beneficiary_name')?.errors || null; }
+  get dateOfDeathErrors() { return this.form.get('date_of_death')?.errors || null; }
+  get motherNameErrors() { return this.form.get('mother_name')?.errors || null; }
+  get guardianNameErrors() { return this.form.get('guardian_name')?.errors || null; }
+  get bankNameErrors() { return this.form.get('bankName')?.errors || null; }
+  get ifscCodeErrors() { return this.form.get('ifscCode')?.errors || null; }
+  get accountNumberErrors() { return this.form.get('accountNumber')?.errors || null; }
+  get nameOnPassbookErrors() { return this.form.get('nameOnPassbook')?.errors || null; }
+  get deathCertificateNumberErrors() { return this.form.get('death_certificate_number')?.errors || null; }
+  get natureOfDeathErrors() { return this.form.get('nature_of_death')?.errors || null; }
+
+  onSubmit() {
+    this.submitted = true;
+    this.cdr.detectChanges();
+    if (this.form.valid) {
+      console.log('Form submitted with value:', this.form.value);
+    } else {
+      console.log('Form is invalid');
+    }
+  }
+
+  backClicked() {
+    this.location.back();
+  }
+}
+```
+
+Contents of external-services-redirection-tracking/external-services-redirection-tracking.component.html:
+```
+<div class="container-fluid top-space">
+    <div class="row">
+        <div class="col-md-12 main-container top-space">
+            <span class="font-weight-bold theme-blue-color-text">Dashboard</span> >
+            <span class="font-weight-bold theme-blue-color-text">List of Schemes</span> > Application
+            <span class="pull-right">All <span class="red-text-color">*</span> marked fields are mandatory</span>
+            <hr />
+            <form [formGroup]="form" [ngClass]="{ 'disabled-form-fields': isViewMode }" (ngSubmit)="onSubmit()">
+                <div class="mt-4">
+                    <span class="heder-color">Application For Scheme For Funeral Assistance In Case Of Death Of
+                        Registered Construction Worker</span>
+                </div>
+                <div class="row mt-4">
+                    <!-- Registration Certificate No. -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Registration No." placeholder="Enter"
+                                    fieldId="registrationCertificateNo"
+                                    [errorMessages]="errorMessages.registrationCertificateNo"
+                                    formControlName="registrationCertificateNo" [readonly]="isViewMode"
+                                    [errors]="registrationCertificateNoErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- District -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="District" placeholder="Enter" fieldId="district"
+                                    [errorMessages]="errorMessages.district" formControlName="district"
+                                    [readonly]="isViewMode" [errors]="districtErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Sub Division -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Sub Division" placeholder="Enter"
+                                    fieldId="subDivision" [errorMessages]="errorMessages.subDivision"
+                                    formControlName="subDivision" [readonly]="isViewMode"
+                                    [errors]="subDivisionErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Block -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Block" placeholder="Enter" fieldId="block"
+                                    [errorMessages]="errorMessages.block" formControlName="block"
+                                    [readonly]="isViewMode" [errors]="blockErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pin Code -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="6" [mandatory]="true"
+                                    fieldLabel="Pin Code" placeholder="Enter" fieldId="pinCode"
+                                    [errorMessages]="errorMessages.pinCode" formControlName="pinCode"
+                                    [readonly]="isViewMode" [errors]="pinCodeErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Address -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="textarea" [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Address" placeholder="Enter" fieldId="address"
+                                    [errorMessages]="errorMessages.address" formControlName="address"
+                                    [readonly]="isViewMode" [errors]="addressErrors" rows="4"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Name of Deceased Worker -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Name of Deceased Worker" placeholder="Enter"
+                                    fieldId="name_of_deceased_worker"
+                                    [errorMessages]="errorMessages.name_of_deceased_worker"
+                                    formControlName="name_of_deceased_worker" [readonly]="isViewMode"
+                                    [errors]="nameOfDeceasedWorkerErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Present Address -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="textarea" [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Present Address" placeholder="Enter" fieldId="present_address"
+                                    [errorMessages]="errorMessages.present_address" formControlName="present_address"
+                                    [readonly]="isViewMode" [errors]="presentAddressErrors" rows="4"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Is Married -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-select [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Whether the worker is married" placeholder="Select"
+                                    [selectOptions]="typeOptions" fieldId="isMarried"
+                                    [errorMessages]="errorMessages.isMarried" formControlName="isMarried"
+                                    [readonly]="isViewMode" [errors]="isMarriedErrors"></app-ilogi-select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Type of Beneficiary -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-select [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Type of Beneficiary" placeholder="Select"
+                                    [selectOptions]="typeBeneficiaryOptions" fieldId="type_beneficiary"
+                                    [errorMessages]="errorMessages.type_beneficiary" formControlName="type_beneficiary"
+                                    [readonly]="isViewMode" [errors]="typeBeneficiaryErrors"></app-ilogi-select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Dependent Beneficiary -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="form.get('type_beneficiary')?.value === 'Dependent'"
+                                    fieldLabel="Dependent Beneficiary" placeholder="Enter"
+                                    fieldId="dependent_beneficiary"
+                                    [errorMessages]="errorMessages.dependent_beneficiary"
+                                    formControlName="dependent_beneficiary" [readonly]="isViewMode"
+                                    [errors]="dependentBeneficiaryErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Other Beneficiary Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="form.get('type_beneficiary')?.value === 'Other'"
+                                    fieldLabel="Other Beneficiary Name" placeholder="Enter"
+                                    fieldId="other_beneficiary_name"
+                                    [errorMessages]="errorMessages.other_beneficiary_name"
+                                    formControlName="other_beneficiary_name" [readonly]="isViewMode"
+                                    [errors]="otherBeneficiaryNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Date of Death -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input-date [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Date of Death" placeholder="DD-MM-YYYY" fieldId="date_of_death"
+                                    [errorMessages]="errorMessages.date_of_death" formControlName="date_of_death"
+                                    [errors]="dateOfDeathErrors" [monthsRange]="6"
+                                    [futureDateErrorMessage]="'Date of death cannot be in the future.'"
+                                    [pastDateErrorMessage]="'Date of death must be within the last 6 months.'"
+                                    [readonly]="isViewMode"></app-ilogi-input-date>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mother Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Mother Name" placeholder="Enter"
+                                    fieldId="mother_name" [errorMessages]="errorMessages.mother_name"
+                                    formControlName="mother_name" [readonly]="isViewMode"
+                                    [errors]="motherNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Guardian Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Guardian Name" placeholder="Enter"
+                                    fieldId="guardian_name" [errorMessages]="errorMessages.guardian_name"
+                                    formControlName="guardian_name" [readonly]="isViewMode"
+                                    [errors]="guardianNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Bank Name -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Bank Name" placeholder="Enter" fieldId="bankName"
+                                    [errorMessages]="errorMessages.bankName" formControlName="bankName"
+                                    [readonly]="isViewMode" [errors]="bankNameErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- IFSC Code -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="11" [mandatory]="true"
+                                    fieldLabel="IFSC Code" placeholder="Enter" fieldId="ifscCode"
+                                    [errorMessages]="errorMessages.ifscCode" formControlName="ifscCode"
+                                    [readonly]="isViewMode" [errors]="ifscCodeErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Account Number -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="20" [mandatory]="true"
+                                    fieldLabel="Account Number" placeholder="Enter" fieldId="accountNumber"
+                                    [errorMessages]="errorMessages.accountNumber" formControlName="accountNumber"
+                                    [readonly]="isViewMode" [errors]="accountNumberErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Name on Passbook -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Name on Passbook" placeholder="Enter"
+                                    fieldId="nameOnPassbook" [errorMessages]="errorMessages.nameOnPassbook"
+                                    formControlName="nameOnPassbook" [readonly]="isViewMode"
+                                    [errors]="nameOnPassbookErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Death Certificate Number -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-input type="text" [submitted]="submitted" [maxlength]="255"
+                                    [mandatory]="true" fieldLabel="Death Certificate Number" placeholder="Enter"
+                                    fieldId="death_certificate_number"
+                                    [errorMessages]="errorMessages.death_certificate_number"
+                                    formControlName="death_certificate_number" [readonly]="isViewMode"
+                                    [errors]="deathCertificateNumberErrors"></app-ilogi-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Nature of Death -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 form-group-margin">
+                                <app-ilogi-select [submitted]="submitted" [mandatory]="true"
+                                    fieldLabel="Nature of Death" placeholder="Select"
+                                    [selectOptions]="typeOptionsNatureOfDeath" fieldId="nature_of_death"
+                                    [errorMessages]="errorMessages.nature_of_death" formControlName="nature_of_death"
+                                    [readonly]="isViewMode" [errors]="natureOfDeathErrors"></app-ilogi-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-4 mb-5 text-center">
+                    <button *ngIf="!isViewMode" type="submit" class="btn save-btn ml-2 pl-4 pr-4">
+                        Submit
+                    </button>
+                    <button *ngIf="isViewMode" (click)="backClicked()" class="btn save-btn ml-2 pl-4 pr-4">
+                        Back
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+```
+
+Contents of example-form/example-form.component.ts:
+```
+import { Component, OnInit } from '@angular/core';
+import { FormConfig, FormFieldConfig } from '../../shared/models/form.models';
+import { DynamicFormComponent } from "../../shared/component/dynamic-form/dynamic-form.component";
+import { ButtonComponent } from "../../shared/component/button-component/button.component";
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-example-form',
+  template: `
+    <div class="form-container">
+      <div class="form-wrapper">
+        <div class="form-header">
+          <h1>Dynamic Form Example</h1>
+          <p>A scalable form component with validation and custom fields</p>
+        </div>
+        
+        <app-dynamic-form  row=2
+          [config]="formConfig"
+          class="fade-in">
+        </app-dynamic-form>
+        
+        <div class="form-actions-demo">
+          <app-button 
+            [type]="'secondary'" 
+            [size]="'medium'"
+            (click)="addField()">
+            Add Field
+          </app-button>
+          
+          <app-button 
+            [type]="'outline'" 
+            [size]="'medium'"
+            (click)="removeLastField()">
+            Remove Last Field
+          </app-button>
+          
+          <app-button 
+            [type]="'ghost'" 
+            [size]="'medium'"
+            (click)="resetForm()">
+            Reset Form
+          </app-button>
+        </div>
+        
+        <div class="form-data-preview" *ngIf="formData">
+          <h3>Form Data Preview:</h3>
+          <pre>{{ formData | json }}</pre>
+        </div>
+      </div>
+    </div>
+  `,
+  styleUrls: ['./example-form.component.scss'],
+  imports: [DynamicFormComponent, ButtonComponent , CommonModule]
+})
+export class ExampleFormComponent implements OnInit  {
+  ngOnInit(): void {
+    this.addField()
+  }
+  formData: any = null;
+  private fieldCounter = 0;
+  
+  formConfig: FormConfig = {
+    fields: [
+      {
+        id: 'name',
+        type: 'text',
+        label: 'Full Name',
+        placeholder: 'Enter your full name',
+        mandatory: true,
+        priority: 5, // Highest priority
+        validations: [
+          {
+            type: 'required',
+            message: 'Name is required'
+          },
+          {
+            type: 'minLength',
+            value: 2,
+            message: 'Name must be at least 2 characters long'
+          }
+        ]
+      },
+      {
+        id: 'email',
+        type: 'email',
+        label: 'Email Address',
+        placeholder: 'Enter your email address',
+        mandatory: true,
+        priority: 4, // Second priority
+        validations: [
+          {
+            type: 'required',
+            message: 'Email is required'
+          },
+          {
+            type: 'email',
+            message: 'Please enter a valid email address'
+          }
+        ]
+      },
+      {
+        id: 'birthDate',
+        type: 'date',
+        label: 'Date of Birth',
+        mandatory: true,
+        priority: 3, // Third priority
+        validations: [
+          {
+            type: 'required',
+            message: 'Date of birth is required'
+          },
+          {
+            type: 'custom',
+            message: 'You must be at least 18 years old',
+            customValidator: (value: string) => {
+              if (!value) return true;
+              const today = new Date();
+              const birthDate = new Date(value);
+              const age = today.getFullYear() - birthDate.getFullYear();
+              return age >= 18;
+            }
+          }
+        ]
+      },
+      {
+        id: 'father-number',
+        type: 'text',
+        label: 'Father Phone Number',
+        placeholder: 'Enter your father phone number',
+        mandatory: true,
+        priority: 2, // Fourth priority
+        validations: [
+          {
+            type: 'pattern',
+            value: /^\+?[\d\s\-()]+$/,
+            message: 'Please enter a valid phone number',
+            customValidator: (value: string) => {
+              if (!value) return true;
+              return /^\+?[\d\s\-()]+$/.test(value);
+            }
+          }
+        ]
+      },
+      {
+        id: 'phone',
+        type: 'text',
+        label: 'Phone Number',
+        placeholder: 'Enter your phone number',
+        mandatory: false,
+        priority: 1, // Fifth priority
+        validations: [
+          {
+            type: 'pattern',
+            value: /^\+?[\d\s\-()]+$/,
+            message: 'Please enter a valid phone number'
+          }
+        ]
+      },
+      {
+        id: 'sdfj',
+        type: 'text',
+        label: 'Full Name',
+        placeholder: 'Enter your fulsdfsfdl name',
+        mandatory: true,
+        priority: 6, // Sixth priority
+        validations: [
+          {
+            type: 'required',
+            message: 'Name is required'
+          },
+          {
+            type: 'minLength',
+            value: 2,
+            message: 'Name must be at least 2 characters long'
+          }
+        ]
+      }
+    ],
+    submitButtonText: 'Submit Form',
+    submitButtonType: 'primary',
+    submitButtonSize: 'medium',
+    onSubmit: (data: any) => {
+      console.log('Form submitted:', data);
+      this.formData = data;
+      this.showSuccessMessage();
+    },
+    onValidationChange: (isValid: boolean) => {
+      console.log('Form validation state:', isValid);
+    }
+  };
+
+  private dynamicFormRef: any; // Reference to the dynamic form component
+
+  showSuccessMessage() {
+    // You can implement a toast notification here
+    alert('Form submitted successfully!');
+  }
+
+  addField() {
+    this.fieldCounter++;
+    const newField: FormFieldConfig = {
+      id: `dynamic_field_${this.fieldCounter}`,
+      type: 'text',
+      label: `Dynamic Field ${this.fieldCounter}`,
+      placeholder: `Enter value for field ${this.fieldCounter}`,
+      mandatory: false,
+      priority: this.getNextPriority() // Auto-assign next priority
+    };
+    
+    this.formConfig.fields.push(newField);
+    // Sort fields by priority after adding
+    this.sortFieldsByPriority();
+  }
+
+  removeLastField() {
+    if (this.formConfig.fields.length > 4) { // Keep the original 4 fields
+      this.formConfig.fields.pop();
+    }
+  }
+
+  resetForm() {
+    this.formData = null;
+    // If you have a reference to the dynamic form component, you can call resetForm method
+    // this.dynamicFormRef.resetForm();
+  }
+
+  // Helper method to get the next priority number
+  private getNextPriority(): number {
+    const maxPriority = Math.max(...this.formConfig.fields.map(f => f.priority || 0));
+    return maxPriority + 1;
+  }
+
+  // Helper method to sort fields by priority
+  private sortFieldsByPriority(): void {
+    this.formConfig.fields.sort((a, b) => {
+      const priorityA = a.priority || Number.MAX_SAFE_INTEGER;
+      const priorityB = b.priority || Number.MAX_SAFE_INTEGER;
+      return priorityA - priorityB;
+    });
+  }
+}
+```
+
+Contents of example-form/example-form.component.scss:
+```
+.form-container {
+  background: linear-gradient(135deg, var(--color-brand-light), var(--color-surface));
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.form-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  
+  .form-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    
+    h1 {
+      color: var(--color-text-primary);
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    
+    p {
+      color: var(--color-text-secondary);
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+}
+
+.form-actions-demo {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.form-data-preview {
+  background-color: var(--color-card-bg);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px var(--shadow-light);
+  margin-top: 2rem;
+  
+  h3 {
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+  }
+  
+  pre {
+    background-color: var(--color-surface);
+    padding: 1rem;
+    border-radius: 0.375rem;
+    overflow-x: auto;
+    color: var(--color-text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+}
+```
+
