@@ -9,7 +9,7 @@ import { LoginComponent } from "./auth/login/login.component";
 export const PAGE_CONTENT_ROUTES: Routes = [
     {
         path: '',
-        component:LoginComponent ,
+        // component:LoginComponent ,
         canActivate: [],
 
         children: [
@@ -17,8 +17,12 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                 path: 'login',
                 loadComponent: () =>
                     import('./auth/login/login.component').then(m => m.LoginComponent)
-            },
+            },{
+                path: 'registration',
+                loadComponent: () =>
+                    import('./auth/registration/registration.component').then(m => m.RegistrationComponent)
+            }
             
         ]
     }
-];
+];                  

@@ -148,7 +148,7 @@
   --color-utility-disabled-text: hsl(0, 0%, 60%);
   --color-utility-backdrop: hsla(0, 0%, 0%, 0.4);
   --color-utility-selection: hsla(348, 99%, 33%, 0.2);
-
+  
   /* Additional Red Theme Variants */
   --color-red-50: hsl(348, 100%, 97%);
   --color-red-100: hsl(348, 100%, 95%);
@@ -172,124 +172,10 @@
   --color-gray-700: hsl(0, 0%, 30%);
   --color-gray-800: hsl(0, 0%, 20%);
   --color-gray-900: hsl(0, 0%, 13%);
-}
-.row {
-  display: flex;
-  // REMOVE flex-wrap: nowrap; here if you want content to wrap.
-  // If the intent is a purely horizontal layout for the sidebar and main content,
-  // then the issue is how widths are calculated, not wrapping.
-  // Given the mobile issue, removing or modifying this is key.
-  flex-wrap: wrap; // CHANGE: Allow content to wrap if needed, especially on smaller screens.
-  margin: 0;
-}
-html,
-body {
-    height: 100%;
-    margin: 0;
-}
-.sidebar-container {
-  width: 250px;
-  background-color: var(--color-brand-primary);
-  transition: width 0.3s ease; /* Animation for width change */
-  height: 100vh;
-  position: fixed; /* Prevents occupying row space on desktop */
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  overflow-y: auto;
-}
-
-.sidebar-container.active {
-  width: 60px; /* Collapsed state */
-  background-color: var(--color-brand-primary);
-}
-
-.main-container {
-  margin-left: 250px; /* Matches open sidebar width for desktop */
-  width: calc(100% - 250px); /* Desktop calculation */
-  transition: all 0.3s ease; /* Animation for margin and width */
-  padding: 10px;
-  background-color: var(--color-primary-bg);
-  color: var(--color-text-primary);
-}
-
-.main-container.active {
-  margin-left: 60px; /* Matches collapsed sidebar for desktop */
-  width: calc(100% - 60px); /* Desktop calculation */
-}
-
-
-
-@media (max-width: 768px) {
-  .sidebar-container {
-    // These values from page-content-with-menu.scss are better for mobile
-    position: fixed;
-    top: 0;
-    left: -250px; /* Hidden initially */
-    height: 100vh;
-    z-index: 1050;
-    background-color: var(--color-primary-bg);
-    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-    width: 250px; /* Full width when open */
-    transition: left 0.3s ease; // Transition for sliding
-    // Ensure overflow-x: hidden is applied if not already on body/html
-    overflow-x: hidden; // Prevents horizontal scroll from sidebar itself
-  }
-
-  .sidebar-container.active {
-    left: 0; /* Slide in when active */
-  }
-
-  .main-container {
-    width: 100%; /* Main content always takes full width on mobile */
-    margin-left: 0; /* No margin from sidebar on mobile - crucial for off-canvas */
-    transition: margin 0.3s ease, width 0.3s ease; // Keep transition for smoother feel
-    padding-top: 70px; /* Example: To prevent content from going under a fixed header */
-  }
-
-  // .main-container.active {    
-    // On mobile, the main-container *does not* change its margin-left or width
-    // when the sidebar opens. The sidebar overlays it.
-    // So, remove or comment out these lines for mobile.
-    /* margin-left: 200px; */
-    /* width: calc(100% - 200px); */
-  // }
-
-  // Ensure this is properly placed in your main layout or header
-  .menu-toggle-control {
-    display: block; // Make sure it's visible to toggle the menu
-    position: fixed; // Fixed position for easy access
-    top: 10px;
-    left: 10px;
-    z-index: 1100;
-    background-color: var(--color-brand-primary);
-    padding: 8px;
-    border-radius: 5px;
-    color: var(--color-text-inverse); // Ensure it's visible
-  }
-
-  // Overlay when sidebar is open
-  body.menu-open::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
-    z-index: 1040; /* Below sidebar, above content */
-  }
-
-  // To prevent horizontal scrolling when the sidebar is open on mobile
-  body.menu-open {
-    overflow-x: hidden;
-  }
-
-
-  
-  
-}
-
+}  
+/* ======================
+Main Content Container
+====================== */   
 html {
   @include mat.theme((
     color: (
@@ -301,4 +187,46 @@ html {
     density: 0
   ));
 }
+/* ======================
+   Main Content Container
+====================== */
+.main-container {
+  margin-left: 135px; /* Default for open sidebar on desktop */
+  width: calc(100% - 135px);
+  min-height: calc(100vh - 70px);
+  padding: 30px 40px;
+  background-color: var(--color-primary-bg);
+  color: var(--color-text-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow-x: hidden;
+}
 
+/* Sidebar collapsed on desktop */
+.sidebar-collapsed .main-container {
+  margin-left: 60px; /* Adjust for collapsed sidebar */
+  width: calc(100% - 60px);
+}
+
+/* Tablet (landscape and portrait) */
+@media (max-width: 1024px) {
+  .main-container {
+    margin-left: 0; /* Sidebar might be hidden or overlaid */
+    width: 100%;
+    padding: 25px 30px;
+  }
+}
+
+/* Mobile (large phones) */
+@media (max-width: 768px) {
+  .main-container {
+    padding: 20px 20px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .main-container {
+    padding: 15px 15px;
+  }
+}

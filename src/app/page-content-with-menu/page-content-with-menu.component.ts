@@ -1,59 +1,63 @@
-import { Component, ElementRef, HostListener, Renderer2 } from '@angular/core';
-import { SidebarComponent } from "./side-bar-menu/side-bar-menu.component";
-import { Router, RouterModule } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { SidebarComponent } from "./side-bar-menu/side-bar-menu.component";
+import { LayoutService } from '../_service/layout.service';
 
 @Component({
   selector: 'app-page-content-with-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SidebarComponent],
   templateUrl: './page-content-with-menu.component.html',
   styleUrl: './page-content-with-menu.component.scss'
 })
-export class PageContentWithMenuComponent {
-  isMenuOpen: boolean = false; // Default to collapsed on desktop, or closed on mobile
+export class PageContentWithMenuComponent implements OnInit, OnDestroy {
+  isDesktopMenuOpen = true;   // Manages desktop collapsed state
+  isMobileMenuVisible = true; // Manages mobile overlay visibility
+  isMobile = true;
+  private layoutSub: Subscription | undefined;
 
-  constructor(private renderer: Renderer2, private el: ElementRef) { } // Inject Renderer2 and ElementRef
+  constructor(private layoutService: LayoutService) {}
 
   ngOnInit(): void {
-    // You might want to initialize isMenuOpen based on screen width
     this.checkScreenSize();
-  }
-
-  onSidebarToggle() {
-    this.isMenuOpen = !this.isMenuOpen;
-    this.toggleBodyOverflow(); // Call the new method to manage body class
-  }
-
-  // Listen for window resize to adjust initial menu state or behavior
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.checkScreenSize();
-    this.toggleBodyOverflow(); // Re-evaluate body class on resize
-  }
-
-  private checkScreenSize() {
-    if (window.innerWidth <= 768) {
-      // On mobile, the menu starts closed
-      this.isMenuOpen = false;
-    } else {
-      // On desktop, you might want it to start open or remember user preference
-      // For now, let's assume it starts open on desktop if not explicitly collapsed
-      this.isMenuOpen = true; // Or false based on your desktop default
-    }
-  }
-
-  // New method to add/remove 'menu-open' class to body
-  private toggleBodyOverflow() {
-    if (window.innerWidth <= 768) {
-      if (this.isMenuOpen) {
-        this.renderer.addClass(document.body, 'menu-open');
-      } else {
-        this.renderer.removeClass(document.body, 'menu-open');
+    
+    this.layoutSub = this.layoutService.sidebarOpen$.subscribe(isOpen => {
+      if (this.isMobile) {
+        this.isMobileMenuVisible = isOpen;
       }
-    } else {
-      // Ensure body class is removed on desktop if it somehow got applied
-      this.renderer.removeClass(document.body, 'menu-open');
+    });
+
+    window.addEventListener('resize', this.checkScreenSize.bind(this));
+  }
+
+  private checkScreenSize(): void {
+    const wasMobile = this.isMobile;
+    this.isMobile = window.innerWidth <= 1024;
+    
+    if (wasMobile !== this.isMobile) {
+      this.layoutService.closeSidebar();
+      this.isDesktopMenuOpen = !this.isMobile;
     }
+  }
+
+  // Called by the sidebar's internal button
+  handleSidebarToggle(): void {
+    if (this.isMobile) {
+      this.layoutService.closeSidebar();
+    } else {
+      this.isDesktopMenuOpen = !this.isDesktopMenuOpen;
+    }
+  }
+
+  // Called when a nav link is clicked or backdrop is clicked
+  closeMobileSidebar(): void {
+      this.layoutService.closeSidebar();
+  }
+
+  ngOnDestroy(): void {
+    if (this.layoutSub) this.layoutSub.unsubscribe();
+    window.removeEventListener('resize', this.checkScreenSize.bind(this));
   }
 }
