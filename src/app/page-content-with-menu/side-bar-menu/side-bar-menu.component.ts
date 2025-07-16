@@ -67,6 +67,7 @@ export class SidebarComponent implements OnInit {
           icon: 'trending_up',
           route: '/reports/sales',
           roles: ['admin', 'moderator'],
+
         },
         {
           id: 'user-report',
