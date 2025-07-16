@@ -1,4 +1,3 @@
-
     <div class="breadcrumb">
       <span class="breadcrumb-item">Dashboard</span> >
       <span class="breadcrumb-item">List of Schemes</span> > Application
@@ -45,7 +44,7 @@
             [formControlName]="config.key"
             [readonly]="isViewMode"
             [errors]="getFieldErrors(config.key)"
-            [rows]="config.rows">
+            [rows]="config.rows !== undefined ? config.rows.toString() : undefined">
           </app-ilogi-input>
           
           <!-- Select Fields -->

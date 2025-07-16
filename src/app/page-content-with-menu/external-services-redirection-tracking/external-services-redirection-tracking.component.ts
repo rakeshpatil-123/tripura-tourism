@@ -15,7 +15,7 @@ interface FieldConfig {
   label: string;
   placeholder: string;
   maxlength?: number;
-  rows?: string;
+  rows?: number;
   mandatory: boolean;
   validators: any[];
   errorMessages: { [key: string]: string };
@@ -23,9 +23,9 @@ interface FieldConfig {
   conditionalMandatory?: string;
   conditionalValue?: string;
   dateConfig?: {
-    monthsRange: number;
-    futureDateErrorMessage: string;
-    pastDateErrorMessage: string;
+    monthsRange?: number;
+    futureDateErrorMessage?: string;
+    pastDateErrorMessage?: string;
   };
 }
 
@@ -103,7 +103,7 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
       type: 'textarea',
       label: 'Address',
       placeholder: 'Enter',
-      rows: '4',
+      rows: 4,
       mandatory: true,
       validators: [Validators.required],
       errorMessages: { required: 'Address is required' }
@@ -123,7 +123,7 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
       type: 'textarea',
       label: 'Present Address',
       placeholder: 'Enter',
-      rows: '4',
+      rows: 4,
       mandatory: true,
       validators: [Validators.required],
       errorMessages: { required: 'Present address is required' }
