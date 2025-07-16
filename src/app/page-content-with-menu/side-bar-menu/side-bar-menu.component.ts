@@ -1,6 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+
+export interface MenuItem {
+  id: string;
+  title: string;
+  icon: string;
+  route?: string;
+  roles: string[];
+  children?: MenuItem[];
+}
 
 @Component({
   selector: 'app-sidebar',
@@ -12,31 +27,82 @@ import { Router, RouterModule } from '@angular/router';
 export class SidebarComponent implements OnInit {
   @Input() isCollapsed = false;
   @Input() isVisible = false;
+  @Input() userRole: string = 'admin'; 
   @Output() onToggle = new EventEmitter<void>();
   @Output() onNavigate = new EventEmitter<void>();
 
   expandedSubmenu: string | null = null;
 
+  menuItems: MenuItem[] = [
+    {
+      id: 'dashboard',
+      title: 'Dashboard',
+      icon: 'dashboard',
+      route: '/dashboard',
+      roles: ['admin', 'user', 'moderator', 'guest'],
+    },
+    {
+      id: 'external-tracking',
+      title: 'External Services',
+      icon: 'track_changes',
+      route: '/external-services-tracking',
+      roles: ['admin', 'user'],
+    },
+    {
+      id: 'example-form',
+      title: 'Dynamic Form',
+      icon: 'dynamic_form',
+      route: '/example-form',
+      roles: ['admin'],
+    },
+    {
+      id: 'reports',
+      title: 'Reports',
+      icon: 'assessment',
+      roles: ['admin', 'moderator'],
+      children: [
+        {
+          id: 'sales-report',
+          title: 'Usage Report',
+          icon: 'trending_up',
+          route: '/reports/sales',
+          roles: ['admin', 'moderator'],
+        },
+        {
+          id: 'user-report',
+          title: 'Engagement',
+          icon: 'people_outline',
+          route: '/reports/users',
+          roles: ['admin'],
+        },
+      ],
+    },
+  ];
+
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    // Initialize component
-  }
+  ngOnInit(): void {}
 
   toggleSubmenu(submenuId: string): void {
     if (this.isCollapsed) {
-      // On collapsed sidebar, clicking a parent should expand the sidebar
       this.onToggle.emit();
       setTimeout(() => {
         this.expandedSubmenu = submenuId;
-      }, 300); // Wait for sidebar to expand
+      }, 300);
     } else {
-      this.expandedSubmenu = this.expandedSubmenu === submenuId ? null : submenuId;
+      this.expandedSubmenu =
+        this.expandedSubmenu === submenuId ? null : submenuId;
     }
   }
 
-  navigate(path: string): void {
+  navigate(path: string | undefined): void {
+    if (!path) return;
     this.router.navigate([path]);
     this.onNavigate.emit();
+  }
+
+  
+  canAccess(item: MenuItem): boolean {
+    return item.roles.includes(this.userRole);
   }
 }

@@ -1,16 +1,16 @@
 $sidebar-width-expanded: 280px;
 $sidebar-width-collapsed: 70px;
-$top-navbar-height: 40px; /* Matches your header's height */
+$top-navbar-height: 40px; 
 $transition-speed: 0.3s;
 $mobile-breakpoint: 1024px;
 
 .page-layout {
   position: relative;
   transition: padding-left $transition-speed ease-in-out;
-  /* This creates space for your fixed header */
+  
   padding-top: $top-navbar-height;
 
-  /* Desktop: content is pushed by the sidebar */
+  
   padding-left: $sidebar-width-expanded;
 
   &.sidebar-collapsed {
@@ -28,7 +28,7 @@ $mobile-breakpoint: 1024px;
   }
 }
 
-/* Mobile: content takes full width as sidebar is an overlay */
+
 @media (max-width: $mobile-breakpoint) {
   .page-layout {
     padding-left: 0;
@@ -50,7 +50,7 @@ $mobile-breakpoint: 1024px;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999; /* Below sidebar, above content */
+  z-index: 999; 
   animation: fadeIn 0.3s ease;
 }
 
@@ -59,7 +59,7 @@ $mobile-breakpoint: 1024px;
   to { opacity: 1; }
 }
 
-/* Prevent scrolling when sidebar is open on mobile */
+
 body.sidebar-open {
   @media (max-width: $mobile-breakpoint) {
     overflow: hidden;
