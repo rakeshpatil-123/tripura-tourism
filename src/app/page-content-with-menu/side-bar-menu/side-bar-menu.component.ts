@@ -27,7 +27,7 @@ export interface MenuItem {
 export class SidebarComponent implements OnInit {
   @Input() isCollapsed = false;
   @Input() isVisible = false;
-  @Input() userRole: string = 'admin'; 
+  @Input() userRole: string = 'admin';
   @Output() onToggle = new EventEmitter<void>();
   @Output() onNavigate = new EventEmitter<void>();
 
@@ -38,21 +38,21 @@ export class SidebarComponent implements OnInit {
       id: 'dashboard',
       title: 'Dashboard',
       icon: 'dashboard',
-      route: '/dashboard',
+      route: '/dashboard/home',
       roles: ['admin', 'user', 'moderator', 'guest'],
     },
     {
       id: 'external-tracking',
       title: 'External Services',
       icon: 'track_changes',
-      route: '/external-services-tracking',
+      route: '/dashboard/external-services-tracking',
       roles: ['admin', 'user'],
     },
     {
       id: 'example-form',
       title: 'Dynamic Form',
       icon: 'dynamic_form',
-      route: '/example-form',
+      route: '/dashboard/example-form',
       roles: ['admin'],
     },
     {
@@ -67,6 +67,7 @@ export class SidebarComponent implements OnInit {
           icon: 'trending_up',
           route: '/reports/sales',
           roles: ['admin', 'moderator'],
+
         },
         {
           id: 'user-report',
@@ -79,9 +80,9 @@ export class SidebarComponent implements OnInit {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   toggleSubmenu(submenuId: string): void {
     if (this.isCollapsed) {
@@ -101,7 +102,7 @@ export class SidebarComponent implements OnInit {
     this.onNavigate.emit();
   }
 
-  
+
   canAccess(item: MenuItem): boolean {
     return item.roles.includes(this.userRole);
   }
