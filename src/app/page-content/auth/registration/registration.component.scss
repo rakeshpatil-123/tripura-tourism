@@ -1,31 +1,31 @@
 // Import your existing color variables
 :root {
   // Your existing color variables from paste.txt
-  --color-primary-bg: hsl(0, 0%, 100%);
-  --color-card-bg: hsl(0, 0%, 100%);
-  --color-surface: hsl(0, 0%, 98%);
-  --color-brand-primary: hsl(348, 99%, 33%);
-  --color-brand-secondary: hsl(348, 85%, 45%);
-  --color-brand-accent: hsl(348, 100%, 40%);
-  --color-brand-light: hsl(348, 100%, 95%);
-  --color-brand-dark: hsl(348, 99%, 25%);
-  --color-text-primary: hsl(0, 0%, 13%);
-  --color-text-secondary: hsl(0, 0%, 40%);
-  --color-text-muted: hsl(0, 0%, 60%);
+  --color-primary: hsl(0, 0%, 100%);
+  --color-primary: hsl(0, 0%, 100%);
+  --color-primary: hsl(0, 0%, 98%);
+  --color-tertiary: hsl(348, 99%, 33%);
+  --color-tertiary: hsl(348, 85%, 45%);
+  --color-tertiary-shade: hsl(348, 100%, 40%);
+  --color-tertiary-shade: hsl(348, 100%, 95%);
+  --color-tertiary-shade: hsl(348, 99%, 25%);
+  --color-text-dark: hsl(0, 0%, 13%);
+  --color-text-medium: hsl(0, 0%, 40%);
+  --color-text-light: hsl(0, 0%, 60%);
   --color-border-light: hsl(0, 0%, 90%);
   --color-border-focus: hsl(348, 99%, 33%);
   --color-form-input-bg: hsl(0, 0%, 100%);
   --color-form-input-border: hsl(0, 0%, 85%);
   --color-form-input-border-focus: hsl(348, 99%, 33%);
-  --color-error: hsl(348, 99%, 33%);
-  --color-success: hsl(142, 76%, 45%);
+  --color-poppy-red: hsl(348, 99%, 33%);
+  --color-poppy-green: hsl(142, 76%, 45%);
   --shadow-light: hsla(0, 0%, 0%, 0.05);
   --shadow-medium: hsla(0, 0%, 0%, 0.1);
 }
 
 .registration-container {
   min-height: 100vh;
-  background-color: var(--color-surface);
+  background-color: var(--color-primary);
   padding: 2rem;
   display: flex;
   justify-content: center;
@@ -39,13 +39,13 @@
 .registration-card {
   max-width: 800px;
   width: 100%;
-  background-color: var(--color-card-bg);
+  background-color: var(--color-primary);
   border-radius: 12px;
   box-shadow: 0 4px 20px var(--shadow-medium);
   margin-top: 2rem;
 
   .mat-mdc-card-header {
-    background-color: var(--color-brand-primary);
+    background-color: var(--color-tertiary);
     color: white;
     padding: 1.5rem;
     border-radius: 12px 12px 0 0;
@@ -94,7 +94,7 @@
     }
 
     .mat-mdc-form-field-label {
-      color: var(--color-text-primary);
+      color: var(--color-text-dark);
       font-weight: 500;
     }
 
@@ -105,7 +105,7 @@
       transition: border-color 0.2s ease;
 
       &:hover {
-        border-color: var(--color-text-secondary);
+        border-color: var(--color-text-medium);
       }
 
       &.mdc-text-field--focused {
@@ -114,15 +114,15 @@
     }
 
     .mat-mdc-input-element {
-      color: var(--color-text-primary);
+      color: var(--color-text-dark);
       
       &::placeholder {
-        color: var(--color-text-muted);
+        color: var(--color-text-light);
       }
     }
 
     .mat-mdc-form-field-error {
-      color: var(--color-error);
+      color: var(--color-poppy-red);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
@@ -138,7 +138,7 @@
     background-color: var(--color-form-input-bg);
 
     .field-label {
-      color: var(--color-text-primary);
+      color: var(--color-text-dark);
       font-weight: 500;
       font-size: 0.875rem;
       margin-bottom: 0.5rem;
@@ -151,7 +151,7 @@
 
       .radio-option {
         .mat-mdc-radio-button {
-          color: var(--color-text-primary);
+          color: var(--color-text-dark);
         }
 
         .mat-mdc-radio-outer-circle {
@@ -159,26 +159,26 @@
         }
 
         .mat-mdc-radio-inner-circle {
-          background-color: var(--color-brand-primary);
+          background-color: var(--color-tertiary);
         }
 
         &.mat-mdc-radio-checked {
           .mat-mdc-radio-outer-circle {
-            border-color: var(--color-brand-primary);
+            border-color: var(--color-tertiary);
           }
         }
       }
     }
 
     .radio-error {
-      color: var(--color-error);
+      color: var(--color-poppy-red);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
   }
 
   .required-asterisk {
-    color: var(--color-error);
+    color: var(--color-poppy-red);
     margin-left: 0.25rem;
   }
 }
@@ -197,15 +197,15 @@
 
   .reset-button {
     background-color: transparent;
-    color: var(--color-text-secondary);
+    color: var(--color-text-medium);
     border: 1px solid var(--color-border-light);
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     transition: all 0.2s ease;
 
     &:hover {
-      background-color: var(--color-surface);
-      border-color: var(--color-text-secondary);
+      background-color: var(--color-primary);
+      border-color: var(--color-text-medium);
     }
 
     mat-icon {
@@ -214,7 +214,7 @@
   }
 
   .submit-button {
-    background-color: var(--color-brand-primary);
+    background-color: var(--color-tertiary);
     color: white;
     padding: 0.75rem 2rem;
     border-radius: 8px;
@@ -222,7 +222,7 @@
     transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
-      background-color: var(--color-brand-dark);
+      background-color: var(--color-tertiary-shade);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px var(--shadow-medium);
     }
@@ -257,12 +257,12 @@
 
 // Snackbar styles
 .success-snackbar {
-  background-color: var(--color-success) !important;
+  background-color: var(--color-poppy-green) !important;
   color: white !important;
 }
 
 .error-snackbar {
-  background-color: var(--color-error) !important;
+  background-color: var(--color-poppy-red) !important;
   color: white !important;
 }
 
@@ -305,12 +305,12 @@
 // Focus styles for accessibility
 .form-field:focus-within {
   .mat-mdc-text-field-wrapper {
-    outline: 2px solid var(--color-brand-primary);
+    outline: 2px solid var(--color-tertiary);
     outline-offset: 2px;
   }
 }
 
 .radio-group:focus-within {
-  outline: 2px solid var(--color-brand-primary);
+  outline: 2px solid var(--color-tertiary);
   outline-offset: 2px;
 }

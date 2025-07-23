@@ -3,7 +3,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    background-color: var(--color-primary-bg);
+    background-color: var(--color-secondary);
     box-shadow: 0 2px 10px var(--shadow-light);
     z-index: 1000;
     transition: all 0.3s ease;
@@ -41,9 +41,9 @@
 .logo-text {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-brand-secondary);
+    color: var(--color-tertiary);
     letter-spacing: -0.5px;
-    background: linear-gradient(to right, var(--color-btn-primary-bg), var(--color-btn-primary-hover));
+    background: linear-gradient(to right, var(--color-tertiary), var(--color-tertiary-shade));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -97,7 +97,7 @@
     transform: translateX(-50%);
     width: 0;
     height: 2px;
-    background-color: var(--color-btn-primary-bg);
+    background-color: var(--color-tertiary);
     transition: width 0.3s;
 }
 
@@ -116,7 +116,7 @@
 .action-button {
     display: inline-block;
     padding: 8px 20px;
-    background-color: var(--color-btn-primary-bg);
+    background-color: var(--color-tertiary);
     color: var(--color-btn-primary-text);
     border-radius: 4px;
     text-decoration: none;
@@ -126,7 +126,7 @@
 }
 
 .action-button:hover {
-    background-color: var(--color-btn-primary-hover);
+    background-color: var(--color-tertiary-shade);
 }
 
 .menu-toggle {
@@ -137,7 +137,7 @@
     padding: 8px;
     z-index: 1001;
     flex-shrink: 0;
-    color: var(--color-brand-secondary);
+    color: var(--color-tertiary);
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -158,7 +158,7 @@
     width: 22px;
     height: 2px;
     margin: 3px 0;
-    background-color: var(--color-brand-secondary);
+    background-color: var(--color-tertiary);
     transition: all 0.3s;
     border-radius: 1px;
 }
@@ -178,7 +178,7 @@
 .close-nav {
     background: none;
     border: none;
-    color: var(--color-brand-secondary);
+    color: var(--color-tertiary);
     cursor: pointer;
     padding: 8px;
 }
@@ -283,7 +283,7 @@
         padding: 15px 20px;
         border-bottom: 1px solid var(--color-border-light);
         font-weight: 600;
-        color: var(--color-brand-secondary);
+        color: var(--color-tertiary);
     }
 
     .nav-menu {
@@ -293,7 +293,7 @@
         width: 280px;
         max-width: 80vw;
         height: 100vh;
-        background-color: var(--color-primary-bg);
+        background-color: var(--color-primary);
         box-shadow: -2px 0 10px var(--shadow-light);  // Shadow on the left side
         transition: right 0.3s ease;
         flex-direction: column;

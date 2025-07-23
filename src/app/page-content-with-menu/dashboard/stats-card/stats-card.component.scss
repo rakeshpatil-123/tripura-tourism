@@ -133,7 +133,7 @@
     }
 
     .stats-card {
-  background: var(--color-card-bg);
+  background: white;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 12px var(--shadow-medium);
@@ -150,43 +150,43 @@
 }
 
 .stats-card__title {
-  color: var(--color-text-secondary);
+  color: var(--color-text-medium);
 }
 
 .stats-card__value {
   font-size: 36px;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-text-dark);
 }
 
 // Color overrides by type
 .stats-card--approved .stats-card__value {
-  color: var(--color-success);
+  color: var(--color-poppy-green);
 }
 .stats-card--pending .stats-card__value {
-  color: var(--color-warning);
+  color: var(--color-poppy-yellow);
 }
 .stats-card--rejected .stats-card__value {
-  color: var(--color-error);
+  color: var(--color-poppy-red);
 }
 .stats-card--total .stats-card__value {
-  color: var(--color-brand-primary);
+  color: var(--color-tertiary);
 }
 
 // Icons
 .stats-card__icon--total {
   background: var(--color-red-100);
-  color: var(--color-brand-primary);
+  color: var(--color-tertiary);
 }
 .stats-card__icon--approved {
   background: hsl(142, 76%, 95%);
-  color: var(--color-success);
+  color: var(--color-poppy-green);
 }
 .stats-card__icon--pending {
   background: hsl(45, 100%, 95%);
-  color: var(--color-warning);
+  color: var(--color-poppy-yellow);
 }
 .stats-card__icon--rejected {
   background: var(--color-notification-error-bg);
-  color: var(--color-error);
+  color: var(--color-poppy-red);
 }

@@ -21,7 +21,7 @@ $mobile-breakpoint: 1024px;
 .main-content {
   width: 100%;
   min-height: calc(100vh - #{$top-navbar-height});
-  background-color: var(--color-surface, #f8f9fa);
+  background-color: var(--color-primary, #f8f9fa);
   
   .content-wrapper {
     padding: 1.5rem;
