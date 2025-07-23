@@ -337,33 +337,33 @@ export const CSS_VARIABLES = `
 
 /* Base Colors */
 
---color-primary-bg: ${COLORS.PRIMARY.background};
+--color-primary: ${COLORS.PRIMARY.background};
 
---color-card-bg: ${COLORS.PRIMARY.card};
+--color-primary: ${COLORS.PRIMARY.card};
 
---color-surface: ${COLORS.PRIMARY.surface};
+--color-primary: ${COLORS.PRIMARY.surface};
 
 
 /* Brand Colors */
 
---color-brand-primary: ${COLORS.BRAND.primary};
+--color-tertiary: ${COLORS.BRAND.primary};
 
---color-brand-secondary: ${COLORS.BRAND.secondary};
+--color-tertiary: ${COLORS.BRAND.secondary};
 
---color-brand-accent: ${COLORS.BRAND.accent};
+--color-tertiary-shade: ${COLORS.BRAND.accent};
 
---color-brand-light: ${COLORS.BRAND.light};
+--color-tertiary-shade: ${COLORS.BRAND.light};
 
 
 /* Text Colors */
 
---color-text-primary: ${COLORS.TEXT.primary};
+--color-text-dark: ${COLORS.TEXT.primary};
 
---color-text-secondary: ${COLORS.TEXT.secondary};
+--color-text-medium: ${COLORS.TEXT.secondary};
 
---color-text-muted: ${COLORS.TEXT.muted};
+--color-text-light: ${COLORS.TEXT.muted};
 
---color-text-inverse: ${COLORS.TEXT.inverse};
+--color-text-white: ${COLORS.TEXT.inverse};
 
 --color-text-link: ${COLORS.TEXT.link};
 
@@ -372,15 +372,15 @@ export const CSS_VARIABLES = `
 
 /* Button Colors */
 
---color-btn-primary-bg: ${COLORS.BUTTON.primaryBg};
+--color-tertiary: ${COLORS.BUTTON.primaryBg};
 
---color-btn-primary-hover: ${COLORS.BUTTON.primaryHover};
+--color-tertiary-shade: ${COLORS.BUTTON.primaryHover};
 
 --color-btn-primary-text: ${COLORS.BUTTON.primaryText};
 
---color-btn-secondary-bg: ${COLORS.BUTTON.secondaryBg};
+--color-secondary: ${COLORS.BUTTON.secondaryBg};
 
---color-btn-secondary-hover: ${COLORS.BUTTON.secondaryHover};
+--color-secondary-shade: ${COLORS.BUTTON.secondaryHover};
 
 --color-btn-secondary-text: ${COLORS.BUTTON.secondaryText};
 
@@ -396,13 +396,13 @@ export const CSS_VARIABLES = `
 
 /* Semantic Colors */
 
---color-success: ${COLORS.SEMANTIC.success};
+--color-poppy-green: ${COLORS.SEMANTIC.success};
 
---color-warning: ${COLORS.SEMANTIC.warning};
+--color-poppy-yellow: ${COLORS.SEMANTIC.warning};
 
---color-error: ${COLORS.SEMANTIC.error};
+--color-poppy-red: ${COLORS.SEMANTIC.error};
 
---color-info: ${COLORS.SEMANTIC.info};
+--color-poppy-blue: ${COLORS.SEMANTIC.info};
 
 
 /* Shadow Colors */

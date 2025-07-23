@@ -5,11 +5,11 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--color-text-primary);
+    color: var(--color-text-dark);
     font-size: 0.875rem;
     
     .required-indicator {
-      color: var(--color-error);
+      color: var(--color-poppy-red);
       margin-left: 0.25rem;
     }
   }

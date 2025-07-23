@@ -1,6 +1,6 @@
 .dashboard-container {
       padding: 24px;
-      background-color: #f8f9fa;
+      background-color:var(--color-primary, #f8f9fa);
       min-height: 100vh;
       font-family: 'Inter', sans-serif;
       box-sizing: border-box; // Ensure consistent box model
