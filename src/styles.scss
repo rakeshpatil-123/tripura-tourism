@@ -9,6 +9,13 @@
     calendar-container-background-color: var(--color-brand-dark),
   ));
 
+  :root {
+  @include mat.select-overrides((
+    panel-background-color:  var(--color-info),
+    enabled-trigger-text-color:  var(--color-info),
+  ));
+}
+
 
   /* Base Colors */
   --color-primary-bg: hsl(0, 0%, 100%); // #ffffff - Main white background
