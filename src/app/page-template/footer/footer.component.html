@@ -1,40 +1,108 @@
-<section id="footer" class="footer">
-  <div class="container">
-    <div class="row text-center text-sm-start">
-      <div class="col-12 col-sm-4 mb-4" *ngFor="let column of [1,2,3]">
-        <h5>Quick Links</h5>
-        <ul class="list-unstyled quick-links">
-          <li><a href="#"><i class="bi bi-chevron-double-right"></i>Home</a></li>
-          <li><a href="#"><i class="bi bi-chevron-double-right"></i>About</a></li>
-          <li><a href="#"><i class="bi bi-chevron-double-right"></i>FAQ</a></li>
-          <li><a href="#"><i class="bi bi-chevron-double-right"></i>Get Started</a></li>
-          <li><a href="#"><i class="bi bi-chevron-double-right"></i>Videos</a></li>
-        </ul>
-      </div>
-    </div>
+<footer class="govt-footer">
+      <!-- Main Footer Content -->
+      <div class="footer-main">
+        <div class="container">
+          <div class="footer-grid">
+            <!-- Government Info Section -->
+            <div class="footer-section govt-info">
+              <div class="govt-logo">
+                <img src="https://image.telanganatoday.com/wp-content/uploads/2025/01/Tripura1_V_jpg--816x480-4g.webp?sw=1680&dsz=816x480&iw=615&p=false&r=1.25" alt="Government Logo" class="logo-img">
+                <h3>Government of Tripura</h3>
+              </div>
+              <p class="govt-description">
+                Committed to serving citizens with transparency, efficiency, and excellence. 
+                Building a better tomorrow through digital governance and public service.
+              </p>
+              <div class="contact-info">
+                <div class="contact-item">
+                  <span class="contact-icon">📧</span>
+                  <span>info&#64;government.gov</span>
+                </div>
+                <div class="contact-item">
+                  <span class="contact-icon">📞</span>
+                  <span>1800-1234-12</span>
+                </div>
+              </div>
+            </div>
 
-    <div class="row">
-      <div class="col-12 mt-4 mt-sm-5">
-        <ul class="list-unstyled list-inline social text-center">
-          <li class="list-inline-item"><a href="#"><i class="bi bi-facebook"></i></a></li>
-          <li class="list-inline-item"><a href="#"><i class="bi bi-twitter-x"></i></a></li>
-          <li class="list-inline-item"><a href="#"><i class="bi bi-instagram"></i></a></li>
-          <li class="list-inline-item"><a href="#"><i class="bi bi-google"></i></a></li>
-          <li class="list-inline-item"><a href="#"><i class="bi bi-envelope"></i></a></li>
-        </ul>
-      </div>
-    </div>
+            <!-- Quick Links -->
+            <div class="footer-section" *ngFor="let section of footerSections">
+              <h4 class="section-title">{{ section.title }}</h4>
+              <ul class="footer-links">
+                <li *ngFor="let link of section.links">
+                  <a 
+                    *ngIf="link.external; else internalLink"
+                    [href]="link.url" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="footer-link"
+                  >
+                    {{ link.title }}
+                    <span class="external-icon">↗</span>
+                  </a>
+                  <ng-template #internalLink>
+                    <a 
+                      [routerLink]="link.url"
+                      class="footer-link"
+                    >
+                      {{ link.title }}
+                    </a>
+                  </ng-template>
+                </li>
+              </ul>
+            </div>
 
-    <div class="row">
-      <div class="col-12 mt-2 text-center">
-        <p>
-          <u><a href="#">National Transaction Corporation</a></u> is a
-          Registered MSP/ISO of Elavon, Inc. Georgia.
-        </p>
-        <p class="h6">
-          © All rights reserved. <a class="ml-2" href="#" target="_blank">Sunlimetech</a>
-        </p>
+            
+          </div>
+
+          <!-- Social Media & Additional Links -->
+          <div class="footer-secondary">
+            <div class="social-links">
+              <h5>Follow Us</h5>
+              <div class="social-icons">
+                <a 
+                  *ngFor="let social of socialLinks" 
+                  [href]="social.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="social-link"
+                  [attr.aria-label]="'Follow us on ' + social.platform"
+                >
+                  <span [innerHTML]="social.icon"></span>
+                </a>
+              </div>
+            </div>
+
+            <div class="accessibility-links">
+              <a routerLink="/accessibility" class="utility-link">Accessibility</a>
+              <a routerLink="/sitemap" class="utility-link">Sitemap</a>
+              <a routerLink="/help" class="utility-link">Help</a>
+              <a routerLink="/feedback" class="utility-link">Feedback</a>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <div class="container">
+          <div class="bottom-content">
+            <div class="copyright">
+              <p>&copy; {{ currentYear }} Government of [State/Country]. All rights reserved.</p>
+            </div>
+            <div class="legal-links">
+              <a routerLink="/privacy-policy" class="legal-link">Privacy Policy</a>
+              <a routerLink="/terms-of-service" class="legal-link">Terms of Service</a>
+              <a routerLink="/disclaimer" class="legal-link">Disclaimer</a>
+              <a routerLink="/rti" class="legal-link">RTI</a>
+            </div>
+          </div>
+          <div class="security-info">
+            <p class="security-text">
+              <span class="security-icon">🔒</span>
+              This is a secure government website. Information is encrypted and transmitted securely.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>

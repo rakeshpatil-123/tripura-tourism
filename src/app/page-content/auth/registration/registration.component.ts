@@ -13,6 +13,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatCardModule} from '@angular/material/card';
 
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ButtonComponent } from "../../../shared/component/button-component/button.component";
 
 interface FormField {
   name: string;
@@ -27,7 +28,7 @@ interface FormField {
 }
 
 @Component({
-  imports:[CommonModule , 
+  imports: [CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -38,7 +39,7 @@ interface FormField {
     MatSelectModule,
     MatDatepickerModule,
     MatCardModule,
-    MatNativeDateModule , MatProgressSpinnerModule],
+    MatNativeDateModule, MatProgressSpinnerModule, ButtonComponent],
   selector: 'app-registration',
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.scss']

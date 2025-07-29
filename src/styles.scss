@@ -13,7 +13,7 @@
   --color-primary: hsl(229, 85%, 98%);            /* #fefae0 */
   --color-secondary: hsl(0, 0%, 100%);          /* #ccd5ae */
   --color-secondary-shade: hsl(76, 45%, 90%);    /* #e9edc9 */
-  --color-tertiary: red;           /* #d4a373 */
+  --color-tertiary: orange;           /* #d4a373 */
   --color-tertiary-shade: hsl(253, 85%, 93%);     /* #faedcd */
   --color-transparent:transparent;
 
@@ -41,6 +41,9 @@
 
   /* Secondary Button (White with Red border) */
   --color-btn-secondary-text: var(--color-text-dark);
+
+
+
 
   // $$$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@####################################################
 
@@ -282,5 +285,34 @@ body.sidebar-open {
 @media (max-width: 768px) {
   .main-content .content-wrapper {
     padding: 1rem;
+  }
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-family: 'Open Sans', Arial, sans-serif;
+
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --footer-bg: hsl(0, 0%, 10%);                /* #1a1a1a */
+    --footer-bottom-bg: hsl(0, 0%, 7%);          /* #111111 */
+    --footer-text: hsl(0, 0%, 88%);              /* #e0e0e0 */
+    --footer-text-secondary: hsl(0, 0%, 69%);    /* #b0b0b0 */
+    --footer-text-muted: hsl(0, 0%, 53%);        /* #888888 */
+    --border-color: hsl(0, 0%, 20%);             /* #333333 */
+    --border-color-light: hsl(0, 0%, 16%);       /* #2a2a2a */
+    --accent-color: var(--color-poppy-blue);     /* Use a poppy color for accent in dark mode */
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --primary-color: hsl(220, 100%, 40%);        /* #0052cc - Strong blue */
+    --footer-text: hsl(0, 0%, 0%);               /* #000000 */
+    --footer-text-secondary: hsl(0, 0%, 20%);    /* #333333 */
+    --border-color: hsl(0, 0%, 0%);              /* #000000 */
   }
 }

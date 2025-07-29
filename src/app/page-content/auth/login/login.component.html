@@ -40,8 +40,8 @@
               class="password-toggle"
               (click)="togglePasswordVisibility()"
             >
-              <span *ngIf="!showPassword">👁️</span>
-              <span *ngIf="showPassword">👁</span>
+              <span *ngIf="!showPassword"></span>
+              <span *ngIf="showPassword"></span>
             </button>
           </div>
           <div *ngIf="password?.invalid && password?.touched" class="error-message">
@@ -59,8 +59,7 @@
           <a href="#" class="forgot-password">Forgot Password?</a>
         </div>
 
-        <button
-          type="submit"
+        <app-button
           class="login-button"
           [disabled]="isLoading"
           [class.loading]="isLoading"
@@ -70,7 +69,7 @@
             <div class="spinner"></div>
             Signing In...
           </span>
-        </button>
+        </app-button>
 
         <div class="signup-link">
           <p>Don't have an account? <a [routerLink]="['/auth/registration']"  class="signup-text">Sign up here</a></p>
