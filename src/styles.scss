@@ -10,10 +10,10 @@
   ));
 
     /* Main Theme Colors - 5 Colors Only */
-  --color-primary: hsl(229, 85%, 98%);            /* #fefae0 */
+  --color-primary: hsl(199, 56, 199);            /* #fefae0 */
   --color-secondary: hsl(0, 0%, 100%);          /* #ccd5ae */
   --color-secondary-shade: hsl(76, 45%, 90%);    /* #e9edc9 */
-  --color-tertiary: orange;           /* #d4a373 */
+  --color-tertiary: hsl(182, 75%, 37%);           /* #d4a373 */
   --color-tertiary-shade: hsl(253, 85%, 93%);     /* #faedcd */
   --color-transparent:transparent;
 
@@ -26,7 +26,7 @@
   --color-text-white: hsl(0, 0%, 100%); // White text for dark backgrounds
 
   /* Supporting Poppy Colors - 5 Colors */
-  --color-poppy-red: hsl(0, 100%, 70%);          /* #ff6b6b */
+  --color-poppy-red: hsl(0, 63%, 35%);          /* #ff6b6b */
   --color-poppy-orange: hsl(20, 100%, 66%);      /* #ff8e53 */
   --color-poppy-yellow: hsl(47, 100%, 64%);      /* #ffd93d */
   --color-poppy-green: hsl(139, 55%, 61%);       /* #6bcf7f */

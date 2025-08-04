@@ -1,105 +1,90 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { LayoutService } from '../../_service/layout.service';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 
 @Component({
-  imports: [CommonModule],
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
+  standalone: true,
+  imports: [CommonModule]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen: boolean = false;
   isSidebarOpen: boolean = false;
   isScrolled: boolean = false;
   isMobile: boolean = false;
-  private layoutSub: Subscription | undefined;
-  
-  constructor(private layoutService: LayoutService ) { }
+
+  navItems = [
+    { label: 'Home', link: 'home', active: true },
+    { label: 'About', link: 'about', active: false },
+    { label: 'Services', link: 'services', active: false },
+    { label: 'Projects', link: 'projects', active: false },
+    { label: 'Contact', link: 'contact', active: false }
+  ];
 
   ngOnInit(): void {
     this.checkScreenSize();
-    
-    this.layoutSub = this.layoutService.sidebarOpen$.subscribe(isOpen => {
-      this.isSidebarOpen = isOpen;
-      
-      // Add/remove body class to prevent scrolling when sidebar is open on mobile
-      if (this.isMobile) {
-        if (this.isSidebarOpen) {
-          document.body.classList.add('sidebar-open');
-        } else {
-          document.body.classList.remove('sidebar-open');
-        }
-      }
-    });
-    
+    this.onScroll(); // Check initial scroll
     window.addEventListener('resize', this.checkScreenSize.bind(this));
+    window.addEventListener('scroll', this.onScroll.bind(this));
   }
-  
-  toggleMenu() {
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.isScrolled = window.scrollY > 10;
+  }
+
+  toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
-    
-    // Add/remove body class to prevent scrolling when menu is open
+
     if (this.isMenuOpen) {
       document.body.classList.add('menu-open');
+      // Close sidebar if open
+      if (this.isSidebarOpen) this.closeSidebar();
     } else {
       document.body.classList.remove('menu-open');
     }
-    
-    // Close sidebar if it's open when toggling nav menu
-    if (this.isMenuOpen && this.isSidebarOpen) {
-      this.closeSidebar();
-    }
   }
-  
-  closeMenu() {
+
+  closeMenu(): void {
     if (this.isMenuOpen) {
       this.isMenuOpen = false;
       document.body.classList.remove('menu-open');
     }
   }
-  
-  toggleSidebar() {
-    this.layoutService.toggleSidebar();
-    
-    // Close the nav menu if it's open when toggling sidebar
-    if (this.isMenuOpen) {
-      this.closeMenu();
-    }
-  }
-  
-  closeSidebar() {
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
     if (this.isSidebarOpen) {
-      this.layoutService.closeSidebar();
-      if (this.isMobile) {
-        document.body.classList.remove('sidebar-open');
-      }
+      document.body.classList.add('sidebar-open');
+      // Close menu if open
+      if (this.isMenuOpen) this.closeMenu();
+    } else {
+      document.body.classList.remove('sidebar-open');
     }
   }
-  
+
+  closeSidebar(): void {
+    if (this.isSidebarOpen) {
+      this.isSidebarOpen = false;
+      document.body.classList.remove('sidebar-open');
+    }
+  }
+
   private checkScreenSize(): void {
+    const wasMobile = this.isMobile;
     this.isMobile = window.innerWidth <= 768;
-    
-    // Close mobile menu and sidebar when resizing to desktop
-    if (!this.isMobile) {
-      if (this.isMenuOpen) {
-        this.closeMenu();
-      }
-      // Don't auto-close sidebar on desktop resize
-      document.body.classList.remove('menu-open', 'sidebar-open');
+
+    if (!this.isMobile && wasMobile) {
+      // On resize to desktop: close everything
+      this.closeMenu();
+      this.closeSidebar();
     }
   }
-  
-  @HostListener('window:resize')
-  onResize() {
-    this.checkScreenSize();
-  }
-  
+
   ngOnDestroy(): void {
-    if (this.layoutSub) this.layoutSub.unsubscribe();
     window.removeEventListener('resize', this.checkScreenSize.bind(this));
-    // Clean up body classes
+    window.removeEventListener('scroll', this.onScroll.bind(this));
     document.body.classList.remove('menu-open', 'sidebar-open');
   }
 }
