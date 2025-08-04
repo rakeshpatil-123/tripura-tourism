@@ -3,7 +3,6 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { SidebarComponent } from "./side-bar-menu/side-bar-menu.component";
-import { LayoutService } from '../_service/layout.service';
 
 @Component({
   selector: 'app-page-content-with-menu',
@@ -18,16 +17,11 @@ export class PageContentWithMenuComponent implements OnInit, OnDestroy {
   isMobile = false;
   private layoutSub: Subscription | undefined;
 
-  constructor(private layoutService: LayoutService) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.checkScreenSize();
     
-    this.layoutSub = this.layoutService.sidebarOpen$.subscribe(isOpen => {
-      if (this.isMobile) {
-        this.isMobileMenuVisible = isOpen;
-      }
-    });
 
     window.addEventListener('resize', this.checkScreenSize.bind(this));
   }
@@ -37,7 +31,6 @@ export class PageContentWithMenuComponent implements OnInit, OnDestroy {
     this.isMobile = window.innerWidth <= 1024;
     
     if (wasMobile !== this.isMobile) {
-      this.layoutService.closeSidebar();
       this.isDesktopMenuOpen = !this.isMobile; // Expanded on desktop, collapsed on mobile
     }
   }
@@ -45,7 +38,6 @@ export class PageContentWithMenuComponent implements OnInit, OnDestroy {
   // Called by the sidebar's internal button
   handleSidebarToggle(): void {
     if (this.isMobile) {
-      this.layoutService.closeSidebar();
     } else {
       this.isDesktopMenuOpen = !this.isDesktopMenuOpen;
     }
@@ -54,7 +46,6 @@ export class PageContentWithMenuComponent implements OnInit, OnDestroy {
   // Called when a nav link is clicked or backdrop is clicked
   closeMobileSidebar(): void {
     if (this.isMobile) {
-      this.layoutService.closeSidebar();
     }
   }
 

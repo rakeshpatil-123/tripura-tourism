@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { PageContentComponent } from "./page-content.component";
 import { LoginComponent } from "./auth/login/login.component";
+import { HomeComponent } from "./home/home.component";
 
 
 
@@ -9,7 +10,6 @@ import { LoginComponent } from "./auth/login/login.component";
 export const PAGE_CONTENT_ROUTES: Routes = [
     {
         path: '',
-        // component:LoginComponent ,
         canActivate: [],
 
         children: [

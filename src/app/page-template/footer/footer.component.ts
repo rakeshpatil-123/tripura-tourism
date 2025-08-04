@@ -19,6 +19,7 @@ interface SocialLink {
   platform: string;
   url: string;
   icon: string;
+  tag:string;
 }
 
 @Component({
@@ -59,33 +60,28 @@ export class FooterComponent {
     {
       platform: 'Facebook',
       url: 'https://facebook.com/government',
-      icon: '📘'
+      icon: '📘',
+      tag: '<i class="fa-brands fa-facebook social-link"></i>',
     },
     {
       platform: 'Twitter',
       url: 'https://twitter.com/government',
-      icon: '🐦'
+      icon: '🐦',
+      tag: '<i class="fa-brands fa-x-twitter social-link"></i>'
     },
     {
       platform: 'YouTube',
       url: 'https://youtube.com/government',
-      icon: '📺'
+      icon: '📺',
+      tag: '<i class="fa-brands fa-youtube social-link"></i>'
     },
     {
       platform: 'LinkedIn',
       url: 'https://linkedin.com/company/government',
-      icon: '💼'
+      icon: '💼',
+      tag: '<i class="fa-brands fa-linkedin social-link"></i>'
     }
   ];
 
-  onNewsletterSubmit(event: Event) {
-    event.preventDefault();
-    if (this.newsletterEmail) {
-      // Handle newsletter subscription
-      console.log('Newsletter subscription:', this.newsletterEmail);
-      // Add your API call here
-      alert('Thank you for subscribing to our newsletter!');
-      this.newsletterEmail = '';
-    }
-  }
+ 
 }

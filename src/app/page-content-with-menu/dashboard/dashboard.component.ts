@@ -6,6 +6,7 @@ import { ClaimStatusTableComponent } from './claim-status-table/claim-status-tab
 import { DonutChartComponent } from './donut-chart/donut-chart.component';
 import { StatsCardComponent } from './stats-card/stats-card.component';
 import { ButtonComponent } from '../../shared/component/button-component/button.component';
+import { TimelineCardComponent } from "../../shared/timeline-card/timeline-card.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +18,8 @@ import { ButtonComponent } from '../../shared/component/button-component/button.
     DonutChartComponent,
     ClaimStatusTableComponent,
     ClarificationRequiredTableComponent,
-    ButtonComponent
+    ButtonComponent,
+    TimelineCardComponent
 ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

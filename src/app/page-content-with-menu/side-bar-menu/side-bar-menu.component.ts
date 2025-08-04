@@ -7,7 +7,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd, RouterModule, Event } from '@angular/router';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 
 export interface MenuItem {
@@ -33,6 +33,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   @Output() onToggle = new EventEmitter<void>();
   @Output() onNavigate = new EventEmitter<void>();
 
+  showSidebar = false;
   expandedSubmenu: string | null = null;
   currentUrl: string = '';
   routerSubscription: Subscription | undefined;
@@ -86,22 +87,29 @@ export class SidebarComponent implements OnInit, OnDestroy {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
+    // Get current URL on init
     this.currentUrl = this.router.url;
-    
-    this.checkAndExpandActiveParent();
-    
-    this.routerSubscription = this.router.events.pipe(
-      filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
-    ).subscribe((event: NavigationEnd) => {
-      this.currentUrl = event.urlAfterRedirects;
-      this.checkAndExpandActiveParent();
-    });
+    this.checkSidebarVisibility(this.currentUrl);
+
+    // Subscribe to router events to track URL changes
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentUrl = event.url;
+        this.checkSidebarVisibility(event.url);
+        this.checkAndExpandActiveParent();
+      });
   }
 
   ngOnDestroy(): void {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
+  }
+
+  private checkSidebarVisibility(url: string): void {
+    // Show sidebar only if URL starts with '/dashboard'
+    this.showSidebar = url.startsWith('/dashboard');
   }
 
   isActive(route: string | undefined): boolean {

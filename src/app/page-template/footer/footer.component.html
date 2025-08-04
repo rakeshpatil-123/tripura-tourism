@@ -1,108 +1,93 @@
 <footer class="govt-footer">
-      <!-- Main Footer Content -->
-      <div class="footer-main">
-        <div class="container">
-          <div class="footer-grid">
-            <!-- Government Info Section -->
-            <div class="footer-section govt-info">
-              <div class="govt-logo">
-                <img src="https://image.telanganatoday.com/wp-content/uploads/2025/01/Tripura1_V_jpg--816x480-4g.webp?sw=1680&dsz=816x480&iw=615&p=false&r=1.25" alt="Government Logo" class="logo-img">
-                <h3>Government of Tripura</h3>
-              </div>
-              <p class="govt-description">
-                Committed to serving citizens with transparency, efficiency, and excellence. 
-                Building a better tomorrow through digital governance and public service.
-              </p>
-              <div class="contact-info">
-                <div class="contact-item">
-                  <span class="contact-icon">📧</span>
-                  <span>info&#64;government.gov</span>
-                </div>
-                <div class="contact-item">
-                  <span class="contact-icon">📞</span>
-                  <span>1800-1234-12</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Quick Links -->
-            <div class="footer-section" *ngFor="let section of footerSections">
-              <h4 class="section-title">{{ section.title }}</h4>
-              <ul class="footer-links">
-                <li *ngFor="let link of section.links">
-                  <a 
-                    *ngIf="link.external; else internalLink"
-                    [href]="link.url" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="footer-link"
-                  >
-                    {{ link.title }}
-                    <span class="external-icon">↗</span>
-                  </a>
-                  <ng-template #internalLink>
-                    <a 
-                      [routerLink]="link.url"
-                      class="footer-link"
-                    >
-                      {{ link.title }}
-                    </a>
-                  </ng-template>
-                </li>
-              </ul>
-            </div>
-
-            
+  <!-- Main Footer Content -->
+  <div class="footer-main">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Government Info Section -->
+        <div class="footer-section govt-info">
+          <div class="govt-logo">
+            <img
+              src="https://image.telanganatoday.com/wp-content/uploads/2025/01/Tripura1_V_jpg--816x480-4g.webp?sw=1680&dsz=816x480&iw=615&p=false&r=1.25"
+              alt="Government Logo"
+              class="logo-img"
+            />
+            <h3 class="govt-name">Government of Tripura</h3>
           </div>
+          <p class="govt-description">
+            Committed to serving citizens with transparency, efficiency, and
+            excellence. Building a better tomorrow through digital governance
+            and public service.
+          </p>
+          <div class="contact-info">
+            <div class="contact-item">
+              <span class="contact-icon">📧</span>
+              <span>info&#64;government.gov</span>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">📞</span>
+              <span>1800-1234-12</span>
+            </div>
+          </div>
+        </div>
 
-          <!-- Social Media & Additional Links -->
-          <div class="footer-secondary">
-            <div class="social-links">
-              <h5>Follow Us</h5>
-              <div class="social-icons">
-                <a 
-                  *ngFor="let social of socialLinks" 
-                  [href]="social.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="social-link"
-                  [attr.aria-label]="'Follow us on ' + social.platform"
-                >
-                  <span [innerHTML]="social.icon"></span>
+        <!-- Quick Links -->
+        <div class="footer-section" *ngFor="let section of footerSections">
+          <h4 class="section-title">{{ section.title }}</h4>
+          <ul class="footer-links">
+            <li *ngFor="let link of section.links">
+              <a
+                *ngIf="link.external; else internalLink"
+                [href]="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="footer-link"
+              >
+                {{ link.title }}
+                <span class="external-icon">↗</span>
+              </a>
+              <ng-template #internalLink>
+                <a [routerLink]="link.url" class="footer-link">
+                  {{ link.title }}
                 </a>
-              </div>
-            </div>
-
-            <div class="accessibility-links">
-              <a routerLink="/accessibility" class="utility-link">Accessibility</a>
-              <a routerLink="/sitemap" class="utility-link">Sitemap</a>
-              <a routerLink="/help" class="utility-link">Help</a>
-              <a routerLink="/feedback" class="utility-link">Feedback</a>
-            </div>
-          </div>
+              </ng-template>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- Footer Bottom -->
-      <div class="footer-bottom">
-        <div class="container">
-          <div class="bottom-content">
-            <div class="copyright">
-              <p>&copy; {{ currentYear }} Government of [State/Country]. All rights reserved.</p>
-            </div>
-            <div class="legal-links">
-              <a routerLink="/privacy-policy" class="legal-link">Privacy Policy</a>
-              <a routerLink="/terms-of-service" class="legal-link">Terms of Service</a>
-              <a routerLink="/disclaimer" class="legal-link">Disclaimer</a>
-              <a routerLink="/rti" class="legal-link">RTI</a>
-            </div>
-          </div>
-          <div class="security-info">
-            <p class="security-text">
-              <span class="security-icon">🔒</span>
-              This is a secure government website. Information is encrypted and transmitted securely.
-            </p>
+      <!-- Social Media & Additional Links -->
+      <div class="footer-secondary">
+        <div class="social-links">
+          <h5>Follow Us</h5>
+          <div class="social-icons">
+            <a
+              *ngFor="let social of socialLinks"
+              [href]="social.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              [attr.aria-label]="'Follow us on ' + social.platform"
+              [innerHTML]="social.tag"
+            >
+            </a>
           </div>
         </div>
+
+        <div class="accessibility-links">
+          <a routerLink="/accessibility" class="utility-link">Accessibility</a>
+          <a routerLink="/sitemap" class="utility-link">Sitemap</a>
+          <a routerLink="/help" class="utility-link">Help</a>
+          <a routerLink="/feedback" class="utility-link">Feedback</a>
+        </div>
       </div>
-    </footer>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container">
+      <p class="security-text">
+        &copy; {{ currentYear }} Government of Tripura. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
