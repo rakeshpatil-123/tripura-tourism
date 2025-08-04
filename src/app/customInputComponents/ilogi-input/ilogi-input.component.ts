@@ -31,8 +31,8 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
   @Input() mandatory = false;
   @Input() appBlockCopyPaste = false;
   @Input() readonly = false;
-  @Input() maxlength: string | number = '255';
-  @Input() rows: string = '2';
+  @Input() maxlength?: string | null | number = '255';
+  @Input() rows?: string | null | number = '2';
   @Input() errors: { [key: string]: any } | null = null;
   @Output() blur = new EventEmitter<Event>();
 

@@ -1,5 +1,4 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed" [class.visible-mobile]="isVisible">
-  <!-- Sidebar Header -->
   <div class="sidebar-header">
     <div class="brand-section" *ngIf="!isCollapsed">
       <div class="brand-logo">
@@ -11,7 +10,7 @@
     </button>
   </div>
 
-  <!-- User Profile -->
+  
   <div class="user-profile" *ngIf="!isCollapsed">
     <div class="user-info">
       <div class="user-name">Joydeep Debnath</div>
@@ -22,23 +21,30 @@
     </div>
   </div>
 
-  <!-- Sidebar Navigation -->
+  
   <nav class="sidebar-nav">
     <ul class="nav-list">
       <ng-container *ngFor="let item of menuItems">
-        <!-- Only show item if user has access -->
+        
         <ng-container *ngIf="canAccess(item)">
-          <!-- Parent item without children -->
+          
           <li class="nav-item" *ngIf="!item.children">
-            <a class="nav-link" (click)="navigate(item.route)" [attr.title]="isCollapsed ? item.title : null">
+            <a class="nav-link" 
+               [class.active]="isActive(item.route)" 
+               (click)="navigate(item.route)" 
+               [attr.title]="isCollapsed ? item.title : null">
               <span class="nav-icon material-icons">{{ item.icon }}</span>
               <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
             </a>
           </li>
 
-          <!-- Parent item with children -->
+          
           <li class="nav-item" *ngIf="item.children">
-            <div class="nav-link has-children" (click)="toggleSubmenu(item.id)" [class.expanded]="expandedSubmenu === item.id" [attr.title]="isCollapsed ? item.title : null">
+            <div class="nav-link has-children" 
+                 [class.expanded]="expandedSubmenu === item.id" 
+                 [class.active]="hasActiveChild(item)" 
+                 (click)="toggleSubmenu(item.id)" 
+                 [attr.title]="isCollapsed ? item.title : null">
               <span class="nav-icon material-icons">{{ item.icon }}</span>
               <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
               <span class="expand-icon material-icons" *ngIf="!isCollapsed">
@@ -46,11 +52,15 @@
               </span>
             </div>
             <ul class="submenu" *ngIf="expandedSubmenu === item.id && !isCollapsed">
-              <li class="submenu-item" *ngFor="let child of item.children" [ngIf]="canAccess(child)">
-                <a class="submenu-link" (click)="navigate(child.route)">
-                  <span class="submenu-icon material-icons">{{ child.icon }}</span>
-                  <span class="submenu-text">{{ child.title }}</span>
-                </a>
+              <li class="submenu-item" *ngFor="let child of item.children">
+                <ng-container *ngIf="canAccess(child)">
+                  <a class="submenu-link" 
+                     [class.active]="isActive(child.route)" 
+                     (click)="navigate(child.route)">
+                    <span class="submenu-icon material-icons">{{ child.icon }}</span>
+                    <span class="submenu-text">{{ child.title }}</span>
+                  </a>
+                </ng-container>
               </li>
             </ul>
           </li>
@@ -59,7 +69,7 @@
     </ul>
   </nav>
 
-  <!-- Footer -->
+  
   <div class="sidebar-footer" *ngIf="!isCollapsed">
     <div class="footer-actions">
       <button class="footer-btn" title="Help & Support">

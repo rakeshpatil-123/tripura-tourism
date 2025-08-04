@@ -28,7 +28,7 @@ export class IlogiSelectComponent implements OnInit, AfterViewInit, ControlValue
   @Input() placeholder = '';
   @Input() mandatory = false;
   @Input() readonly = false;
-  @Input() selectOptions: { id: any; name: string }[] = [{ id: '', name: 'Select' }];
+  @Input() selectOptions?: { id: any; name: string }[] = [{ id: '', name: 'Select' }];
   @Input() errors: { [key: string]: any } | null = null;
   @Output() change = new EventEmitter<{ value: any }>();
 
@@ -89,7 +89,7 @@ export class IlogiSelectComponent implements OnInit, AfterViewInit, ControlValue
   }
 
   getDisplayName(value: any): string {
-    const option = this.selectOptions.find(opt => opt.id === value);
+    const option = this.selectOptions!.find(opt => opt.id === value);
     return option ? option.name : '';
   }
 }

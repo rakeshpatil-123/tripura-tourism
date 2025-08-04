@@ -1,57 +1,29 @@
-// Import your existing color variables
-:root {
-  // Your existing color variables from paste.txt
-  --color-primary-bg: hsl(0, 0%, 100%);
-  --color-card-bg: hsl(0, 0%, 100%);
-  --color-surface: hsl(0, 0%, 98%);
-  --color-brand-primary: hsl(348, 99%, 33%);
-  --color-brand-secondary: hsl(348, 85%, 45%);
-  --color-brand-accent: hsl(348, 100%, 40%);
-  --color-brand-light: hsl(348, 100%, 95%);
-  --color-brand-dark: hsl(348, 99%, 25%);
-  --color-text-primary: hsl(0, 0%, 13%);
-  --color-text-secondary: hsl(0, 0%, 40%);
-  --color-text-muted: hsl(0, 0%, 60%);
-  --color-border-light: hsl(0, 0%, 90%);
-  --color-border-focus: hsl(348, 99%, 33%);
-  --color-form-input-bg: hsl(0, 0%, 100%);
-  --color-form-input-border: hsl(0, 0%, 85%);
-  --color-form-input-border-focus: hsl(348, 99%, 33%);
-  --color-error: hsl(348, 99%, 33%);
-  --color-success: hsl(142, 76%, 45%);
-  --shadow-light: hsla(0, 0%, 0%, 0.05);
-  --shadow-medium: hsla(0, 0%, 0%, 0.1);
-}
-
 .registration-container {
   min-height: 100vh;
-  background-color: var(--color-surface);
-  padding: 2rem;
+  background-color: var(--color-primary);
+  padding: clamp(1rem, 5vw, 2rem);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
+  margin-top: 2rem;
 }
 
 .registration-card {
-  max-width: 800px;
-  width: 100%;
-  background-color: var(--color-card-bg);
+  max-width: 1000px;
+  width: clamp(95%, 60vw, 60%);
+  background-color: var(--color-primary);
+  border: 1px solid black;
   border-radius: 12px;
-  box-shadow: 0 4px 20px var(--shadow-medium);
+  box-shadow: 0 4px 20px rgb(110, 75, 55);
   margin-top: 2rem;
-
+  
   .mat-mdc-card-header {
-    background-color: var(--color-brand-primary);
-    color: white;
+    color: black;
     padding: 1.5rem;
     border-radius: 12px 12px 0 0;
     margin: -1px -1px 0 -1px;
   }
-
+  
   .registration-title {
     display: flex;
     align-items: center;
@@ -59,75 +31,91 @@
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
-
+    
     mat-icon {
       font-size: 1.8rem;
       width: 1.8rem;
       height: 1.8rem;
     }
   }
-
+  
   .mat-mdc-card-content {
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
   }
 }
 
 .registration-form {
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 1rem;
     margin-bottom: 2rem;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
   }
-
+  
   .form-field {
     &.half-width {
       // Will automatically fit in grid
     }
-
+    
     &.full-width {
       grid-column: 1 / -1;
     }
-
+    
+    // Remove shaded background from inputs
+    .mat-mdc-form-field {
+      .mat-mdc-text-field-wrapper {
+        background-color: transparent !important;
+        border-radius: 8px;
+        
+        .mdc-notched-outline {
+          .mdc-notched-outline__leading,
+          .mdc-notched-outline__notch,
+          .mdc-notched-outline__trailing {
+            border-color: var(--color-form-input-border);
+            border-width: 1px;
+          }
+        }
+        
+        &:hover .mdc-notched-outline {
+          .mdc-notched-outline__leading,
+          .mdc-notched-outline__notch,
+          .mdc-notched-outline__trailing {
+            border-color: var(--color-text-medium);
+          }
+        }
+        
+        &.mdc-text-field--focused .mdc-notched-outline {
+          .mdc-notched-outline__leading,
+          .mdc-notched-outline__notch,
+          .mdc-notched-outline__trailing {
+            border-color: var(--color-form-input-border-focus);
+            border-width: 2px;
+          }
+        }
+      }
+    }
+    
     .mat-mdc-form-field-label {
-      color: var(--color-text-primary);
+      color: var(--color-text-dark);
       font-weight: 500;
     }
-
-    .mat-mdc-text-field-wrapper {
-      background-color: var(--color-form-input-bg);
-      border: 1px solid var(--color-form-input-border);
-      border-radius: 8px;
-      transition: border-color 0.2s ease;
-
-      &:hover {
-        border-color: var(--color-text-secondary);
-      }
-
-      &.mdc-text-field--focused {
-        border-color: var(--color-form-input-border-focus);
-      }
-    }
-
+    
     .mat-mdc-input-element {
-      color: var(--color-text-primary);
+      color: var(--color-text-dark);
+      background-color: transparent !important;
       
       &::placeholder {
-        color: var(--color-text-muted);
+        color: var(--color-text-light);
       }
     }
-
+    
     .mat-mdc-form-field-error {
-      color: var(--color-error);
+      color: var(--color-poppy-red);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
   }
-
+  
   .radio-group {
     display: flex;
     flex-direction: column;
@@ -135,50 +123,50 @@
     padding: 1rem;
     border: 1px solid var(--color-border-light);
     border-radius: 8px;
-    background-color: var(--color-form-input-bg);
-
+    background-color: transparent;
+    
     .field-label {
-      color: var(--color-text-primary);
+      color: var(--color-text-dark);
       font-weight: 500;
       font-size: 0.875rem;
       margin-bottom: 0.5rem;
     }
-
+    
     .radio-buttons {
       display: flex;
       gap: 1.5rem;
       flex-wrap: wrap;
-
+      
       .radio-option {
         .mat-mdc-radio-button {
-          color: var(--color-text-primary);
+          color: var(--color-text-dark);
         }
-
+        
         .mat-mdc-radio-outer-circle {
           border-color: var(--color-border-focus);
         }
-
+        
         .mat-mdc-radio-inner-circle {
-          background-color: var(--color-brand-primary);
+          background-color: var(--color-tertiary);
         }
-
+        
         &.mat-mdc-radio-checked {
           .mat-mdc-radio-outer-circle {
-            border-color: var(--color-brand-primary);
+            border-color: var(--color-tertiary);
           }
         }
       }
     }
-
+    
     .radio-error {
-      color: var(--color-error);
+      color: var(--color-poppy-red);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
   }
-
+  
   .required-asterisk {
-    color: var(--color-error);
+    color: var(--color-poppy-red);
     margin-left: 0.25rem;
   }
 }
@@ -186,53 +174,18 @@
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1rem);
   padding-top: 1rem;
   border-top: 1px solid var(--color-border-light);
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .reset-button {
-    background-color: transparent;
-    color: var(--color-text-secondary);
-    border: 1px solid var(--color-border-light);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background-color: var(--color-surface);
-      border-color: var(--color-text-secondary);
-    }
-
-    mat-icon {
-      margin-right: 0.5rem;
-    }
-  }
-
-  .submit-button {
-    background-color: var(--color-brand-primary);
-    color: white;
-    padding: 0.75rem 2rem;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-
-    &:hover:not(:disabled) {
-      background-color: var(--color-brand-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px var(--shadow-medium);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    mat-icon, mat-spinner {
+  flex-direction: row;
+  flex-wrap: wrap;
+  
+  app-button {
+    display: flex;
+    align-items: center;
+    
+    .button-spinner {
       margin-right: 0.5rem;
     }
   }
@@ -243,7 +196,7 @@
   .mat-mdc-form-field-subscript-wrapper {
     margin-top: 0.25rem;
   }
-
+  
   .mat-mdc-form-field-bottom-align::before {
     display: none;
   }
@@ -257,12 +210,12 @@
 
 // Snackbar styles
 .success-snackbar {
-  background-color: var(--color-success) !important;
+  background-color: var(--color-poppy-green) !important;
   color: white !important;
 }
 
 .error-snackbar {
-  background-color: var(--color-error) !important;
+  background-color: var(--color-poppy-red) !important;
   color: white !important;
 }
 
@@ -273,44 +226,45 @@
   }
 }
 
-// Responsive design
-@media (max-width: 768px) {
-  .registration-container {
-    padding: 1rem;
-  }
-
-  .registration-card {
-    margin-top: 1rem;
-    
-    .mat-mdc-card-content {
-      padding: 1.5rem;
-    }
-  }
-
-  .registration-form {
-    .form-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .radio-group {
-      .radio-buttons {
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-    }
-  }
-}
-
 // Focus styles for accessibility
 .form-field:focus-within {
   .mat-mdc-text-field-wrapper {
-    outline: 2px solid var(--color-brand-primary);
+    outline: 2px solid var(--color-tertiary);
     outline-offset: 2px;
   }
 }
 
 .radio-group:focus-within {
-  outline: 2px solid var(--color-brand-primary);
+  outline: 2px solid var(--color-tertiary);
   outline-offset: 2px;
+}
+
+// Responsive adjustments using container queries and modern CSS
+@container (min-width: 768px) {
+  .registration-card {
+    width: 60%;
+  }
+  
+  .form-actions {
+    flex-direction: row;
+  }
+  
+  .radio-group .radio-buttons {
+    gap: 1.5rem;
+  }
+}
+
+@container (max-width: 767px) {
+  .form-actions {
+    flex-direction: column;
+    
+    app-button {
+      width: 100%;
+    }
+  }
+  
+  .radio-group .radio-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
 }

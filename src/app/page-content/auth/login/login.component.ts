@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {RouterLink} from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ButtonComponent } from "../../../shared/component/button-component/button.component";
 
 @Component({
-  imports: [CommonModule , RouterLink],
+  imports: [CommonModule, RouterLink, ButtonComponent],
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']

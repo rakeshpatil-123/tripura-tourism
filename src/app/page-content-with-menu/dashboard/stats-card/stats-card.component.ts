@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AnimationCounterService } from '../../../shared/utils/animated-counter';
 import { Subscription } from 'rxjs';
+import { AnimationCounterService } from '../../../shared/utils/animated-counter';
 
 @Component({
   selector: 'app-stats-card',
@@ -16,9 +16,10 @@ export class StatsCardComponent implements OnInit {
   @Input() type: 'total' | 'approved' | 'pending' | 'rejected' = 'total';
   @Input() iconClass: string = 'fas fa-file-alt';
 
+  private animationSubscription: Subscription | null = null;
+
   constructor(private animationService: AnimationCounterService) {}
   animatedValue: number = 0;
-  private animationSubscription: Subscription | undefined;
   private duration: number = 1000; // Animation duration in ms
 
   ngOnInit(): void {

@@ -40,27 +40,22 @@
               class="password-toggle"
               (click)="togglePasswordVisibility()"
             >
-              <span *ngIf="!showPassword">👁️</span>
-              <span *ngIf="showPassword">👁</span>
+              <span *ngIf="!showPassword"></span>
+              <span *ngIf="showPassword"></span>
             </button>
           </div>
           <div *ngIf="password?.invalid && password?.touched" class="error-message">
             <span *ngIf="password?.errors?.['required']">Password is required</span>
             <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
           </div>
-        </div>
+        </div>  
 
         <div class="form-options">
-          <label class="checkbox-container">
-            <input type="checkbox" formControlName="rememberMe" />
-            <span class="checkmark"></span>
-            Remember me
-          </label>
+
           <a href="#" class="forgot-password">Forgot Password?</a>
         </div>
 
-        <button
-          type="submit"
+        <app-button
           class="login-button"
           [disabled]="isLoading"
           [class.loading]="isLoading"
@@ -70,7 +65,7 @@
             <div class="spinner"></div>
             Signing In...
           </span>
-        </button>
+        </app-button>
 
         <div class="signup-link">
           <p>Don't have an account? <a [routerLink]="['/auth/registration']"  class="signup-text">Sign up here</a></p>

@@ -1,0 +1,44 @@
+<!-- dynamic-card-container.component.html -->
+<div class="cards-grid">
+  <div
+    *ngFor="let card of cardData; trackBy: trackById"
+    class="card-container"
+    [style]="'--card-gradient: ' + card.gradient"
+  >
+    <!-- Card Header -->
+    <div class="card-header">
+      <!-- Render SVG Icon if provided -->
+      <div class="icon-container" *ngIf="card.icon">
+        <div class="card-icon" [innerHTML]="card.icon"></div>
+      </div>
+
+      <div class="header-content">
+        <h3 class="card-title">{{ card.title }}</h3>
+        <p class="card-description">{{ card.description }}</p>
+      </div>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body">
+      <div class="features-list">
+        <div class="feature-item" *ngFor="let feature of card.features; trackBy: trackByFeature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <path d="m9 11 3 3L22 4"></path>
+            </svg>
+          </div>
+          <span class="feature-text">{{ feature }}</span>
+        </div>
+      </div>
+
+      <button class="card-button" (click)="onButtonClick(card)" *ngIf="card.buttonText">
+        {{ card.buttonText }}
+        <div class="button-ripple"></div>
+      </button>
+    </div>
+
+    <!-- Glow Effect -->
+    <div class="card-glow"></div>
+  </div>
+</div>

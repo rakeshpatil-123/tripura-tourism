@@ -3,10 +3,12 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnInit
+  OnInit,
+  OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
 
 export interface MenuItem {
   id: string;
@@ -24,14 +26,17 @@ export interface MenuItem {
   templateUrl: './side-bar-menu.component.html',
   styleUrls: ['./side-bar-menu.component.scss']
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   @Input() isCollapsed = false;
   @Input() isVisible = false;
   @Input() userRole: string = 'admin';
   @Output() onToggle = new EventEmitter<void>();
   @Output() onNavigate = new EventEmitter<void>();
 
+  showSidebar = false;
   expandedSubmenu: string | null = null;
+  currentUrl: string = '';
+  routerSubscription: Subscription | undefined;
 
   menuItems: MenuItem[] = [
     {
@@ -67,7 +72,6 @@ export class SidebarComponent implements OnInit {
           icon: 'trending_up',
           route: '/reports/sales',
           roles: ['admin', 'moderator'],
-
         },
         {
           id: 'user-report',
@@ -82,7 +86,50 @@ export class SidebarComponent implements OnInit {
 
   constructor(private router: Router) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // Get current URL on init
+    this.currentUrl = this.router.url;
+    this.checkSidebarVisibility(this.currentUrl);
+
+    // Subscribe to router events to track URL changes
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentUrl = event.url;
+        this.checkSidebarVisibility(event.url);
+        this.checkAndExpandActiveParent();
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+
+  private checkSidebarVisibility(url: string): void {
+    // Show sidebar only if URL starts with '/dashboard'
+    this.showSidebar = url.startsWith('/dashboard');
+  }
+
+  isActive(route: string | undefined): boolean {
+    if (!route) return false;
+    return this.currentUrl === route || this.currentUrl.startsWith(`${route}/`);
+  }
+
+  hasActiveChild(item: MenuItem): boolean {
+    if (!item.children) return false;
+    return item.children.some(child => this.isActive(child.route));
+  }
+
+  checkAndExpandActiveParent(): void {
+    for (const item of this.menuItems) {
+      if (item.children && this.hasActiveChild(item)) {
+        this.expandedSubmenu = item.id;
+        break;
+      }
+    }
+  }
 
   toggleSubmenu(submenuId: string): void {
     if (this.isCollapsed) {
@@ -91,7 +138,7 @@ export class SidebarComponent implements OnInit {
         this.expandedSubmenu = submenuId;
       }, 300);
     } else {
-      this.expandedSubmenu =
+      this.expandedSubmenu = 
         this.expandedSubmenu === submenuId ? null : submenuId;
     }
   }
@@ -101,7 +148,6 @@ export class SidebarComponent implements OnInit {
     this.router.navigate([path]);
     this.onNavigate.emit();
   }
-
 
   canAccess(item: MenuItem): boolean {
     return item.roles.includes(this.userRole);
