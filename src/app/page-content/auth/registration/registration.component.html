@@ -7,16 +7,17 @@
       </mat-card-title>
     </mat-card-header>
 
-      <mat-card-content>
+    <mat-card-content>
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
         <div class="form-grid">
           
           <ng-container *ngFor="let field of formFields">
             
-            
+            <!-- Text, Email, Tel inputs -->
             <mat-form-field *ngIf="field.type === 'text' || field.type === 'email' || field.type === 'tel'" 
                            class="form-field" 
-                           [ngClass]="{'half-width': field.name !== 'registeredEnterpriseAddress'}">
+                           [ngClass]="{'half-width': field.name !== 'registeredEnterpriseAddress', 'full-width': field.name === 'registeredEnterpriseAddress'}"
+                           appearance="outline">
               <mat-label>
                 {{ field.label }}
                 <span class="required-asterisk" *ngIf="field.required">*</span>
@@ -31,9 +32,10 @@
               </mat-error>
             </mat-form-field>
 
-            
+            <!-- Textarea -->
             <mat-form-field *ngIf="field.type === 'textarea'" 
-                           class="form-field full-width">
+                           class="form-field full-width"
+                           appearance="outline">
               <mat-label>
                 {{ field.label }}
                 <span class="required-asterisk" *ngIf="field.required">*</span>
@@ -48,7 +50,7 @@
               </mat-error>
             </mat-form-field>
 
-            
+            <!-- Radio buttons -->
             <div *ngIf="field.type === 'radio'" class="form-field radio-group">
               <label class="field-label">
                 {{ field.label }}
@@ -61,35 +63,34 @@
                   {{ option.label }}
                 </mat-radio-button>
               </mat-radio-group>
-              <mat-error *ngIf="hasError(field.name)" class="radio-error">
+              <div *ngIf="hasError(field.name)" class="radio-error">
                 {{ getErrorMessage(field) }}
-              </mat-error>
+              </div>
             </div>
 
           </ng-container>
         </div>
 
-        
+        <!-- Form Actions with Custom Buttons -->
         <div class="form-actions">
-          <button mat-raised-button 
-                  type="button" 
-                  color="basic" 
-                  (click)="onReset()"
-                  [disabled]="isSubmitting"
-                  class="reset-button">
-            <mat-icon>refresh</mat-icon>
-            Reset
-          </button>
+          <app-button 
+            type="outline" 
+            size="medium"
+            text="Reset"
+            icon="refresh-cw"
+            [disabled]="isSubmitting"
+            (clicked)="onReset()">
+          </app-button>
           
-          <button mat-raised-button 
-                  type="submit" 
-                  color="primary"
-                  [disabled]="isSubmitting"
-                  class="submit-button">
-            <mat-icon *ngIf="!isSubmitting">how_to_reg</mat-icon>
-            <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
-            {{ isSubmitting ? 'Registering...' : 'Register' }}
-          </button>
+          <app-button 
+            type="primary" 
+            size="medium"
+            [text]="isSubmitting ? 'Registering...' : 'Register'"
+            [icon]="isSubmitting ? '' : 'user-plus'"
+            htmlType="submit"
+            [disabled]="isSubmitting || registrationForm.invalid">
+            <mat-spinner *ngIf="isSubmitting" diameter="16" class="button-spinner"></mat-spinner>
+          </app-button>
         </div>
       </form>
     </mat-card-content>
