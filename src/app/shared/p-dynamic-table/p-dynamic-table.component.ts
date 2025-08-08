@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonSeverity } from 'primeng/button';
 import { BadgeSeverity, TableColumn } from './p-table.model';
 import { BadgeModule } from 'primeng/badge';
-
+import { TagModule } from 'primeng/tag';
 @Component({
   selector: 'app-p-dynamic-table',
   templateUrl: './p-dynamic-table.component.html',
@@ -28,6 +28,7 @@ import { BadgeModule } from 'primeng/badge';
     ButtonModule,
     MenuModule,
     MenuModule,
+    TagModule,
     BadgeModule,
     FormsModule,
   ],
@@ -307,5 +308,25 @@ export class PDynamicTableComponent implements OnInit {
 
   onMenuHide(event: any) {
     this.openMenuInstance = null;
+  }
+  private adjustMenuPosition(menu: Menu, event: Event) {
+    setTimeout(() => {
+      const menuElement = menu.el.nativeElement.querySelector('.p-menu');
+      if (menuElement) {
+        const rect = menuElement.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        if (rect.right > viewportWidth) {
+          menuElement.style.left =
+            rect.left - (rect.right - viewportWidth) - 10 + 'px';
+        }
+
+        if (rect.bottom > viewportHeight) {
+          menuElement.style.top =
+            rect.top - (rect.bottom - viewportHeight) - 10 + 'px';
+        }
+      }
+    }, 0);
   }
 }

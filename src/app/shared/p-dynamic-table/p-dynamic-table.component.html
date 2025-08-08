@@ -78,101 +78,91 @@
         [style.width]="getColumnWidth(col)"
       >
         <!-- Render Component -->
-        <ng-container *ngIf="col.renderComponent">
-          <ng-container
-            *ngComponentOutlet="
-              col.renderComponent;
-              inputs: getRenderComponentInputs(col, rowData);
-              injector: injector
-            "
-          >
-          </ng-container>
+        @if (col.renderComponent) {
+        <ng-container
+          *ngComponentOutlet="
+            col.renderComponent;
+            inputs: getRenderComponentInputs(col, rowData);
+            injector: injector
+          "
+        >
         </ng-container>
+        }
 
         <!-- Action Dropdown Menu -->
-        <ng-container
-          *ngIf="col.type === 'action' && col.actions && col.actions.length > 0"
-        >
-          <div
-            class="flex justify-content-center"
-            *ngIf="col.actions && col.actions.length > 0"
-          >
+        @if (col.type === 'action' && col.actions && col.actions.length > 0) {
+        <div class="action-cell-wrapper">
+          <div class="action-cell-content">
             <p-menu
               #menu
               [popup]="true"
               (onShow)="onMenuOpen($event)"
               (onHide)="onMenuHide($event)"
+              appendTo="body"
             />
             <button
               pButton
               type="button"
               icon="pi pi-ellipsis-v"
-              class="p-button-text p-button-rounded p-button-plain p-button-sm"
+              class="action-button"
               (click)="toggleMenuWithCol($event, menu, col, rowData)"
+              [attr.aria-label]="'Actions'"
             ></button>
           </div>
-        </ng-container>
+        </div>
+        }
 
         <!-- Status Badge -->
-        <ng-container *ngIf="col.type === 'status'">
+        @if (col.type === 'status') {
+        <div class="status-badge-wrapper">
           <div
             pBadge
             [value]="getCellValue(rowData, col)"
             [severity]="getStatusSeverity(getCellValue(rowData, col))"
             size="small"
           ></div>
-        </ng-container>
+        </div>
+        }
 
         <!-- Payment Status Badge -->
-        <ng-container *ngIf="col.type === 'payment'">
+        @if (col.type === 'payment') {
+        <div class="payment-tag-wrapper">
           <p-tag
             [value]="getCellValue(rowData, col)"
             [severity]="getPaymentSeverity(getCellValue(rowData, col))"
             [size]="'small'"
           ></p-tag>
-        </ng-container>
+        </div>
+        }
 
         <!-- Boolean -->
-        <ng-container *ngIf="col.type === 'boolean'">
-          {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
-        </ng-container>
+        @if (col.type === 'boolean') {
+        {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
+        }
 
         <!-- Currency -->
-        <ng-container *ngIf="col.type === 'currency'">
-          {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
-        </ng-container>
+        @if (col.type === 'currency') {
+        {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
+        }
 
         <!-- Date -->
-        <ng-container *ngIf="col.type === 'date'">
-          {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
-        </ng-container>
+        @if (col.type === 'date') {
+        {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
+        }
 
         <!-- Link -->
-        <ng-container *ngIf="col.type === 'link'">
-          <a
-            *ngIf="col.linkHref && col.linkText"
-            [href]="col.linkHref(rowData)"
-            target="_blank"
-          >
-            {{ col.linkText(rowData) }}
-          </a>
-        </ng-container>
+        @if (col.type === 'link' && col.linkHref && col.linkText) {
+        <a [href]="col.linkHref(rowData)" target="_blank">
+          {{ col.linkText(rowData) }}
+        </a>
+        }
 
         <!-- Default Text -->
-        <ng-container
-          *ngIf="
-            !col.renderComponent &&
-            col.type !== 'action' &&
-            col.type !== 'status' &&
-            col.type !== 'payment' &&
-            col.type !== 'boolean' &&
-            col.type !== 'currency' &&
-            col.type !== 'date' &&
-            col.type !== 'link'
-          "
-        >
-          {{ getCellValue(rowData, col) }}
-        </ng-container>
+        @if (!col.renderComponent && col.type !== 'action' && col.type !==
+        'status' && col.type !== 'payment' && col.type !== 'boolean' && col.type
+        !== 'currency' && col.type !== 'date' && col.type !== 'link') {
+        {{ getCellValue(rowData, col) }}
+        }
       </td>
     </tr>
   </ng-template>

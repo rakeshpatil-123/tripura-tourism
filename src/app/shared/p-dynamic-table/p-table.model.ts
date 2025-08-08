@@ -11,6 +11,19 @@ export type BadgeSeverity =
   | null
   | undefined;
 
+// Add ButtonSeverity if not already defined
+export type ButtonSeverity =
+  | 'secondary'
+  | 'info'
+  | 'success'
+  | 'warn'
+  | 'danger'
+  | 'help'
+  | 'primary'
+  | 'contrast'
+  | null
+  | undefined;
+
 export type ColumnType =
   | 'text'
   | 'number'
@@ -37,7 +50,7 @@ export interface TableColumn {
     label?: string;
     action?: string;
     icon?: string;
-    color?: BadgeSeverity; // ✅ Use BadgeSeverity instead of ButtonSeverity
+    color?: BadgeSeverity;
     handler?: (row: any) => void;
     onClick?: (row: any) => void;
     component?: Type<any>;

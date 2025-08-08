@@ -4,7 +4,7 @@ import {
   Output,
   EventEmitter,
   OnInit,
-  OnDestroy
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
@@ -24,7 +24,7 @@ export interface MenuItem {
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './side-bar-menu.component.html',
-  styleUrls: ['./side-bar-menu.component.scss']
+  styleUrls: ['./side-bar-menu.component.scss'],
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   @Input() isCollapsed = false;
@@ -61,6 +61,35 @@ export class SidebarComponent implements OnInit, OnDestroy {
       roles: ['admin'],
     },
     {
+      id: 'Upload Existing Licence',
+      title: 'Upload Existing Licence',
+      icon: 'dynamic_form',
+      route: '/dashboard/upload-existing-licence',
+      roles: ['admin'],
+    },
+    {
+      id: 'Renewal List',
+      title: 'Renewal List',
+      icon: 'dynamic_form',
+      route: '/dashboard/renewal-list',
+      roles: ['admin'],
+    },
+    {
+      id: 'Inspection List',
+      title: 'Inspection List',
+      icon: 'dynamic_form',
+      route: '/dashboard/inspection-list',
+      roles: ['admin'],
+    },
+
+    {
+      id: 'Application List',
+      title: 'Application List',
+      icon: 'dynamic_form',
+      route: '/dashboard/application-list',
+      roles: ['admin'],
+    },
+    {
       id: 'reports',
       title: 'Reports',
       icon: 'assessment',
@@ -84,7 +113,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     // Get current URL on init
@@ -93,7 +122,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     // Subscribe to router events to track URL changes
     this.routerSubscription = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.currentUrl = event.url;
         this.checkSidebarVisibility(event.url);
@@ -119,7 +148,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   hasActiveChild(item: MenuItem): boolean {
     if (!item.children) return false;
-    return item.children.some(child => this.isActive(child.route));
+    return item.children.some((child) => this.isActive(child.route));
   }
 
   checkAndExpandActiveParent(): void {
@@ -138,7 +167,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.expandedSubmenu = submenuId;
       }, 300);
     } else {
-      this.expandedSubmenu = 
+      this.expandedSubmenu =
         this.expandedSubmenu === submenuId ? null : submenuId;
     }
   }
