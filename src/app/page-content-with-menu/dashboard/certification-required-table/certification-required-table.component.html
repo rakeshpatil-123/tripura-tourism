@@ -1,29 +1,37 @@
 <div class="clarification-required-container">
-      <h4 class="table-title">{{ title }}</h4>
-      
-      <div class="table-responsive-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Application Id</th>
-              <th>Department</th>
-              <th>NOC</th>
-              <th>Clarification</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of data">
-              <td>{{ item.applicationId }}</td>
-              <td>{{ item.department }}</td>
-              <td>{{ item.noc }}</td>
-              <td>
-                <span *ngIf="item.isDocumentMissing" class="document-missing-tag">DOCUMENT MISSING</span>
-                <span *ngIf="!item.isDocumentMissing">{{ item.clarification }}</span>
-              </td>
-              <td><button class="upload-button"><i class="fas fa-upload"></i> Upload</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+  <h4 class="table-title">{{ title }}</h4>
+
+  <div class="table-responsive-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Application Id</th>
+          <th>Department</th>
+          <th>NOC</th>
+          <th>Clarification</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of data">
+          <td>{{ item.applicationId }}</td>
+          <td>{{ item.department }}</td>
+          <td>{{ item.noc }}</td>
+          <td>
+            <span *ngIf="item.isDocumentMissing" class="document-missing-tag"
+              >DOCUMENT MISSING</span
+            >
+            <span *ngIf="!item.isDocumentMissing">{{
+              item.clarification
+            }}</span>
+          </td>
+          <td>
+            <button class="upload-button">
+              <i class="fas fa-upload"></i> Upload
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

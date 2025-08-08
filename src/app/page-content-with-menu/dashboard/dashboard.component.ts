@@ -6,7 +6,8 @@ import { ClaimStatusTableComponent } from './claim-status-table/claim-status-tab
 import { DonutChartComponent } from './donut-chart/donut-chart.component';
 import { StatsCardComponent } from './stats-card/stats-card.component';
 import { ButtonComponent } from '../../shared/component/button-component/button.component';
-import { TimelineCardComponent } from "../../shared/timeline-card/timeline-card.component";
+import { TimelineCardComponent } from '../../shared/timeline-card/timeline-card.component';
+import { TableColumn } from '../../shared/component/table/table.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,10 +20,9 @@ import { TimelineCardComponent } from "../../shared/timeline-card/timeline-card.
     ClaimStatusTableComponent,
     ClarificationRequiredTableComponent,
     ButtonComponent,
-    TimelineCardComponent
-],
+  ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
   barChartData = [
@@ -30,19 +30,25 @@ export class DashboardComponent {
     { label: 'CTO', approved: 5, rejected: 0 },
     { label: 'Panchayat', approved: 0, rejected: 1 },
     { label: 'Electrical', approved: 0, rejected: 0 },
-    { label: 'Other', approved: 2.5, rejected: 0 }
+    { label: 'Other', approved: 2.5, rejected: 0 },
   ];
 
   donutChartData = [
     { label: 'Approved', value: 86, color: '#198754' },
     { label: 'Pending', value: 28, color: '#ffc107' },
-    { label: 'Rejected', value: 10, color: '#dc3545' }
+    { label: 'Rejected', value: 10, color: '#dc3545' },
   ];
 
   claimStatusData = [
     { type: 'Proforma I', submitted: 0, approved: 0, received: 0, pending: 0 },
     { type: 'Proforma II', submitted: 0, approved: 0, received: 0, pending: 0 },
-    { type: 'Proforma III', submitted: 0, approved: 0, received: 0, pending: 0 }
+    {
+      type: 'Proforma III',
+      submitted: 0,
+      approved: 0,
+      received: 0,
+      pending: 0,
+    },
   ];
 
   clarificationRequiredData = [
@@ -51,14 +57,82 @@ export class DashboardComponent {
       department: 'Electrical Inspectorate',
       noc: 'Application for NOC from Electrical Inspectorate',
       clarification: '',
-      isDocumentMissing: true
+      isDocumentMissing: true,
     },
     {
       applicationId: 'PFR-94-000187',
       department: 'Partnership Firm Registration (L & C)',
       noc: 'Application for Partnership Firm Registration',
-      clarification: 'Kindly upload all the documents properly as mentioned in the portal.',
-      isDocumentMissing: false
-    }
+      clarification:
+        'Kindly upload all the documents properly as mentioned in the portal.',
+      isDocumentMissing: false,
+    },
+  ];
+
+  tableData = [
+    {
+      id: 1,
+      name: 'John Michael',
+      email: 'john.michael@example.com',
+      department: 'Engineering',
+      status: true,
+      salary: 95000,
+      joinDate: '2022-01-15',
+    },
+    {
+      id: 2,
+      name: 'Alexa Liras',
+      email: 'alexa@example.com',
+      department: 'Marketing',
+      status: false,
+      salary: 82000,
+      joinDate: '2021-11-03',
+    },
+    {
+      id: 3,
+      name: 'Laurent Perrier',
+      email: 'laurent@example.com',
+      department: 'Sales',
+      status: true,
+      salary: 120000,
+      joinDate: '2020-05-22',
+    },
+    {
+      id: 4,
+      name: 'Michael Levi',
+      email: 'michael@example.com',
+      department: 'Human Resources',
+      status: true,
+      salary: 78000,
+      joinDate: '2023-03-10',
+    },
+    {
+      id: 5,
+      name: 'Richard Gran',
+      email: 'richard@example.com',
+      department: 'Engineering',
+      status: false,
+      salary: 92000,
+      joinDate: '2022-08-17',
+    },
+    {
+      id: 6,
+      name: 'Miriam Ericson',
+      email: 'miriam@example.com',
+      department: 'Product',
+      status: true,
+      salary: 110000,
+      joinDate: '2021-12-01',
+    },
+  ];
+
+  tableColumns: TableColumn[] = [
+    { key: 'id', label: 'ID', type: 'number', sortable: true, width: '80px' },
+    { key: 'name', label: 'Full Name', sortable: true },
+    { key: 'email', label: 'Email' },
+    { key: 'department', label: 'Department', sortable: true },
+    { key: 'status', label: 'Status', type: 'boolean', sortable: true },
+    { key: 'salary', label: 'Salary', type: 'currency', sortable: true },
+    { key: 'joinDate', label: 'Join Date', type: 'date', sortable: true },
   ];
 }

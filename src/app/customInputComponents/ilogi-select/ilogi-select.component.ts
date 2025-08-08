@@ -1,24 +1,46 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, forwardRef } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  forwardRef,
+} from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared-imports';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { CommonModule } from '@angular/common';
+
+export interface SelectOption {
+  id: any;
+  name: string;
+}
 
 @Component({
   selector: 'app-ilogi-select',
   standalone: true,
-  imports: [...SHARED_IMPORTS, MatSelectModule, MatFormFieldModule],
+  imports: [
+    ...SHARED_IMPORTS,
+    MatSelectModule,
+    MatFormFieldModule,
+    CommonModule,
+  ],
   templateUrl: './ilogi-select.component.html',
   styleUrls: ['./ilogi-select.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => IlogiSelectComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
-export class IlogiSelectComponent implements OnInit, AfterViewInit, ControlValueAccessor {
+export class IlogiSelectComponent
+  implements OnInit, AfterViewInit, ControlValueAccessor
+{
   @Input() submitted = false;
   @Input() fieldLabel: string = '';
   @Input() hideLabel = false;
@@ -28,19 +50,21 @@ export class IlogiSelectComponent implements OnInit, AfterViewInit, ControlValue
   @Input() placeholder = '';
   @Input() mandatory = false;
   @Input() readonly = false;
-  @Input() selectOptions?: { id: any; name: string }[] = [{ id: '', name: 'Select' }];
+  @Input() selectOptions: SelectOption[] = [{ id: '', name: 'Select' }];
   @Input() errors: { [key: string]: any } | null = null;
+
   @Output() change = new EventEmitter<{ value: any }>();
+  @Output() blur = new EventEmitter<void>(); // Add blur output
 
   errorFieldId = '';
   isHovered = false;
   value: any = null;
   isDisabled = false;
 
-  private onChange: (value: any) => void = () => { };
-  private onTouched: () => void = () => { };
+  private onChange: (value: any) => void = () => {};
+  private onTouched: () => void = () => {};
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     if (this.fieldId) {
@@ -50,6 +74,10 @@ export class IlogiSelectComponent implements OnInit, AfterViewInit, ControlValue
 
   ngAfterViewInit() {
     this.cdr.detectChanges();
+  }
+
+  get hasErrors(): boolean {
+    return !!this.errors && Object.keys(this.errors).length > 0;
   }
 
   writeValue(value: any): void {
@@ -70,15 +98,15 @@ export class IlogiSelectComponent implements OnInit, AfterViewInit, ControlValue
     this.cdr.detectChanges();
   }
 
-  showErrorOnFieldHover() {
+  showErrorOnFieldHover(): void {
     this.isHovered = true;
   }
 
-  hideErrorOnFieldHoverOut() {
+  hideErrorOnFieldHoverOut(): void {
     this.isHovered = false;
   }
 
-  onChangeControl(value: any) {
+  onChangeControl(value: any): void {
     if (!this.readonly && !this.isDisabled) {
       this.value = value;
       this.onChange(this.value);
@@ -88,8 +116,15 @@ export class IlogiSelectComponent implements OnInit, AfterViewInit, ControlValue
     }
   }
 
+  onBlur(): void {
+    this.onTouched();
+    this.blur.emit();
+  }
+
   getDisplayName(value: any): string {
-    const option = this.selectOptions!.find(opt => opt.id === value);
+    if (value === null || value === undefined) return '';
+
+    const option = this.selectOptions.find((opt) => opt.id === value);
     return option ? option.name : '';
   }
 }

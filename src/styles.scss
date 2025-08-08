@@ -1,37 +1,55 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 @use "../theme-colors" as theme-colors;
-  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
-@import url('https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.css');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap");
+@import url("https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.css");
 
 :root {
-  @include mat.datepicker-overrides((
-    calendar-body-label-text-color: var(--color-poppy-yellow),
-    calendar-container-background-color: var(--color-tertiary-shade),
-  ));
+  @include mat.datepicker-overrides(
+    (
+      calendar-body-label-text-color: var(--color-poppy-yellow),
+      calendar-container-background-color: var(--color-tertiary-shade),
+    )
+  );
 
-    /* Main Theme Colors - 5 Colors Only */
-  --color-primary: hsl(199, 56, 199);            /* #fefae0 */
-  --color-secondary: hsl(0, 0%, 100%);          /* #ccd5ae */
-  --color-secondary-shade: hsl(76, 45%, 90%);    /* #e9edc9 */
-  --color-tertiary: hsl(182, 75%, 37%);           /* #d4a373 */
-  --color-tertiary-shade: hsl(253, 85%, 93%);     /* #faedcd */
-  --color-transparent:transparent;
+  @include mat.table-overrides(
+    (
+      background-color: #ffffff,
+      header-headline-color: #ffffff,
+      // White text on dark header
+      row-item-label-text-color: rgba(0, 0, 0, 0.87),
+      // Standard dark text
+      row-item-outline-color: rgba(0, 0, 0, 0.12),
+      // Subtle borders
+      header-headline-font: 22px,
+      header-headline-weight: 500,
+      row-item-label-text-font: 12px,
+      header-container-height: 56px,
+      // Slightly taller header
+      row-item-container-height: 52px,
+      // Consistent row height
+    )
+  );
 
-
+  /* Main Theme Colors - 5 Colors Only */
+  --color-primary: hsl(199, 56, 199); /* #fefae0 */
+  --color-secondary: hsl(0, 0%, 100%); /* #ccd5ae */
+  --color-secondary-shade: hsl(76, 45%, 90%); /* #e9edc9 */
+  --color-tertiary: hsl(182, 75%, 37%); /* #d4a373 */
+  --color-tertiary-shade: hsl(253, 85%, 93%); /* #faedcd */
+  --color-transparent: transparent;
 
   /* Text Colors - 3 Black Shades */
-  --color-text-dark: hsl(0, 0%, 10%);            /* #1a1a1a */
-  --color-text-medium: hsl(0, 0%, 29%);          /* #4a4a4a */
-  --color-text-light: hsl(0, 0%, 48%);           /* #7a7a7a */
+  --color-text-dark: hsl(0, 0%, 10%); /* #1a1a1a */
+  --color-text-medium: hsl(0, 0%, 29%); /* #4a4a4a */
+  --color-text-light: hsl(0, 0%, 48%); /* #7a7a7a */
   --color-text-white: hsl(0, 0%, 100%); // White text for dark backgrounds
 
   /* Supporting Poppy Colors - 5 Colors */
-  --color-poppy-red: hsl(0, 63%, 35%);          /* #ff6b6b */
-  --color-poppy-orange: hsl(20, 100%, 66%);      /* #ff8e53 */
-  --color-poppy-yellow: hsl(47, 100%, 64%);      /* #ffd93d */
-  --color-poppy-green: hsl(139, 55%, 61%);       /* #6bcf7f */
-  --color-poppy-blue: hsl(174, 67%, 60%);        /* #4ecdc4 */
-
+  --color-poppy-red: hsl(0, 63%, 35%); /* #ff6b6b */
+  --color-poppy-orange: hsl(20, 100%, 66%); /* #ff8e53 */
+  --color-poppy-yellow: hsl(47, 100%, 64%); /* #ffd93d */
+  --color-poppy-green: hsl(139, 55%, 61%); /* #6bcf7f */
+  --color-poppy-blue: hsl(174, 67%, 60%); /* #4ecdc4 */
 
   /*Link Colors */
   --color-text-link: ver(--color-tertiary);
@@ -42,8 +60,33 @@
   /* Secondary Button (White with Red border) */
   --color-btn-secondary-text: var(--color-text-dark);
 
+  // Base & Neutral Tones (Clean White Theme)
+  $bg-white: hsl(0, 0%, 100%);
+  $bg-surface: hsl(210, 15%, 98%); // Very soft blue-white
+  $border-light: hsl(210, 12%, 90%); // Soft border
+  $border-medium: hsl(210, 10%, 80%); // Table lines
+  $text-primary: hsl(220, 14%, 20%); // Deep charcoal (excellent readability)
+  $text-secondary: hsl(220, 10%, 40%); // Gray-blue for secondary text
+  $text-disabled: hsl(220, 8%, 60%); // Light gray
 
+  // Accent & Interactive Colors
+  $primary: hsl(215, 80%, 50%); // Crisp cobalt blue
+  $primary-hover: hsl(215, 85%, 45%); // Slightly deeper on hover
+  $primary-light: hsl(215, 90%, 94%); // Soft blue tint for highlights
+  $primary-border: hsl(215, 70%, 85%); // Soft border for primary
 
+  $success: hsl(145, 60%, 45%); // Vibrant emerald
+  $warning: hsl(39, 80%, 55%); // Warm amber
+  $error: hsl(355, 70%, 55%); // Clean crimson
+  $info: hsl(205, 70%, 50%); // Confident blue
+
+  // Action & Secondary
+  $secondary: hsl(300, 60%, 55%); // Magenta-pink (from your gradient energy)
+  $secondary-light: hsl(300, 90%, 95%); // Soft tint
+
+  // States & Feedback
+  $hover-overlay: hsla(0, 0%, 0%, 0.04);
+  $focus-ring: hsla(215, 80%, 50%, 0.3);
 
   // $$$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@####################################################
 
@@ -202,15 +245,17 @@ $box-shadow: 0 4px 8px var(--shadow-light); // Update if needed
 Main Content Container
 ====================== */
 html {
-  @include mat.theme((
-    color: (
-      primary: theme-colors.$primary-palette,
-      tertiary: theme-colors.$tertiary-palette,
-      theme-type: light,
-    ),
-    typography: Roboto,
-    density: 0
-  ));
+  @include mat.theme(
+    (
+      color: (
+        primary: theme-colors.$primary-palette,
+        tertiary: theme-colors.$tertiary-palette,
+        theme-type: light,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }
 /* ======================
    Main Content Container
@@ -262,7 +307,6 @@ html {
   }
 }
 
-
 .page-layout {
   position: relative;
   min-height: 100vh;
@@ -291,28 +335,41 @@ body.sidebar-open {
 *::before,
 *::after {
   box-sizing: border-box;
-  font-family: 'Open Sans', Arial, sans-serif;
-
+  font-family: "Open Sans", Arial, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --footer-bg: hsl(0, 0%, 10%);                /* #1a1a1a */
-    --footer-bottom-bg: hsl(0, 0%, 7%);          /* #111111 */
-    --footer-text: hsl(0, 0%, 88%);              /* #e0e0e0 */
-    --footer-text-secondary: hsl(0, 0%, 69%);    /* #b0b0b0 */
-    --footer-text-muted: hsl(0, 0%, 53%);        /* #888888 */
-    --border-color: hsl(0, 0%, 20%);             /* #333333 */
-    --border-color-light: hsl(0, 0%, 16%);       /* #2a2a2a */
-    --accent-color: var(--color-poppy-blue);     /* Use a poppy color for accent in dark mode */
+    --footer-bg: hsl(0, 0%, 10%); /* #1a1a1a */
+    --footer-bottom-bg: hsl(0, 0%, 7%); /* #111111 */
+    --footer-text: hsl(0, 0%, 88%); /* #e0e0e0 */
+    --footer-text-secondary: hsl(0, 0%, 69%); /* #b0b0b0 */
+    --footer-text-muted: hsl(0, 0%, 53%); /* #888888 */
+    --border-color: hsl(0, 0%, 20%); /* #333333 */
+    --border-color-light: hsl(0, 0%, 16%); /* #2a2a2a */
+    --accent-color: var(
+      --color-poppy-blue
+    ); /* Use a poppy color for accent in dark mode */
   }
 }
 
 @media (prefers-contrast: high) {
   :root {
-    --primary-color: hsl(220, 100%, 40%);        /* #0052cc - Strong blue */
-    --footer-text: hsl(0, 0%, 0%);               /* #000000 */
-    --footer-text-secondary: hsl(0, 0%, 20%);    /* #333333 */
-    --border-color: hsl(0, 0%, 0%);              /* #000000 */
+    --primary-color: hsl(220, 100%, 40%); /* #0052cc - Strong blue */
+    --footer-text: hsl(0, 0%, 0%); /* #000000 */
+    --footer-text-secondary: hsl(0, 0%, 20%); /* #333333 */
+    --border-color: hsl(0, 0%, 0%); /* #000000 */
   }
+}
+
+.main-container {
+  margin-top: 10vh;
+  width: 100%;
+}
+
+.highlight-text {
+  background: linear-gradient(90deg, #7c3aed 0%, #c026d3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
