@@ -3,27 +3,36 @@ import {
   Input,
   Output,
   EventEmitter,
-  Type,
   OnInit,
   Injector,
-  CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectorRef,
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
-import { Table } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { Menu, MenuModule } from 'primeng/menu';
 import { FormsModule } from '@angular/forms';
 import { ButtonSeverity } from 'primeng/button';
-import { TableColumn } from './p-table.model';
-import { Menu } from 'primeng/menu';
+import { BadgeSeverity, TableColumn } from './p-table.model';
+import { BadgeModule } from 'primeng/badge';
 
 @Component({
   selector: 'app-p-dynamic-table',
   templateUrl: './p-dynamic-table.component.html',
   styleUrls: ['./p-dynamic-table.component.scss'],
-  imports: [CommonModule, TableModule, ButtonModule, FormsModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    TableModule,
+    ButtonModule,
+    MenuModule,
+    MenuModule,
+    BadgeModule,
+    FormsModule,
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  host: { class: 'block' },
 })
 export class PDynamicTableComponent implements OnInit {
   @Input() data: any[] = [];
@@ -63,6 +72,9 @@ export class PDynamicTableComponent implements OnInit {
   filteredColumns: TableColumn[] = [];
   currencyCode: string = 'USD';
 
+  // Track open menu for cleanup
+  private openMenuInstance: Menu | null = null;
+
   constructor(public injector: Injector, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
@@ -77,6 +89,7 @@ export class PDynamicTableComponent implements OnInit {
   applyFiltersAndSorting() {
     let result = [...this.data];
 
+    // Global search
     if (this.searchable && this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       result = result.filter((item) =>
@@ -91,6 +104,7 @@ export class PDynamicTableComponent implements OnInit {
       );
     }
 
+    // Sorting
     if (this.internalSortField) {
       const sortField = this.internalSortField;
       const sortOrder = this.internalSortOrder;
@@ -132,46 +146,6 @@ export class PDynamicTableComponent implements OnInit {
     this.applyFiltersAndSorting();
   }
 
-  getRenderComponentInputs(
-    col: TableColumn,
-    rowData: any
-  ): { [key: string]: any } {
-    const baseInputs = col.renderComponentInputs || {};
-    const value = this.getCellValue(rowData, col);
-    return {
-      ...baseInputs,
-      value: value,
-      row: rowData,
-      column: col,
-    };
-  }
-
-  getActionComponentInputs(action: any, rowData: any): { [key: string]: any } {
-    const baseInputs = action.componentInputs || {};
-    return {
-      ...baseInputs,
-      row: rowData,
-      actionConfig: action,
-    };
-  }
-
-  onRowSelect(event: any) {
-    this.selectedRow = event.data;
-    this.rowSelect.emit(event.data);
-  }
-
-  onRowUnselect(event: any) {
-    this.selectedRow = null;
-    this.rowUnselect.emit(event.data);
-  }
-
-  onCustomActionClick(actionConfig: any, row: any) {
-    if (actionConfig.handler) {
-      actionConfig.handler(row);
-    }
-    this.customAction.emit({ action: actionConfig, row });
-  }
-
   getCellValue(rowData: any, col: TableColumn): any {
     return rowData[col.key];
   }
@@ -188,6 +162,7 @@ export class PDynamicTableComponent implements OnInit {
           currency: this.currencyCode,
         });
         return currencyFormatter.format(value);
+
       case 'date':
         if (value instanceof Date) {
           return value.toLocaleDateString();
@@ -198,15 +173,12 @@ export class PDynamicTableComponent implements OnInit {
             : dateObj.toLocaleDateString();
         }
         return value;
+
       case 'boolean':
         return value ? 'Yes' : 'No';
-      case 'status':
-      case 'payment':
-        return value;
-      case 'link':
-        return value;
+
       default:
-        return value;
+        return value != null ? value : '';
     }
   }
 
@@ -224,16 +196,27 @@ export class PDynamicTableComponent implements OnInit {
   isColumnSortable(col: TableColumn): boolean {
     return col.sortable !== false;
   }
-
-  getStatusSeverity(status: string): string {
-    const severityMap: { [key: string]: string } = {
+  getStatusSeverity(status: string): BadgeSeverity {
+    const map: { [key: string]: BadgeSeverity } = {
       Active: 'success',
       Inactive: 'danger',
-      Pending: 'warning',
-      Completed: 'success',
-      Failed: 'danger',
+      Pending: 'warn',
+      Draft: 'info',
+      Verified: 'success',
     };
-    return severityMap[status] || 'info';
+    return map[status] ?? 'info';
+  }
+
+  getPaymentSeverity(status: string): ButtonSeverity {
+    const map: { [key: string]: ButtonSeverity } = {
+      Paid: 'success',
+      'Partially Paid': 'warn',
+      Overdue: 'danger',
+      Refunded: 'info',
+      Failed: 'danger',
+      Cancelled: 'danger',
+    };
+    return map[status] || 'info';
   }
 
   trackByColumnKey(index: number, item: TableColumn): string {
@@ -248,7 +231,81 @@ export class PDynamicTableComponent implements OnInit {
     return Math.min(a, b);
   }
 
-  hasActionComponent(action: any): boolean {
-    return !!action.component;
+  // Action handling
+  onRowSelect(event: any) {
+    this.selectedRow = event.data;
+    this.rowSelect.emit(event.data);
+  }
+
+  onRowUnselect(event: any) {
+    this.selectedRow = null;
+    this.rowUnselect.emit(event.data);
+  }
+
+  onCustomActionClick(actionConfig: any, row: any) {
+    if (actionConfig.handler) {
+      actionConfig.handler(row);
+    }
+    this.customAction.emit({ action: actionConfig, row });
+  }
+
+  getRenderComponentInputs(
+    col: TableColumn,
+    rowData: any
+  ): { [key: string]: any } {
+    const baseInputs = col.renderComponentInputs || {};
+    const value = this.getCellValue(rowData, col);
+    return {
+      ...baseInputs,
+      value,
+      row: rowData,
+      column: col,
+    };
+  }
+
+  getActionComponentInputs(action: any, rowData: any): { [key: string]: any } {
+    const baseInputs = action.componentInputs || {};
+    return {
+      ...baseInputs,
+      row: rowData,
+      actionConfig: action,
+    };
+  }
+
+  // Dropdown Menu Logic
+  toggleMenuWithCol(event: Event, menu: Menu, col: TableColumn, rowData: any) {
+    // Close previous menu
+    if (this.openMenuInstance && this.openMenuInstance !== menu) {
+      this.openMenuInstance.hide();
+    }
+
+    // Set dynamic items
+    menu.model = this.getActionItems(col, rowData);
+    menu.toggle(event);
+    this.openMenuInstance = menu;
+
+    // Prevent event propagation
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  getActionItems(col: TableColumn, rowData: any): any[] {
+    return (col.actions || []).map((action) => ({
+      label: action.label,
+      icon: action.icon || 'pi pi-arrow-right',
+      command: () => {
+        if (action.handler) {
+          action.handler(rowData);
+        }
+      },
+    }));
+  }
+
+  onMenuOpen(event: any) {
+    // Optional: add analytics or logging
+  }
+
+  onMenuHide(event: any) {
+    this.openMenuInstance = null;
   }
 }
