@@ -21,6 +21,12 @@ export class ClaimStatusTableComponent {
   @Input() data: ClaimStatus[] = [
     { type: 'Proforma I', submitted: 0, approved: 0, received: 0, pending: 0 },
     { type: 'Proforma II', submitted: 0, approved: 0, received: 0, pending: 0 },
-    { type: 'Proforma III', submitted: 0, approved: 0, received: 0, pending: 0 }
+    {
+      type: 'Proforma III',
+      submitted: 0,
+      approved: 0,
+      received: 0,
+      pending: 0,
+    },
   ];
 }

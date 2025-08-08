@@ -1,33 +1,37 @@
- <div class="claim-status-table-container">
-      <div class="table-header">
-        <h4 class="table-title">{{ title }}</h4>
-        <button class="export-button">
-          <i class="fas fa-download"></i> Export
-        </button>
-      </div>
-      <!-- Added a wrapper div for horizontal scrolling on small screens -->
-      <div class="table-responsive-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Claim Submitted</th>
-              <th>Approved Claim</th>
-              <th>Claim Received</th>
-              <th>Pending</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of data">
-              <td>{{ item.type }}</td>
-              <td>{{ item.submitted }}</td>
-              <td>{{ item.approved }}</td>
-              <td>{{ item.received }}</td>
-              <td>{{ item.pending }}</td>
-              <td><button class="action-button"><i class="fas fa-ellipsis-h"></i></button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<div class="claim-status-table-container">
+  <div class="table-header">
+    <h4 class="table-title">{{ title }}</h4>
+    <button class="export-button">
+      <i class="fas fa-download"></i> Export
+    </button>
+  </div>
+  <!-- Added a wrapper div for horizontal scrolling on small screens -->
+  <div class="table-responsive-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Claim Submitted</th>
+          <th>Approved Claim</th>
+          <th>Claim Received</th>
+          <th>Pending</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of data">
+          <td>{{ item.type }}</td>
+          <td>{{ item.submitted }}</td>
+          <td>{{ item.approved }}</td>
+          <td>{{ item.received }}</td>
+          <td>{{ item.pending }}</td>
+          <td>
+            <button class="action-button">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

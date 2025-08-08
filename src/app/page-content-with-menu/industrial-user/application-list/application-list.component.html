@@ -1,0 +1,103 @@
+<div style="margin-top: 6rem">
+  <h1 style="text-align: start; margin-bottom: 2rem">
+    <span class="">Application List</span>
+  </h1>
+
+  <div class="search-filters-container">
+    <form (ngSubmit)="onSearch()" class="filters-form">
+      <div class="row gap-3 align-items-end">
+        <div class="col-12 col-md-2">
+          <app-ilogi-input-date
+            fieldLabel="Application Date From"
+            fieldId="fromDate"
+            [(ngModel)]="fromDate"
+            name="fromDate"
+            [monthsRange]="24"
+            [allowFutureDates]="false"
+            placeholder="DD-MM-YYYY"
+            [mandatory]="false"
+            [readonly]="false"
+          >
+          </app-ilogi-input-date>
+        </div>
+
+        <div class="col-12 col-md-2">
+          <app-ilogi-input-date
+            fieldLabel="Application Date To"
+            fieldId="toDate"
+            [(ngModel)]="toDate"
+            name="toDate"
+            [monthsRange]="24"
+            [allowFutureDates]="false"
+            placeholder="DD-MM-YYYY"
+            [mandatory]="false"
+            [readonly]="false"
+          >
+          </app-ilogi-input-date>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <app-ilogi-select
+            fieldLabel="Department"
+            fieldId="department"
+            [(ngModel)]="department"
+            name="department"
+            [selectOptions]="departmentOptions"
+            placeholder="Select Department"
+            [mandatory]="false"
+            [readonly]="false"
+          >
+          </app-ilogi-select>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <app-ilogi-select
+            fieldLabel="Application Type"
+            fieldId="applicationType"
+            [(ngModel)]="applicationType"
+            name="applicationType"
+            [selectOptions]="applicationTypeOptions"
+            placeholder="Select Type"
+            [mandatory]="false"
+            [readonly]="false"
+          >
+          </app-ilogi-select>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12 text-end">
+          <app-button
+            label="Reset"
+            type="outline"
+            (onClick)="onReset()"
+            class="me-2 px-4"
+          >
+            Reset
+          </app-button>
+          <app-button
+            label="Search"
+            type="primary"
+            (onClick)="onSearch()"
+            class="px-4"
+          >
+            Search
+          </app-button>
+        </div>
+      </div>
+    </form>
+
+    <hr class="my-4" />
+  </div>
+</div>
+<!-- Dynamic Table -->
+<app-dynamic-table
+  [data]="ApplicationData"
+  [columns]="ApplicationColumns"
+  [searchable]="true"
+  [pageSize]="5"
+  [showPagination]="true"
+  (rowAction)="onRowAction($event)"
+></app-dynamic-table>
+
+<!-- Dialog Template for Transaction History -->

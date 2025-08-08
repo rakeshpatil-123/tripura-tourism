@@ -1,88 +1,116 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, forwardRef } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  forwardRef,
+} from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared-imports';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import {
+  MatNativeDateModule,
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+} from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { DatePipe, formatDate } from '@angular/common';
+import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import moment from 'moment';
-import { CUSTOM_DATE_FORMATS, CustomDateAdapter } from '../../shared/utils/dateformator';
+import {
+  CUSTOM_DATE_FORMATS,
+  CustomDateAdapter,
+} from '../../shared/utils/dateformator';
 
 @Component({
   selector: 'app-ilogi-input-date',
   standalone: true,
-  imports: [...SHARED_IMPORTS, MatInputModule, MatDatepickerModule, MatNativeDateModule, MatIconModule],
+  imports: [
+    ...SHARED_IMPORTS,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule,
+    CommonModule,
+  ],
   templateUrl: './ilogi-input-date.component.html',
   styleUrls: ['./ilogi-input-date.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => IlogiInputDateComponent),
-      multi: true
+      multi: true,
     },
     {
       provide: DateAdapter,
       useClass: CustomDateAdapter,
-      deps: [MAT_DATE_LOCALE]
+      deps: [MAT_DATE_LOCALE],
     },
     {
       provide: MAT_DATE_FORMATS,
-      useValue: CUSTOM_DATE_FORMATS
+      useValue: CUSTOM_DATE_FORMATS,
     },
-    DatePipe
-  ]
+    DatePipe,
+  ],
 })
-export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlValueAccessor {
+export class IlogiInputDateComponent
+  implements OnInit, AfterViewInit, ControlValueAccessor
+{
   @Input() submitted = false;
   @Input() fieldLabel: string = '';
   @Input() fieldId: string = '';
   @Input() errorMessages: { [key: string]: string } = {};
   @Input() placeholder = 'DD-MM-YYYY';
   @Input() mandatory = false;
-  @Input() appBlockCopyPaste = false;
-  @Input() readonly = true;
+  @Input() readonly = false;
   @Input() errors: { [key: string]: any } | null = null;
 
   // New inputs for dynamic date range and custom messages
-  @Input() monthsRange: number = 6; // Default to 6 months
-  @Input() futureDateErrorMessage: string = 'Future dates are not allowed. Please select a date within the allowed range.';
-  @Input() pastDateErrorMessage: string = 'Date must be within the allowed range. Please select a more recent date.';
-  @Input() allowFutureDates: boolean = false; // Option to allow future dates
-  @Input() futureMonthsRange: number = 0; // How many months in future to allow
+  @Input() monthsRange: number = 6;
+  @Input() futureDateErrorMessage: string =
+    'Future dates are not allowed. Please select a date within the allowed range.';
+  @Input() pastDateErrorMessage: string =
+    'Date must be within the allowed range. Please select a more recent date.';
+  @Input() allowFutureDates: boolean = false;
+  @Input() futureMonthsRange: number = 0;
+
+  // Output for blur event
+  @Output() blur = new EventEmitter<Event>();
 
   errorFieldId = '';
   isHovered = false;
   value: Date | null = null;
-  displayValue: string = '';
   isDisabled = false;
   dateRangeError = '';
 
   // Date range properties
-  minDate: Date;
-  maxDate: Date;
+  minDate: Date = new Date();
+  maxDate: Date = new Date();
 
-  private onChange: (value: any) => void = () => { };
-  private onTouched: () => void = () => { };
+  // ControlValueAccessor callbacks
+  private onChange: (value: Date | null) => void = () => {};
+  private onTouched: () => void = () => {};
 
-  constructor(private cdr: ChangeDetectorRef, private datePipe: DatePipe) {
-    // Initial setup - will be updated in ngOnInit
-    this.maxDate = new Date();
-    this.minDate = new Date();
-  }
+  constructor(private cdr: ChangeDetectorRef, private datePipe: DatePipe) {}
 
   ngOnInit() {
     if (this.fieldId) {
       this.errorFieldId = `invalid-input-${this.fieldId}`;
     }
-
-    // Set up date range based on inputs
     this.setupDateRange();
   }
 
   ngAfterViewInit() {
     this.cdr.detectChanges();
+  }
+
+  get hasErrors(): boolean {
+    return !!this.errors && Object.keys(this.errors).length > 0;
   }
 
   private setupDateRange(): void {
@@ -93,14 +121,13 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
       this.maxDate = new Date();
       this.maxDate.setMonth(this.maxDate.getMonth() + this.futureMonthsRange);
     } else {
-      this.maxDate = new Date(); // Today
+      this.maxDate = new Date();
     }
 
     // Set min date
     this.minDate = new Date();
     this.minDate.setMonth(this.minDate.getMonth() - this.monthsRange);
 
-    // Update error messages with dynamic range
     this.updateErrorMessages();
   }
 
@@ -118,18 +145,25 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
     }
   }
 
-  writeValue(value: any): void {
+  // ControlValueAccessor implementation
+  writeValue(value: Date | string | null): void {
     if (value) {
-      // Handle both string and Date inputs
-      this.value = moment(value, 'DD-MM-YYYY', true).isValid() ? moment(value, 'DD-MM-YYYY').toDate() : null;
+      if (typeof value === 'string') {
+        this.value = moment(value, ['DD-MM-YYYY', 'YYYY-MM-DD'], true).isValid()
+          ? moment(value, ['DD-MM-YYYY', 'YYYY-MM-DD']).toDate()
+          : null;
+      } else if (value instanceof Date) {
+        this.value = value;
+      } else {
+        this.value = null;
+      }
     } else {
       this.value = null;
     }
-    this.updateDisplayValue();
     this.cdr.detectChanges();
   }
 
-  registerOnChange(fn: (value: any) => void): void {
+  registerOnChange(fn: (value: Date | null) => void): void {
     this.onChange = fn;
   }
 
@@ -142,39 +176,38 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
     this.cdr.detectChanges();
   }
 
-  onDateChange(value: any): void {
+  // Handle date changes from date picker
+  onDateChange(value: Date | null): void {
     this.dateRangeError = '';
+    this.onTouched(); // Mark as touched when user interacts
 
-    // Validate date range
     if (value) {
-      const selectedDate = moment(value).toDate();
+      const selectedDate = new Date(value);
       const today = new Date();
-      today.setHours(23, 59, 59, 999); // Set to end of day for comparison
+      today.setHours(23, 59, 59, 999);
 
       const pastLimitDate = new Date();
       pastLimitDate.setMonth(pastLimitDate.getMonth() - this.monthsRange);
-      pastLimitDate.setHours(0, 0, 0, 0); // Set to start of day for comparison
+      pastLimitDate.setHours(0, 0, 0, 0);
 
       // Check future date validation
       if (!this.allowFutureDates && selectedDate > today) {
         this.dateRangeError = this.futureDateErrorMessage;
         this.value = null;
-        this.updateDisplayValue();
-        this.onChange(this.value);
-        this.onTouched();
+        this.onChange(null);
         this.cdr.detectChanges();
         return;
       } else if (this.allowFutureDates && this.futureMonthsRange > 0) {
         const futureLimitDate = new Date();
-        futureLimitDate.setMonth(futureLimitDate.getMonth() + this.futureMonthsRange);
+        futureLimitDate.setMonth(
+          futureLimitDate.getMonth() + this.futureMonthsRange
+        );
         futureLimitDate.setHours(23, 59, 59, 999);
 
         if (selectedDate > futureLimitDate) {
           this.dateRangeError = this.futureDateErrorMessage;
           this.value = null;
-          this.updateDisplayValue();
-          this.onChange(this.value);
-          this.onTouched();
+          this.onChange(null);
           this.cdr.detectChanges();
           return;
         }
@@ -184,36 +217,36 @@ export class IlogiInputDateComponent implements OnInit, AfterViewInit, ControlVa
       if (selectedDate < pastLimitDate) {
         this.dateRangeError = this.pastDateErrorMessage;
         this.value = null;
-        this.updateDisplayValue();
-        this.onChange(this.value);
-        this.onTouched();
+        this.onChange(null);
         this.cdr.detectChanges();
         return;
       }
     }
 
     // If validation passes, set the value
-    this.value = value ? moment(value).toDate() : null;
-    this.updateDisplayValue();
-    this.onChange(this.value);
-    this.onTouched();
+    this.value = value;
+    this.onChange(this.value); // Notify Angular forms of the change
     this.cdr.detectChanges();
   }
 
-  private updateDisplayValue(): void {
-    if (this.value) {
-      // Use moment for consistent DD-MM-YYYY formatting
-      this.displayValue = moment(this.value).format('DD-MM-YYYY');
-    } else {
-      this.displayValue = '';
-    }
+  // Handle blur event
+  onBlur(event: Event): void {
+    this.onTouched(); // Mark as touched when field loses focus
+    this.blur.emit(event); // Emit custom blur event
   }
 
-  showErrorOnFieldHover() {
+  // Hover effects for error display
+  showErrorOnFieldHover(): void {
     this.isHovered = true;
   }
 
-  hideErrorOnFieldHoverOut() {
+  hideErrorOnFieldHoverOut(): void {
     this.isHovered = false;
+  }
+
+  // Utility method to format date for display
+  formatDate(date: Date | null): string {
+    if (!date) return '';
+    return this.datePipe.transform(date, 'dd/MM/yyyy') || '';
   }
 }

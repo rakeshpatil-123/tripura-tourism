@@ -1,11 +1,35 @@
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  position: relative;
 }
+
 label {
-  margin-bottom: 0.5rem; /* Controls space between label and input */
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--color-text-dark, #333);
 }
-.bold-label {
-  font-weight: 500 !important; /* Bold when readonly */
+
+.required-indicator {
+  color: var(--color-poppy-red, #dc3545);
+  margin-left: 0.25rem;
+}
+
+.readonly-display {
+  padding: 0.75rem 1rem;
+  background-color: var(--color-background-light, #f8f9fa);
+  border: 1px solid var(--color-border, #ced4da);
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--color-text-dark, #333);
+  min-height: calc(1.5em + 0.75rem + 2px);
+  word-break: break-word;
+}
+
+.date-input-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
 }
 
 .form-control.date-input {
@@ -17,21 +41,51 @@ label {
   padding: 0.75rem 1rem;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  padding-right: 3rem; // Space for calendar icon
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-poppy-blue, #0a54c4);
+    box-shadow: 0 0 0 3px rgba(6, 41, 236, 0.2);
+  }
+
+  &.is-invalid {
+    border-color: var(--color-poppy-red, #dc3545);
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+    }
+  }
+
+  &:disabled {
+    background-color: var(--color-background-light, #f8f9fa);
+    cursor: not-allowed;
+  }
 }
 
-.form-control.date-input:focus {
-  outline: none;
-  border-color: var(--color-poppy-blue, #0a54c4); /* Highlight on focus */
-  box-shadow: 0 0 0 3px rgba(6, 41, 236, 0.2); /* Subtle glow effect */
-}
+.calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--color-text-dark, #333);
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
 
-.is-invalid.date-input-invalid {
-  border-color: var(--color-poppy-red, #dc3545);
-}
-.is-invalid.date-input-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
-}
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 
+  &:active {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
 
 .invalid-input {
   opacity: 0;
@@ -40,83 +94,19 @@ label {
   margin-top: 0.25rem;
   transform: translateY(-4px);
   transition: opacity 0.2s ease, transform 0.2s ease;
-}
 
-.invalid-input.show-error {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.red-font {
-  color: #dc3545;
-}
-
-.show-data {
-  margin-bottom: 0.5rem;
+  &.show-error {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .x-error-msg-text {
   font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-.date-input-container {
-  position: relative;
-  display: inline-block;
-  width: 100%;
+// Hide the default date picker icon in WebKit browsers
+.date-input::-webkit-calendar-picker-indicator {
+  display: none;
 }
-
-.calendar-icon {
-  position: absolute;
-  right: 0.75rem; /* Adjusted for better alignment inside input */
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #333; /* Match input text color */
-  font-size: 1.2rem;
-}
-
-/* Override global datepicker styles */
-:host ::ng-deep .mat-datepicker-content {
-  background-color: #ffffff !important;
-  color: #ae0f0f !important;
-  border-radius: 8px !important;
-}
-
-:host ::ng-deep .mat-calendar {
-  background-color: #f86464 !important;
-}
-
-:host ::ng-deep .mat-calendar-body-cell-content {
-  color: #333 !important;
-}
-
-:host ::ng-deep .mat-calendar-body-today {
-  border-color: #333 !important;
-}
-
-:host ::ng-deep .mat-calendar-body-selected {
-  background-color: var(--color-tertiary, #a11220) !important;
-  color: #ffffff !important;
-}
-
-:host ::ng-deep .mat-calendar-body-cell:hover .mat-calendar-body-cell-content {
-  background-color: var(--color-red-100, #f9e1e6) !important;
-}
-
-.mat-calendar{
-  background: var(--color-tertiary) !important;
-}
-
-:host ::ng-deep .mat-calendar {
-  background-color: #450303 !important;
-}
-
-:host ::ng-deep #mat-datepicker-2{
-  background-color: #450303 !important;
-  color: #ffffff !important;
-}
-
-
-
-
-

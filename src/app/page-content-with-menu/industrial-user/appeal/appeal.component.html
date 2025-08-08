@@ -1,0 +1,76 @@
+<!-- appeal.component.html -->
+<div class="appeal-container">
+  <div class="appeal-content">
+    <form
+      [formGroup]="filterForm"
+      (ngSubmit)="onSearch()"
+      novalidate
+      class="appeal-form"
+    >
+      <div class="filter-section card">
+        <div class="filter-grid">
+          <div class="filter-item">
+            <label for="applicationId" class="filter-label"
+              >Application name</label
+            >
+            <app-ilogi-select
+              formControlName="applicationId"
+              fieldId="applicationId"
+              placeholder="Select"
+              [mandatory]="false"
+              [selectOptions]="applicationOptions"
+            >
+            </app-ilogi-select>
+          </div>
+
+          <div class="filter-item">
+            <label for="status" class="filter-label">Status</label>
+            <app-ilogi-select
+              formControlName="status"
+              fieldId="status"
+              placeholder="Select"
+              [mandatory]="false"
+              [selectOptions]="statusOptions"
+            >
+            </app-ilogi-select>
+          </div>
+
+          <div class="filter-item filter-actions">
+            <label class="filter-label">&nbsp;</label>
+            <div class="button-group">
+              <app-button type="outline" text="Reset" (clicked)="onReset()">
+              </app-button>
+              <app-button type="primary" text="Search" htmlType="submit">
+              </app-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="list-section">
+        <div class="list-header">
+          <h2 class="header-text">List Of Appeal</h2>
+          <app-button
+            type="primary"
+            text="Create New Appeal"
+            icon="add"
+            (clicked)="createNewAppeal()"
+            class="create-button"
+          >
+          </app-button>
+        </div>
+
+        <div class="table-section card">
+          <app-dynamic-table
+            [data]="appealListData"
+            [columns]="appealColumns"
+            [pageSize]="5"
+            [showPagination]="true"
+            [searchable]="false"
+          >
+          </app-dynamic-table>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

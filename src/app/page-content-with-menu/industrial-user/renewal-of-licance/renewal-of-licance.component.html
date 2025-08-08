@@ -1,0 +1,16 @@
+<div class="renewal-container">
+  <div class="header">
+    <h2>Licenses & NOC Renewals</h2>
+    <p>Manage your license and NOC renewals</p>
+  </div>
+
+  <app-dynamic-table
+    [data]="renewalData"
+    [columns]="columns"
+    [pageSize]="10"
+    [showPagination]="true"
+    [searchable]="true"
+    (rowAction)="handleRowAction($event)"
+  >
+  </app-dynamic-table>
+</div>

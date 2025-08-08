@@ -1,0 +1,35 @@
+// Base & Neutral Tones (Clean White Theme)
+$bg-white: hsl(0, 0%, 100%);
+$bg-surface: hsl(210, 15%, 98%); // Very soft blue-white
+$border-light: hsl(210, 12%, 90%); // Soft border
+$border-medium: hsl(210, 10%, 80%); // Table lines
+$text-primary: hsl(220, 14%, 20%); // Deep charcoal (excellent readability)
+$text-secondary: hsl(220, 10%, 40%); // Gray-blue for secondary text
+$text-disabled: hsl(220, 8%, 60%); // Light gray
+
+// Accent & Interactive Colors
+$primary: hsl(215, 80%, 50%); // Crisp cobalt blue
+$primary-hover: hsl(215, 85%, 45%); // Slightly deeper on hover
+$primary-light: hsl(215, 90%, 94%); // Soft blue tint for highlights
+$primary-border: hsl(215, 70%, 85%); // Soft border for primary
+
+$success: hsl(145, 60%, 45%); // Vibrant emerald
+$warning: hsl(39, 80%, 55%); // Warm amber
+$error: hsl(355, 70%, 55%); // Clean crimson
+$info: hsl(205, 70%, 50%); // Confident blue
+
+// Action & Secondary
+$secondary: hsl(300, 60%, 55%); // Magenta-pink (from your gradient energy)
+$secondary-light: hsl(300, 90%, 95%); // Soft tint
+
+// States & Feedback
+$hover-overlay: hsla(0, 0%, 0%, 0.04);
+$focus-ring: hsla(215, 80%, 50%, 0.3);
+
+// Spacing & Radius
+$radius-sm: 4px;
+$radius-base: 6px;
+$transition: all 0.2s cubic-bezier(0.33, 1, 0.68, 1);
+
+$border-radius: 6px;
+$transition: all 0.2s ease;

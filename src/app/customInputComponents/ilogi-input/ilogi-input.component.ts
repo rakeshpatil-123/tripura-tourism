@@ -1,22 +1,38 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild, forwardRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  forwardRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormControlName, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { BlockCopyPasteDirective } from '../../directives/block-copy-paste.directive';
 
 @Component({
   selector: 'app-ilogi-input',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatInputModule, BlockCopyPasteDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    BlockCopyPasteDirective,
+  ],
   templateUrl: './ilogi-input.component.html',
   styleUrls: ['./ilogi-input.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => IlogiInputComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class IlogiInputComponent implements OnInit, ControlValueAccessor {
   @Input() submitted = false;
@@ -34,16 +50,16 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
   @Input() maxlength?: string | null | number = '255';
   @Input() rows?: string | null | number = '2';
   @Input() errors: { [key: string]: any } | null = null;
+
   @Output() blur = new EventEmitter<Event>();
 
   errorFieldId = '';
   isHovered = false;
   value: any;
   isDisabled = false;
-  // errors: { [key: string]: any } | null = null;
 
-  private onChange: (value: any) => void = () => { };
-  private onTouched: () => void = () => { };
+  private onChange: (value: any) => void = () => {};
+  private onTouched: () => void = () => {};
 
   ngOnInit() {
     if (this.fieldId) {
@@ -51,8 +67,12 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
     }
   }
 
+  get hasErrors(): boolean {
+    return !!this.errors && Object.keys(this.errors).length > 0;
+  }
+
   writeValue(value: any): void {
-    this.value = value;
+    this.value = value ?? '';
   }
 
   registerOnChange(fn: (value: any) => void): void {
@@ -65,11 +85,6 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
 
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled = isDisabled;
-  }
-
-  // Method to update errors (called by parent form if needed)
-  setErrors(errors: { [key: string]: any } | null) {
-    this.errors = errors;
   }
 
   onInputChange(event: Event): void {
@@ -94,7 +109,7 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  checkIsNan(value: any) {
-    return isNaN(value);
+  checkIsNaN(value: any): boolean {
+    return isNaN(Number(value));
   }
 }

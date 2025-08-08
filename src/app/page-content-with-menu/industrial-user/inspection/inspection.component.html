@@ -1,0 +1,115 @@
+<div class="inspection-container">
+  <div class="inspection-content">
+    <form
+      [formGroup]="filterForm"
+      (ngSubmit)="onSearch()"
+      novalidate
+      class="inspection-form"
+    >
+      <div class="filter-section">
+        <div class="filter-row">
+          <div class="filter-item date-from">
+            <label for="from_dt" class="filter-label">Date From</label>
+            <app-ilogi-input-date
+              formControlName="from_dt"
+              fieldId="from_dt"
+              placeholder="DD/MM/YYYY"
+              [mandatory]="false"
+              [readonly]="false"
+            >
+            </app-ilogi-input-date>
+          </div>
+
+          <div class="filter-item date-to">
+            <label for="to_dt" class="filter-label">Date To</label>
+
+            <app-ilogi-input-date
+              formControlName="to_dt"
+              fieldId="to_dt"
+              placeholder="DD/MM/YYYY"
+              [mandatory]="false"
+              [readonly]="false"
+            >
+            </app-ilogi-input-date>
+          </div>
+
+          <div class="filter-item department">
+            <label for="deptId" class="filter-label">Department</label>
+            <app-ilogi-select
+              formControlName="deptId"
+              fieldId="deptId"
+              placeholder="Select Department"
+              [mandatory]="false"
+              [selectOptions]="departments"
+            >
+            </app-ilogi-select>
+          </div>
+
+          <div class="filter-item actions">
+            <label class="filter-label blank-label">&nbsp;</label>
+            <div class="button-group">
+              <app-button type="outline" text="Reset" (clicked)="onReset()">
+              </app-button>
+              <app-button
+                type="primary"
+                text="Search"
+                htmlType="submit"
+                class="search-button"
+              >
+              </app-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="list-section">
+        <div class="list-header">
+          <span class="header-text">List of Inspection</span>
+          <div class="header-actions">
+            <app-button
+              type="primary"
+              text="Request for Inspection"
+              (clicked)="requestInspection()"
+              class="request-button"
+            >
+            </app-button>
+          </div>
+        </div>
+
+        <div class="tabs-container">
+          <mat-tab-group dynamicHeight>
+            <mat-tab label="Inspection List">
+              <div class="table-wrapper">
+                <app-dynamic-table
+                  [data]="inspectionListData"
+                  [columns]="inspectionColumns"
+                  [pageSize]="5"
+                  [showPagination]="true"
+                  [searchable]="false"
+                  (rowAction)="handleRowAction($event)"
+                >
+                </app-dynamic-table>
+              </div>
+            </mat-tab>
+
+            <mat-tab label="Inspection Request">
+              <div class="table-wrapper">
+                <app-dynamic-table
+                  [data]="inspectionRequestListData"
+                  [columns]="requestColumns"
+                  [pageSize]="5"
+                  [showPagination]="true"
+                  [searchable]="false"
+                  (rowAction)="handleRowAction($event)"
+                >
+                </app-dynamic-table>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
