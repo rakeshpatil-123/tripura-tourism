@@ -1,16 +1,28 @@
-// table-column.interface.ts
 import { Type } from '@angular/core';
-// If you can import ButtonSeverity directly, use it. Otherwise, define a compatible type.
-// import { ButtonModule, ButtonSeverity } from 'primeng/button'; // Check actual import path
-type ButtonSeverity =
+
+// Define only the severities allowed by BadgeDirective
+export type BadgeSeverity =
   | 'secondary'
-  | 'success'
   | 'info'
+  | 'success'
   | 'warn'
   | 'danger'
   | 'contrast'
-  | undefined
-  | null; // Simplified version
+  | null
+  | undefined;
+
+// Add ButtonSeverity if not already defined
+export type ButtonSeverity =
+  | 'secondary'
+  | 'info'
+  | 'success'
+  | 'warn'
+  | 'danger'
+  | 'help'
+  | 'primary'
+  | 'contrast'
+  | null
+  | undefined;
 
 export type ColumnType =
   | 'text'
@@ -38,12 +50,11 @@ export interface TableColumn {
     label?: string;
     action?: string;
     icon?: string;
-    // Constrain color to PrimeNG severity types
-    color?: ButtonSeverity;
+    color?: BadgeSeverity;
     handler?: (row: any) => void;
+    onClick?: (row: any) => void;
     component?: Type<any>;
     componentInputs?: { [key: string]: any };
-    onClick?: (row: any) => void;
   }>;
   class?: string;
   cellClass?: (value: any, row: any) => string;

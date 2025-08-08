@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 $sidebar-width-expanded: 320px;
 $sidebar-width-collapsed: 70px;
-$top-navbar-height: 70px; // Match header height
+$top-navbar-height: 100px; // Match header height
 $transition-speed: 0.3s;
 $mobile-breakpoint: 1024px;
 
@@ -18,16 +18,26 @@ $mobile-breakpoint: 1024px;
   background-color: var(--color-secondary, #ffffff);
   border-right: 1px solid var(--color-border-light, #e9ecef);
   z-index: 1000;
-  transition: width $transition-speed ease-in-out, transform $transition-speed ease-in-out;
+  transition: width $transition-speed ease-in-out,
+    transform $transition-speed ease-in-out;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
 
-  &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-track { background: var(--color-primary, #f8f9fa); }
-  &::-webkit-scrollbar-thumb { background: var(--color-border-medium, #ced4da); border-radius: 3px; }
-  &::-webkit-scrollbar-thumb:hover { background: var(--color-border-dark, #adb5bd); }
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--color-primary, #f8f9fa);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border-medium, #ced4da);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-border-dark, #adb5bd);
+  }
 
   &.collapsed {
     width: $sidebar-width-collapsed;
@@ -41,7 +51,7 @@ $mobile-breakpoint: 1024px;
   .sidebar {
     transform: translateX(-100%);
     width: $sidebar-width-expanded;
-    box-shadow: 0 0 25px rgba(0,0,0,0.2);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
 
     &.visible-mobile {
       transform: translateX(0);
@@ -63,7 +73,7 @@ $mobile-breakpoint: 1024px;
   justify-content: space-between;
   padding: 15px 16px;
   border-bottom: 1px solid var(--color-border-light, #e9ecef);
-  background-color: #c10e21;
+  background-color: rgb(44, 130, 170);
   color: white;
 }
 
@@ -173,7 +183,7 @@ $mobile-breakpoint: 1024px;
 }
 
 .sidebar-nav .nav-link.active {
-  background-color: var(--color-poppy-red, #eef5ff);
+  background-color: rgb(44, 130, 170);
   border: 2px solid black;
   color: white;
 }
