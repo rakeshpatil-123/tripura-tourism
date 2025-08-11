@@ -25,9 +25,10 @@
 
 .card-container {
   position: relative;
-  max-width: 400px;
+  max-width: 300px;
   width: 100%;
-  background: var(--card-gradient);
+  // Remove gradient background from main container
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -38,11 +39,10 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex: 1 1 300px;
-  
-  // KEY CHANGES: Make cards flex containers with consistent height
+
   display: flex;
   flex-direction: column;
-  min-height: 400px; // Set minimum height for consistency
+  min-height: 400px;
 }
 
 .card-container:hover {
@@ -70,7 +70,9 @@
   padding: 2rem 2rem 1rem;
   position: relative;
   z-index: 2;
-  // Remove flex-grow so header doesn't expand
+  // Add gradient background to header only
+  background: var(--card-gradient);
+  border-radius: 20px 20px 0 0; // Round top corners only
 }
 
 .icon-container {
@@ -109,17 +111,20 @@
   padding: 0 2rem 2rem;
   position: relative;
   z-index: 2;
-  
-  // KEY CHANGES: Make card-body flex and push button to bottom
+  // Add white background to body
+  background: white;
+  color: #333; // Dark text for better contrast on white background
+
   display: flex;
   flex-direction: column;
-  flex-grow: 1; // This makes the body expand to fill available space
+  flex-grow: 1;
+  border-radius: 0 0 20px 20px; // Round bottom corners only
 }
 
 .features-list {
   margin-bottom: 2rem;
-  // Allow features to grow if needed, but button stays at bottom
   flex-grow: 1;
+  padding-top: 1.5rem; // Add some spacing from header
 }
 
 .feature-item {
@@ -140,8 +145,8 @@
   height: 20px;
   margin-right: 1rem;
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.95);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  color: #666; // Darker color for white background
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .feature-icon svg {
@@ -152,17 +157,18 @@
 .feature-text {
   font-size: 0.95rem;
   font-weight: 500;
-  opacity: 0.95;
+  opacity: 0.85;
   line-height: 1.4;
+  color: #555; // Dark text for white background
 }
 
 .card-button {
   width: 100%;
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.05); // Light background for white section
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  color: white;
+  color: #333; // Dark text
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -170,17 +176,16 @@
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(10px);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  
-  // KEY CHANGES: Remove margin-top auto since we're using flex-grow on features-list
-  margin-top: 0; // Button will naturally be at bottom due to flex layout
+  text-shadow: none; // Remove text shadow for dark text
+
+  margin-top: 0;
 }
 
 .card-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .card-button:active {
@@ -220,7 +225,15 @@
   .card-container {
     max-width: 100%;
     border-radius: 16px;
-    min-height: 350px; // Adjust minimum height for mobile
+    min-height: 350px;
+  }
+
+  .card-header {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .card-body {
+    border-radius: 0 0 16px 16px;
   }
 
   .card-title {
@@ -245,7 +258,15 @@
 @media (max-width: 480px) {
   .card-container {
     border-radius: 14px;
-    min-height: 320px; // Further adjust for smaller screens
+    min-height: 320px;
+  }
+
+  .card-header {
+    border-radius: 14px 14px 0 0;
+  }
+
+  .card-body {
+    border-radius: 0 0 14px 14px;
   }
 
   .card-title {

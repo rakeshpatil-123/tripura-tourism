@@ -8,18 +8,18 @@
 }
 
 .about-wrapper {
-  max-width: 1280px;
+  max-width: 90vw;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
+  gap: 5rem;
   align-items: center;
 }
 
 @media (min-width: 992px) {
   .about-wrapper {
-    grid-template-columns: 1fr 1.1fr;
-    gap: 5rem;
+      grid-template-columns: 1fr 1fr; /* Changed from 1fr 1.1fr to 1fr 1fr for exact 50/50 */
+      gap: 2rem; /* Reduced gap to give more space to content */
   }
 }
 
@@ -73,6 +73,10 @@
   color: #1f2937;
 }
 
+.stat-item strong {
+  display: block;
+}
+
 .stat-item small {
   display: block;
   font-size: 0.875rem;
@@ -122,25 +126,34 @@
   transform: translateY(-2px);
 }
 
-/* SVG Illustration */
+/* Visual Container - Ensure it doesn't exceed 50% */
 .about-visual {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1rem;
+  width: 100%; /* Ensure full width usage */
+  max-width: 100%; /* Prevent overflow */
 }
 
-.about-visual svg {
+.about-visual img {
   width: 100%;
-  max-width: 300px;
-  height: auto;
+  max-width: 600px;
+  /*Madeimagelarger*/height: auto;
   filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.1));
-  transition: transform 0.4s ease, filter 0.4s ease;
+  transition: transform 0.4s ease;
+  object-fit: contain;
 }
 
-.about-visual svg:hover {
+.about-visual img:hover {
   transform: translateY(-6px) rotate(2deg);
-  filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.15));
+  /* Removed the blur effect - keeping only the original drop-shadow */
+}
+
+/* Content Container - Ensure it doesn't exceed 50% */
+.about-content {
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Subtle background wave decoration (optional) */
@@ -154,4 +167,32 @@
   background: radial-gradient(circle at center, rgba(124, 58, 237, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
   pointer-events: none;
   z-index: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .about-visual {
+      order: -1; /* Image first on mobile */
+  }
+
+  .about-title {
+      font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-stats {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      text-align: center;
+  }
+
+  .about-cta {
+      flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-outline {
+      width: 100%;
+  }
 }
