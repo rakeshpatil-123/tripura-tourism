@@ -1,168 +1,262 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
 .services-section {
-  padding: 2rem 1rem;
-  margin: 0 auto;
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 4rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10vh;
+  position: relative;
+  background-image: url('https://images.unsplash.com/photo-1657294908845-05fdfdd07a24?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  overflow-x: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+  }
+
+  .header,
+  .services-grid,
+  .load-more-section {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
 
   h2 {
-    text-align: center;
     font-size: 2.8rem;
     font-weight: 700;
     color: #1a1a2e;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, #e563f1, #f65c9f);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.5px;
-    margin-bottom: 1rem;
   }
 
   p.subtitle {
-    text-align: center;
     font-size: 1.2rem;
     color: #4b5563;
     margin-bottom: 3rem;
     line-height: 1.6;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 600px;
+  }
+}
+
+.services-grid  {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem; /* Increased gap between grid and button */
+  align-content: center;
+  justify-items: center; /* Center grid items on the X-axis */
+}
+
+.service-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    border-color: #e2e8f0;
+
+    .icon-container {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.icon-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+
+  ::ng-deep svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+}
+
+.service-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.4;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.load-more-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: #e11d48;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(225, 29, 72, 0.4);
+    background: #dc2626;
+
+    svg {
+      transform: translateY(2px);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .services-section {
+    padding: 2rem 0;
+  }
+
+  .header,
+  .services-grid,
+  .load-more-section {
+    padding: 0 1rem;
+  }
+
+  .header {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 2.25rem;
+    }
+
+    .subtitle {
+      font-size: 1.125rem;
+    }
   }
 
   .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-    gap: 2rem;
-    padding: 0 0.2rem;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 3rem; /* Adjusted gap for smaller screens */
   }
 
   .service-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-    transition: all 0.4s ease;
-    position: relative;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #e0e0ef;
-
-    &:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 30px rgba(99, 102, 241, 0.15);
-      border-color: rgba(99, 102, 241, 0.3);
-
-      .icon-container {
-        transform: scale(1.05);
-      }
-    }
+    padding: 1.25rem;
+    min-height: 140px;
   }
 
-  .icon-wrapper {
-    height: 120px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-
-    .icon-container {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: all 0.4s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-      .icon {
-        width: 32px;
-        height: 32px;
-        
-        ::ng-deep svg {
-          width: 100%;
-          height: 100%;
-          stroke: white;
-          fill: none;
-          stroke-width: 2;
-        }
-      }
-    }
+  .icon-container {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 0.75rem;
   }
 
-  .content {
-    padding: 1.5rem;
-    text-align: center;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-
-    .name {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #1f2937;
-      margin: 0 0 1rem 0;
-      line-height: 1.4;
-    }
-
-    .description {
-      font-size: 0.9rem;
-      color: #6b7280;
-      line-height: 1.6;
-      margin: 0;
-      flex: 1;
-    }
+  .icon {
+    width: 26px;
+    height: 26px;
   }
 
-  // Load More Button
-  .load-more-btn {
-    display: block;
-    margin: 2rem auto;
-    padding: 0.9rem 2.2rem;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: white;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
-    max-width: 220px;
+  .service-name {
+    font-size: 0.8rem;
+  }
+}
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
+@media (max-width: 480px) {
+  .services-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem; /* Adjusted gap for smaller screens */
   }
 
-  // Hide on large screens
-  @media (min-width: 768px) {
-    .load-more-btn {
-      display: none;
-    }
+  .service-card {
+    padding: 1rem;
+    min-height: 120px;
   }
 
-  @media (max-width: 768px) {
-    padding: 1rem 0.5rem;
-    
-    h2 {
-      font-size: 2.2rem;
-    }
-    
-    p.subtitle {
-      font-size: 1rem;
-      margin-bottom: 2rem;
-    }
-    
-    .services-grid {
-      gap: 1.5rem;
-    }
+  .icon-container {
+    width: 45px;
+    height: 45px;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .service-name {
+    font-size: 0.75rem;
   }
 }

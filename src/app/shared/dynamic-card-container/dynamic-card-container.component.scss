@@ -1,10 +1,39 @@
 // dynamic-card-container.component.scss
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   padding: 0;
   margin: 0;
+  min-height: 100vh;
+  gap: 5vh;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(255, 252, 245);
+}
+
+.section-title h2 {
+  text-align: center;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(90deg, #e563f1, #f65c9f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.section-title p.subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #4b5563;
+  margin-bottom: 3rem;
+  // max-width: 700px;
+  line-height: 1.6;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cards-grid {

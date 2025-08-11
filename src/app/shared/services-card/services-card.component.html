@@ -1,42 +1,37 @@
-
-
-
 <section class="services-section">
-  <h2>Tripura Government Services</h2>
-  <p class="subtitle">
-    Comprehensive government services and departments serving the state of Tripura with excellence and dedication.
-  </p>
+  <div class="header">
+    <h2>Government Services</h2>
+    <p class="subtitle">Digital services for Tripura citizens</p>
+  </div>
 
-  <!-- Grid of visible services -->
+  <!-- Compact Grid of services -->
   <div class="services-grid">
     <div
       class="service-card"
       *ngFor="let service of visibleServices; let i = index"
       [attr.data-index]="i"
     >
-      <div class="icon-wrapper">
-        <div 
-          class="icon-container"
-          [style.background]="getGradientForIndex(i)"
-          >
-          <div 
-          class="icon" 
-            [innerHTML]="service.icon"
-          ></div>
-        </div>
+      <div
+        class="icon-container"
+        [style.background-color]="getBackgroundColorForIndex(i)"
+      >
+        <div
+          class="icon"
+          [style.color]="getIconColorForIndex(i)"
+          [innerHTML]="service.icon"
+        ></div>
       </div>
-      <div class="content">
-        <h3 class="name">{{ service.name }}</h3>
-      </div>
+      <h3 class="service-name">{{ service.name }}</h3>
     </div>
   </div>
 
-  <!-- Load More Button (only on mobile) -->
-  <button
-    class="load-more-btn"
-    *ngIf="isMobile && hasMoreServices"
-    (click)="loadMore()"
-  >
-    Load More Services
-  </button>
+  <!-- Load More Button -->
+  <div class="load-more-section" *ngIf="hasMoreServices">
+    <button class="load-more-btn" (click)="loadMore()">
+      <span>Show All Services</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6,9 12,15 18,9"></polyline>
+      </svg>
+    </button>
+  </div>
 </section>
