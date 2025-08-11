@@ -23,6 +23,7 @@
   (onRowUnselect)="onRowUnselect($event)"
   responsiveLayout="scroll"
 >
+  <!-- Caption: Search Bar -->
   <ng-template #caption>
     <div class="flex flex-wrap justify-content-between align-items-center">
       <div
@@ -48,6 +49,7 @@
     </div>
   </ng-template>
 
+  <!-- Header -->
   <ng-template #header>
     <tr>
       <th
@@ -64,6 +66,7 @@
     </tr>
   </ng-template>
 
+  <!-- Body -->
   <ng-template #body let-rowData>
     <tr
       [pSelectableRow]="rowData"
@@ -74,77 +77,97 @@
         [ngClass]="getCellClass(getCellValue(rowData, col), rowData, col)"
         [style.width]="getColumnWidth(col)"
       >
-        <ng-container *ngIf="col.renderComponent">
-          <ng-container
-            *ngComponentOutlet="
-              col.renderComponent;
-              inputs: getRenderComponentInputs(col, rowData);
-              injector: injector
-            "
-          >
-          </ng-container>
-        </ng-container>
-
+        <!-- Render Component -->
+        @if (col.renderComponent) {
         <ng-container
-          *ngIf="
-            !col.renderComponent &&
-            col.type === 'action' &&
-            col.actions &&
-            col.actions.length > 0
+          *ngComponentOutlet="
+            col.renderComponent;
+            inputs: getRenderComponentInputs(col, rowData);
+            injector: injector
           "
         >
-          <div class="flex justify-content-center align-items-center">
-            <ng-container
-              *ngFor="let action of col.actions; trackBy: trackByAction"
-            >
-              <p-button
-                *ngIf="!action.component"
-                [label]="action.label"
-                [icon]="action.icon"
-                [severity]="action.color || 'secondary'"
-                (onClick)="onCustomActionClick(action, rowData)"
-                styleClass="mr-1 p-button-sm"
-                [outlined]="true"
-              ></p-button>
+        </ng-container>
+        }
 
-              <span *ngIf="action.component" class="mr-1">
-                <ng-container
-                  *ngComponentOutlet="
-                    action.component;
-                    inputs: getActionComponentInputs(action, rowData);
-                    injector: injector
-                  "
-                >
-                </ng-container>
-              </span>
-            </ng-container>
+        <!-- Action Dropdown Menu -->
+        @if (col.type === 'action' && col.actions && col.actions.length > 0) {
+        <div class="action-cell-wrapper">
+          <div class="action-cell-content">
+            <p-menu
+              #menu
+              [popup]="true"
+              (onShow)="onMenuOpen($event)"
+              (onHide)="onMenuHide($event)"
+              appendTo="body"
+            />
+            <button
+              pButton
+              type="button"
+              icon="pi pi-ellipsis-v"
+              class="action-button"
+              (click)="toggleMenuWithCol($event, menu, col, rowData)"
+              [attr.aria-label]="'Actions'"
+            ></button>
           </div>
-        </ng-container>
+        </div>
+        }
 
-        <ng-container *ngIf="!col.renderComponent && col.type !== 'action'">
-          <ng-container [ngSwitch]="col.type">
-            <ng-container *ngSwitchCase="'link'">
-              <a
-                *ngIf="col.linkHref && col.linkText"
-                [href]="col.linkHref(rowData)"
-                target="_blank"
-              >
-                {{ col.linkText(rowData) }}
-              </a>
-            </ng-container>
-            <ng-container *ngSwitchDefault>
-              <span
-                [innerHTML]="
-                  getFormattedValue(getCellValue(rowData, col), rowData, col)
-                "
-              ></span>
-            </ng-container>
-          </ng-container>
-        </ng-container>
+        <!-- Status Badge -->
+        @if (col.type === 'status') {
+        <div class="status-badge-wrapper">
+          <div
+            pBadge
+            [value]="getCellValue(rowData, col)"
+            [severity]="getStatusSeverity(getCellValue(rowData, col))"
+            size="small"
+          ></div>
+        </div>
+        }
+
+        <!-- Payment Status Badge -->
+        @if (col.type === 'payment') {
+        <div class="payment-tag-wrapper">
+          <p-tag
+            [value]="getCellValue(rowData, col)"
+            [severity]="getPaymentSeverity(getCellValue(rowData, col))"
+            [size]="'small'"
+          ></p-tag>
+        </div>
+        }
+
+        <!-- Boolean -->
+        @if (col.type === 'boolean') {
+        {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
+        }
+
+        <!-- Currency -->
+        @if (col.type === 'currency') {
+        {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
+        }
+
+        <!-- Date -->
+        @if (col.type === 'date') {
+        {{ getFormattedValue(getCellValue(rowData, col), rowData, col) }}
+        }
+
+        <!-- Link -->
+        @if (col.type === 'link' && col.linkHref && col.linkText) {
+        <a [href]="col.linkHref(rowData)" target="_blank">
+          {{ col.linkText(rowData) }}
+        </a>
+        }
+
+        <!-- Default Text -->
+        @if (!col.renderComponent && col.type !== 'action' && col.type !==
+        'status' && col.type !== 'payment' && col.type !== 'boolean' && col.type
+        !== 'currency' && col.type !== 'date' && col.type !== 'link') {
+        {{ getCellValue(rowData, col) }}
+        }
       </td>
     </tr>
   </ng-template>
 
+  <!-- Empty Message -->
   <ng-template #emptymessage>
     <tr>
       <td [attr.colspan]="filteredColumns.length" class="text-center">

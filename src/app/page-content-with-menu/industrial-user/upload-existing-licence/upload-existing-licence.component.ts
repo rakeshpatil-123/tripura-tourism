@@ -106,7 +106,6 @@ import { TableColumn } from '../../../shared/p-dynamic-table/p-table.model';
         cursor: pointer;
         color: #999;
         padding: 0;
-        width: 30px;
         height: 30px;
         display: flex;
         align-items: center;
@@ -143,7 +142,6 @@ import { TableColumn } from '../../../shared/p-dynamic-table/p-table.model';
       .label {
         font-weight: 600;
         color: #555;
-        width: 150px;
         flex-shrink: 0;
       }
 
@@ -271,78 +269,74 @@ export class UploadExistingLicenceComponent {
   columns: TableColumn[] = [
     {
       key: 'id',
-      label: 'Sl No.',
+      label: 'ID',
       type: 'number',
-      sortable: false,
     },
     {
-      key: 'certificate_number',
-      label: 'Clearance Number',
+      key: 'name',
+      label: 'Full Name',
       type: 'text',
-      sortable: true,
     },
     {
-      key: 'certificate_date',
-      label: 'Clearance Date',
+      key: 'email',
+      label: 'Email',
+      type: 'text',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'status',
+    },
+    {
+      key: 'paymentStatus',
+      label: 'Payment',
+      type: 'payment',
+    },
+    {
+      key: 'amount',
+      label: 'Amount',
+      type: 'currency',
+    },
+    {
+      key: 'dateApplied',
+      label: 'Applied On',
       type: 'date',
-      sortable: true,
     },
     {
-      key: 'type',
-      label: 'Clearance Type',
+      key: 'lastLogin',
+      label: 'Last Seen',
       type: 'text',
-      sortable: true,
     },
     {
-      key: 'name_of_noc',
-      label: 'Clearance Name',
-      type: 'text',
-      sortable: true,
-    },
-    {
-      key: 'department',
-      label: 'Department',
-      type: 'text',
-      sortable: true,
-    },
-    {
-      key: 'valid_till',
-      label: 'Valid Till',
-      type: 'date',
-      sortable: true,
+      key: 'profileLink',
+      label: 'Profile',
+      type: 'link',
+      linkHref: (row) => row.profileLink,
+      linkText: (row) => 'View Profile',
     },
     {
       key: 'actions',
-      label: 'Action',
+      label: 'Actions',
       type: 'action',
-      sortable: false,
+      class: 'text-center',
       actions: [
         {
-          label: 'View Details',
-          icon: '👁️',
-          action: 'view-details',
-          handler: (row: any) => {
-            this.openDialog(row);
-          },
+          label: 'View',
+          icon: 'pi pi-eye',
+          color: 'secondary',
+          handler: (row) => console.log('View:', row),
         },
         {
           label: 'Edit',
-          icon: '✏️',
-          action: 'edit',
-          handler: (row: any) => {
-            console.log('Edit clicked for row ID:', row.id);
-            this.simulateApiCall('edit', row.id);
-          },
+          icon: 'pi pi-pencil',
+          color: 'info',
+          handler: (row) => console.log('Edit:', row),
         },
         {
           label: 'Delete',
-          icon: '🗑️',
-          color: 'warn',
-          action: 'delete',
-          handler: (row: any) => {
-            console.log('Delete clicked for row ID:', row.id);
-            this.simulateApiCall('delete', row.id);
-          },
+          icon: 'pi pi-trash',
+          color: 'danger',
+          handler: (row) => confirm(`Delete ${row.name}?`),
         },
       ],
     },
@@ -351,36 +345,63 @@ export class UploadExistingLicenceComponent {
   tableData = [
     {
       id: 1,
-      certificate_number: 'CLR-2023-001',
-      certificate_date: '2023-12-01',
-      type: 'Fire Safety',
-      name_of_noc: 'Fire Department NOC',
-      department: 'Fire & Emergency',
-      valid_till: '2025-12-01',
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      status: 'Active',
+      paymentStatus: 'Paid',
+      amount: 299.99,
+      dateApplied: new Date('2024-01-15'),
+      lastLogin: '2 hours ago',
+      profileLink: 'https://example.com/alice',
     },
     {
       id: 2,
-      certificate_number: 'CLR-2023-002',
-      certificate_date: '2024-01-15',
-      type: 'Environmental Clearance',
-      name_of_noc: 'Pollution Control NOC',
-      department: 'Environment Dept.',
-      valid_till: '2026-01-15',
+      name: 'Bob Smith',
+      email: 'bob@example.com',
+      status: 'Pending',
+      paymentStatus: 'Partially Paid',
+      amount: 149.5,
+      dateApplied: new Date('2024-02-03'),
+      lastLogin: '1 day ago',
+      profileLink: 'https://example.com/bob',
     },
     {
       id: 3,
-      certificate_number: 'CLR-2023-003',
-      certificate_date: '2024-06-10',
-      type: 'Structural Stability',
-      name_of_noc: 'Building Safety NOC',
-      department: 'Urban Planning',
-      valid_till: '2027-06-10',
+      name: 'Carol Davis',
+      email: 'carol@example.com',
+      status: 'Inactive',
+      paymentStatus: 'Overdue',
+      amount: 399.0,
+      dateApplied: new Date('2024-01-28'),
+      lastLogin: '3 weeks ago',
+      profileLink: 'https://example.com/carol',
+    },
+    {
+      id: 4,
+      name: 'Dan Lee',
+      email: 'dan@example.com',
+      status: 'Active',
+      paymentStatus: 'Refunded',
+      amount: 199.99,
+      dateApplied: new Date('2024-03-10'),
+      lastLogin: '5 days ago',
+      profileLink: 'https://example.com/dan',
+    },
+    {
+      id: 5,
+      name: 'Eva Martinez',
+      email: 'eva@example.com',
+      status: 'Completed',
+      paymentStatus: 'Paid',
+      amount: 599.99,
+      dateApplied: new Date('2024-02-20'),
+      lastLogin: 'Just now',
+      profileLink: 'https://example.com/eva',
     },
   ];
 
   openDialog(row: any) {
     const dialogRef = this.dialog.open(ClearanceDialogComponent, {
-      width: '600px',
       maxWidth: '95vw',
       data: { selectedRow: row },
     });
