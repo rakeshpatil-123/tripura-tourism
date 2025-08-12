@@ -158,7 +158,7 @@ export interface SelectOption {
     CommonModule,
     FormsModule,
     FloatLabelModule,
-    SelectModule, // PrimeNG dropdown
+    SelectModule, 
   ],
   templateUrl: './ilogi-select.component.html',
   styleUrls: ['./ilogi-select.component.scss'],

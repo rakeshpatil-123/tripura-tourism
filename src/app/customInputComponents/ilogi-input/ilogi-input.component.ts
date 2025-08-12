@@ -142,9 +142,9 @@ import { BlockCopyPasteDirective } from '../../directives/block-copy-paste.direc
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    InputTextModule,       // ✅ PrimeNG Input
-    TextareaModule,   // ✅ PrimeNG Textarea
-    FloatLabelModule,      // ✅ PrimeNG Float Label
+    InputTextModule,       
+    TextareaModule,   
+    FloatLabelModule,      
     BlockCopyPasteDirective,
   ],
   templateUrl: './ilogi-input.component.html',
