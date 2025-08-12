@@ -1,11 +1,9 @@
-<div class="form-group">
-  <!-- Label -->
+<!-- <div class="form-group">
   <label *ngIf="!hideLabel" [for]="fieldId" [class.bold-label]="readonly">
     {{ fieldLabel }}
     <span *ngIf="mandatory" class="required-indicator">*</span>
   </label>
 
-  <!-- Display Mode (Readonly) -->
   <div
     *ngIf="readonly"
     class="readonly-display"
@@ -20,7 +18,6 @@
     </ng-template>
   </div>
 
-  <!-- Editable Select -->
   <ng-container *ngIf="!readonly">
     <mat-form-field
       appearance="outline"
@@ -56,7 +53,81 @@
     </mat-form-field>
   </ng-container>
 
-  <!-- Error Messages -->
+  <div
+    *ngIf="submitted && hasErrors"
+    class="invalid-input"
+    [id]="errorFieldId"
+    [ngClass]="{ 'show-error': isHovered || submitted }"
+  >
+    <ng-container *ngFor="let item of errors | keyvalue; let i = index">
+      <div *ngIf="i === 0" class="x-error-msg-text">
+        {{ errorMessages[item.key] || item.value?.message }}
+      </div>
+    </ng-container>
+    <div *ngIf="errors?.['custom']?.status" class="x-error-msg-text">
+      {{ errors?.['custom'].message }}
+    </div>
+  </div>
+</div> -->
+
+<div class="form-group">
+  <label *ngIf="!hideLabel" [for]="fieldId" [class.bold-label]="readonly">
+    {{ fieldLabel }}
+    <span *ngIf="mandatory" class="required-indicator">*</span>
+  </label>
+
+  <!-- Readonly display -->
+  <div
+    *ngIf="readonly"
+    class="readonly-display"
+    [attr.id]="fieldId"
+    [attr.aria-label]="fieldLabel"
+  >
+    <ng-container *ngIf="fieldExactVal; else defaultDisplay">
+      {{ fieldExactVal }}
+    </ng-container>
+    <ng-template #defaultDisplay>
+      {{ getDisplayName(value) }}
+    </ng-template>
+  </div>
+
+  <!-- Editable dropdown -->
+  <ng-container *ngIf="!readonly">
+    <div
+      class="w-100 select-form-field"
+      [ngClass]="{ 'is-invalid': submitted && errors }"
+    >
+      <p-select
+        [inputId]="fieldId"
+        [options]="selectOptions"
+        optionLabel="name"
+        optionValue="id"
+        [placeholder]="placeholder"
+        [disabled]="isDisabled"
+        [ngModel]="value"
+        (onChange)="onChangeControl($event.value)"
+        (onFocus)="showErrorOnFieldHover()"
+        (onBlur)="onBlur()"
+        [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+        [attr.aria-describedby]="errorFieldId"
+        styleClass="w-full"
+      >
+        <ng-template let-option pTemplate="item">
+          <span
+            [title]="option.name"
+          >
+            {{
+              option.name.length > 70
+                ? option.name.substring(0, 70) + "..."
+                : option.name
+            }}
+          </span>
+        </ng-template>
+      </p-select>
+    </div>
+  </ng-container>
+
+  <!-- Error messages -->
   <div
     *ngIf="submitted && hasErrors"
     class="invalid-input"

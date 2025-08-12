@@ -1,0 +1,89 @@
+/* Make dropdown same size & look as inputs */
+:host ::ng-deep .p-select {
+  font-size: 0.85rem;
+  height: 32px;
+  width: 200px;
+  background-color: #fff !important;
+  color: #3b3b3b;
+  border: 1px solid #b8b8b8;
+//   border-radius: 4px;
+}
+
+/* Label text inside closed dropdown */
+:host ::ng-deep .p-select-label {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  color: #3b3b3b;
+}
+
+/* Placeholder style */
+:host ::ng-deep .p-select-label.p-placeholder {
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 500;
+
+}
+
+/* Dropdown focus state */
+:host ::ng-deep .p-select.p-focus {
+  border-color: #00c3ff;
+  box-shadow: none;
+  
+}
+
+/* Panel (opened dropdown) */
+:host ::ng-deep .p-select-panel {
+  background-color: transparent !important;
+  color: #3b3b3b;
+  border: 1px solid #b8b8b8;
+}
+
+/* Search input inside dropdown panel */
+:host ::ng-deep .p-select-filter {
+  background-color: #fff !important;
+  color: #3b3b3b;
+  border: 1px solid #b8b8b8;
+  font-size: 0.8rem;
+  height: 28px;
+}
+
+
+/* "No results found" message */
+:host ::ng-deep .p-select-empty-message {
+  color: #666 !important;
+  background-color: #fff;
+  font-size: 0.8rem;
+}
+
+/* Options style */
+:host ::ng-deep .p-select-items {
+  font-size: 0.8rem;
+}
+
+:host ::ng-deep .p-select-item.p-highlight {
+//   background-color: #28a745 !important;
+  color: #fff !important;
+}
+
+/* Make dropdown panel content background white */
+:host ::ng-deep .p-select-panel,
+:host ::ng-deep .p-select-items-wrapper {
+  background-color: #fff !important;
+}
+
+/* Individual option background */
+:host ::ng-deep  .p-select-overlay {
+  background-color: #fff !important;
+  border: 1px solid #b8b8b8;
+}
+
+:host ::ng-deep .p-select-item.p-highlight {
+//   background-color: #28a745 !important;
+  color: #fff !important;
+}
+
+
+:host ::ng-deep .p-floatlabel.p-floatlabel-on label {
+  background-color: #fff !important;
+  font-size: 0.75rem;
+}

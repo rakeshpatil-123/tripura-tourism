@@ -64,6 +64,13 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
             (m) => m.ExampleFormComponent
           ),
       },
+      {
+        path: 'demo',
+        loadComponent: () =>
+          import('./demo/demo.component').then(
+            (m) => m.DemoComponent
+          ),
+      },
     ],
   },
 ];
