@@ -1,4 +1,11 @@
 <!-- dynamic-card-container.component.html -->
+<div class="section-title">
+  <h2>Our Advantages</h2>
+    <p class="subtitle">
+      We deliver cutting-edge solutions tailored to your needs. From design to
+      deployment, we’ve got you covered.
+    </p>
+</div>
 <div class="cards-grid">
   <div
     *ngFor="let card of cardData; trackBy: trackById"
@@ -6,7 +13,7 @@
     [style]="'--card-gradient: ' + card.gradient"
   >
     <!-- Card Header -->
-    <div class="card-header">
+    <div class="card-header" >
       <!-- Render SVG Icon if provided -->
       <div class="icon-container" *ngIf="card.icon">
         <div class="card-icon" [innerHTML]="card.icon"></div>
