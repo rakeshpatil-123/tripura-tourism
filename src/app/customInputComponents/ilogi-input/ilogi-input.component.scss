@@ -78,7 +78,7 @@
 
 :host ::ng-deep .p-floatlabel {
   font-size: 0.85rem; 
-  margin-bottom: 0.5rem; 
+  margin-top: 1.5rem; 
   background-color: transparent;
 
 }
@@ -86,7 +86,7 @@
 :host ::ng-deep .p-floatlabel input,
 :host ::ng-deep .p-floatlabel  .p-textarea {
   height: 32px;
-  width: 200px;
+  // width: 200px;
   padding: 4px 8px;
   font-size: 0.8rem; 
   background-color: #fff;
