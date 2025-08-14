@@ -1,0 +1,32 @@
+.main-form-card {
+  margin: 20px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.main-tab-group {
+}
+
+.tab-content-wrapper {
+  padding: 20px;
+  min-height: 500px;
+
+  background-color: #fafafa;
+}
+
+::ng-deep .mat-mdc-tab-labels {
+}
+
+@media (max-width: 768px) {
+  .main-form-card {
+    margin: 10px;
+    border-radius: 8px;
+  }
+
+  .tab-content-wrapper {
+    padding: 15px;
+  }
+}
