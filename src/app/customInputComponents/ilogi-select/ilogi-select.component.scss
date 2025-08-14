@@ -150,8 +150,19 @@
 }
 
 /* Options style */
-:host ::ng-deep .p-select-items {
+:host ::ng-deep .ng-star-inserted .p-select-option {
   font-size: 0.8rem;
+  color: #000;
+}
+
+:host ::ng-deep .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus{
+  background-color: #2C82AA!important;
+}
+
+:host ::ng-deep .ng-star-inserted li:hover,
+:host ::ng-deep .ng-star-inserted li span:hover {
+ background-color: #2C82AA!important;
+ color: #fff!important;
 }
 
 :host ::ng-deep .p-select-item.p-highlight {

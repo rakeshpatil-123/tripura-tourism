@@ -71,6 +71,13 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
             (m) => m.DemoComponent
           ),
       },
+      {
+        path: 'user-profile',
+        loadComponent: () =>
+          import('./user-profile/user-profile.component').then(
+            (m) => m.UserProfileComponent
+          ),
+      },
     ],
   },
 ];

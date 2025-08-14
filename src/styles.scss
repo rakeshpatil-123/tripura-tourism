@@ -373,3 +373,31 @@ body.sidebar-open {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+.swgt-container{
+  width: 100%;
+  margin: 28px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px
+}
+.profile-container{
+  width: 100%;
+  margin: 28px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px
+}
+
+.page-head{
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.warn{
+  color: var(--color-poppy-red, #dc3545);
+  font-weight: 500;
+  font-size: 0.75rem;
+}

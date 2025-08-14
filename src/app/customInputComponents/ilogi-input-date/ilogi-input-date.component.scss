@@ -1,5 +1,5 @@
 .form-group {
-  margin-bottom: 1.25rem;
+  // margin-bottom: 1.25rem;
   position: relative;
 }
 
@@ -10,7 +10,7 @@ label {
   color: var(--color-text-dark, #333);
 }
 
-.required-indicator {
+.required-indicator { 
   color: var(--color-poppy-red, #dc3545);
   margin-left: 0.25rem;
 }

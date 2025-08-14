@@ -106,11 +106,12 @@
   font-weight: 500;
 }
 
-:host ::ng-deep .p-floatlabel input:focus{
+:host ::ng-deep .p-floatlabel input:focus,
+:host ::ng-deep .p-floatlabel textarea:focus{
   border: 1px solid #2C82AA
 }
 :host ::ng-deep .p-floatlabel input:focus ~ label,
-:host ::ng-deep .p-floatlabel input.p-filled ~ label {
+:host ::ng-deep .p-floatlabel input.p-filled ~ label,:host ::ng-deep .p-floatlabel textarea:focus ~ label {
   background-color: white;
   color: #2C82AA;
   padding: 0 4px; 
