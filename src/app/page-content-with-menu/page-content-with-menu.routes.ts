@@ -51,6 +51,13 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           ),
       },
       {
+        path: 'caf',
+        loadComponent: () =>
+          import('./industrial-user/caf/caf.component').then(
+            (m) => m.ApplicationFormComponent
+          ),
+      },
+      {
         path: 'upload-existing-licence',
         loadComponent: () =>
           import(
