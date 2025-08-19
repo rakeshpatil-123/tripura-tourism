@@ -1,51 +1,48 @@
-import { CommonModule } from '@angular/common';
+// login.component.ts
 import { Component } from '@angular/core';
-import {RouterLink} from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ButtonComponent } from "../../../shared/component/button-component/button.component";
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
+import { GenericService } from '../../../_service/generic/generic.service';
+import { Router } from '@angular/router';
 
 @Component({
-  imports: [CommonModule, RouterLink, ButtonComponent],
   selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, IlogiInputComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  isLoading = false;
-  showPassword = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private genericService: GenericService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
+      user_name: [''],
+      password: [''],
     });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.loginForm.valid) {
-      this.isLoading = true;
-      
-      // Simulate API call
-      setTimeout(() => {
-        console.log('Login submitted:', this.loginForm.value);
-        this.isLoading = false;
-        // Handle successful login here
-      }, 2000);
-    } else {
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.loginForm.controls).forEach(key => {
-        this.loginForm.get(key)?.markAsTouched();
+      const payload = this.loginForm.value;
+      this.genericService.loginUser(payload).subscribe({
+        next: (response) => {
+          console.log('Login successful:', response);
+          this.genericService.openSnackBar('Login successful!', 'Success');
+          this.router.navigate(['/dashboard/home']);
+          this.loginForm.reset();
+        },
+        error: (error) => {
+          console.error('Login failed:', error);
+        }
       });
+    }else{
+      this.genericService.openSnackBar('Please fill in all fields correctly.', 'Error');
     }
   }
-
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
-  }
-
-  // Getter methods for easy access to form controls
-  get email() { return this.loginForm.get('email'); }
-  get password() { return this.loginForm.get('password'); }
 }

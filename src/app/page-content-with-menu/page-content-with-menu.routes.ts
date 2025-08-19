@@ -51,6 +51,13 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           ),
       },
       {
+        path: 'caf',
+        loadComponent: () =>
+          import('./industrial-user/caf/caf.component').then(
+            (m) => m.ApplicationFormComponent
+          ),
+      },
+      {
         path: 'upload-existing-licence',
         loadComponent: () =>
           import(
@@ -62,6 +69,20 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         loadComponent: () =>
           import('./example-form/example-form.component').then(
             (m) => m.ExampleFormComponent
+          ),
+      },
+      // {
+      //   path: 'demo',
+      //   loadComponent: () =>
+      //     import('./demo/demo.component').then(
+      //       (m) => m.DemoComponent
+      //     ),
+      // },
+      {
+        path: 'user-profile',
+        loadComponent: () =>
+          import('./user-profile/user-profile.component').then(
+            (m) => m.UserProfileComponent
           ),
       },
     ],

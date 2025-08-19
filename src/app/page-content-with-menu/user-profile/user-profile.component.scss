@@ -1,0 +1,56 @@
+// .profile-fields{
+//     display: grid;
+
+// }
+
+.avatar{
+    width: 2.2rem;
+    height: 2.2rem;
+    // border: 1px solid #ccc;
+    border-radius: 50%;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #9cfaff 0%, #2C82AA 100%);
+    color: #fff;
+    font-weight: bold;
+}
+
+.form-con{
+width: 500px;
+margin: 24px 0;
+}
+:host ::ng-deep  .p-tabs .p-tablist-tab-list, :host ::ng-deep .p-tabs .p-tabpanels {
+background-color: #fff!important;
+}
+:host ::ng-deep  .p-tab-active {
+background-color: #fff!important;
+color: #2C82AA!important;
+border-color   :  #2C82AA!important;
+}
+
+::ng-deep .p-tablist-tab-list {
+  display: flex;
+  width: 100%;
+}
+
+::ng-deep .p-tablist-tab-list .p-tab {
+  flex: 1; // Makes both tabs equally wide
+  justify-content: center; // Center text & icon
+  border-bottom: 2px solid transparent; // Default border
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-tablist-tab-list .p-tab:hover {
+  color: #000!important; // Hover text/icon color
+}
+
+::ng-deep .p-tablist-tab-list .p-tab.p-tab-active {
+  border-bottom: 2px solid #2C82AA; // Active border bottom
+  color: #2C82AA; // Active text/icon color
+}
+
+::ng-deep .p-tablist-active-bar {
+  display: none !important; // Hide default ink bar
+}

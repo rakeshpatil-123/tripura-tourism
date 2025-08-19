@@ -1,5 +1,5 @@
 .form-group {
-  margin-bottom: 1.25rem;
+  // margin-bottom: 1.25rem;
   position: relative;
 }
 
@@ -10,7 +10,7 @@ label {
   color: var(--color-text-dark, #333);
 }
 
-.required-indicator {
+.required-indicator { 
   color: var(--color-poppy-red, #dc3545);
   margin-left: 0.25rem;
 }
@@ -110,3 +110,41 @@ label {
 .date-input::-webkit-calendar-picker-indicator {
   display: none;
 }
+
+.date-input-container  {
+   height: 32px;
+  width: 100%;
+  // padding: 4px 8px;
+  font-size: 0.8rem; 
+  background-color: #fff;
+  color: #3b3b3b;
+  // border: 1px solid #b8b8b8
+}
+
+.date-input-container input {
+   height: 32px;
+    width: 100%;
+
+  padding: 4px 8px;
+  font-size: 0.8rem; 
+  background-color: #fff;
+  color: #3b3b3b;
+  border: 1px solid #b8b8b8
+}
+label{
+     font-size: 0.75rem;
+  color: #2C82AA;
+  margin-bottom: 0;
+
+}
+
+.date-input-container .mat-icon{
+  // width: 0!important;
+  height: 27px!important;
+  fill: #2C82AA;
+  color: #b8b8b8;
+}
+.mat-datepicker-content{
+  background: #fff!important;
+}
+

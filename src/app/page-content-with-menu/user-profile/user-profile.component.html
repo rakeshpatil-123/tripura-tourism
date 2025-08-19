@@ -1,0 +1,60 @@
+
+
+<div class="profile-container">
+  <div class="form-con shadow p-4">
+
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Profile</p-tab>
+      <p-tab value="1">Change Password</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <div class="profile-fields">
+          <app-ilogi-input fieldLabel="First Name" [(ngModel)]="profile.firstName">
+          </app-ilogi-input>
+
+          <app-ilogi-input fieldLabel="Last Name" [(ngModel)]="profile.lastName">
+          </app-ilogi-input>
+
+          <app-ilogi-input fieldLabel="Email" type="email" [(ngModel)]="profile.email">
+          </app-ilogi-input>
+
+          <app-ilogi-input fieldLabel="Phone" type="tel" [(ngModel)]="profile.phone">
+          </app-ilogi-input>
+
+          <app-ilogi-input fieldLabel="Address" type="textarea" [(ngModel)]="profile.address">
+          </app-ilogi-input>
+
+          <div class="mt-4 row justify-content-center">
+            <button type="button" class="btn btn-primary w-auto" [disabled]="!isProfileChanged || checkEmptyField"
+              (click)="updateProfile()">
+              Update
+            </button>
+          </div>
+        </div>
+      </p-tabpanel>
+      <p-tabpanel value="1">
+        <app-ilogi-input fieldLabel="Current Password" type="password" [(ngModel)]="passwordData.currentPassword">
+        </app-ilogi-input>
+
+        <app-ilogi-input fieldLabel="New Password" type="password" [(ngModel)]="passwordData.newPassword">
+        </app-ilogi-input>
+
+        <app-ilogi-input fieldLabel="Confirm Password" type="password" [(ngModel)]="passwordData.confirmPassword">
+        </app-ilogi-input>
+        @if(passwordData.newPassword !== passwordData.confirmPassword) {
+        <span class="warn">Make sure your passwords match</span>
+        }
+        <div class="mt-4 row justify-content-center">
+          <button type="button" class="btn btn-primary w-auto" (click)="changePassword()"
+            [disabled]="!passwordData.currentPassword || !passwordData.newPassword || passwordData.newPassword !== passwordData.confirmPassword">
+            Change Password
+          </button>
+        </div>
+      </p-tabpanel>
+
+    </p-tabpanels>
+  </p-tabs>
+</div>
+</div>

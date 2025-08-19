@@ -46,20 +46,34 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/home',
       roles: ['admin', 'user', 'moderator', 'guest'],
     },
-    {
-      id: 'external-tracking',
-      title: 'External Services',
+      {
+      id: 'common-application-form',
+      title: 'Common Application Form',
       icon: 'track_changes',
-      route: '/dashboard/external-services-tracking',
+      route: '/dashboard/caf',
       roles: ['admin', 'user'],
     },
-    {
-      id: 'example-form',
-      title: 'Dynamic Form',
-      icon: 'dynamic_form',
-      route: '/dashboard/example-form',
-      roles: ['admin'],
-    },
+    // {
+    //   id: 'external-tracking',
+    //   title: 'Common Application Form',
+    //   icon: 'track_changes',
+    //   route: '/dashboard/external-services-tracking',
+    //   roles: ['admin', 'user'],
+    // },
+    // {
+    //   id: 'example-form',
+    //   title: 'Application List',
+    //   icon: 'dynamic_form',
+    //   route: '/dashboard/example-form',
+    //   roles: ['admin'],
+    // },
+    // {
+    //   id: 'application-list',
+    //   title: 'Application List',
+    //   icon: 'dynamic_form',
+    //   route: '/dashboard/application-list',
+    //   roles: ['admin'],
+    // },
     {
       id: 'Upload Existing Licence',
       title: 'Upload Existing Licence',
@@ -110,6 +124,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
           roles: ['admin'],
         },
       ],
+    },
+     {
+      id: 'User',
+      title: 'Profile',
+      icon: 'dynamic_form',
+      route: '/dashboard/user-profile',
+      roles: ['admin'],
     },
   ];
 

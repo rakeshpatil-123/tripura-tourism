@@ -1,0 +1,49 @@
+<div class="ilogi-file-upload" [class.disabled]="disabled">
+
+  <!-- Display Mode -->
+  <div *ngIf="selectedFile; else uploadMode" class="file-display">
+    <span class="filename" [title]="selectedFile.name">
+      {{ selectedFile.name }}
+    </span>
+    <button
+      type="button"
+      class="remove-btn"
+      (click)="clearFile()"
+      [disabled]="disabled"
+      aria-label="Remove file"
+    >
+      ✕
+    </button>
+  </div>
+
+  <!-- Upload Mode -->
+  <ng-template #uploadMode>
+    <div class="upload-area">
+      <input
+        type="file"
+        #fileInput
+        [accept]="accept"
+        (change)="onFileSelected($event)"
+        class="hidden-input"
+        [disabled]="disabled"
+      />
+
+      <div class="file-input-wrapper">
+        <span class="placeholder-text">{{ label || 'Select file' }}</span>
+        <button
+          type="button"
+          class="browse-btn"
+          (click)="onButtonClick()"
+          [disabled]="disabled"
+        >
+          Browse
+        </button>
+      </div>
+
+      <div *ngIf="error" class="error-msg">
+        {{ error }}
+      </div>
+    </div>
+  </ng-template>
+
+</div>

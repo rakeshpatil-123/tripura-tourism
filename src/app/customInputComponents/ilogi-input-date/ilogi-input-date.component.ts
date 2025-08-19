@@ -70,7 +70,6 @@ export class IlogiInputDateComponent
   @Input() readonly = false;
   @Input() errors: { [key: string]: any } | null = null;
 
-  // New inputs for dynamic date range and custom messages
   @Input() monthsRange: number = 6;
   @Input() futureDateErrorMessage: string =
     'Future dates are not allowed. Please select a date within the allowed range.';

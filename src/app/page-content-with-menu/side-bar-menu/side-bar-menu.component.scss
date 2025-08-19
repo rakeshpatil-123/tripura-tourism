@@ -158,6 +158,7 @@ $mobile-breakpoint: 1024px;
   list-style: none;
   padding: 0;
   margin: 0;
+  font-size: 14px;
 }
 
 .sidebar-nav .nav-item {
@@ -184,7 +185,6 @@ $mobile-breakpoint: 1024px;
 
 .sidebar-nav .nav-link.active {
   background-color: rgb(44, 130, 170);
-  border: 2px solid black;
   color: white;
 }
 

@@ -1,98 +1,62 @@
-<div class="registration-container">
-  <mat-card class="registration-card">
-    <mat-card-header>
-      <mat-card-title class="registration-title">
-        <mat-icon>person_add</mat-icon>
-        New User Registration
-      </mat-card-title>
-    </mat-card-header>
+<!-- registration.component.html -->
+<div class="swgt-container">
+  <div class="registration-container">
+    <div class="card">
+      <h2 class="title">New User Registration</h2>
+      <p class="subtitle">Fill in your details to register</p>
 
-    <mat-card-content>
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
-        <div class="form-grid">
-          
-          <ng-container *ngFor="let field of formFields">
-            
-            <!-- Text, Email, Tel inputs -->
-            <mat-form-field *ngIf="field.type === 'text' || field.type === 'email' || field.type === 'tel'" 
-                           class="form-field" 
-                           [ngClass]="{'half-width': field.name !== 'registeredEnterpriseAddress', 'full-width': field.name === 'registeredEnterpriseAddress'}"
-                           appearance="outline">
-              <mat-label>
-                {{ field.label }}
-                <span class="required-asterisk" *ngIf="field.required">*</span>
-              </mat-label>
-              <input matInput 
-                     [type]="field.type"
-                     [formControlName]="field.name"
-                     [placeholder]="field.placeholder || ''"
-                     [required]="field.required">
-              <mat-error *ngIf="hasError(field.name)">
-                {{ getErrorMessage(field) }}
-              </mat-error>
-            </mat-form-field>
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form enterprise-form">
 
-            <!-- Textarea -->
-            <mat-form-field *ngIf="field.type === 'textarea'" 
-                           class="form-field full-width"
-                           appearance="outline">
-              <mat-label>
-                {{ field.label }}
-                <span class="required-asterisk" *ngIf="field.required">*</span>
-              </mat-label>
-              <textarea matInput 
-                       [formControlName]="field.name"
-                       [placeholder]="field.placeholder || ''"
-                       [rows]="field.rows || 3"
-                       [required]="field.required"></textarea>
-              <mat-error *ngIf="hasError(field.name)">
-                {{ getErrorMessage(field) }}
-              </mat-error>
-            </mat-form-field>
+        <!-- Enterprise Name -->
+        <app-ilogi-input fieldId="name_of_enterprise" fieldLabel="Name of Enterprise" [mandatory]="true"
+          formControlName="name_of_enterprise" placeholder="Enter enterprise name"></app-ilogi-input>
 
-            <!-- Radio buttons -->
-            <div *ngIf="field.type === 'radio'" class="form-field radio-group">
-              <label class="field-label">
-                {{ field.label }}
-                <span class="required-asterisk" *ngIf="field.required">*</span>
-              </label>
-              <mat-radio-group [formControlName]="field.name" class="radio-buttons">
-                <mat-radio-button *ngFor="let option of field.options" 
-                                 [value]="option.value"
-                                 class="radio-option">
-                  {{ option.label }}
-                </mat-radio-button>
-              </mat-radio-group>
-              <div *ngIf="hasError(field.name)" class="radio-error">
-                {{ getErrorMessage(field) }}
-              </div>
-            </div>
+        <!-- Authorized Person -->
+        <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
+          formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
 
-          </ng-container>
-        </div>
+        <!-- Email -->
+        <app-ilogi-input fieldId="email_id" fieldLabel="Email ID" [mandatory]="true" formControlName="email_id"
+          placeholder="Enter email" type="email"></app-ilogi-input>
 
-        <!-- Form Actions with Custom Buttons -->
+        <!-- Mobile -->
+        <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
+          placeholder="Enter mobile number" type="tel"></app-ilogi-input>
+
+        <!-- Username -->
+        <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
+          placeholder="Choose a username"></app-ilogi-input>
+
+        <!-- Address -->
+        <app-ilogi-input fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
+          [mandatory]="true" formControlName="registered_enterprise_address"
+          placeholder="Enter full address"></app-ilogi-input>
+
+        <!-- City -->
+        <app-ilogi-input fieldId="registered_enterprise_city" fieldLabel="City" [mandatory]="true"
+          formControlName="registered_enterprise_city" placeholder="Enter city"></app-ilogi-input>
+
+        <!-- User Type -->
+        <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
+          [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
+
+        <!-- Password -->
+        <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
+          type="password" placeholder="Enter password"></app-ilogi-input>
+
+        <!-- Confirm Password -->
+        <app-ilogi-input fieldId="confirmPassword" fieldLabel="Confirm Password" [mandatory]="true"
+          formControlName="confirmPassword" type="password" placeholder="Re-enter password"
+          errorMessage="Passwords do not match"></app-ilogi-input>
+
+        <!-- Submit Button -->
         <div class="form-actions">
-          <app-button 
-            type="outline" 
-            size="medium"
-            text="Reset"
-            icon="refresh-cw"
-            [disabled]="isSubmitting"
-            (clicked)="onReset()">
-          </app-button>
-          
-          <app-button 
-            type="primary" 
-            size="medium"
-            [text]="isSubmitting ? 'Registering...' : 'Register'"
-            [icon]="isSubmitting ? '' : 'user-plus'"
-            htmlType="submit"
-            [disabled]="isSubmitting || registrationForm.invalid">
-            <mat-spinner *ngIf="isSubmitting" diameter="16" class="button-spinner"></mat-spinner>
-          </app-button>
+          <button type="submit" class="btn-submit btn btn-primary" [disabled]="!registrationForm.valid">
+            Register
+          </button>
         </div>
       </form>
-    </mat-card-content>
-  </mat-card>
+      <span class="text-center small mt-2">Already Registered? <a href="/auth/login">Login</a></span>
+    </div>
+  </div>
 </div>

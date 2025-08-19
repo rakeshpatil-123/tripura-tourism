@@ -1,11 +1,9 @@
 <div class="form-group">
-  <!-- Label -->
   <label *ngIf="fieldLabel" [for]="fieldId" [class.bold-label]="readonly">
     {{ fieldLabel }}
     <span *ngIf="mandatory" class="required-indicator">*</span>
   </label>
 
-  <!-- Display Mode (Readonly) -->
   <div
     *ngIf="readonly"
     class="readonly-display"
@@ -15,7 +13,6 @@
     {{ value ? (value | date : "dd/MM/yyyy") : "" }}
   </div>
 
-  <!-- Editable Date Input -->
   <ng-container *ngIf="!readonly">
     <div class="date-input-container">
       <input
@@ -53,8 +50,6 @@
     </div>
   </ng-container>
 
-  <!-- Error Messages -->
-  <!-- Form validation errors -->
   <div
     *ngIf="submitted && hasErrors"
     class="invalid-input"
@@ -71,7 +66,6 @@
     </div>
   </div>
 
-  <!-- Date range validation error -->
   <div
     *ngIf="dateRangeError"
     class="invalid-input"

@@ -1,0 +1,147 @@
+// activities.component.scss
+
+:host {
+  display: block;
+  font-size: 0.85rem; // Global base font size
+  color: #495057;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.container {
+  max-width: 100%;
+  padding: 0;
+}
+
+// Form labels
+label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+  display: block;
+  font-size: 0.875rem;
+}
+
+// Compact inputs
+.form-control,
+::ng-deep .ilogi-select .form-control,
+::ng-deep .ilogi-radio .radio-label {
+  font-size: 0.85rem !important;
+  padding: 0.375rem 0.5rem;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+}
+
+::ng-deep .ilogi-select .form-control {
+  min-height: 38px;
+}
+
+// Radio buttons spacing
+::ng-deep .ilogi-radio {
+  margin-top: 0.25rem;
+
+  .radio-option {
+    margin-right: 1rem;
+    white-space: nowrap;
+  }
+}
+
+// Table styling
+.table {
+  font-size: 0.85rem;
+  margin-bottom: 0;
+  border-color: #dee2e6;
+
+  th,
+  td {
+    padding: 0.4rem 0.6rem;
+    vertical-align: middle;
+  }
+
+  // th {
+  //   background-color: #cfe2ff;
+  //   color: #495057;
+  //   font-weight: 500;
+  //   border-bottom: 2px solid #dee2e6;
+  // }
+
+  td {
+    color: #212529;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f1f3f5;
+    }
+
+    a {
+      font-size: 0.85rem;
+      text-decoration: underline;
+      color: #dc3545;
+
+      &:hover {
+        color: #c82333;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+// Button styling
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 0.375rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    background-color: #0069d9;
+  }
+
+  &:disabled {
+    background-color: #6c757d;
+    opacity: 0.6;
+  }
+}
+
+// Search input
+#search {
+  font-size: 0.85rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+// Spacing between form rows
+.row.mb-3 {
+  margin-bottom: 0.75rem !important;
+}
+
+// Responsive: On small screens, reduce padding
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.8125rem;
+
+    th,
+    td {
+      padding: 0.3rem 0.4rem;
+      font-size: 0.8125rem;
+    }
+  }
+
+  .btn-primary {
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.8rem;
+  }
+}

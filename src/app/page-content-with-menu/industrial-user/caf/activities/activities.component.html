@@ -1,0 +1,124 @@
+<!-- enterprise-activity.component.html -->
+<div class="container">
+  <form [formGroup]="activityForm" novalidate>
+    <!-- Search Input -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <label for="search">Search</label>
+        <input type="text" id="search" class="form-control" placeholder="Search" />
+      </div>
+    </div>
+
+    <!-- Activity of Enterprise Radio Buttons -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <label>Activity of Enterprise</label>
+        <app-ilogi-radio
+          fieldId="companyActivity"
+          fieldLabel="Activity of Enterprise"
+          [radioOptions]="activityOptions"
+          [formControlName]="'companyActivity'"
+          [submitted]="submitted"
+          [mandatory]="true"
+        ></app-ilogi-radio>
+      </div>
+    </div>
+
+    <!-- NIC 2 Digit Code -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <app-ilogi-select
+          fieldId="nic2DigitCode"
+          fieldLabel="NIC 2 Digit Code"
+          [selectOptions]="nic2SelectOptions"
+          [formControlName]="'nic2DigitCode'"
+          [placeholder]="'Select NIC 2 Digit Code'"
+          (change)="onNic2Change($event.value)"
+          [submitted]="submitted"
+          [mandatory]="true"
+        ></app-ilogi-select>
+      </div>
+    </div>
+
+    <!-- NIC 4 Digit Code -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <app-ilogi-select
+          fieldId="nic4DigitCode"
+          fieldLabel="NIC 4 Digit Code"
+          [selectOptions]="nic4SelectOptions"
+          [formControlName]="'nic4DigitCode'"
+          [placeholder]="'Select NIC 4 Digit Code'"
+          (change)="onNic4Change($event.value)"
+          [submitted]="submitted"
+          [mandatory]="true"
+        ></app-ilogi-select>
+      </div>
+    </div>
+
+    <!-- NIC 5 Digit Code -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12">
+        <app-ilogi-select
+          fieldId="nic5DigitCode"
+          fieldLabel="NIC 5 Digit Code"
+          [selectOptions]="nic5SelectOptions"
+          [placeholder]="'Select NIC 5 Digit Code'"
+          [formControlName]="'nic5DigitCode'"
+          [submitted]="submitted"
+          [mandatory]="true"
+        ></app-ilogi-select>
+      </div>
+    </div>
+
+    <!-- Add More Activities Button -->
+    <div class="row mb-3">
+      <div class="col-md-6 col-sm-12 d-flex justify-content-center">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="addActivity()"
+          [disabled]="!activityForm.valid"
+        >
+          Add More Activities
+        </button>
+      </div>
+    </div>
+
+    <!-- Table of Added Activities -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <table class="table table-bordered">
+          <thead class="table-primary">
+            <tr>
+              <th>Sl. No.</th>
+              <th>Activity of Enterprise *</th>
+              <th>NIC 2 Digit Code *</th>
+              <th>NIC 4 Digit Code *</th>
+              <th>NIC 5 Digit Code *</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let act of activities; let i = index">
+              <td>{{ act.slNo }} </td>
+              <td>{{ act.companyActivity }}</td>
+              <td>{{ act.nic2DigitLabel }}</td>
+              <td>{{ act.nic4DigitLabel }}</td>
+              <td>{{ act.nic5DigitLabel }}</td>
+              <td>
+                <a (click)="removeActivity(i)" class="text-danger" style="cursor: pointer;">
+                  <i class="fa fa-trash-o"></i> Remove
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </form>
+  <div class="form-actions">
+  <button type="button" class="btn btn-primary">Save As Draft</button>
+  <button type="submit" class="btn btn-success">Save</button>
+</div>
+</div>

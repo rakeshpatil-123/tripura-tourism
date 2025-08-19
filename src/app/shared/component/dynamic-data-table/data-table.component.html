@@ -9,26 +9,16 @@
         </button>
       </div>
     </div>
-    
+
     <div class="header-right">
       <div class="search-section" *ngIf="config.showSearch" [class.focused]="isSearchFocused">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search..."
-          [(ngModel)]="searchTerm"
-          (input)="onSearch()"
-          (focus)="isSearchFocused = true"
-          (blur)="isSearchFocused = false"
-        />
-        <button 
-          *ngIf="searchTerm" 
-          class="clear-search" 
-          (click)="clearSearch()"
-          aria-label="Clear search">
+        <input type="text" class="search-input" placeholder="Search..." [(ngModel)]="searchTerm" (input)="onSearch()"
+          (focus)="isSearchFocused = true" (blur)="isSearchFocused = false" />
+        <button *ngIf="searchTerm" class="clear-search" (click)="clearSearch()" aria-label="Clear search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -48,52 +38,46 @@
       config.compact ? 'compact' : '',
       config.stickyHeader ? 'sticky-header' : ''
     ].join(' ')">
-      
+
       <!-- Table Head -->
       <thead>
         <tr>
           <th *ngIf="config.selectable" class="select-column">
             <div class="checkbox-wrapper">
-              <input
-                type="checkbox"
-                class="checkbox"
-                [checked]="isAllSelected()"
-                [indeterminate]="isSomeSelected() && !isAllSelected()"
-                (change)="toggleAllSelection()"
-                aria-label="Select all rows"
-              />
+              <input type="checkbox" class="checkbox" [checked]="isAllSelected()"
+                [indeterminate]="isSomeSelected() && !isAllSelected()" (change)="toggleAllSelection()"
+                aria-label="Select all rows" />
               <span class="checkbox-custom"></span>
             </div>
           </th>
-          
-          <th
-            *ngFor="let column of columns"
-            [style.width]="column.width"
-            [class.align-center]="column.align === 'center'"
-            [class.align-right]="column.align === 'right'"
+
+          <th *ngFor="let column of columns" [style.width]="column.width"
+            [class.align-center]="column.align === 'center'" [class.align-right]="column.align === 'right'"
             [class.sortable]="column.sortable && config.sortable"
-            (click)="column.sortable && config.sortable && sort(column)"
-          >
+            (click)="column.sortable && config.sortable && sort(column)">
             <div class="column-header">
               <span>{{ column.header }}</span>
               <div class="sort-indicator" *ngIf="column.sortable && config.sortable">
                 <ng-container *ngIf="sortColumn === column.key; else defaultSort">
-                  <svg *ngIf="sortDirection === 'asc'" class="sort-icon active" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <svg *ngIf="sortDirection === 'asc'" class="sort-icon active" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
                   </svg>
-                  <svg *ngIf="sortDirection === 'desc'" class="sort-icon active" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <svg *ngIf="sortDirection === 'desc'" class="sort-icon active" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </ng-container>
                 <ng-template #defaultSort>
                   <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                   </svg>
                 </ng-template>
               </div>
             </div>
           </th>
-          
+
           <th *ngIf="actions.length > 0" class="actions-column">Actions</th>
         </tr>
       </thead>
@@ -101,49 +85,35 @@
       <!-- Table Body -->
       <tbody [@staggeredRows]="paginatedData.length">
         <ng-container *ngIf="paginatedData.length > 0; else emptyState">
-          <tr
-            *ngFor="let row of paginatedData; let i = index; trackBy: trackByFn"
-            [class.selected]="isRowSelected(row)"
-            (click)="handleRowClick(row, $event)"
-            [@fadeInOut]="config.animatedRows"
-          >
+          <tr *ngFor="let row of paginatedData; let i = index; trackBy: trackByFn" [class.selected]="isRowSelected(row)"
+            (click)="handleRowClick(row, $event)" (contextmenu)="showContextMenu($event, row)"
+            [@fadeInOut]="config.animatedRows">
             <td *ngIf="config.selectable" class="select-column">
               <div class="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  class="checkbox"
-                  [checked]="isRowSelected(row)"
-                  (change)="toggleRowSelection(row)"
-                />
+                <input type="checkbox" class="checkbox" [checked]="isRowSelected(row)"
+                  (change)="toggleRowSelection(row)" />
                 <span class="checkbox-custom"></span>
               </div>
             </td>
-            
-            <td
-              *ngFor="let column of columns"
-              [class.align-center]="column.align === 'center'"
-              [class.align-right]="column.align === 'right'"
-            >
+
+            <td *ngFor="let column of columns" [class.align-center]="column.align === 'center'"
+              [class.align-right]="column.align === 'right'">
               <ng-container *ngIf="column.type === 'custom' && column.customTemplate; else defaultCell">
                 <ng-container
-                  *ngTemplateOutlet="column.customTemplate; context: { $implicit: row, value: row[column.key], column: column }"
-                >
+                  *ngTemplateOutlet="column.customTemplate; context: { $implicit: row, value: row[column.key], column: column }">
                 </ng-container>
               </ng-container>
-              
+
               <ng-template #defaultCell>
                 <span class="cell-content" [innerHTML]="formatCellValue(row[column.key], column)"></span>
               </ng-template>
             </td>
-            
+
             <td *ngIf="actions.length > 0" class="actions-column">
               <div class="actions-cell">
                 <ng-container *ngFor="let action of getRowActions(row)">
-                  <button
-                    [class]="'btn btn-' + (action.type || 'ghost') + ' btn-' + (action.size || 'small')"
-                    (click)="$event.stopPropagation(); action.action(row)"
-                    [title]="action.label"
-                  >
+                  <button [class]="'btn btn-' + (action.type || 'ghost') + ' btn-' + (action.size || 'small')"
+                    (click)="$event.stopPropagation(); action.action(row)" [title]="action.label">
                     <span *ngIf="action.icon" [innerHTML]="action.icon"></span>
                     <span *ngIf="!action.icon">{{ action.label }}</span>
                   </button>
@@ -152,7 +122,7 @@
             </td>
           </tr>
         </ng-container>
-        
+
         <ng-template #emptyState>
           <tr class="empty-row">
             <td [attr.colspan]="getTotalColumns()">
@@ -180,43 +150,30 @@
         <span>{{ getPageInfo() }}</span>
       </ng-container>
     </div>
-    
+
     <div class="pagination-controls" *ngIf="config.showPagination && totalPages > 1">
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === 1"
-        (click)="previousPage()"
-        aria-label="Previous page"
-      >
+      <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()" aria-label="Previous page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
-      
+
       <div class="page-numbers">
         <ng-container *ngFor="let page of getVisiblePages()">
           <ng-container *ngIf="page === '...'; else pageButton">
             <span class="page-ellipsis">...</span>
           </ng-container>
           <ng-template #pageButton>
-            <button
-              class="page-number"
-              [class.active]="currentPage === page"
-              (click)="goToPage(1)"
-              [attr.aria-current]="currentPage === page ? 'page' : null"
-            >
+            <button class="page-number" [class.active]="currentPage === page" (click)="goToPage(1)"
+              [attr.aria-current]="currentPage === page ? 'page' : null">
               {{ page }}
             </button>
           </ng-template>
         </ng-container>
       </div>
-      
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="nextPage()"
-        aria-label="Next page"
-      >
+
+      <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()"
+        aria-label="Next page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>

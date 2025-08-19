@@ -1,5 +1,5 @@
 .form-group {
-    margin-bottom: 1rem;
+    // margin-bottom: 1rem;
   }
   label {
     margin-bottom: 0.5rem; /* Controls space between label and input */
@@ -9,13 +9,13 @@
   }
   
   .red-font {
-    color: var(--color-poppy-red, #dc3545);
+    color: var(--color-poppy-red, #2C82AA)!important;
   }
   
   .invalid-input {
     visibility: hidden;
     opacity: 0;
-    color: var(--color-poppy-red, #dc3545);
+    color: var(--color-poppy-red, #2C82AA)!important;
     font-size: 0.875rem;
     height: 0;
     overflow: hidden;
@@ -29,7 +29,7 @@
   }
   
   .x-error-msg-text {
-    color: var(--color-poppy-red, #dc3545);
+    color: var(--color-poppy-red, #2C82AA)!important;
   }
   
   .show-data {
@@ -49,19 +49,85 @@
   }
   
   mat-radio-group.is-invalid {
-    border: 1px solid var(--color-poppy-red, #dc3545);
+    border: 1px solid var(--color-poppy-red, #2C82AA)!important;
     border-radius: 4px;
     transition: none;
   }
   
-  :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-outer-circle {
-    border-color: var(--color-tertiary, #a11220);
-  }
+  // :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-outer-circle {
+  //   border-color: var(--color-tertiary, #2C82AA)!important;
+  // }
   
-  :host ::ng-deep .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
-    background-color: var(--color-tertiary, #a11220);
-  }
-  
-  :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
-    background-color: var(--color-tertiary, #a11220);
-  }
+  //   :host ::ng-deep .mdc-radio .mdc-radio__background .mat-radio-outer-circle {
+  //     border-color: var(--color-tertiary, #9c9c9c)!important;
+  //   }
+
+  // :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
+  //   background-color: var(--color-tertiary, #2C82AA)!important;
+  // }
+
+  ::ng-deep .mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__background .mdc-radio__inner-circle {
+  background-color: #2C82AA !important;   /* inner circle */
+  border-color: #2C82AA !important;
+}
+
+::ng-deep .mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__background .mdc-radio__outer-circle {
+  border-color: rgb(102, 102, 102) !important;      /* outer circle border */
+}
+
+
+::ng-deep .mat-mdc-radio-button .mdc-form-field {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* adjust as per your need */
+}
+
+::ng-deep .mat-mdc-radio-button .mdc-form-field label{
+  font-size: 0.85rem;
+}
+
+::ng-deep .mat-mdc-radio-button .mdc-form-field{
+  gap: 0;
+}
+
+/* Put label + radio group inline */
+.area-type {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* space between label and radios */
+}
+
+/* Label style */
+.area-type .area-label {
+  font-size: 0.85rem;
+  color: #2C82AA;
+  margin: 0; /* remove default margin */
+  white-space: nowrap; /* keep label in one line */
+}
+
+/* Space between radios */
+.area-type mat-radio-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+/* Inner circle (blue) */
+::ng-deep .mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__inner-circle {
+  background-color: #2196f3 !important; /* sky blue */
+  border-color: #2196f3 !important;
+}
+
+/* Outer circle border (black with shade) */
+::ng-deep .mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__outer-circle {
+  border-color: black !important;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Ripple / Halo color (make it sky blue with transparency) */
+::ng-deep .mat-mdc-radio-button.mat-mdc-radio-checked .mat-ripple-element {
+  background-color: rgba(135, 206, 250, 0.5) !important; /* sky blue with 50% opacity */
+}
+
+

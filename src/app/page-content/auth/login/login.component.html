@@ -1,76 +1,39 @@
+
+
 <div class="login-container">
-  
-  <main class="main-content">
-    <div class="login-card">
-      <div class="login-header">
-        <h1>Welcome Back</h1>
-        <p>Please sign in to your account</p>
-      </div>
+  <div class="card">
+    <h2 class="title">Welcome Back</h2>
+    <p class="subtitle">Please sign in to continue</p>
 
-      <form  (ngSubmit)="onSubmit()" class="login-form">
-        <div class="form-group">
-          <label for="email" class="form-label">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            class="form-input"
-            [class.error]="email?.invalid && email?.touched"
-            placeholder="Enter your email"
-          />
-          <div *ngIf="email?.invalid && email?.touched" class="error-message">
-            <span *ngIf="email?.errors?.['required']">Email is required</span>
-            <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>   
-          </div>
-        </div>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
 
-        <div class="form-group">
-          <label for="password" class="form-label">Password</label>
-          <div class="password-container">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              id="password"
-              formControlName="password"
-              class="form-input"
-              [class.error]="password?.invalid && password?.touched"
-              placeholder="Enter your password"
-            />
-            <button
-              type="button"
-              class="password-toggle"
-              (click)="togglePasswordVisibility()"
-            >
-              <span *ngIf="!showPassword"></span>
-              <span *ngIf="showPassword"></span>
-            </button>
-          </div>
-          <div *ngIf="password?.invalid && password?.touched" class="error-message">
-            <span *ngIf="password?.errors?.['required']">Password is required</span>
-            <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
-          </div>
-        </div>  
+      <app-ilogi-input
+        fieldId="user_name"
+        fieldLabel="User Name"
+        [mandatory]="true"
+        formControlName="user_name"
+        type="text"
+        placeholder="Enter your user name"
+      ></app-ilogi-input>
 
-        <div class="form-options">
+      <app-ilogi-input
+        fieldId="password"
+        fieldLabel="Password"
+        [mandatory]="true"
+        formControlName="password"
+        type="password"
+        placeholder="Enter your password"
+      ></app-ilogi-input>
 
-          <a href="#" class="forgot-password">Forgot Password?</a>
-        </div>
+      <button
+        type="submit"
+        class="btn-submit"
+        [disabled]="!loginForm.valid"
+      >
+        Login
+      </button>
+      <span class="text-center small mt-2">New User? <a href="/auth/register">Register here</a></span>
 
-        <app-button
-          class="login-button"
-          [disabled]="isLoading"
-          [class.loading]="isLoading"
-        >
-          <span *ngIf="!isLoading">Sign In</span>
-          <span *ngIf="isLoading">
-            <div class="spinner"></div>
-            Signing In...
-          </span>
-        </app-button>
-
-        <div class="signup-link">
-          <p>Don't have an account? <a [routerLink]="['/auth/registration']"  class="signup-text">Sign up here</a></p>
-        </div>
-      </form>
-    </div>
-  </main>
+    </form>
+  </div>
 </div>

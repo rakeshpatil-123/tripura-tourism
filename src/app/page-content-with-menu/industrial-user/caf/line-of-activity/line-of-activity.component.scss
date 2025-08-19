@@ -1,0 +1,86 @@
+.header-color {
+  font-weight: 600;
+   color: #2C82AA;
+
+}
+
+.red-font {
+  color: #e33;
+}
+
+.show-data {
+  display: block;
+  padding: 0.375rem 0.75rem;
+  min-height: 38px;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.clkable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.add-new-btn {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.blackiconcolor {
+  color: #333;
+}
+
+.blackiconcolor-red {
+  color: #dc3545;
+}
+
+.form-group-margin {
+  margin-bottom: 0;
+}
+
+.input-large {
+  width: 100%;
+}
+
+.input-extra-large {
+  width: 100%;
+}
+
+.input-mid {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pull-right {
+  float: right;
+}
+
+.color-666666 {
+  color: #666;
+}
+
+hr {
+  border-color: #ddd;
+  margin: 1rem 0;
+}
+
+th{
+    font-size: 0.9rem;
+}
+
+td{
+    font-size: 0.85rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
