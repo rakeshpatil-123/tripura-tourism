@@ -1,50 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
+// management.component.ts
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule,  } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatStepperModule } from '@angular/material/stepper';
 
-export interface PartnerDetails {
-  name: string;
-  fatherName: string;
-  age: string;
-  sex: string;
-  socialStatus: string;
-  profession: string;
-  permanentAddress: string;
-  mobileNo: string;
-  dateOfBirth: Date | null;
-  dateOfJoining: Date | null;
-  idProof: File | null;
-  signature: File | null;
-}
-
-export interface BoardDirector {
-  name: string;
-  permanentAddress: string;
-  mobileNo: string;
-}
-
-export interface ChiefAdminHead {
-  name: string;
-  permanentAddress: string;
-  mobileNo: string;
-}
+// Import your custom components
+import { IlogiInputComponent } from '../../../../customInputComponents/ilogi-input/ilogi-input.component';
+import { IlogiFileUploadComponent } from '../../../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
+import { IlogiInputDateComponent } from '../../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
+import { IlogiSelectComponent } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
 
 @Component({
   selector: 'app-management',
@@ -52,311 +15,214 @@ export interface ChiefAdminHead {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatTableModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatToolbarModule,
-    MatDividerModule,
-    MatStepperModule,
+    IlogiInputComponent,
+    IlogiInputDateComponent,
+    IlogiFileUploadComponent,
+    IlogiSelectComponent
   ],
   templateUrl: './management.component.html',
   styleUrls: ['./management.component.scss'],
 })
 export class ManagementComponent implements OnInit {
-  managementForm!: FormGroup;
+  form: FormGroup;
 
-  // Dropdown options
-  statusPersonOptions = [
-    'Owner',
-    'Partner',
-    'Director',
-    'Manager',
-    'Authorized Signatory',
-  ];
+statusOfPersonOptions = [
+  { id: 'Owner', name: 'Owner' },
+  { id: 'Managing Director', name: 'Managing Director' },
+  { id: 'CEO', name: 'CEO' },
+  { id: 'Chairman', name: 'Chairman' },
+  { id: 'Partner', name: 'Partner' },
+  { id: 'COO', name: 'COO' },
+  { id: 'CFO', name: 'CFO' },
+  { id: 'Director', name: 'Director' },
+  { id: 'VP', name: 'VP' },
+  { id: 'Chief Operating Officer', name: 'Chief Operating Officer' },
+  { id: 'Chief Financial Officer', name: 'Chief Financial Officer' },
+  { id: 'Chief Executive Officer', name: 'Chief Executive Officer' },
+  { id: 'Vice President', name: 'Vice President' },
+  { id: 'President', name: 'President' }
+];
 
-  sexOptions = ['Male', 'Female', 'Other'];
+socialStatusOptions = [
+  { id: 'General', name: 'General' },
+  { id: 'SC', name: 'SC' },
+  { id: 'ST', name: 'ST' },
+  { id: 'OBC', name: 'OBC' }
+];
 
-  socialStatusOptions = ['General', 'OBC', 'SC', 'ST', 'EWS'];
+yesNoOptions = [
+  { id: '1', name: 'Yes' },
+  { id: '0', name: 'No' }
+];
 
-  yesNoOptions = ['Yes', 'No'];
+  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
+    this.form = this.fb.group({
+      // --- Owner Details ---
+      name: ['', Validators.required],
+      fatherName: ['', Validators.required],
+      residentialAddress: ['', Validators.required],
+      policeStation: ['', Validators.required],
+      pin: ['', Validators.required],
+      mobile: ['', Validators.required],
+      alternateMobileNo: [''],
+      email: ['', [Validators.required, Validators.email]],
+      dob: ['', Validators.required],
+      statusOfPerson: ['', Validators.required],
+      socialStatus: [''],
+      minority: ['', Validators.required],
+      differentlyAbled: ['', Validators.required],
+      aadharNo: [''],
+      employerPhoto: [null],
 
-  // Table columns
-  partnerColumns: string[] = [
-    'name',
-    'fatherName',
-    'age',
-    'sex',
-    'socialStatus',
-    'profession',
-    'permanentAddress',
-    'mobileNo',
-    'dateOfBirth',
-    'dateOfJoining',
-    'idProof',
-    'signature',
-    'actions',
-  ];
+      // --- Manager Details ---
+      managerName: [''],
+      managerFatherName: [''],
+      managerResidentialAddress: [''],
+      managerPoliceStation: [''],
+      managerPin: [''],
+      managerMobile: [''],
+      managerAadharNo: [''],
+      managerDOB: [''],
+      managerEmployerPhoto: [null],
 
-  boardColumns: string[] = ['name', 'permanentAddress', 'mobileNo', 'actions'];
-  adminColumns: string[] = ['name', 'permanentAddress', 'mobileNo', 'actions'];
+      // --- Signatures ---
+      signedAuthorizationDocument: [null, Validators.required],
+      signatureOfOccupierOfFactory: [null],
+      signatureOfManagerOfFactory: [null],
 
-  constructor(
-    private fb: FormBuilder,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
-  ) {}
-
-  ngOnInit(): void {
-    this.initializeForm();
-  }
-
-  initializeForm(): void {
-    this.managementForm = this.fb.group({
-      // Owner Details
-      ownerDetails: this.fb.group({
-        name: ['', [Validators.required]],
-        residentialAddress: ['', [Validators.required]],
-        fatherName: ['', [Validators.required]],
-        policeStation: ['', [Validators.required]],
-        photograph: [null],
-        pin: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-        aadharNo: ['', [Validators.pattern(/^\d{12}$/)]],
-        mobile: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-        statusOfPerson: ['', [Validators.required]],
-        alternateMobile: ['', [Validators.pattern(/^\d{10}$/)]],
-        email: ['', [Validators.required, Validators.email]],
-        dateOfBirth: ['', [Validators.required]],
-        womenEntrepreneur: ['', [Validators.required]],
-        socialStatus: [''],
-        minority: ['', [Validators.required]],
-        differentlyAbled: ['', [Validators.required]],
-      }),
-
-      // Manager Details
-      managerDetails: this.fb.group({
-        name: [''],
-        residentialAddress: [''],
-        fatherName: [''],
-        policeStation: [''],
-        photograph: [null],
-        pin: ['', [Validators.pattern(/^\d{6}$/)]],
-        dateOfBirth: [''],
-        mobile: ['', [Validators.pattern(/^\d{10}$/)]],
-        aadharNo: ['', [Validators.pattern(/^\d{12}$/)]],
-      }),
-
-      // Signature Uploads
-      signatures: this.fb.group({
-        ownerSignature: [null, [Validators.required]],
-        occupierSignature: [null],
-        managerSignature: [null],
-      }),
-
-      // Dynamic Arrays
+      // --- Dynamic Sections ---
       partnerDetails: this.fb.array([]),
-      boardDirectors: this.fb.array([]),
-      chiefAdminHeads: this.fb.array([]),
+      boardOfDirectors: this.fb.array([]),
+      chiefAdministrativeHead: this.fb.array([]),
     });
   }
 
-  // Getter methods for FormArrays
-  get partnerDetailsArray(): FormArray {
-    return this.managementForm.get('partnerDetails') as FormArray;
+  ngOnInit(): void {
+    this.form.patchValue({
+      name: 'Deeptanu Bhowmik',
+      fatherName: 'Rabindra Bhowmik',
+      residentialAddress: 'Joynagar',
+      policeStation: 'West P.S',
+      pin: '799001',
+      mobile: '7085542194',
+      email: 'deeptanubhowmik462002@gmail.com',
+      dob: new Date('2001-01-01'),
+      statusOfPerson: 'Managing Director',
+      minority: '0',
+      differentlyAbled: '0',
+      aadharNo: '654376544321',
+
+      managerName: 'Moumita Sinha',
+      managerFatherName: 'Surajit Sinha',
+      managerResidentialAddress: 'Behind Hindi H. S School',
+      managerPoliceStation: 'West P.S',
+      managerPin: '799005',
+      managerMobile: '9233108616',
+      managerAadharNo: '552303161494',
+      managerDOB: new Date('1999-01-08'),
+    });
+
+    // Add sample data
+    this.addChiefAdministrativeHead();
+    this.addChiefAdministrativeHead();
   }
 
-  get boardDirectorsArray(): FormArray {
-    return this.managementForm.get('boardDirectors') as FormArray;
+  // --- File Handling ---
+
+  addAdminHead(): void {
+  this.chiefAdministrativeHead.push(this.fb.group({
+    name: ['', Validators.required],
+    permanentAddress: ['', Validators.required],
+    mobile: ['', Validators.required],
+  }));
+  this.cdr.markForCheck();
+}
+  onPhotoSelected(file: File): void {
+    this.form.get('employerPhoto')?.setValue(file);
+    this.cdr.markForCheck();
   }
 
-  get chiefAdminHeadsArray(): FormArray {
-    return this.managementForm.get('chiefAdminHeads') as FormArray;
+  onManagerPhotoSelected(file: File): void {
+    this.form.get('managerEmployerPhoto')?.setValue(file);
+    this.cdr.markForCheck();
   }
 
-  // Partner Details Methods
-  createPartnerFormGroup(): FormGroup {
-    return this.fb.group({
-      name: ['', [Validators.required]],
-      fatherName: ['', [Validators.required]],
-      age: ['', [Validators.min(18), Validators.max(100)]],
+  removeFile(fieldName: string): void {
+    this.form.get(fieldName)?.reset();
+    this.cdr.markForCheck();
+  }
+
+  getImageUrl(file: File | string | null): string {
+    if (!file) return '/assets/img/profile-picture.jpg';
+    if (file instanceof File) {
+      return URL.createObjectURL(file);
+    }
+    return file;
+  }
+
+  // --- FormArray: Partner Details ---
+  get partnerDetails(): FormArray {
+    return this.form.get('partnerDetails') as FormArray;
+  }
+
+  addPartner(): void {
+    this.partnerDetails.push(this.fb.group({
+      name: ['', Validators.required],
+      fatherName: ['', Validators.required],
+      age: [''],
       sex: [''],
       socialStatus: [''],
       profession: [''],
       permanentAddress: [''],
-      mobileNo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      dateOfBirth: ['', [Validators.required]],
+      mobile: ['', Validators.required],
+      dob: ['', Validators.required],
       dateOfJoining: [''],
       idProof: [null],
       signature: [null],
-    });
-  }
-
-  addPartner(): void {
-    this.partnerDetailsArray.push(this.createPartnerFormGroup());
+    }));
+    this.cdr.markForCheck();
   }
 
   removePartner(index: number): void {
-    this.partnerDetailsArray.removeAt(index);
-    this.showSnackBar('Partner removed successfully');
+    this.partnerDetails.removeAt(index);
+    this.cdr.markForCheck();
   }
 
-  editPartner(index: number): void {
-    // Logic for editing partner (could open a dialog)
-    this.showSnackBar('Edit functionality to be implemented');
+  // --- Board of Directors ---
+  get boardOfDirectors(): FormArray {
+    return this.form.get('boardOfDirectors') as FormArray;
   }
 
-  // Board Directors Methods
-  createBoardDirectorFormGroup(): FormGroup {
-    return this.fb.group({
-      name: ['', [Validators.required]],
+  addDirector(): void {
+    this.boardOfDirectors.push(this.fb.group({
+      name: ['', Validators.required],
       permanentAddress: [''],
-      mobileNo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-    });
+      mobile: ['', Validators.required],
+    }));
+    this.cdr.markForCheck();
   }
 
-  addBoardDirector(): void {
-    this.boardDirectorsArray.push(this.createBoardDirectorFormGroup());
+  removeDirector(index: number): void {
+    this.boardOfDirectors.removeAt(index);
+    this.cdr.markForCheck();
   }
 
-  removeBoardDirector(index: number): void {
-    this.boardDirectorsArray.removeAt(index);
-    this.showSnackBar('Board Director removed successfully');
+  // --- Chief Administrative Head ---
+  get chiefAdministrativeHead(): FormArray {
+    return this.form.get('chiefAdministrativeHead') as FormArray;
   }
 
-  editBoardDirector(index: number): void {
-    this.showSnackBar('Edit functionality to be implemented');
+  addChiefAdministrativeHead(): void {
+    this.chiefAdministrativeHead.push(this.fb.group({
+      name: ['', Validators.required],
+      permanentAddress: ['', Validators.required],
+      mobile: ['', Validators.required],
+    }));
+    this.cdr.markForCheck();
   }
 
-  // Chief Admin Head Methods
-  createChiefAdminFormGroup(): FormGroup {
-    return this.fb.group({
-      name: ['', [Validators.required]],
-      permanentAddress: [''],
-      mobileNo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-    });
-  }
-
-  addChiefAdminHead(): void {
-    this.chiefAdminHeadsArray.push(this.createChiefAdminFormGroup());
-  }
-
-  removeChiefAdminHead(index: number): void {
-    this.chiefAdminHeadsArray.removeAt(index);
-    this.showSnackBar('Chief Administrative Head removed successfully');
-  }
-
-  editChiefAdminHead(index: number): void {
-    this.showSnackBar('Edit functionality to be implemented');
-  }
-
-  // File Upload Methods
-  onFileSelected(
-    event: any,
-    controlName: string,
-    formGroupName?: string,
-    index?: number
-  ): void {
-    const file = event.target.files[0];
-    if (file) {
-      if (formGroupName && index !== undefined) {
-        // For dynamic arrays
-        const formArray = this.managementForm.get(formGroupName) as FormArray;
-        formArray.at(index).get(controlName)?.setValue(file);
-      } else if (formGroupName) {
-        // For nested form groups
-        this.managementForm
-          .get(formGroupName)
-          ?.get(controlName)
-          ?.setValue(file);
-      } else {
-        // For top-level controls
-        this.managementForm.get(controlName)?.setValue(file);
-      }
-      this.showSnackBar(`File uploaded: ${file.name}`);
-    }
-  }
-
-  // Utility Methods
-  showSnackBar(message: string): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 3000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-    });
-  }
-
-  onSubmit(): void {
-    if (this.managementForm.valid) {
-      console.log('Form Data:', this.managementForm.value);
-      this.showSnackBar('Management details saved successfully!');
-    } else {
-      this.showSnackBar('Please fill all required fields correctly');
-      this.markFormGroupTouched(this.managementForm);
-    }
-  }
-
-  private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach((key) => {
-      const control = formGroup.get(key);
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      } else if (control instanceof FormArray) {
-        control.controls.forEach((arrayControl) => {
-          if (arrayControl instanceof FormGroup) {
-            this.markFormGroupTouched(arrayControl);
-          }
-        });
-      } else {
-        control?.markAsTouched();
-      }
-    });
-  }
-
-  resetForm(): void {
-    this.managementForm.reset();
-    this.initializeForm();
-    this.showSnackBar('Form reset successfully');
-  }
-
-  // Helper method to get error messages
-  getErrorMessage(controlName: string, formGroupName?: string): string {
-    let control;
-    if (formGroupName) {
-      control = this.managementForm.get(formGroupName)?.get(controlName);
-    } else {
-      control = this.managementForm.get(controlName);
-    }
-
-    if (control?.hasError('required')) {
-      return 'This field is required';
-    }
-    if (control?.hasError('email')) {
-      return 'Please enter a valid email';
-    }
-    if (control?.hasError('pattern')) {
-      if (controlName.includes('mobile') || controlName.includes('Mobile')) {
-        return 'Please enter a valid 10-digit mobile number';
-      }
-      if (controlName === 'pin') {
-        return 'Please enter a valid 6-digit PIN';
-      }
-      if (controlName === 'aadharNo') {
-        return 'Please enter a valid 12-digit Aadhar number';
-      }
-    }
-    if (control?.hasError('min')) {
-      return 'Age must be at least 18';
-    }
-    if (control?.hasError('max')) {
-      return 'Age cannot exceed 100';
-    }
-    return '';
+  removeChiefAdministrativeHead(index: number): void {
+    this.chiefAdministrativeHead.removeAt(index);
+    this.cdr.markForCheck();
   }
 }

@@ -1,1 +1,50 @@
-<p>bank-details works!</p>
+<div>
+<div [formGroup]="bankDetailsForm" class="grid-container ">
+  <app-ilogi-input
+    formControlName="accountHolderName"
+    fieldLabel="Account Holder Name"
+    [mandatory]="true"
+    [placeholder]="'Enter Account Holder Name'"
+  ></app-ilogi-input>
+
+  <app-ilogi-input
+    formControlName="accountNumber"
+    fieldLabel="Account Number"
+    [mandatory]="true"
+    [placeholder]="'Enter Account Number'"
+  ></app-ilogi-input>
+
+  <app-ilogi-input
+    formControlName="bankName"
+    fieldLabel="Bank Name"
+    [mandatory]="true"
+    [placeholder]="'Enter Bank Name'"
+  ></app-ilogi-input>
+
+  <app-ilogi-input
+    formControlName="branchName"
+    fieldLabel="Branch Name"
+    [mandatory]="true"
+    [placeholder]="'Enter Branch Name'"
+  ></app-ilogi-input>
+
+  <app-ilogi-input
+    formControlName="ifscCode"
+    fieldLabel="IFSC Code"
+    [mandatory]="true"
+    [placeholder]="'Enter IFSC Code'"
+  ></app-ilogi-input>
+
+  <app-ilogi-select
+    formControlName="accountType"
+    fieldLabel="Account Type"
+    [selectOptions]="AccountTypes"
+    [placeholder]="'Select Account Type'"
+    [mandatory]="true"
+  ></app-ilogi-select>
+</div>
+<div class="form-actions">
+  <button type="button" class="btn btn-primary">Save As Draft</button>
+  <button type="submit" class="btn btn-success">Save</button>
+</div>
+</div>

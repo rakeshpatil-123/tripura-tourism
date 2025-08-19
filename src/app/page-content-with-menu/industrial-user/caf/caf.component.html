@@ -1,18 +1,18 @@
 <!-- application-form.component.html -->
-<mat-card appearance="outlined" class="main-form-card">
-  <mat-card-content>
-    <mat-tab-group
-      dynamicHeight
-      animationDuration="300ms"
-      (selectedTabChange)="onTabChange($event)"
-      class="main-tab-group"
-    >
-      <mat-tab *ngFor="let tab of tabs" [label]="tab.label">
-        <div class="tab-content-wrapper">
-          <!-- Dynamically load the component based on the selected tab -->
-          <ng-container *ngComponentOutlet="tab.component"></ng-container>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card-content>
-</mat-card>
+<div class="swgt-container">
+  <h1 class="page-head">Common Application Form</h1>
+  <mat-card appearance="outlined" class="main-form-card">
+    <mat-card-content>
+      <mat-tab-group dynamicHeight animationDuration="300ms" (selectedTabChange)="onTabChange($event)"
+        class="main-tab-group">
+        <mat-tab *ngFor="let tab of tabs" [label]="tab.label">
+          <div class="tab-content-wrapper">
+            <!-- Dynamically load the component based on the selected tab -->
+            <ng-container *ngComponentOutlet="tab.component"></ng-container>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+
+</div>

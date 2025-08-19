@@ -10,7 +10,8 @@ import { ActivitiesComponent } from './activities/activities.component';
 import { ClearenceComponent } from './clearence/clearence.component';
 import { AttachmentComponent } from './attachment/attachment.component';
 import { ManagementComponent } from './management/management.component';
-import { EnterpriseDetailsComponent } from './enterprise-details/enterprise-details.component';
+import { EnterpriseFormComponent } from './enterprise-details/enterprise-details.component';
+// import { EnterpriseDetailsComponent } from './enterprise-details/enterprise-details.component';
 @Component({
   selector: 'app-application-form',
   standalone: true,
@@ -22,10 +23,12 @@ import { EnterpriseDetailsComponent } from './enterprise-details/enterprise-deta
 export class ApplicationFormComponent implements OnInit {
   // Define tabs with label and component
   tabs = [
-    { label: 'Enterprise Details', component: EnterpriseDetailsComponent },
+    { label: 'Enterprise Details', component: EnterpriseFormComponent },
     { label: 'Unit Details', component: UnitDetailsComponent },
     { label: 'Management', component: ManagementComponent },
     { label: 'Line of Activity', component: LineOfActivityComponent },
+       { label: 'Attachments', component: AttachmentComponent },
+
     { label: 'Clearances', component: ClearenceComponent },
     { label: 'Bank Details', component: BankDetailsComponent },
     { label: 'Activities', component: ActivitiesComponent },

@@ -1,107 +1,48 @@
+// login.component.ts
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import {
-  HttpClient,
-  HttpClientModule,
-  HttpErrorResponse,
-} from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
-
-interface LoginResponse {
-  token: string;
-  user: any;
-}
+import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
+import { GenericService } from '../../../_service/generic/generic.service';
+import { Router } from '@angular/router';
 
 @Component({
-  imports: [
-    CommonModule,
-    RouterLink,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
   selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, IlogiInputComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
-  loginForm!: FormGroup;
-  isLoading = false;
-  showPassword = false;
-  errorMessage = '';
+export class LoginComponent {
+  loginForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private genericService: GenericService,
     private router: Router
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.loginForm = this.fb.group({
-      user_name: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false],
+      user_name: [''],
+      password: [''],
     });
   }
 
-  onSubmit() {
-    console.log('Form submitted');
-
+  onSubmit(): void {
     if (this.loginForm.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
-
-      const loginData = {
-        user_name: this.loginForm.get('user_name')?.value,
-        password: this.loginForm.get('password')?.value,
-      };
-
-      // Simulate API call
-      this.http
-        .post<LoginResponse>(
-          'http://swaagatstaging.tripura.cloud/api/user/login',
-          loginData
-        )
-        .pipe(
-          catchError((error: HttpErrorResponse) => {
-            this.isLoading = false;
-            this.errorMessage = error.error.message;
-            return throwError(error);
-          })
-        )
-        .subscribe(
-          (response) => {
-            console.log(response);
-          },
-          (error) => {
-            this.isLoading = false;
-            this.errorMessage = error.error.message;
-          }
-        );
-    } else {
-      console.log('Form is invalid');
-      Object.keys(this.loginForm.controls).forEach((key) => {
-        this.loginForm.get(key)?.markAsTouched();
+      const payload = this.loginForm.value;
+      this.genericService.loginUser(payload).subscribe({
+        next: (response) => {
+          console.log('Login successful:', response);
+          this.genericService.openSnackBar('Login successful!', 'Success');
+          this.router.navigate(['/dashboard/home']);
+          this.loginForm.reset();
+        },
+        error: (error) => {
+          console.error('Login failed:', error);
+        }
       });
+    }else{
+      this.genericService.openSnackBar('Please fill in all fields correctly.', 'Error');
     }
-  }
-
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
-  }
-
-  get user_name() {
-    return this.loginForm.get('user_name');
-  }
-  get password() {
-    return this.loginForm.get('password');
   }
 }

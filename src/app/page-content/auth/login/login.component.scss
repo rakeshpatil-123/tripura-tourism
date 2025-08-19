@@ -1,247 +1,67 @@
+// login.component.scss
 
 .login-container {
-  min-height: 100vh;
-  background: var(--color-primary);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  border: 0;
-  margin: 0;
-  padding: 0;
-  margin-top: 5rem;
-}
-
-/* Main Content */
-.main-content {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 3rem;
-  min-height: calc(100vh - max(100px, 80px));
-  padding: min(2rem, 4vw);
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 1rem;
 }
 
-.login-card {
-  background: var(--color-primary);
-  padding: min(2.5rem, 5vw);
-  border-radius: min(20px, 4vw);
-  box-shadow: 0 10px 30px rgb(152, 129, 129);
-  border: 1px solid var(--color-border-light);
-  width: min(95vw, max(500px, 40vw));
-  max-width: none;
-  border: 2px solid rgb(226, 206, 206);
-  outline: none;
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #e9ecef;
 }
 
-.login-header {
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
   text-align: center;
-  margin-bottom: 2rem;
 }
 
-.login-header h1 {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  color: var(--color-text-dark);
-  margin-bottom: 0.5rem;
-  font-weight: 700;
+.subtitle {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
 }
 
-.login-header p {
-  color: var(--color-text-medium);
-  font-size: clamp(0.8rem, 2vw, 0.9rem);
-  margin: 0;
-}
-
-/* Form Styles */
-.login-form {
+.form {
   display: flex;
   flex-direction: column;
+  // gap: 4px;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--color-text-dark);
-  font-weight: 500;
-  font-size: clamp(0.8rem, 2vw, 0.9rem);
-}
-
-.form-input {
-  width: 100%;
-  border: 2px solid rgb(224, 232, 224);
-  border-radius: min(10px, 2vw);
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background: var(--color-form-input-bg);
-  color: var(--color-form-input-text);
-  box-sizing: border-box;
-  padding: min(0.875rem, 3vw);
-}
-
-.form-input::placeholder {
-  color: var(--color-form-input-placeholder);
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--color-form-input-border-focus);
-  box-shadow: 0 0 0 3px var(--shadow-focus);
-}
-
-.form-input:hover:not(:focus) {
-  border-color: var(--color-form-input-border-hover);
-}
-
-.form-input.error {
-  border-color: var(--color-form-input-error);
-  background: var(--color-red-50);
-}
-
-.password-container {
-  position: relative;
-}
-
-.password-toggle {
-  position: absolute;
-  right: min(1rem, 3vw);
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  color: var(--color-text-medium);
-  transition: color 0.3s ease;
-}
-
-.password-toggle:hover {
-  color: var(--color-tertiary);
-}
-
-.error-message {
-  color: var(--color-form-input-error);
-  font-size: clamp(0.7rem, 2vw, 0.8rem);
-  margin-top: 0.5rem;
-}
-
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: min(1rem, 2vw);
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: clamp(0.8rem, 2vw, 0.9rem);
-  color: var(--color-text-medium);
-}
-
-.checkbox-container input {
-  margin-right: 0.5rem;
-  cursor: pointer;
-  accent-color: var(--color-tertiary);
-}
-
-.forgot-password {
-  color: var(--color-text-link);
-  text-decoration: none;
-  font-size: clamp(0.8rem, 2vw, 0.9rem);
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.forgot-password:hover {
-  color: var(--color-text-link-hover);
-  text-decoration: underline;
-}
-
-// .login-button {
-//   width: 100%;
-//   padding: min(0.875rem, 3vw);
-//   background: var(--color-tertiary);
-//   color: var(--color-btn-primary-text);
-//   border: none;
-//   border-radius: min(10px, 2vw);
-//   font-size: clamp(0.9rem, 2.5vw, 1rem);
-//   font-weight: 600;
-//   cursor: pointer;
-//   transition: all 0.3s ease;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   gap: 0.5rem;
-//   box-sizing: border-box;
-// }
-
-// .login-button:hover:not(:disabled) {
-//   background: var(--color-tertiary-shade);
-//   transform: translateY(-2px);
-//   box-shadow: 0 8px 16px var(--shadow-medium);
-// }
-
-// .login-button:active:not(:disabled) {
-//   background: var(--color-tertiary);
-//   transform: translateY(0);
-// }
-
-// .login-button:disabled {
-//   opacity: 0.6;
-//   cursor: not-allowed;
-//   background: var(--color-utility-disabled);
-//   color: var(--color-utility-disabled-text);
-// }
-
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: var(--color-btn-primary-text);
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.signup-link {
-  text-align: center;
+.btn-submit {
   margin-top: 1.5rem;
-}
-
-.signup-link p {
-  color: var(--color-text-medium);
-  font-size: clamp(0.8rem, 2vw, 0.9rem);
-  margin: 0;
-}
-
-.signup-text {
-  color: var(--color-text-link);
-  text-decoration: none;
+  padding: 0.75rem;
+  font-size: 1rem;
   font-weight: 500;
-  transition: color 0.3s ease;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #0069d9;
+  }
+
+  &:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
 }
 
-.signup-text:hover {
-  color: var(--color-text-link-hover);
-  text-decoration: underline;
-}
-
-/* Navigation responsive styling (if nav exists) */
-.nav-links {
-  display: flex;
-}
-
-.nav-toggle {
-  display: none;
-}
-
-.nav-content {
-  padding: 0 min(2rem, 4vw);
+::ng-deep .form-group {
+  margin-bottom: 0.5rem;
 }

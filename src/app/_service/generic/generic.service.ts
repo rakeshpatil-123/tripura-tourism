@@ -9,11 +9,11 @@ import * as CryptoJS from 'crypto-js';
 import Swal from 'sweetalert2';
 
 @Injectable({
-  providedIn: 'root' // Makes the service available app-wide in standalone setup
+  providedIn: 'root', // Makes the service available app-wide in standalone setup
 })
 export class GenericService {
   // API URLs (same as provided)
-  static DEV_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in';
+  static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static QA_BACKEND_URL = 'https://swaagat-backend-qa.oitsystems.com';
   static UAT_BACKEND_URL = 'https://swaagat-backend-uat.oitsystems.com';
   static CERTIN_BACKEND_URL = 'https://swagat-backend-certin.oitsystems.com';
@@ -34,18 +34,20 @@ export class GenericService {
   }
 
   public baseUrl: string = GenericService.BACKEND_URL();
-  public claimThresholdAmount = 500000.00;
+  public claimThresholdAmount = 500000.0;
   private encryptSecretKey = 'René Über';
   public maxDate: Date = new Date();
   private loginStatus = new Subject<boolean>();
   public reCaptcha_key = '6LduT_QUAAAAAKKDWXmKYw710NFYd4S-9GlI-pWj';
   public currentDate = new Date();
-  public financialYearFirstDate = this.currentDate.getMonth() >= 3
-    ? new Date(this.currentDate.getFullYear(), 3, 1)
-    : new Date(this.currentDate.getFullYear() - 1, 3, 1);
-  public financialYearLastDate = this.currentDate.getMonth() >= 3
-    ? new Date(this.currentDate.getFullYear() + 1, 2, 31)
-    : new Date(this.currentDate.getFullYear(), 2, 31);
+  public financialYearFirstDate =
+    this.currentDate.getMonth() >= 3
+      ? new Date(this.currentDate.getFullYear(), 3, 1)
+      : new Date(this.currentDate.getFullYear() - 1, 3, 1);
+  public financialYearLastDate =
+    this.currentDate.getMonth() >= 3
+      ? new Date(this.currentDate.getFullYear() + 1, 2, 31)
+      : new Date(this.currentDate.getFullYear(), 2, 31);
   public companyConstitutionChanged = -1;
   public companyProposalForChanged = '';
 
@@ -54,7 +56,18 @@ export class GenericService {
     private router: Router,
     private snackBar: MatSnackBar,
     private cookieService: CookieService
-  ) { }
+  ) {}
+
+  loginUser(credentials: {
+    username: string;
+    password: string;
+  }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/user/login`, credentials);
+  }
+
+  registerUser(userData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/user/register`, userData);
+  }
 
   getSiteKey(): string {
     return this.reCaptcha_key;
@@ -82,15 +95,25 @@ export class GenericService {
     return this.http.delete(`${this.baseUrl}${endPoint}?${queryString}`);
   }
 
-  updateByField(updateParams: any, conditionParams: any, apiObject: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${apiObject}/`, { update: updateParams, condition: conditionParams });
+  updateByField(
+    updateParams: any,
+    conditionParams: any,
+    apiObject: string
+  ): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${apiObject}/`, {
+      update: updateParams,
+      condition: conditionParams,
+    });
   }
 
   getByConditions(conditionParams: any, apiObject: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/${apiObject}/`, conditionParams);
   }
 
-  getByConditionsExternal(conditionParams: any, apiObject: string): Observable<any> {
+  getByConditionsExternal(
+    conditionParams: any,
+    apiObject: string
+  ): Observable<any> {
     return this.http.post(apiObject, conditionParams);
   }
 
@@ -115,7 +138,7 @@ export class GenericService {
     this.snackBar.open(message, action, {
       duration: 4000,
       verticalPosition: 'top',
-      panelClass: [panelClass]
+      panelClass: [panelClass],
     });
   }
 
@@ -181,19 +204,36 @@ export class GenericService {
       localStorage.clear();
       // Store session data
       const keysToStore = [
-        'session_id', 'session_name', 'token', 'user_details', 'user_role',
-        'unique_id', 'user_additional_roles', 'isInspectionActive',
-        'isJointInspectionActive', 'IsNodalOfficer', 'isAppellate',
-        'appellateLevel', 'isCustomerSupport', 'department_id',
-        'organization_status', 'partnership_status', 'society_status',
-        'companyType', 'partnership_frm_status', 'society_frm_status',
-        'uid', 'full_name', 'csc_operator_id'
+        'session_id',
+        'session_name',
+        'token',
+        'user_details',
+        'user_role',
+        'unique_id',
+        'user_additional_roles',
+        'isInspectionActive',
+        'isJointInspectionActive',
+        'IsNodalOfficer',
+        'isAppellate',
+        'appellateLevel',
+        'isCustomerSupport',
+        'department_id',
+        'organization_status',
+        'partnership_status',
+        'society_status',
+        'companyType',
+        'partnership_frm_status',
+        'society_frm_status',
+        'uid',
+        'full_name',
+        'csc_operator_id',
       ];
-      keysToStore.forEach(key => {
+      keysToStore.forEach((key) => {
         if (response['result'][key] || response[key]) {
-          const value = key === 'user_details' || key === 'user_additional_roles'
-            ? JSON.stringify(response['result'][key] || response[key])
-            : this.encryptData(response['result'][key] || response[key]);
+          const value =
+            key === 'user_details' || key === 'user_additional_roles'
+              ? JSON.stringify(response['result'][key] || response[key])
+              : this.encryptData(response['result'][key] || response[key]);
           localStorage.setItem(key, value);
         }
       });
@@ -223,13 +263,16 @@ export class GenericService {
         if (error.status === 403) {
           this.removeSessionData();
         }
-      }
+      },
     });
   }
 
   encryptData(data: any): string {
     try {
-      return CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptSecretKey).toString();
+      return CryptoJS.AES.encrypt(
+        JSON.stringify(data),
+        this.encryptSecretKey
+      ).toString();
     } catch (e) {
       console.error(e);
       return '';
@@ -262,9 +305,10 @@ export class GenericService {
       if (container.controls.hasOwnProperty(controlKey)) {
         const control = container.get(controlKey);
         if (control?.errors) {
-          errorCount += control instanceof FormArray
-            ? Object.keys(control.errors).length
-            : 1;
+          errorCount +=
+            control instanceof FormArray
+              ? Object.keys(control.errors).length
+              : 1;
         }
       }
     }
@@ -274,7 +318,7 @@ export class GenericService {
   getTotalErrorCount(formToInvestigate: FormGroup | FormArray): number {
     let errorCount = 0;
     const recursiveFunc = (form: FormGroup | FormArray) => {
-      Object.keys(form.controls).forEach(field => {
+      Object.keys(form.controls).forEach((field) => {
         const control = form.get(field);
         if (control?.invalid) {
           errorCount += Object.keys(control.errors || {}).length;
@@ -288,10 +332,12 @@ export class GenericService {
     return errorCount;
   }
 
-  findInvalidControlsRecursive(formToInvestigate: FormGroup | FormArray): string[] {
+  findInvalidControlsRecursive(
+    formToInvestigate: FormGroup | FormArray
+  ): string[] {
     const invalidControls: string[] = [];
     const recursiveFunc = (form: FormGroup | FormArray) => {
-      Object.keys(form.controls).forEach(field => {
+      Object.keys(form.controls).forEach((field) => {
         const control = form.get(field);
         if (control?.invalid) {
           if (control instanceof FormGroup || control instanceof FormArray) {
@@ -311,7 +357,9 @@ export class GenericService {
   }
 
   getLoggedInUserRoleText(): string {
-    return (localStorage.getItem('user_role') || '').replace('_', ' ').toUpperCase();
+    return (localStorage.getItem('user_role') || '')
+      .replace('_', ' ')
+      .toUpperCase();
   }
 
   getLoggedInUserUniqueId(): string | null {
@@ -319,17 +367,23 @@ export class GenericService {
   }
 
   getLoggedInUserName(): string {
-    const userDetails = JSON.parse(localStorage.getItem('user_details') || '{}');
+    const userDetails = JSON.parse(
+      localStorage.getItem('user_details') || '{}'
+    );
     return userDetails.user_name || '';
   }
 
   getLoggedInName(): string {
-    const userDetails = JSON.parse(localStorage.getItem('user_details') || '{}');
+    const userDetails = JSON.parse(
+      localStorage.getItem('user_details') || '{}'
+    );
     return userDetails.full_name || '';
   }
 
   getLoggedInUserId(): string {
-    const userDetails = JSON.parse(localStorage.getItem('user_details') || '{}');
+    const userDetails = JSON.parse(
+      localStorage.getItem('user_details') || '{}'
+    );
     return userDetails.uid || '';
   }
 
@@ -345,40 +399,56 @@ export class GenericService {
     });
   }
 
-  getElementPositionAndScroll(id: string = '', navigateRoute: string = '/page/home'): void {
+  getElementPositionAndScroll(
+    id: string = '',
+    navigateRoute: string = '/page/home'
+  ): void {
     const testDiv = document.getElementById(id);
     if (testDiv) {
       window.scrollTo({
         top: testDiv.offsetTop,
         left: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     } else {
       this.router.navigate([navigateRoute]);
-      setTimeout(() => this.getElementPositionAndScroll(id, navigateRoute), 500);
+      setTimeout(
+        () => this.getElementPositionAndScroll(id, navigateRoute),
+        500
+      );
     }
   }
 
-  getSelectValue(id: string | number, list: any[], key: string = 'name', idKey: string = 'id'): string {
+  getSelectValue(
+    id: string | number,
+    list: any[],
+    key: string = 'name',
+    idKey: string = 'id'
+  ): string {
     if (id && list.length > 0) {
-      const data = list.find(item => item[idKey] == id);
+      const data = list.find((item) => item[idKey] == id);
       return data ? data[key] : '';
     }
     return '';
   }
 
-  getRadioValue(id: string | number, list: any[], key: string = 'name'): string {
+  getRadioValue(
+    id: string | number,
+    list: any[],
+    key: string = 'name'
+  ): string {
     if (id && list.length > 0) {
-      const data = list.find(item => item.value == id);
+      const data = list.find((item) => item.value == id);
       return data ? data[key] : '';
     }
     return '';
   }
 
   goBackToList(): void {
-    const route = this.getLoggedInUserRole() === 'industrial'
-      ? '/manufacturing-process/combined-list'
-      : '/manufacturing-process/combined-dept-list';
+    const route =
+      this.getLoggedInUserRole() === 'industrial'
+        ? '/manufacturing-process/combined-list'
+        : '/manufacturing-process/combined-dept-list';
     this.router.navigate([route]);
   }
 
@@ -386,18 +456,23 @@ export class GenericService {
     const data = { noc_id: noc_details_id };
     this.getByConditions(data, 'api/fetch-noc-status').subscribe({
       next: (res) => {
-        if (res['status_code'] === 1 && !['draft', 'clarification_required', 'approved'].includes(res['result']['noc_status_key'])) {
+        if (
+          res['status_code'] === 1 &&
+          !['draft', 'clarification_required', 'approved'].includes(
+            res['result']['noc_status_key']
+          )
+        ) {
           this.router.navigate(['/dashboard/home']);
           Swal.fire({
             text: 'You are not authorized to access this page.',
-            confirmButtonColor: '#04578D'
+            confirmButtonColor: '#04578D',
           });
         }
       },
       error: (error) => {
         console.error(error);
         this.removeSessionData();
-      }
+      },
     });
   }
 
@@ -408,7 +483,10 @@ export class GenericService {
   checkFormGroupPropsInvalid(formGroup: FormGroup): void {
     for (const key in formGroup.controls) {
       if (formGroup.controls[key].invalid) {
-        console.log(`'${key}' is invalid with errors:`, formGroup.controls[key].errors);
+        console.log(
+          `'${key}' is invalid with errors:`,
+          formGroup.controls[key].errors
+        );
       }
     }
   }

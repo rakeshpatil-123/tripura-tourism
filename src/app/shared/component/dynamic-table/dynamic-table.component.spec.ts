@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PrimeDropDownComponent } from './prime-drop-down.component';
+import { DynamicTableComponent } from './dynamic-table.component';
 
-describe('PrimeDropDownComponent', () => {
-  let component: PrimeDropDownComponent;
-  let fixture: ComponentFixture<PrimeDropDownComponent>;
+describe('DynamicTableComponent', () => {
+  let component: DynamicTableComponent;
+  let fixture: ComponentFixture<DynamicTableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PrimeDropDownComponent]
+      imports: [DynamicTableComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PrimeDropDownComponent);
+    fixture = TestBed.createComponent(DynamicTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

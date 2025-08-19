@@ -1,1102 +1,440 @@
-<div class="management-container">
-  <form
-    [formGroup]="managementForm"
-    (ngSubmit)="onSubmit()"
-    class="management-form"
-  >
-    <!-- Header -->
-    <mat-toolbar class="form-header">
-      <mat-icon class="header-icon">business</mat-icon>
-      <span class="header-title">Management Details</span>
-      <span class="spacer"></span>
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="managementForm.invalid"
-      >
-        <mat-icon>save</mat-icon>
-        Save Details
-      </button>
-      <button
-        mat-stroked-button
-        type="button"
-        (click)="resetForm()"
-        class="ml-2"
-      >
-        <mat-icon>refresh</mat-icon>
-        Reset
-      </button>
-    </mat-toolbar>
+<form [formGroup]="form" novalidate>
 
-    <mat-stepper #stepper linear="false" class="form-stepper">
-      <!-- Step 1: Owner Details -->
-      <mat-step
-        label="Owner Details"
-        [completed]="managementForm.get('ownerDetails')?.valid"
-      >
-        <mat-card class="section-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon class="section-icon">person</mat-icon>
-              Owner Details
-            </mat-card-title>
-            <mat-card-subtitle>Primary owner's information</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div formGroupName="ownerDetails" class="form-grid">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Name *</mat-label>
-                <input
-                  matInput
-                  formControlName="name"
-                  placeholder="Enter full name"
-                />
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.name')
-                      ?.hasError('required')
-                  "
-                >
-                  Name is required
-                </mat-error>
-              </mat-form-field>
+  <!-- Owner Details -->
+  <div class="mt-2">
+    <span class="heder-color">Owner Details</span>
+  </div>
 
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Residential Address *</mat-label>
-                <textarea
-                  matInput
-                  formControlName="residentialAddress"
-                  rows="3"
-                  placeholder="Enter complete residential address"
-                ></textarea>
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.residentialAddress')
-                      ?.hasError('required')
-                  "
-                >
-                  Residential address is required
-                </mat-error>
-              </mat-form-field>
+  <div class="row no-padding-first-last">
+    <!-- Name, Father's Name, PIN -->
+    <div class="col-md-4">
+      <app-ilogi-input
+        fieldId="name"
+        fieldLabel="Name"
+        [mandatory]="true"
+        [formControlName]="'name'"
+        placeholder="Enter"
+        maxlength="255"
+      ></app-ilogi-input>
 
-              <mat-form-field appearance="outline">
-                <mat-label>Father's Name *</mat-label>
-                <input
-                  matInput
-                  formControlName="fatherName"
-                  placeholder="Enter father's name"
-                />
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.fatherName')
-                      ?.hasError('required')
-                  "
-                >
-                  Father's name is required
-                </mat-error>
-              </mat-form-field>
+      <app-ilogi-input
+        fieldId="fatherName"
+        fieldLabel="Father's Name"
+        [mandatory]="true"
+        [formControlName]="'fatherName'"
+        placeholder="Enter"
+        maxlength="255"
+      ></app-ilogi-input>
 
-              <mat-form-field appearance="outline">
-                <mat-label>Police Station *</mat-label>
-                <input
-                  matInput
-                  formControlName="policeStation"
-                  placeholder="Enter police station"
-                />
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.policeStation')
-                      ?.hasError('required')
-                  "
-                >
-                  Police station is required
-                </mat-error>
-              </mat-form-field>
+      <app-ilogi-input
+        fieldId="pin"
+        fieldLabel="PIN"
+        [mandatory]="true"
+        [formControlName]="'pin'"
+        placeholder="Enter"
+        maxlength="6"
+      ></app-ilogi-input>
 
-              <div class="file-upload-section">
-                <mat-label class="file-label">Photograph</mat-label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  (change)="
-                    onFileSelected($event, 'photograph', 'ownerDetails')
-                  "
-                  class="file-input"
-                  id="owner-photo"
-                />
-                <label
-                  for="owner-photo"
-                  class="file-upload-button mat-raised-button"
-                >
-                  <mat-icon>cloud_upload</mat-icon>
-                  Choose Photo
-                </label>
-              </div>
+      <app-ilogi-input
+        fieldId="aadharNo"
+        fieldLabel="Aadhar No"
+        [formControlName]="'aadharNo'"
+        placeholder="Enter"
+        maxlength="12"
+      ></app-ilogi-input>
+    </div>
 
-              <mat-form-field appearance="outline">
-                <mat-label>PIN *</mat-label>
-                <input
-                  matInput
-                  formControlName="pin"
-                  placeholder="Enter 6-digit PIN"
-                />
-                <mat-error>{{
-                  getErrorMessage("pin", "ownerDetails")
-                }}</mat-error>
-              </mat-form-field>
+    <!-- Residential Address, Police Station, Mobile -->
+    <div class="col-md-4">
+      <app-ilogi-input
+        type="textarea"
+        fieldId="residentialAddress"
+        fieldLabel="Residential Address"
+        [mandatory]="true"
+        [formControlName]="'residentialAddress'"
+        placeholder="Enter"
+        maxlength="255"
+        [rows]="4"
+      ></app-ilogi-input>
 
-              <mat-form-field appearance="outline">
-                <mat-label>Aadhar No</mat-label>
-                <input
-                  matInput
-                  formControlName="aadharNo"
-                  placeholder="Enter 12-digit Aadhar number"
-                />
-                <mat-error>{{
-                  getErrorMessage("aadharNo", "ownerDetails")
-                }}</mat-error>
-              </mat-form-field>
+      <app-ilogi-input
+        fieldId="policeStation"
+        fieldLabel="Police Station"
+        [mandatory]="true"
+        [formControlName]="'policeStation'"
+        placeholder="Enter"
+        maxlength="255"
+      ></app-ilogi-input>
 
-              <mat-form-field appearance="outline">
-                <mat-label>Mobile *</mat-label>
-                <input
-                  matInput
-                  formControlName="mobile"
-                  placeholder="Enter 10-digit mobile number"
-                />
-                <mat-error>{{
-                  getErrorMessage("mobile", "ownerDetails")
-                }}</mat-error>
-              </mat-form-field>
+      <app-ilogi-input
+        fieldId="mobile"
+        fieldLabel="Mobile"
+        [mandatory]="true"
+        [formControlName]="'mobile'"
+        placeholder="Enter"
+        maxlength="10"
+      ></app-ilogi-input>
 
-              <mat-form-field appearance="outline">
-                <mat-label>Status of Person *</mat-label>
-                <mat-select formControlName="statusOfPerson">
-                  <mat-option
-                    *ngFor="let status of statusPersonOptions"
-                    [value]="status"
-                  >
-                    {{ status }}
-                  </mat-option>
-                </mat-select>
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.statusOfPerson')
-                      ?.hasError('required')
-                  "
-                >
-                  Status is required
-                </mat-error>
-              </mat-form-field>
+      <app-ilogi-input
+        fieldId="alternateMobileNo"
+        fieldLabel="Alternate Mobile No"
+        [formControlName]="'alternateMobileNo'"
+        placeholder="Enter"
+        maxlength="10"
+      ></app-ilogi-input>
+    </div>
 
-              <mat-form-field appearance="outline">
-                <mat-label>Alternate Mobile No</mat-label>
-                <input
-                  matInput
-                  formControlName="alternateMobile"
-                  placeholder="Enter alternate mobile number"
-                />
-                <mat-error>{{
-                  getErrorMessage("alternateMobile", "ownerDetails")
-                }}</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Email *</mat-label>
-                <input
-                  matInput
-                  formControlName="email"
-                  type="email"
-                  placeholder="Enter email address"
-                />
-                <mat-error>{{
-                  getErrorMessage("email", "ownerDetails")
-                }}</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Date of Birth *</mat-label>
-                <input
-                  matInput
-                  [matDatepicker]="ownerDobPicker"
-                  formControlName="dateOfBirth"
-                />
-                <mat-datepicker-toggle
-                  matIconSuffix
-                  [for]="ownerDobPicker"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #ownerDobPicker></mat-datepicker>
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.dateOfBirth')
-                      ?.hasError('required')
-                  "
-                >
-                  Date of birth is required
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Women Entrepreneur *</mat-label>
-                <mat-select formControlName="womenEntrepreneur">
-                  <mat-option
-                    *ngFor="let option of yesNoOptions"
-                    [value]="option"
-                  >
-                    {{ option }}
-                  </mat-option>
-                </mat-select>
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.womenEntrepreneur')
-                      ?.hasError('required')
-                  "
-                >
-                  This field is required
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Social Status</mat-label>
-                <mat-select formControlName="socialStatus">
-                  <mat-option
-                    *ngFor="let status of socialStatusOptions"
-                    [value]="status"
-                  >
-                    {{ status }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Minority *</mat-label>
-                <mat-select formControlName="minority">
-                  <mat-option
-                    *ngFor="let option of yesNoOptions"
-                    [value]="option"
-                  >
-                    {{ option }}
-                  </mat-option>
-                </mat-select>
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.minority')
-                      ?.hasError('required')
-                  "
-                >
-                  This field is required
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Differently Abled *</mat-label>
-                <mat-select formControlName="differentlyAbled">
-                  <mat-option
-                    *ngFor="let option of yesNoOptions"
-                    [value]="option"
-                  >
-                    {{ option }}
-                  </mat-option>
-                </mat-select>
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('ownerDetails.differentlyAbled')
-                      ?.hasError('required')
-                  "
-                >
-                  This field is required
-                </mat-error>
-              </mat-form-field>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <div class="step-actions">
-          <button mat-button matStepperNext type="button">Next</button>
+    <!-- Photo Upload -->
+    <div class="col-md-4">
+      <div class="form-group form-group-margin">
+        <label for="employerPhoto">Photograph</label>
+        <div class="d-flex align-items-center mb-1">
+          <img
+            *ngIf="form.get('employerPhoto')?.value"
+            [src]="getImageUrl(form.get('employerPhoto')?.value)"
+            alt="Owner Photo"
+            class="rounded employer-photo"
+            style="width: 100px; height: 128px; object-fit: cover;"
+          />
+          <img
+            *ngIf="!form.get('employerPhoto')?.value"
+            src="/assets/img/profile-picture.jpg"
+            alt="Default Photo"
+            class="rounded employer-photo"
+            style="width: 100px; height: 128px; object-fit: cover;"
+          />
         </div>
-      </mat-step>
 
-      <!-- Step 2: Manager Details -->
-      <mat-step label="Manager Details">
-        <mat-card class="section-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon class="section-icon">supervisor_account</mat-icon>
-              Manager Details
-            </mat-card-title>
-            <mat-card-subtitle
-              >Manager's information (optional)</mat-card-subtitle
-            >
-          </mat-card-header>
-          <mat-card-content>
-            <div formGroupName="managerDetails" class="form-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Name</mat-label>
-                <input
-                  matInput
-                  formControlName="name"
-                  placeholder="Enter manager's name"
-                />
-              </mat-form-field>
+        <app-ilogi-file-upload
+          [formControlName]="'employerPhoto'"
+          accept="image/png,image/jpg,image/jpeg"
+          label="Upload Photo"
+          (fileSelected)="onPhotoSelected($event)"
+        ></app-ilogi-file-upload>
 
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Residential Address</mat-label>
-                <textarea
-                  matInput
-                  formControlName="residentialAddress"
-                  rows="3"
-                  placeholder="Enter residential address"
-                ></textarea>
-              </mat-form-field>
+        <button
+          *ngIf="form.get('employerPhoto')?.value"
+          type="button"
+          class="btn-remove-attach browse-btn ml-2 pl-3 pr-3 add-new-btn"
+          (click)="removeFile('employerPhoto')"
+        >
+          Remove
+        </button>
 
-              <mat-form-field appearance="outline">
-                <mat-label>Father's Name</mat-label>
-                <input
-                  matInput
-                  formControlName="fatherName"
-                  placeholder="Enter father's name"
-                />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>P.S. (Police Station)</mat-label>
-                <input
-                  matInput
-                  formControlName="policeStation"
-                  placeholder="Enter police station"
-                />
-              </mat-form-field>
-
-              <div class="file-upload-section">
-                <mat-label class="file-label">Photograph</mat-label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  (change)="
-                    onFileSelected($event, 'photograph', 'managerDetails')
-                  "
-                  class="file-input"
-                  id="manager-photo"
-                />
-                <label
-                  for="manager-photo"
-                  class="file-upload-button mat-raised-button"
-                >
-                  <mat-icon>cloud_upload</mat-icon>
-                  Choose Photo
-                </label>
-              </div>
-
-              <mat-form-field appearance="outline">
-                <mat-label>PIN</mat-label>
-                <input
-                  matInput
-                  formControlName="pin"
-                  placeholder="Enter 6-digit PIN"
-                />
-                <mat-error>{{
-                  getErrorMessage("pin", "managerDetails")
-                }}</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Date of Birth</mat-label>
-                <input
-                  matInput
-                  [matDatepicker]="managerDobPicker"
-                  formControlName="dateOfBirth"
-                />
-                <mat-datepicker-toggle
-                  matIconSuffix
-                  [for]="managerDobPicker"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #managerDobPicker></mat-datepicker>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Mobile</mat-label>
-                <input
-                  matInput
-                  formControlName="mobile"
-                  placeholder="Enter 10-digit mobile number"
-                />
-                <mat-error>{{
-                  getErrorMessage("mobile", "managerDetails")
-                }}</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Aadhar No</mat-label>
-                <input
-                  matInput
-                  formControlName="aadharNo"
-                  placeholder="Enter 12-digit Aadhar number"
-                />
-                <mat-error>{{
-                  getErrorMessage("aadharNo", "managerDetails")
-                }}</mat-error>
-              </mat-form-field>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Back</button>
-          <button mat-button matStepperNext type="button">Next</button>
+        <div class="sub-field-text">
+          [Photograph should be in colour, against a light-coloured, preferably white, background. 35mm X 45mm or 100 x 128 pixels (preferred). Size of file should be between 10kb - 1mb.]
         </div>
-      </mat-step>
+      </div>
+    </div>
+  </div>
 
-      <!-- Step 3: Signature Uploads -->
-      <mat-step label="Signature Uploads">
-        <mat-card class="section-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon class="section-icon">draw</mat-icon>
-              Signature Uploads
-            </mat-card-title>
-            <mat-card-subtitle>Upload required signatures</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div formGroupName="signatures" class="signature-grid">
-              <div class="file-upload-section signature-upload">
-                <mat-label class="file-label required-label"
-                  >Signature Authorization of Owner *</mat-label
-                >
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  (change)="
-                    onFileSelected($event, 'ownerSignature', 'signatures')
-                  "
-                  class="file-input"
-                  id="owner-signature"
-                />
-                <label
-                  for="owner-signature"
-                  class="file-upload-button mat-raised-button"
-                >
-                  <mat-icon>cloud_upload</mat-icon>
-                  Upload Signature
-                </label>
-                <div class="file-hint">Accepted formats: PDF, JPG, PNG</div>
-                <mat-error
-                  *ngIf="
-                    managementForm
-                      .get('signatures.ownerSignature')
-                      ?.hasError('required') &&
-                    managementForm.get('signatures.ownerSignature')?.touched
-                  "
-                >
-                  Owner signature is required
-                </mat-error>
-              </div>
+  <!-- DOB, Status, Social Status, Minority, Differently Abled -->
+  <div class="row top-space no-padding-first-last">
+    <div class="col-md-4">
+      <app-ilogi-input-date
+        fieldId="dob"
+        fieldLabel="Date of Birth"
+        [formControlName]="'dob'"
+        [mandatory]="true"
+        placeholder="DD/MM/YYYY"
+      ></app-ilogi-input-date>
 
-              <div class="file-upload-section signature-upload">
-                <mat-label class="file-label"
-                  >Factory Occupier's Signature</mat-label
-                >
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  (change)="
-                    onFileSelected($event, 'occupierSignature', 'signatures')
-                  "
-                  class="file-input"
-                  id="occupier-signature"
-                />
-                <label
-                  for="occupier-signature"
-                  class="file-upload-button mat-raised-button"
-                >
-                  <mat-icon>cloud_upload</mat-icon>
-                  Upload Signature
-                </label>
-                <div class="file-hint">Accepted formats: PDF, JPG, PNG</div>
-              </div>
+      <app-ilogi-select
+        fieldId="statusOfPerson"
+        fieldLabel="Status of Person"
+        [formControlName]="'statusOfPerson'"
+        [selectOptions]="statusOfPersonOptions"
+        placeholder="Select"
+      ></app-ilogi-select>
+    </div>
 
-              <div class="file-upload-section signature-upload">
-                <mat-label class="file-label"
-                  >Factory Manager's Signature</mat-label
-                >
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  (change)="
-                    onFileSelected($event, 'managerSignature', 'signatures')
-                  "
-                  class="file-input"
-                  id="manager-signature"
-                />
-                <label
-                  for="manager-signature"
-                  class="file-upload-button mat-raised-button"
-                >
-                  <mat-icon>cloud_upload</mat-icon>
-                  Upload Signature
-                </label>
-                <div class="file-hint">Accepted formats: PDF, JPG, PNG</div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+    <div class="col-md-4">
+      <app-ilogi-select
+        fieldId="socialStatus"
+        fieldLabel="Social Status"
+        [formControlName]="'socialStatus'"
+        [selectOptions]="socialStatusOptions"
+        placeholder="Select"
+      ></app-ilogi-select>
 
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Back</button>
-          <button mat-button matStepperNext type="button">Next</button>
+      <app-ilogi-select
+        fieldId="minority"
+        fieldLabel="Minority"
+        [formControlName]="'minority'"
+        [selectOptions]="yesNoOptions"
+      ></app-ilogi-select>
+
+      <app-ilogi-select
+        fieldId="differentlyAbled"
+        fieldLabel="Differently Abled"
+        [formControlName]="'differentlyAbled'"
+        [selectOptions]="yesNoOptions"
+      ></app-ilogi-select>
+    </div>
+
+    <div class="col-md-4"></div>
+  </div>
+
+  <hr>
+
+  <!-- Manager Details -->
+  <div class="mt-4">
+    <span class="heder-color">Manager Details</span>
+  </div>
+
+  <div class="row top-space no-padding-first-last">
+    <div class="col-md-4">
+      <app-ilogi-input
+        fieldId="managerName"
+        fieldLabel="Name"
+        [formControlName]="'managerName'"
+        placeholder="Enter"
+        maxlength="255"
+      ></app-ilogi-input>
+
+      <app-ilogi-input
+        fieldId="managerFatherName"
+        fieldLabel="Father's Name"
+        [formControlName]="'managerFatherName'"
+        placeholder="Enter"
+        maxlength="255"
+      ></app-ilogi-input>
+
+      <app-ilogi-input
+        fieldId="managerPin"
+        fieldLabel="PIN"
+        [formControlName]="'managerPin'"
+        placeholder="Enter"
+        maxlength="6"
+      ></app-ilogi-input>
+
+      <app-ilogi-input
+        fieldId="managerAadharNo"
+        fieldLabel="Aadhar No"
+        [formControlName]="'managerAadharNo'"
+        placeholder="Enter"
+        maxlength="12"
+      ></app-ilogi-input>
+    </div>
+
+    <div class="col-md-4">
+      <app-ilogi-input
+        fieldId="managerResidentialAddress"
+        fieldLabel="Residential Address"
+        [formControlName]="'managerResidentialAddress'"
+        placeholder="Enter"
+        maxlength="255"
+        [rows]="4"
+      ></app-ilogi-input>
+
+      <app-ilogi-input
+        fieldId="managerPoliceStation"
+        fieldLabel="P.S."
+        [formControlName]="'managerPoliceStation'"
+        placeholder="Enter"
+        maxlength="255"
+      ></app-ilogi-input>
+
+      <app-ilogi-input-date
+        fieldId="managerDOB"
+        fieldLabel="Date of Birth"
+        [formControlName]="'managerDOB'"
+        placeholder="DD/MM/YYYY"
+      ></app-ilogi-input-date>
+    </div>
+
+    <div class="col-md-4">
+      <div class="form-group form-group-margin">
+        <label for="managerEmployerPhoto">Manager Photo</label>
+        <div class="d-flex align-items-center mb-1">
+          <img
+            *ngIf="form.get('managerEmployerPhoto')?.value"
+            [src]="getImageUrl(form.get('managerEmployerPhoto')?.value)"
+            alt="Manager Photo"
+            class="rounded employer-photo"
+            style="width: 100px; height: 128px; object-fit: cover;"
+          />
+          <img
+            *ngIf="!form.get('managerEmployerPhoto')?.value"
+            src="/assets/img/profile-picture.jpg"
+            alt="Default Photo"
+            class="rounded employer-photo"
+            style="width: 100px; height: 128px; object-fit: cover;"
+          />
         </div>
-      </mat-step>
 
-      <!-- Step 4: Partner Details -->
-      <mat-step label="Partner Details">
-        <mat-card class="section-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon class="section-icon">group</mat-icon>
-              Partner Details / Share Holders
-            </mat-card-title>
-            <mat-card-subtitle
-              >Add multiple partners or shareholders</mat-card-subtitle
-            >
-          </mat-card-header>
-          <mat-card-content>
-            <div class="table-actions">
-              <button
-                mat-raised-button
-                color="primary"
-                type="button"
-                (click)="addPartner()"
-              >
-                <mat-icon>add</mat-icon>
-                Add Partner
-              </button>
-            </div>
+        <app-ilogi-file-upload
+          [formControlName]="'managerEmployerPhoto'"
+          accept="image/png,image/jpg,image/jpeg"
+          label="Upload Photo"
+          (fileSelected)="onManagerPhotoSelected($event)"
+        ></app-ilogi-file-upload>
 
-            <div *ngIf="partnerDetailsArray.length > 0" class="table-container">
-              <table
-                mat-table
-                [dataSource]="partnerDetailsArray.controls"
-                class="full-width-table"
-              >
-                <ng-container matColumnDef="name">
-                  <th mat-header-cell *matHeaderCellDef>Name *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('name')"
-                        placeholder="Name"
-                      />
-                      <mat-error
-                        *ngIf="element.get('name')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
+        <button
+          *ngIf="form.get('managerEmployerPhoto')?.value"
+          type="button"
+          class="browse-btn ml-2 pl-3 pr-3 add-new-btn"
+          (click)="removeFile('managerEmployerPhoto')"
+        >
+          Remove
+        </button>
 
-                <ng-container matColumnDef="fatherName">
-                  <th mat-header-cell *matHeaderCellDef>Father's Name *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('fatherName')"
-                        placeholder="Father's Name"
-                      />
-                      <mat-error
-                        *ngIf="element.get('fatherName')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="age">
-                  <th mat-header-cell *matHeaderCellDef>Age</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('age')"
-                        type="number"
-                        placeholder="Age"
-                      />
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="sex">
-                  <th mat-header-cell *matHeaderCellDef>Sex</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <mat-select [formControl]="element.get('sex')">
-                        <mat-option
-                          *ngFor="let sex of sexOptions"
-                          [value]="sex"
-                          >{{ sex }}</mat-option
-                        >
-                      </mat-select>
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="socialStatus">
-                  <th mat-header-cell *matHeaderCellDef>Social Status</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <mat-select [formControl]="element.get('socialStatus')">
-                        <mat-option
-                          *ngFor="let status of socialStatusOptions"
-                          [value]="status"
-                          >{{ status }}</mat-option
-                        >
-                      </mat-select>
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="profession">
-                  <th mat-header-cell *matHeaderCellDef>Profession</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('profession')"
-                        placeholder="Profession"
-                      />
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="permanentAddress">
-                  <th mat-header-cell *matHeaderCellDef>Permanent Address</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <textarea
-                        matInput
-                        [formControl]="element.get('permanentAddress')"
-                        rows="2"
-                      ></textarea>
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="mobileNo">
-                  <th mat-header-cell *matHeaderCellDef>Mobile No *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('mobileNo')"
-                        placeholder="Mobile"
-                      />
-                      <mat-error
-                        *ngIf="element.get('mobileNo')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                      <mat-error
-                        *ngIf="element.get('mobileNo')?.hasError('pattern')"
-                        >Invalid mobile</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="dateOfBirth">
-                  <th mat-header-cell *matHeaderCellDef>Date of Birth *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [matDatepicker]="partnerDobPicker"
-                        [formControl]="element.get('dateOfBirth')"
-                      />
-                      <mat-datepicker-toggle
-                        matIconSuffix
-                        [for]="partnerDobPicker"
-                      ></mat-datepicker-toggle>
-                      <mat-datepicker #partnerDobPicker></mat-datepicker>
-                      <mat-error
-                        *ngIf="element.get('dateOfBirth')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="dateOfJoining">
-                  <th mat-header-cell *matHeaderCellDef>Date of Joining</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [matDatepicker]="partnerDojPicker"
-                        [formControl]="element.get('dateOfJoining')"
-                      />
-                      <mat-datepicker-toggle
-                        matIconSuffix
-                        [for]="partnerDojPicker"
-                      ></mat-datepicker-toggle>
-                      <mat-datepicker #partnerDojPicker></mat-datepicker>
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="idProof">
-                  <th mat-header-cell *matHeaderCellDef>ID Proof</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      (change)="
-                        onFileSelected($event, 'idProof', 'partnerDetails', i)
-                      "
-                      class="file-input"
-                      [id]="'partner-id-' + i"
-                    />
-                    <label
-                      [for]="'partner-id-' + i"
-                      class="file-upload-button-small mat-stroked-button"
-                    >
-                      <mat-icon>attach_file</mat-icon>
-                      Upload
-                    </label>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="signature">
-                  <th mat-header-cell *matHeaderCellDef>Signature</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      (change)="
-                        onFileSelected($event, 'signature', 'partnerDetails', i)
-                      "
-                      class="file-input"
-                      [id]="'partner-sign-' + i"
-                    />
-                    <label
-                      [for]="'partner-sign-' + i"
-                      class="file-upload-button-small mat-stroked-button"
-                    >
-                      <mat-icon>draw</mat-icon>
-                      Upload
-                    </label>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef>Actions</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <button
-                      mat-icon-button
-                      color="primary"
-                      (click)="editPartner(i)"
-                      matTooltip="Edit"
-                    >
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      color="warn"
-                      (click)="removePartner(i)"
-                      matTooltip="Remove"
-                    >
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="partnerColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: partnerColumns"></tr>
-              </table>
-            </div>
-
-            <div *ngIf="partnerDetailsArray.length === 0" class="empty-state">
-              <mat-icon class="empty-icon">group_add</mat-icon>
-              <p>No partners added yet</p>
-              <p class="empty-subtitle">Click "Add Partner" to get started</p>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Back</button>
-          <button mat-button matStepperNext type="button">Next</button>
+        <div class="sub-field-text">
+          [Photograph should be in colour, against a light-coloured, preferably white, background. 35mm X 45mm or 100 x 128 pixels (preferred). Size of file should be between 10kb - 1mb.]
         </div>
-      </mat-step>
+      </div>
+    </div>
+  </div>
 
-      <!-- Step 5: Board of Directors -->
-      <mat-step label="Board of Directors">
-        <mat-card class="section-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon class="section-icon">account_balance</mat-icon>
-              Board of Directors
-            </mat-card-title>
-            <mat-card-subtitle
-              >Add board of directors information</mat-card-subtitle
-            >
-          </mat-card-header>
-          <mat-card-content>
-            <div class="table-actions">
-              <button
-                mat-raised-button
-                color="primary"
-                type="button"
-                (click)="addBoardDirector()"
-              >
-                <mat-icon>add</mat-icon>
-                Add Director
-              </button>
-            </div>
+  <!-- Mobile -->
+  <div class="row top-space no-padding-first-last">
+    <div class="col-md-4">
+      <app-ilogi-input
+        fieldId="managerMobile"
+        fieldLabel="Mobile"
+        [formControlName]="'managerMobile'"
+        placeholder="Enter"
+        maxlength="10"
+      ></app-ilogi-input>
+    </div>
+    <div class="col-md-4"></div>
+    <div class="col-md-4"></div>
+  </div>
 
-            <div *ngIf="boardDirectorsArray.length > 0" class="table-container">
-              <table
-                mat-table
-                [dataSource]="boardDirectorsArray.controls"
-                class="full-width-table"
-              >
-                <ng-container matColumnDef="name">
-                  <th mat-header-cell *matHeaderCellDef>Name *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('name')"
-                        placeholder="Director Name"
-                      />
-                      <mat-error
-                        *ngIf="element.get('name')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
+  <hr>
 
-                <ng-container matColumnDef="permanentAddress">
-                  <th mat-header-cell *matHeaderCellDef>Permanent Address</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <textarea
-                        matInput
-                        [formControl]="element.get('permanentAddress')"
-                        rows="2"
-                        placeholder="Permanent Address"
-                      ></textarea>
-                    </mat-form-field>
-                  </td>
-                </ng-container>
+  <!-- Signature Uploads -->
+  <div class="row top-space no-padding-first-last">
+    <div class="col-md-4">
+      <app-ilogi-file-upload
+        [formControlName]="'signedAuthorizationDocument'"
+        label="Signature Authorization of Owner"
+        accept="image/png,image/jpg,image/jpeg,application/pdf"
+      ></app-ilogi-file-upload>
+    </div>
+    <div class="col-md-4">
+      <app-ilogi-file-upload
+        [formControlName]="'signatureOfOccupierOfFactory'"
+        label="Factory Occupier's Signature"
+        accept="image/png,image/jpg,image/jpeg,application/pdf"
+      ></app-ilogi-file-upload>
+    </div>
+    <div class="col-md-4">
+      <app-ilogi-file-upload
+        [formControlName]="'signatureOfManagerOfFactory'"
+        label="Factory Manager's Signature"
+        accept="image/png,image/jpg,image/jpeg,application/pdf"
+      ></app-ilogi-file-upload>
+    </div>
+  </div>
 
-                <ng-container matColumnDef="mobileNo">
-                  <th mat-header-cell *matHeaderCellDef>Mobile No *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('mobileNo')"
-                        placeholder="Mobile Number"
-                      />
-                      <mat-error
-                        *ngIf="element.get('mobileNo')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                      <mat-error
-                        *ngIf="element.get('mobileNo')?.hasError('pattern')"
-                        >Invalid mobile</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
+  <hr>
 
-                <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef>Actions</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <button
-                      mat-icon-button
-                      color="primary"
-                      (click)="editBoardDirector(i)"
-                      matTooltip="Edit"
-                    >
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      color="warn"
-                      (click)="removeBoardDirector(i)"
-                      matTooltip="Remove"
-                    >
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
+  <!-- Partner Details Table -->
+  <div class="mt-4 mb-4">
+    <span class="heder-color">Partner Details / Share Holders / President / Secretary</span>
+  </div>
+  <div class="mb-5">
+    <div class="container large-container grid-container no-padding-first-last">
+      <table formArrayName="partnerDetails" class="table table-bordered grid-table">
+        <thead>
+          <tr>
+            <th>SL No</th>
+            <th>Name <span class="red-font">*</span></th>
+            <th>Father's Name <span class="red-font">*</span></th>
+            <th>Age</th>
+            <th>Sex</th>
+            <th>Social Status</th>
+            <th>Profession</th>
+            <th>Permanent Address</th>
+            <th>Mobile No <span class="red-font">*</span></th>
+            <th>Date of Birth <span class="red-font">*</span></th>
+            <th>Date of Joining</th>
+            <th>Upload ID Proof</th>
+            <th>Upload Signature</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="partnerDetails.length === 0">
+            <td colspan="14">No data exists!</td>
+          </tr>
+          <!-- Dynamic rows will be added here -->
+        </tbody>
+      </table>
+    </div>
+    <div class="pull-right mt-2 color-666666 clkable" (click)="addPartner()">
+      <i aria-hidden="true" class="fa fa-plus"></i>
+      <span class="font-weight-bold ml-2">ADD NEW</span>
+    </div>
+  </div>
 
-                <tr mat-header-row *matHeaderRowDef="boardColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: boardColumns"></tr>
-              </table>
-            </div>
+  <hr>
 
-            <div *ngIf="boardDirectorsArray.length === 0" class="empty-state">
-              <mat-icon class="empty-icon">account_balance</mat-icon>
-              <p>No directors added yet</p>
-              <p class="empty-subtitle">Click "Add Director" to get started</p>
-            </div>
-          </mat-card-content>
-        </mat-card>
+  <!-- Board of Directors -->
+  <div class="mt-4">
+    <span class="heder-color">Board of Directors</span>
+  </div>
+  <div class="mt-4 mb-5">
+    <div class="container large-container grid-container no-padding-first-last">
+      <table formArrayName="boardOfDirectors" class="table table-bordered grid-table">
+        <thead>
+          <tr>
+            <th>SL No</th>
+            <th>Name <span class="red-font">*</span></th>
+            <th>Permanent Address</th>
+            <th>Mobile No <span class="red-font">*</span></th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="boardOfDirectors.length === 0">
+            <td colspan="5">No data exists!</td>
+          </tr>
+          <!-- Dynamic rows -->
+        </tbody>
+      </table>
+    </div>
+    <div class="pull-right mt-2 color-666666 clkable" (click)="addDirector()">
+      <i aria-hidden="true" class="fa fa-plus"></i>
+      <span class="font-weight-bold ml-2">ADD NEW</span>
+    </div>
+  </div>
 
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Back</button>
-          <button mat-button matStepperNext type="button">Next</button>
-        </div>
-      </mat-step>
+  <hr>
 
-      <!-- Step 6: Chief Administrative Head -->
-      <mat-step label="Administrative Head">
-        <mat-card class="section-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon class="section-icon">admin_panel_settings</mat-icon>
-              Chief Administrative Head
-            </mat-card-title>
-            <mat-card-subtitle
-              >Add chief administrative head information</mat-card-subtitle
-            >
-          </mat-card-header>
-          <mat-card-content>
-            <div class="table-actions">
-              <button
-                mat-raised-button
-                color="primary"
-                type="button"
-                (click)="addChiefAdminHead()"
-              >
-                <mat-icon>add</mat-icon>
-                Add Admin Head
-              </button>
-            </div>
+  <!-- Chief Administrative Head -->
+  <div class="mt-4">
+    <span class="heder-color">Chief Administrative Head</span>
+  </div>
+  <div class="mt-4 mb-5">
+    <div class="container large-container grid-container no-padding-first-last">
+      <table formArrayName="chiefAdministrativeHead" class="table table-bordered grid-table">
+        <thead>
+          <tr>
+            <th>SL No</th>
+            <th>Name <span class="red-font">*</span></th>
+            <th>Permanent Address</th>
+            <th>Mobile No <span class="red-font">*</span></th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic rows -->
+        </tbody>
+      </table>
+    </div>
+    <div class="pull-right mt-2 color-666666 clkable" (click)="addAdminHead()">
+      <i aria-hidden="true" class="fa fa-plus"></i>
+      <span class="font-weight-bold ml-2">ADD NEW</span>
+    </div>
+  </div>
 
-            <div
-              *ngIf="chiefAdminHeadsArray.length > 0"
-              class="table-container"
-            >
-              <table
-                mat-table
-                [dataSource]="chiefAdminHeadsArray.controls"
-                class="full-width-table"
-              >
-                <ng-container matColumnDef="name">
-                  <th mat-header-cell *matHeaderCellDef>Name *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('name')"
-                        placeholder="Admin Head Name"
-                      />
-                      <mat-error
-                        *ngIf="element.get('name')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
+  <hr>
 
-                <ng-container matColumnDef="permanentAddress">
-                  <th mat-header-cell *matHeaderCellDef>Permanent Address</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <textarea
-                        matInput
-                        [formControl]="element.get('permanentAddress')"
-                        rows="2"
-                        placeholder="Permanent Address"
-                      ></textarea>
-                    </mat-form-field>
-                  </td>
-                </ng-container>
+</form>
 
-                <ng-container matColumnDef="mobileNo">
-                  <th mat-header-cell *matHeaderCellDef>Mobile No *</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <mat-form-field appearance="outline" class="table-field">
-                      <input
-                        matInput
-                        [formControl]="element.get('mobileNo')"
-                        placeholder="Mobile Number"
-                      />
-                      <mat-error
-                        *ngIf="element.get('mobileNo')?.hasError('required')"
-                        >Required</mat-error
-                      >
-                      <mat-error
-                        *ngIf="element.get('mobileNo')?.hasError('pattern')"
-                        >Invalid mobile</mat-error
-                      >
-                    </mat-form-field>
-                  </td>
-                </ng-container>
-
-                <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef>Actions</th>
-                  <td mat-cell *matCellDef="let element; let i = index">
-                    <button
-                      mat-icon-button
-                      color="primary"
-                      (click)="editChiefAdminHead(i)"
-                      matTooltip="Edit"
-                    >
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      color="warn"
-                      (click)="removeChiefAdminHead(i)"
-                      matTooltip="Remove"
-                    >
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="adminColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: adminColumns"></tr>
-              </table>
-            </div>
-
-            <div *ngIf="chiefAdminHeadsArray.length === 0" class="empty-state">
-              <mat-icon class="empty-icon">admin_panel_settings</mat-icon>
-              <p>No administrative heads added yet</p>
-              <p class="empty-subtitle">
-                Click "Add Admin Head" to get started
-              </p>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Back</button>
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="managementForm.invalid"
-          >
-            <mat-icon>save</mat-icon>
-            Submit Form
-          </button>
-        </div>
-      </mat-step>
-    </mat-stepper>
-  </form>
-</div>
+  <div class="form-actions">
+    <button type="button" class="btn btn-primary">Save As Draft</button>
+    <button type="submit" class="btn btn-success">Save</button>
+  </div>

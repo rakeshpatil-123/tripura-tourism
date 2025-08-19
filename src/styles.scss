@@ -376,7 +376,7 @@ body.sidebar-open {
 
 .swgt-container{
   width: 100%;
-  margin: 28px 12px;
+  margin: 42px 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -393,11 +393,17 @@ body.sidebar-open {
 }
 
 .page-head{
-  font-size: 1.2rem;
-  font-weight: 600;
+  width: fit-content;
+  // padding: 8px 12px;
+  color: #2e2e2e;
+  font-size: 1rem;
+  font-weight: 800;
+  // background-color: #ff9100;
+  border-radius: 3px;
 }
 .warn{
   color: var(--color-poppy-red, #dc3545);
   font-weight: 500;
   font-size: 0.75rem;
 }
+

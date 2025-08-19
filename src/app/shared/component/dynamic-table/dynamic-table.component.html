@@ -1,0 +1,27 @@
+<table class="table table-bordered table-striped">
+  <thead class="table-primary">
+    <tr>
+      <th>{{ title1 }}</th>
+      <th>{{ title2 }}</th>
+    </tr>
+  </thead>
+  <tbody [formGroup]="formGroup">
+    <tr *ngFor="let row of rows">
+      <td [ngClass]="{'fw-bold': row.readonly}">{{ row.label }}</td>
+      <td>
+        <input
+          *ngIf="!row.readonly"
+          [type]="row.type || 'text'"
+          class="form-control"
+          [formControlName]="row.controlName"
+        />
+        <input
+          *ngIf="row.readonly"
+          class="form-control"
+          [formControlName]="row.controlName"
+          readonly
+        />
+      </td>
+    </tr>
+  </tbody>
+</table>

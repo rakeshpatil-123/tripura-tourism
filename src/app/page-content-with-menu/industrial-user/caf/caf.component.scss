@@ -1,15 +1,30 @@
 .main-form-card {
-  margin: 20px;
+  // margin: 20px;
   padding: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   background-color: #fff;
   overflow: hidden;
 }
+::ng-deep {
+  .mdc-tab.mdc-tab--active {
+    background-color: #2c82aa !important;
+    color: white !important;
 
-.main-tab-group {
+    .mdc-tab__text-label {
+      color: white !important;
+    }
+
+    .mdc-tab-indicator__content--underline {
+      border-color: orange !important;
+    }
+  }
+
+  // Optional: Style inactive tab text
+  .mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label {
+    color: rgba(0, 0, 0, 0.87);
+  }
 }
-
 .tab-content-wrapper {
   padding: 20px;
   min-height: 500px;
@@ -17,8 +32,7 @@
   background-color: #fafafa;
 }
 
-::ng-deep .mat-mdc-tab-labels {
-}
+
 
 @media (max-width: 768px) {
   .main-form-card {

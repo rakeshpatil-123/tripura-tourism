@@ -1,0 +1,49 @@
+:host {
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.form-group label,
+.heder-color,
+.download-btn,
+.button,
+.btn,
+table,
+.filename {
+  font-size: 0.85rem;
+}
+
+.form-group-margin {
+  margin-bottom: 0.5rem;
+}
+
+.table {
+  font-size: 0.85rem;
+  td, th {
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+.file-display {
+  padding: 6px 8px;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.filename {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+th{
+  background-color: #cfe2ff;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
