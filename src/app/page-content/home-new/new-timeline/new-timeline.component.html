@@ -1,0 +1,135 @@
+<section class="investment-process">
+    <div class="container">
+        <div class="header">
+            <h2>Business Cycle - Investment Process (8 Steps)</h2>
+            <p>Our comprehensive 8-step investment process ensures smooth, transparent, and efficient journey from initial inquiry to project commencement.</p>
+        </div>
+
+        <!-- Desktop Timeline -->
+        <div class="timeline">
+            <div class="progress-bar">
+                <div class="progress" [style.width]="progressWidth"></div>
+            </div>
+            <div class="timeline-grid">
+                <div *ngFor="let step of steps | slice:0:4; let i = index" class="timeline-item" [ngClass]="step.isActive ? 'active' : 'inactive'">
+                    <button (click)="selectStep(step, i)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="'lucide lucide-' + step.icon" [innerHTML]="step.iconSvgSafe"></svg>
+                    </button>
+                    <h3>{{ step.title }}</h3>
+                    <p>{{ step.days }}</p>
+                </div>
+            </div>
+            <div class="timeline-grid">
+                <div *ngFor="let step of steps | slice:4:8; let i = index" class="timeline-item" [ngClass]="step.isActive ? 'active' : 'inactive'">
+                    <button (click)="selectStep(step, i + 4)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="'lucide lucide-' + step.icon" [innerHTML]="step.iconSvgSafe"></svg>
+                    </button>
+                    <h3>{{ step.title }}</h3>
+                    <p>{{ step.days }}</p>
+                </div>
+            </div>
+
+            <!-- Details Card -->
+            <div class="details-card">
+                <div class="details-grid">
+                    <div>
+                        <div class="step-details">
+                            <div class="step-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="'lucide lucide-' + selectedStep.icon" [innerHTML]="selectedStep.iconSvgSafe"></svg>
+                            </div>
+                            <div class="step-content">
+                                <h3>Step {{ steps.indexOf(selectedStep) + 1 }}: {{ selectedStep.title }}</h3>
+                                <p>{{ selectedStep.description }}</p>
+                                <div class="tags">
+                                    <span class="tag tag-orange">{{ selectedStep.days }}</span>
+                                    <span class="tag tag-blue">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock" [innerHTML]="clockSvgSafe"></svg>
+                                        {{ selectedStep.duration }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="key-activities">
+                            <h4>Key Activities</h4>
+                            <ul>
+                                <li *ngFor="let activity of selectedStep.keyActivities">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle text-green-500" [innerHTML]="checkCircleSvgSafe"></svg>
+                                    {{ activity }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="required-docs bg-gray-50 rounded-xl p-6">
+                            <h4>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text mr-2 text-blue-600" [innerHTML]="selectedStep.iconSvgSafe"></svg>
+                                Required Documents
+                            </h4>
+                            <ul>
+                                <li *ngFor="let doc of selectedStep.requiredDocs">{{ doc }}</li>
+                            </ul>
+                        </div>
+                        <div class="support">
+                            <h4>Need Help?</h4>
+                            <p>Our dedicated support team is available to assist you through this step.</p>
+                            <button (click)="contactSupport()">Contact Support</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Steps -->
+        <div class="mobile-steps">
+            <div *ngFor="let step of steps; let i = index" class="mobile-step" [ngClass]="step.isActive ? 'active' : 'inactive'">
+                <button (click)="selectStep(step, i)">
+                    <div class="step-header">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="'lucide lucide-' + step.icon" [innerHTML]="step.iconSvgSafe"></svg>
+                        </div>
+                        <div>
+                            <h3>Step {{ i + 1 }}: {{ step.title }}</h3>
+                            <p>{{ step.description }}</p>
+                            <div class="tags">
+                                <span class="tag tag-orange">{{ step.days }}</span>
+                                <span class="tag tag-blue">{{ step.duration }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+                <div class="details" *ngIf="step.isActive">
+                    <div>
+                        <h4>Key Activities</h4>
+                        <ul>
+                            <li *ngFor="let activity of step.keyActivities">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle text-green-500" [innerHTML]="checkCircleSvgSafe"></svg>
+                                {{ activity }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="required-docs">
+                        <h4>Required Documents</h4>
+                        <ul>
+                            <li *ngFor="let doc of step.requiredDocs">{{ doc }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="cta">
+            <div class="cta-card">
+                <h3>Ready to Start Your Investment Journey?</h3>
+                <p>Experience the most efficient and transparent investment process in Northeast India. Our dedicated team will guide you through every step.</p>
+                <div class="cta-buttons">
+                    <button class="primary-btn" (click)="beginApplication()">
+                        <span>Begin Application</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right" [innerHTML]="arrowRightSvgSafe"></svg>
+                    </button>
+                    <button class="secondary-btn" (click)="downloadGuide()">Download Process Guide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

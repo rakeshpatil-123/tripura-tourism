@@ -1,0 +1,92 @@
+<div class="brand-header" (clickOutside)="onClickOutside()">
+  <!-- Left section with logo -->
+  <div class="logo-section">
+    <img src="assets/logo/SWAAGAT2.0LogoRecreated.png" alt="SWAGAT 2.0 Logo" class="logo">
+  </div>
+
+  <!-- Right section with buttons -->
+  <div class="action-section">
+    <!-- Search button -->
+    <button 
+      class="search-btn" 
+      aria-label="Search"
+      (click)="onSearch()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path [attr.d]="getIconPath('search')"></path>
+      </svg>
+    </button>
+
+    <!-- Dropdown buttons -->
+    <div 
+      *ngFor="let button of dropdownButtons; let i = index" 
+      class="dropdown-container"
+      [class.open]="button.isOpen"
+    >
+      <button
+        [attr.aria-label]="button.ariaLabel"
+        [class.primary]="button.type === 'primary'"
+        [class.secondary]="button.type === 'secondary'"
+        (click)="onDropdownToggle(i)"
+        class="dropdown-btn"
+      >
+        <!-- Main icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="main-icon"
+        >
+          <path [attr.d]="getIconPath(button.icon)"></path>
+        </svg>
+
+        <!-- Button text -->
+        <span>{{ button.label }}</span>
+
+        <!-- Chevron down icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="chevron-icon"
+          [class.rotated]="button.isOpen"
+        >
+          <path [attr.d]="getIconPath('chevron-down')"></path>
+        </svg>
+      </button>
+
+      <!-- Dropdown menu -->
+      <div class="dropdown-menu" *ngIf="button.isOpen">
+        <div 
+          *ngFor="let item of button.items"
+          class="dropdown-item"
+          (click)="onDropdownItemClick(item.action)"
+        >
+          {{ item.label }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

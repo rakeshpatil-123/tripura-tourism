@@ -1,0 +1,89 @@
+<section class="py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-200/30 to-red-200/30 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-200/30 to-green-200/30 rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center space-x-2 bg-gradient-to-r from-orange-100 to-blue-100 rounded-full px-6 py-3 mb-6 transition-all duration-700 opacity-100 translate-y-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap text-orange-500">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span class="text-gray-700 font-medium">Powerful Features</span>
+            </div>
+            <h2 class="font-merriweather font-bold text-3xl sm:text-4xl text-gray-900 mb-4 transition-all duration-700 delay-100 opacity-100 translate-y-0">Key Features That Drive Success</h2>
+            <p class="font-open-sans text-xl text-gray-600 max-w-3xl mx-auto transition-all duration-700 delay-200 opacity-100 translate-y-0">Discover the powerful tools and services designed to make your investment journey in Tripura seamless, efficient, and transparent.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div *ngFor="let feature of features; let i = index" class="group relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-gray-100 overflow-hidden opacity-100 translate-y-0" [style.animation-delay]="i*100 + 'ms'" [style.transition-delay]="i*100 + 'ms'">
+                <div class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-5 transition-opacity duration-500" [ngClass]="'from-' + feature.gradientFrom + ' to-' + feature.gradientTo"></div>
+                <div class="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-white/50 to-transparent rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div class="relative w-20 h-20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg" [ngClass]="'bg-gradient-to-br from-' + feature.gradientFrom + ' to-' + feature.gradientTo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="'lucide lucide-' + feature.icon + ' text-white'" [innerHTML]="feature.iconSvgSafe">
+                    </svg>
+                    <div class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                <h3 class="font-merriweather font-bold text-xl text-gray-900 mb-4 group-hover:text-orange-600 transition-colors duration-300">{{ feature.title }}</h3>
+                <p class="font-open-sans text-gray-600 leading-relaxed mb-6">{{ feature.description }}</p>
+                <div class="space-y-2 mb-6 transition-all duration-300 opacity-70 max-h-20 overflow-hidden">
+                    <div *ngFor="let check of feature.checks" class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle text-green-500 flex-shrink-0" [innerHTML]="checkSvgSafe">
+                        </svg>
+                        <span class="font-open-sans text-sm text-gray-600">{{ check }}</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="rounded-xl p-3 flex-1 mr-4" [ngClass]="'bg-' + feature.statBg">
+                        <div class="text-2xl font-bold bg-clip-text text-transparent" [ngClass]="'bg-gradient-to-r from-' + feature.statGradientFrom + ' to-' + feature.statGradientTo">{{ feature.statValue }}</div>
+                        <div class="text-xs text-gray-600">{{ feature.statLabel }}</div>
+                    </div>
+                </div>
+                <button (click)="onExplore(feature.title)" class="w-full font-open-sans font-semibold text-orange-500 hover:text-orange-600 transition-all duration-300 flex items-center justify-center space-x-2 group-hover:translate-x-2 bg-orange-50 hover:bg-orange-100 py-3 rounded-xl">
+                    <span>Explore Feature</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right group-hover:translate-x-1 transition-transform duration-200">
+                        <path d="M5 12h14"></path>
+                        <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 transition-all duration-700 delay-500 opacity-100 translate-y-0">
+            <div *ngFor="let smallFeature of smallFeatures" class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:border-orange-300 transition-all duration-300 group">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="'lucide lucide-' + smallFeature.icon + ' text-white'" [innerHTML]="smallFeature.iconSvgSafe">
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-merriweather font-semibold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">{{ smallFeature.title }}</h4>
+                        <p class="font-open-sans text-sm text-gray-600">{{ smallFeature.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="relative transition-all duration-700 delay-700 opacity-100 translate-y-0">
+            <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-green-800 rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10">
+                    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M20 20c0-11.046-8.954-20-20-20v20h20z\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+                </div>
+                <div class="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-transparent rounded-full blur-2xl animate-pulse"></div>
+                <div class="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-green-400/20 to-transparent rounded-full blur-2xl animate-pulse" style="animation-delay: 1s"></div>
+                <div class="relative z-10">
+                    <h3 class="font-merriweather font-bold text-2xl lg:text-3xl text-white mb-4">Ready to Transform Your Business Vision?</h3>
+                    <p class="font-open-sans text-blue-100 mb-8 max-w-2xl mx-auto text-lg">Join hundreds of successful investors who have chosen Tripura as their business destination. Experience the fastest and most transparent approval process in Northeast India.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <button (click)="onStartApplication()" class="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-orange-500/25 flex items-center space-x-3 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                            <span class="relative z-10">Start Application Now</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right group-hover:translate-x-1 transition-transform duration-200 relative z-10">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </button>
+                        <button (click)="onScheduleConsultation()" class="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 hover:scale-105">Schedule Consultation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

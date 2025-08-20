@@ -1,0 +1,103 @@
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <!-- Background Images as divs with background-image -->
+    <div *ngFor="let slide of slides; let i = index" 
+         class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
+         [style.background-image]="'url(' + slide.src + ')'"
+         [class.opacity-100]="i === currentSlide"
+         [class.opacity-0]="i !== currentSlide">
+    </div>
+    
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-700/80 via-blue-600/80 to-teal-700/80 z-10">
+      <!-- Animated dots and decorations -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 96.1237%; top: 68.5753%; animation-delay: 2.52366s; animation-duration: 3.23321s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 6.47107%; top: 4.95536%; animation-delay: 0.324335s; animation-duration: 4.29571s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 12.8058%; top: 16.1901%; animation-delay: 1.03621s; animation-duration: 4.09953s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 77.5828%; top: 87.1132%; animation-delay: 0.00499753s; animation-duration: 4.07005s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 4.06328%; top: 50.7382%; animation-delay: 1.61184s; animation-duration: 4.68824s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 25.4358%; top: 97.5242%; animation-delay: 2.77152s; animation-duration: 4.22163s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 47.4707%; top: 52.9601%; animation-delay: 0.753214s; animation-duration: 3.16421s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 14.4095%; top: 11.9077%; animation-delay: 0.0145841s; animation-duration: 3.89066s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 96.2778%; top: 67.3811%; animation-delay: 1.5425s; animation-duration: 4.17517s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 25.8164%; top: 74.1996%; animation-delay: 0.363291s; animation-duration: 4.95589s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 42.8043%; top: 13.9615%; animation-delay: 0.766973s; animation-duration: 4.67822s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 57.6863%; top: 32.4411%; animation-delay: 1.60474s; animation-duration: 4.63475s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 16.3499%; top: 79.3561%; animation-delay: 0.292149s; animation-duration: 3.31166s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 56.2281%; top: 41.6652%; animation-delay: 1.46357s; animation-duration: 3.23652s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 62.0573%; top: 63.8351%; animation-delay: 0.567631s; animation-duration: 3.13621s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 53.2765%; top: 84.3971%; animation-delay: 2.37257s; animation-duration: 4.64775s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 36.2242%; top: 65.6978%; animation-delay: 0.107061s; animation-duration: 4.47421s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 44.086%; top: 1.6315%; animation-delay: 0.353544s; animation-duration: 3.44847s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 88.9988%; top: 87.2837%; animation-delay: 2.35018s; animation-duration: 4.87596s;"></div>
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-pulse" style="left: 85.1958%; top: 57.1249%; animation-delay: 0.0738799s; animation-duration: 3.1722s;"></div>
+        <div class="absolute w-96 h-96 bg-gradient-radial from-orange-400/20 to-transparent rounded-full blur-3xl transition-all duration-300" style="left: 843px; top: 12px"></div>
+      </div>
+    </div>
+    
+    <!-- Pattern overlay -->
+    <div class="absolute inset-0 z-5 opacity-10">
+      <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'2\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    </div>
+  </div>
+  <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center">
+      <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles text-orange-400">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+          <path d="M5 3v4"></path>
+          <path d="M19 17v4"></path>
+          <path d="M3 5h4"></path>
+          <path d="M17 19h4"></path>
+        </svg>
+        <span class="text-white font-medium">SWAGAT 2.0 - Digital First Approach</span>
+      </div>
+      <h1 class="font-merriweather font-bold text-4xl sm:text-5xl lg:text-6xl text-white mb-6 leading-tight">
+        <span class="inline-block animate-fade-in-up">
+          <span class="inline-block mr-4 text-orange-400" style="animation-delay: 0s">Cultural</span>
+          <span class="inline-block mr-4" style="animation-delay: 0.1s">Heritage</span>
+        </span>
+        <br />
+        <span class="text-orange-400 animate-fade-in-up" style="animation-delay: 0.3s">Rich Traditions, Modern Opportunities</span>
+      </h1>
+      <p class="font-open-sans text-xl sm:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style="animation-delay: 0.5s">
+        Invest in a state where ancient traditions meet modern aspirations. Tripura's cultural richness creates unique business opportunities in tourism and handicrafts.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-fade-in-up" style="animation-delay: 0.7s">
+        <button class="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-orange-500/25 flex items-center space-x-3 min-w-[280px] justify-center relative overflow-hidden" (click)="onInvestClick()">
+          <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+          <span class="relative z-10">Submit Intent to Invest</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right group-hover:translate-x-1 transition-transform duration-200 relative z-10">
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </button>
+        <button class="group bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:bg-white/20 hover:scale-105 flex items-center space-x-3 min-w-[200px] justify-center" (click)="onWatchDemoClick()">
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play fill-white ml-1">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </div>
+          <span>Watch Demo</span>
+        </button>
+      </div>
+      <div class="grid grid-cols-3 gap-6 animate-fade-in-up" style="animation-delay: 0.9s">
+        <div class="text-center group" *ngFor="let stat of stats">
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 group-hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
+            <div class="text-2xl sm:text-3xl font-bold text-orange-400 mb-2 group-hover:text-orange-300 transition-colors duration-300">{{stat.value}}</div>
+            <div class="text-gray-300 font-medium text-sm">{{stat.label}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3">
+    <button *ngFor="let slide of slides; let i = index" class="w-3 h-3 rounded-full transition-all duration-300" [ngClass]="{'bg-orange-400 w-8': i === currentSlide, 'bg-white/50 hover:bg-white/70': i !== currentSlide}" [attr.aria-label]="'Go to slide ' + (i + 1)" (click)="setSlide(i)"></button>
+  </div>
+  <div class="absolute bottom-8 right-8 z-20">
+    <div class="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+      <div class="w-1 h-3 bg-white/70 rounded-full mt-2 animate-bounce"></div>
+    </div>
+  </div>
+</section>
