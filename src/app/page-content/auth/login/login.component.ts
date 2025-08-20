@@ -30,19 +30,33 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       const payload = this.loginForm.value;
+
       this.genericService.loginUser(payload).subscribe({
         next: (response) => {
           console.log('Login successful:', response);
+
+          this.genericService.storeSessionData(
+            response,
+            payload.rememberMe || false
+          );
+
           this.genericService.openSnackBar('Login successful!', 'Success');
-          this.router.navigate(['/dashboard/home']);
+          this.genericService.setLoginStatus(true);
           this.loginForm.reset();
         },
         error: (error) => {
           console.error('Login failed:', error);
-        }
+          this.genericService.openSnackBar(
+            'Login failed. Please check your credentials.',
+            'Error'
+          );
+        },
       });
-    }else{
-      this.genericService.openSnackBar('Please fill in all fields correctly.', 'Error');
+    } else {
+      this.genericService.openSnackBar(
+        'Please fill in all fields correctly.',
+        'Error'
+      );
     }
   }
 }

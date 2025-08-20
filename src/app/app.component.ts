@@ -8,6 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LoaderService } from './_service/loader/loader.service';
 import { ExternalServicesRedirectionTrackingComponent } from './page-content-with-menu/external-services-redirection-tracking/external-services-redirection-tracking.component';
 import { CommonModule } from '@angular/common';
+import { GenericService } from './_service/generic/generic.service';
 
 @Component({
   selector: 'app-root',
@@ -18,11 +19,13 @@ import { CommonModule } from '@angular/common';
 export class AppComponent implements OnInit, OnDestroy {
   protected title = 'swaagat_2';
   showLoader: boolean = true;
+  isLoggedIn: boolean = false; 
   private loaderSubscription!: Subscription;
 
   constructor(
     private loaderService: LoaderService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private genericService: GenericService
 
   ) { }
   ngOnInit() {
@@ -31,6 +34,19 @@ export class AppComponent implements OnInit, OnDestroy {
       this.showLoader = status;
       this.cdRef.detectChanges();
     });
+
+      this.genericService.getLoginStatus().subscribe((status) => {
+    this.isLoggedIn = status;
+    this.cdRef.detectChanges();
+  });
+
+      this.checkToken();
+  }
+
+   checkToken() {
+    const token = localStorage.getItem('token'); 
+    // console.log(token);
+    this.isLoggedIn = !!token; 
   }
 
   ngOnDestroy() {

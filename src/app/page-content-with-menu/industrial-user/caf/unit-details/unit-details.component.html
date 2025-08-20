@@ -1,28 +1,50 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" >
 
-  <!-- General Info + Location in grid -->
   <div class="form-grid">
-    <app-ilogi-input fieldLabel="Name of the Unit" formControlName="unitName" [mandatory]="true" [placeholder]="'Name of the Unit'" ></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Name of the Unit" formControlName="unitName" [mandatory]="true" [placeholder]="'Name of the Unit'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Post Office" formControlName="postOffice" [placeholder]="'Post Office'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Unit Address" formControlName="unitAddress" [placeholder]="'Unit Address'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Unit Address" formControlName="unitAddress" [mandatory]="true" [placeholder]="'Unit Address'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Contact No" formControlName="contactNo" [placeholder]="'Contact No'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Email" formControlName="email" [placeholder]="'Email'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Website" formControlName="website" [placeholder]="'Website'"></app-ilogi-input>
 
-    <app-ilogi-select fieldLabel="District" formControlName="district" [placeholder]="'Select District'"></app-ilogi-select>
-    <app-ilogi-select fieldLabel="Sub Division" formControlName="subDivision" [placeholder]="'Select Sub Division'"></app-ilogi-select>
-</div>
-<app-ilogi-radio fieldLabel="Area Type" formControlName="areaType"
-  [radioOptions]="[{name:'Urban', value:'urban'},{name:'Rural', value:'rural'}]">
-</app-ilogi-radio>
+    <app-ilogi-select fieldLabel="District" [selectOptions]="districtOptions" formControlName="district" [mandatory]="true" [placeholder]="'Select District'"></app-ilogi-select>
+    <app-ilogi-select fieldLabel="Sub Division" [selectOptions]="subDivisionOptions" formControlName="subDivision" [mandatory]="true" [placeholder]="'Select Sub Division'"></app-ilogi-select>
+  </div>
 
-  <!-- Land Record -->
+  <app-ilogi-radio fieldLabel="Area Type" formControlName="areaType"
+    [radioOptions]="[{name:'Urban', value:'urban'},{name:'Rural', value:'rural'}]">
+  </app-ilogi-radio>
+
   <div class="form-grid">
-    <app-ilogi-input fieldLabel="Revenue Circle" formControlName="revenueCircle" [placeholder]="'Revenue Circle'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Khatian No" formControlName="khatianNo" [placeholder]="'Khatian No'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Plot No" formControlName="plotNo" [placeholder]="'Plot No'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Land Area" formControlName="landArea"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Classification" formControlName="classification" [placeholder]="'Classification'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Pin Code" formControlName="pinNo" [mandatory]="true"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Fax" formControlName="fax"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Police Station" formControlName="policeStation" [mandatory]="true"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Land Type" formControlName="landType" [mandatory]="true"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Estate Name" formControlName="estateName"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Plot No" formControlName="estatePlotNo"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Block" formControlName="block"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Gram Panchayat" formControlName="gramPanchayat"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Municipality" formControlName="municipality"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Ward No" formControlName="wardNo"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Planning Area" formControlName="planningArea"></app-ilogi-input>
+  </div>
+
+  <div class="form-grid">
+    <app-ilogi-input fieldLabel="Tehasil" formControlName="tehasil"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Revenue Mouza" formControlName="mouza"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Plot No (CS Sabek)" formControlName="plotNoCs"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Load Bearing (Sq. Mtr)" formControlName="loadBearing"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Other Construction (Sq. Mtr)" formControlName="otherConstruction"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Power Supply Agency" formControlName="powerSupply"></app-ilogi-input>
+  </div>
+
+  <div class="form-grid">
+    <app-ilogi-input fieldLabel="Revenue Circle" formControlName="revenueCircle" [mandatory]="true" [placeholder]="'Revenue Circle'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Khatian No" formControlName="khatianNo" [mandatory]="true" [placeholder]="'Khatian No'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Plot No" formControlName="plotNo" [mandatory]="true" [placeholder]="'Plot No'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Land Area" formControlName="landArea" [mandatory]="true"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Classification" formControlName="classification" [mandatory]="true" [placeholder]="'Classification'"></app-ilogi-input>
 
     <app-ilogi-input fieldLabel="Land Floor Building (Sq. Mtr)" formControlName="landFloor" [placeholder]="'Land Floor Building (Sq. Mtr)'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Sanitary Latrine Count" formControlName="sanitaryCount" [placeholder]="'Sanitary Latrine Count'"></app-ilogi-input>
@@ -30,18 +52,15 @@
     <app-ilogi-input fieldLabel="Building Sq. Mtr" formControlName="buildingSqMtr" [placeholder]="'Building Sq. Mtr'"></app-ilogi-input>
   </div>
 
-  <!-- Investment Details -->
-   <div class="mt-3" >
-
-       <app-dynamic-table
-       [title1]="'Type'"
-       [title2]="'Amount'"
-       [rows]="projectCostRows"
-       [formGroup]="form">
+  <div class="mt-3">
+    <app-dynamic-table
+      [title1]="'Type'"
+      [title2]="'Amount'"
+      [rows]="projectCostRows"
+      [formGroup]="form">
     </app-dynamic-table>
-</div>
+  </div>
 
-  <!-- Employment Details -->
   <app-dynamic-table
     [title1]="'Type'"
     [title2]="'Count'"
@@ -49,17 +68,27 @@
     [formGroup]="form">
   </app-dynamic-table>
 
-  <!-- Financial -->
   <div class="form-grid">
-    <app-ilogi-input fieldLabel="Annual Turnover" formControlName="annualTurnover" [placeholder]="'Annual Turnover'" ></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Category Enterprise" formControlName="category" [placeholder]="'Category Enterprise'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Product Manufacturing Process" formControlName="process" [placeholder]="'Product Manufacturing Process'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Working Session" formControlName="workingSession" [placeholder]="'Working Session'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Annual Turnover" formControlName="annualTurnover" [mandatory]="true" [placeholder]="'Annual Turnover'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Category Enterprise" formControlName="category" [mandatory]="true" [placeholder]="'Category Enterprise'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Product Manufacturing Process" formControlName="process" [mandatory]="true" [placeholder]="'Product Manufacturing Process'"></app-ilogi-input>
+    <app-ilogi-input fieldLabel="Working Session" formControlName="workingSession" [mandatory]="true" [placeholder]="'Working Session'"></app-ilogi-input>
   </div>
 
-  <!-- Buttons -->
-<div class="form-actions">
-    <button type="button" class="btn btn-primary">Save As Draft</button>
-    <button type="submit" class="btn btn-success">Save</button>
-  </div>
+ <div class="form-actions">
+  <button 
+    type="button" 
+    class="btn btn-primary"
+    (click)="onSubmit(true)">
+    Save As Draft
+  </button>
+
+  <button 
+    type="submit" 
+    class="btn btn-success"
+    (click)="onSubmit(false)">
+    Submit
+  </button>
+</div>
+
 </form>
