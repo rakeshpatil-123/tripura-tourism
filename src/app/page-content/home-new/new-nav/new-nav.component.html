@@ -1,17 +1,17 @@
 <nav class="main-navigation">
-  <!-- Background pattern and animated elements -->
   <div class="pattern-overlay">
     <div class="pattern-bg"></div>
   </div>
   <div class="bg-element-1"></div>
   <div class="bg-element-2"></div>
   
-  <!-- Desktop Navigation Container -->
   <div class="nav-container" [class.hidden]="isMobileMenuOpen">
-    <div 
-      *ngFor="let item of navigationItems; let i = index" 
+    <div
+      *ngFor="let item of navigationItems; let i = index"
       class="dropdown-container"
       [class.dropdown-open]="item.dropdownOpen"
+      (mouseenter)="onNavItemHover(item, i)"
+      (mouseleave)="onNavItemLeave()"
     >
       <button 
         class="nav-button"
@@ -21,35 +21,21 @@
         [attr.aria-haspopup]="item.hasDropdown"
       >
         <span>{{ item.label }}</span>
-        
-        <!-- Chevron icon for dropdown items -->
-        <svg 
-          *ngIf="item.hasDropdown" 
-          class="chevron" 
-          [class]="'chevron ' + getChevronClass(item)"
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round"
-        >
+        <svg *ngIf="item.hasDropdown" class="chevron" [class]="getChevronClass(item)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m6 9 6 6 6-6"></path>
         </svg>
-        
         <div class="nav-underline"></div>
       </button>
-      
-      <!-- Dropdown Menu -->
-      <div 
-        *ngIf="item.hasDropdown && item.dropdownOpen" 
-        class="dropdown-menu"
-        [@dropdownAnimation]
+
+      <div
+        *ngIf="item.hasDropdown && item.dropdownOpen"
+        style="position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #ffffff; min-width: 200px; min-height: 100px; z-index: 1000; overflow: visible; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); border-radius: 8px;"
+        (mouseenter)="onDropdownHover()"
+        (mouseleave)="onDropdownLeave()"
       >
-        <div class="dropdown-content">
+        <div style="padding: 8px 0; overflow: visible;">
           <a 
-            *ngFor="let childItem of item.children" 
+            *ngFor="let childItem of item.children"
             class="dropdown-item"
             (click)="onDropdownItemClick(i, childItem)"
             [attr.aria-label]="childItem.label"
@@ -60,27 +46,23 @@
       </div>
     </div>
   </div>
-  
-  <!-- Mobile Menu Button -->
+
   <button 
     class="mobile-menu-btn" 
     aria-label="Toggle menu"
     (click)="toggleMobileMenu()"
     [class.menu-open]="isMobileMenuOpen"
   >
-    <!-- Hamburger/Close icon with animation -->
     <div class="hamburger-icon">
       <span class="hamburger-line" [class.line-1-active]="isMobileMenuOpen"></span>
       <span class="hamburger-line" [class.line-2-active]="isMobileMenuOpen"></span>
       <span class="hamburger-line" [class.line-3-active]="isMobileMenuOpen"></span>
     </div>
   </button>
-  
-  <!-- Mobile Menu Overlay -->
+
   <div 
     class="mobile-menu-overlay" 
     *ngIf="isMobileMenuOpen"
-    [@mobileMenuAnimation]
   >
     <div class="mobile-menu-content">
       <div 
@@ -94,29 +76,13 @@
           (click)="onNavItemClick(item, i)"
         >
           <span>{{ item.label }}</span>
-          
-          <!-- Chevron for mobile dropdown -->
-          <svg 
-            *ngIf="item.hasDropdown" 
-            class="mobile-chevron"
-            [class]="'mobile-chevron ' + getChevronClass(item)"
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            stroke-width="2" 
-            stroke-linecap="round" 
-            stroke-linejoin="round"
-          >
+          <svg *ngIf="item.hasDropdown" class="mobile-chevron" [class]="getChevronClass(item)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m6 9 6 6 6-6"></path>
           </svg>
         </button>
-        
-        <!-- Mobile Dropdown Items -->
         <div 
           *ngIf="item.hasDropdown && item.dropdownOpen" 
           class="mobile-dropdown-items"
-          [@mobileDropdownAnimation]
         >
           <a 
             *ngFor="let childItem of item.children"
