@@ -38,6 +38,5 @@ export class ApplicationFormComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  // Optional: Handle tab change events if needed
   onTabChange(event: any) {}
 }

@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
+import { GenericService } from '../../_service/generic/generic.service';
 
 export interface MenuItem {
   id: string;
@@ -51,7 +52,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Common Application Form',
       icon: 'track_changes',
       route: '/dashboard/caf',
-      roles: ['admin', 'user'],
+      roles: ['admin', 'user','moderator', 'guest'],
     },
     // {
     //   id: 'external-tracking',
@@ -134,7 +135,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private genericService: GenericService) {}
+
+
+
 
   ngOnInit(): void {
     // Get current URL on init
@@ -201,5 +205,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   canAccess(item: MenuItem): boolean {
     return item.roles.includes(this.userRole);
+  }
+
+  logout(): void {
+    this.genericService.logoutUser(); 
   }
 }
