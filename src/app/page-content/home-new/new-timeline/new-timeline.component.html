@@ -7,8 +7,11 @@
 
         <!-- Desktop Timeline -->
         <div class="timeline">
-            <div class="progress-bar">
-                <div class="progress" [style.width]="progressWidth"></div>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress" [style.width]="progressWidth"></div>
+                </div>
+                <div class="progress-percentage">{{ progressWidth }}</div>
             </div>
             <div class="timeline-grid">
                 <div *ngFor="let step of steps | slice:0:4; let i = index" class="timeline-item" [ngClass]="step.isActive ? 'active' : 'inactive'">
