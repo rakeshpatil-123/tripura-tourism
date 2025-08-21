@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders,HttpParams } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
@@ -65,6 +65,8 @@ export class GenericService {
     return this.http.post(`${this.baseUrl}/api/user/login`, credentials);
   }
 
+  
+
   registerUser(userData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/api/user/register`, userData);
   }
@@ -106,9 +108,37 @@ export class GenericService {
     });
   }
 
-  getByConditions(conditionParams: any, apiObject: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${apiObject}/`, conditionParams);
+  // getByConditions(conditionParams: any, apiObject: string): Observable<any> {
+  //   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams);
+  // }
+
+getByConditions(conditionParams: any, apiObject: string): Observable<any> {
+  const token = localStorage.getItem('token'); 
+  let headers = new HttpHeaders();
+
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
   }
+
+  return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, { headers });
+}
+
+// getDataByConditions(queryParams: any, apiObject: string): Observable<any> {
+//   const token = localStorage.getItem('token'); 
+//   let headers = new HttpHeaders();
+
+//   if (token) {
+//     headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+//   }
+
+//   let params = new HttpParams();
+//   Object.keys(queryParams).forEach(key => {
+//     params = params.set(key, queryParams[key]);
+//   });
+
+//   return this.http.post(`${this.baseUrl}/${apiObject}`, { headers, params });
+// }
+
 
   getByConditionsExternal(
     conditionParams: any,
@@ -199,48 +229,89 @@ export class GenericService {
   }
 
   storeSessionData(response: any, rememberme: boolean): void {
-    if (response['result'] && response['token']) {
-      // Clear existing storage
-      localStorage.clear();
-      // Store session data
-      const keysToStore = [
-        'session_id',
-        'session_name',
-        'token',
-        'user_details',
-        'user_role',
-        'unique_id',
-        'user_additional_roles',
-        'isInspectionActive',
-        'isJointInspectionActive',
-        'IsNodalOfficer',
-        'isAppellate',
-        'appellateLevel',
-        'isCustomerSupport',
-        'department_id',
-        'organization_status',
-        'partnership_status',
-        'society_status',
-        'companyType',
-        'partnership_frm_status',
-        'society_frm_status',
-        'uid',
-        'full_name',
-        'csc_operator_id',
-      ];
-      keysToStore.forEach((key) => {
-        if (response['result'][key] || response[key]) {
-          const value =
-            key === 'user_details' || key === 'user_additional_roles'
-              ? JSON.stringify(response['result'][key] || response[key])
-              : this.encryptData(response['result'][key] || response[key]);
-          localStorage.setItem(key, value);
-        }
-      });
-      this.setLoginStatus(true);
-      this.router.navigate(['dashboard/home']);
-    }
+  if (response['user'] && response['token']) {
+    // Clear existing storage
+    localStorage.clear();
+
+    // Required keys from response
+    const keysToStore = [
+      'token',
+      'id',
+      'name_of_enterprise',
+      'authorized_person_name',
+      'email_id',
+      'mobile_no',
+      'user_name',
+      'bin',
+      'registered_enterprise_address',
+      'registered_enterprise_city',
+      'user_type',
+      'status'
+    ];
+
+    keysToStore.forEach((key) => {
+      if (response['user'][key] || response[key]) {
+        const value =
+          typeof response['user'][key] === 'object'
+            ? JSON.stringify(response['user'][key])
+            : this.encryptData(response['user'][key] || response[key]);
+        localStorage.setItem(key, value);
+      }
+    });
+
+    this.setLoginStatus(true);
+    this.router.navigate(['dashboard/home']);
   }
+}
+
+
+  // storeSessionData(response: any, rememberme: boolean): void {
+  //   if (response['result'] && response['token']) {
+  //     // Clear existing storage
+  //     localStorage.clear();
+  //     // Store session data
+  //     const keysToStore = [
+  //       'session_id',
+  //       'session_name',
+  //       'token',
+  //       'user_details',
+  //       'user_role',
+  //       'unique_id',
+  //       'user_additional_roles',
+  //       'isInspectionActive',
+  //       'isJointInspectionActive',
+  //       'IsNodalOfficer',
+  //       'isAppellate',
+  //       'appellateLevel',
+  //       'isCustomerSupport',
+  //       'department_id',
+  //       'organization_status',
+  //       'partnership_status',
+  //       'society_status',
+  //       'companyType',
+  //       'partnership_frm_status',
+  //       'society_frm_status',
+  //       'uid',
+  //       'full_name',
+  //       'csc_operator_id',
+  //     ];
+  //     keysToStore.forEach((key) => {
+  //       if (response['result'][key] || response[key]) {
+  //         const value =
+  //           key === 'user_details' || key === 'user_additional_roles'
+  //             ? JSON.stringify(response['result'][key] || response[key])
+  //             : this.encryptData(response['result'][key] || response[key]);
+  //         localStorage.setItem(key, value);
+  //       }
+  //     });
+  //     this.setLoginStatus(true);
+  //     this.router.navigate(['dashboard/home']);
+  //   }
+  // }
+
+  postWithoutAuth(apiObject: string, body: any = {}): Observable<any> {
+  return this.http.post(`${this.baseUrl}/${apiObject}`, body);
+}
 
   removeSessionData(): void {
     localStorage.clear();
@@ -256,13 +327,13 @@ export class GenericService {
   }
 
   logoutUser(): void {
-    this.getByConditions({}, 'api/logout').subscribe({
+    this.getByConditions({}, 'api/user/logout').subscribe({
       next: () => this.removeSessionData(),
       error: (error) => {
         console.error(error);
-        if (error.status === 403) {
+        // if (error.status === 403) {
           this.removeSessionData();
-        }
+        // }
       },
     });
   }

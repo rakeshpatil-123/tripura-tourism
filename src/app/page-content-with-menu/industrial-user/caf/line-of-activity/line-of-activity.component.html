@@ -2,7 +2,6 @@
 
   <form [formGroup]="form" novalidate class="mb-5">
 
-    <!-- Raw Materials -->
     <div class="mt-2 mb-2">
       <span class="header-color">List of Raw Materials to be Used</span>
     </div>
@@ -23,9 +22,8 @@
             <tr *ngFor="let rawMaterial of rawMaterials.controls; let i = index" [formGroupName]="i">
               <td> {{ i + 1 }} </td>
 
-              <!-- Name of Raw Material -->
               <td>
-                <div class="row no-padding-first-last">
+                <div class="row no-padding-first-last mt-3">
                   <div class="col-md-12">
                     <div class="form-group form-group-margin">
                       <app-ilogi-input fieldId="rawMaterialsNameOfRawMaterialInput-{{i}}" fieldLabel="Raw Material"
@@ -35,9 +33,8 @@
                 </div>
               </td>
 
-              <!-- Quantity/Month -->
               <td>
-                <div class="row no-padding-first-last">
+                <div class="row no-padding-first-last mt-3">
                   <div class="col-md-12">
                     <div class="form-group form-group-margin">
                       <app-ilogi-input fieldId="rawMaterialsQuantityPerMonthInput-{{i}}" fieldLabel="Quantity/Month"
@@ -47,7 +44,6 @@
                 </div>
               </td>
 
-              <!-- Unit -->
               <td>
                 <div class="row no-padding-first-last">
                   <div class="col-md-12">
@@ -59,9 +55,8 @@
                 </div>
               </td>
 
-              <!-- Action: Remove Only -->
               <td class="input-mid-td">
-                <div class="input-mid">
+                <div class="input-mid mt-3">
                   <a class="input-micro clkable add-new-btn" (click)="removeRawMaterial(i)">
                     <i class="fa fa-trash-o blackiconcolor-red"></i>
                     <span class="ml-1">Remove</span>
@@ -73,7 +68,6 @@
         </table>
       </div>
 
-      <!-- ADD NEW Button for Raw Materials -->
       <div class="pull-right mt-2 color-666666 clkable" (click)="addRawMaterial()">
         <i class="fa fa-plus"></i>
         <span class="font-weight-bold ml-2">ADD NEW</span>
@@ -82,10 +76,7 @@
 
     <hr>
 
-    <!-- Thrust Sector -->
     <div class="mb-2">
-      <!-- <span class="heder-color">Thrust Sector </span> -->
-      <!-- <span class="red-font">*</span> -->
     </div>
     <div class="mt-2 mb-2">
       <div class="row no-padding-first-last">
@@ -101,7 +92,6 @@
 
     <hr>
 
-    <!-- Products -->
     <div class="mt-2">
       <span class="header-color">List of Product & by-products/Finished Products</span>
     </div>
@@ -123,7 +113,6 @@
             <tr *ngFor="let product of products.controls; let i = index" [formGroupName]="i">
               <td> {{ i + 1 }} </td>
 
-              <!-- Name of Product -->
               <td>
                 <div class="row no-padding-first-last">
                   <div class="col-md-12">
@@ -135,7 +124,6 @@
                 </div>
               </td>
 
-              <!-- Production Capacity -->
               <td>
                 <div class="row no-padding-first-last">
                   <div class="col-md-12">
@@ -147,7 +135,6 @@
                 </div>
               </td>
 
-              <!-- Avg Production -->
               <td>
                 <div class="row no-padding-first-last">
                   <div class="col-md-12">
@@ -159,7 +146,6 @@
                 </div>
               </td>
 
-              <!-- Unit -->
               <td>
                 <div class="row no-padding-first-last">
                   <div class="col-md-12">
@@ -171,7 +157,6 @@
                 </div>
               </td>
 
-              <!-- Action: Remove Only -->
               <td class="input-mid-td">
                 <div class="input-mid">
                   <a class="input-micro clkable add-new-btn" (click)="removeProduct(i)">
@@ -198,3 +183,4 @@
     <button type="submit" class="btn btn-success">Save</button>
   </div>
 </div>
+

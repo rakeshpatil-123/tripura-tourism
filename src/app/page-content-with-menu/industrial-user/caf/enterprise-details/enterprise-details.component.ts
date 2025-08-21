@@ -1,32 +1,45 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IlogiSelectComponent } from "../../../../customInputComponents/ilogi-select/ilogi-select.component";
-import { IlogiInputComponent } from "../../../../customInputComponents/ilogi-input/ilogi-input.component";
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { IlogiSelectComponent } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
+import { IlogiInputComponent } from '../../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiInputDateComponent } from '../../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
+import { GenericService } from '../../../../_service/generic/generic.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-enterprise-form',
   templateUrl: './enterprise-details.component.html',
   styleUrls: ['./enterprise-details.component.scss'],
-  imports: [IlogiSelectComponent, IlogiInputComponent, IlogiInputDateComponent, ReactiveFormsModule]
+  imports: [
+    IlogiSelectComponent,
+    IlogiInputComponent,
+    IlogiInputDateComponent,
+    ReactiveFormsModule,
+    CommonModule,
+  ],
 })
-export class EnterpriseFormComponent implements OnInit {
+export class EnterpriseDetailsComponent implements OnInit {
   enterpriseForm!: FormGroup;
   submitted = false;
 
   constitutionOptions = [
-    { id: 'pvt', name: 'Pvt. Ltd' },
-    { id: 'llp', name: 'LLP' },
-    { id: 'partnership', name: 'Partnership' },
-    { id: 'proprietorship', name: 'Proprietorship' }
+    { id: 'Pvt. Ltd', name: 'Pvt. Ltd' },
+    { id: 'LLP', name: 'LLP' },
+    { id: 'Partnership', name: 'Partnership' },
+    { id: 'Proprietorship', name: 'Proprietorship' },
   ];
 
   proposalOptions = [
-    { id: 'new', name: 'New Unit' },
-    { id: 'existing', name: 'Existing Unit' }
+    { id: 'New Unit', name: 'New Unit' },
+    { id: 'Existing Unit', name: 'Existing Unit' },
   ];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private apiService: GenericService) {}
 
   ngOnInit(): void {
     this.enterpriseForm = this.fb.group({
@@ -48,14 +61,138 @@ export class EnterpriseFormComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       altMobile: [''],
       proposalFor: ['', Validators.required],
-      commissioningDate: ['', Validators.required]
+      commissioningDate: ['', Validators.required],
     });
+    this.loadEnterpriseDetails();
   }
 
-  onSave(): void {
+  loadEnterpriseDetails(): void {
+    this.apiService
+      .getByConditions({}, 'api/caf/core-application-show-enterprise-detail')
+      .subscribe({
+        next: (res: any) => {
+          if (res && res.data) {
+            const data = res.data;
+
+            this.enterpriseForm = this.fb.group({
+              constitution: [
+                data.constitution_of_enterprise || '',
+                Validators.required,
+              ],
+              enterpriseName: [data.enterprise_name || '', Validators.required],
+              businessPan: [data.business_pan_no || '', Validators.required],
+
+              registeredAddress: [data.enterprise_address || ''],
+              habitation: [data.habitation_area_building || ''],
+              pin: [
+                data.pin || '',
+                [Validators.required, Validators.pattern(/^[0-9]{6}$/)],
+              ],
+              postOffice: [data.post_office || '', Validators.required],
+              policeStation: [data.police_station || '', Validators.required],
+
+              repName: [
+                data.authorized_representative_name || '',
+                Validators.required,
+              ],
+              designation: [data.authorized_representative_designation || ''],
+              aadhar: [
+                data.authorized_representative_aadhar_no || '',
+                [Validators.required, Validators.pattern(/^[0-9]{12}$/)],
+              ],
+              mobile: [
+                data.authorized_representative_mobile_no || '',
+                [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
+              ],
+              phone: [data.authorized_representative_phone_no || ''],
+              email: [
+                data.authorized_representative_email_id || '',
+                [Validators.required, Validators.email],
+              ],
+              altMobile: [
+                data.authorized_representative_alternate_mobile_no || '',
+              ],
+              proposalFor: [data.proposal_for || '', Validators.required],
+              commissioningDate: [
+                data.proposed_date_of_commissioning
+                  ? new Date(data.proposed_date_of_commissioning)
+                  : '',
+                Validators.required,
+              ],
+            });
+          }
+        },
+        error: (err: any) => {
+          console.error('Failed to load enterprise details:', err);
+        },
+      });
+  }
+
+  onSave(isDraft: boolean = false): void {
     this.submitted = true;
-    if (this.enterpriseForm.valid) {
-      console.log('Form Data:', this.enterpriseForm.value);
+    console.log(this.enterpriseForm.value, ' jahfjks');
+
+    // if (this.enterpriseForm.valid) {
+    const formValue = this.enterpriseForm.value;
+
+    const payload: any = {
+      constitution_of_enterprise: formValue.constitution,
+      enterprise_name: formValue.enterpriseName,
+      business_pan_no: formValue.businessPan,
+      enterprise_address: formValue.registeredAddress,
+      enterprises_registered_address: formValue.registeredAddress,
+      habitation_area_building: formValue.habitation,
+      pin: formValue.pin,
+      post_office: formValue.postOffice,
+      police_station: formValue.policeStation,
+      authorized_representative_name: formValue.repName,
+      authorized_representative_designation: formValue.designation,
+      authorized_representative_aadhar_no: formValue.aadhar,
+      authorized_representative_mobile_no: formValue.mobile,
+      authorized_representative_email_id: formValue.email,
+      authorized_representative_alternate_mobile_no: formValue.altMobile,
+      authorized_representative_phone_no: formValue.phone,
+      proposal_for: formValue.proposalFor,
+      proposed_date_of_commissioning: formValue.commissioningDate,
+    };
+
+    if (isDraft) {
+      payload.save_data = 1;
     }
+
+    console.log('Final Payload:', payload);
+
+    this.apiService
+      .getByConditions(
+        payload,
+        'api/caf/core-application-store-enterprise-detail'
+      )
+      .subscribe({
+        next: (res: any) => {
+          console.log('API Success:', res);
+          // this.genericService.openSnackBar('Something went wrong while saving unit details', 'Error');
+          if (isDraft) {
+            this.apiService.openSnackBar(
+              'Draft saved successfully!',
+              'success'
+            );
+          } else {
+            this.apiService.openSnackBar(
+              'Enterprise details submitted successfully!',
+              'success'
+            );
+          }
+        },
+        error: (err: any) => {
+          console.error('API Error:', err);
+          this.apiService.openSnackBar(
+            'Failed to save enterprise details.',
+            'error'
+          );
+        },
+      });
+    // } else {
+    //   console.warn('Form Invalid');
+    // }
   }
 }

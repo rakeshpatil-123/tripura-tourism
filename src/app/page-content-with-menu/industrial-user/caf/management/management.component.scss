@@ -24,3 +24,40 @@ th{
   gap: 1rem;
   margin-top: 1rem;
 }
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* horizontal scroll */
+  overflow-y: hidden; /* vertical overflow nahi chahiye */
+}
+
+.table-wrapper table {
+  min-width: 600px; /* ya jitna bhi required */
+  border-collapse: collapse;
+}
+
+
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Horizontal scroll enable */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Important: Fix layout */
+}
+
+th, td {
+  width: 200px;
+  border: 1px solid #b8b8b8;
+  text-align: center;
+  padding: 8px;
+  word-wrap: break-word; /* Text wrap */
+}
+
+.form-con{
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}

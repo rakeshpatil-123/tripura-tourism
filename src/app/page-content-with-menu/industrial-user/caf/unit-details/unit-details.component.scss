@@ -3,7 +3,13 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
 column-gap: 1.5rem;
-row-gap: 6px;
+row-gap: 1.5rem;
+}
+
+.form-con{
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 /* Tablet: 2 columns */

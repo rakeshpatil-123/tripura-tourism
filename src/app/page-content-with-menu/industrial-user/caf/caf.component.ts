@@ -10,7 +10,7 @@ import { ActivitiesComponent } from './activities/activities.component';
 import { ClearenceComponent } from './clearence/clearence.component';
 import { AttachmentComponent } from './attachment/attachment.component';
 import { ManagementComponent } from './management/management.component';
-import { EnterpriseFormComponent } from './enterprise-details/enterprise-details.component';
+import { EnterpriseDetailsComponent } from './enterprise-details/enterprise-details.component';
 // import { EnterpriseDetailsComponent } from './enterprise-details/enterprise-details.component';
 @Component({
   selector: 'app-application-form',
@@ -23,7 +23,7 @@ import { EnterpriseFormComponent } from './enterprise-details/enterprise-details
 export class ApplicationFormComponent implements OnInit {
   // Define tabs with label and component
   tabs = [
-    { label: 'Enterprise Details', component: EnterpriseFormComponent },
+    { label: 'Enterprise Details', component: EnterpriseDetailsComponent },
     { label: 'Unit Details', component: UnitDetailsComponent },
     { label: 'Management', component: ManagementComponent },
     { label: 'Line of Activity', component: LineOfActivityComponent },
@@ -38,6 +38,5 @@ export class ApplicationFormComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  // Optional: Handle tab change events if needed
   onTabChange(event: any) {}
 }

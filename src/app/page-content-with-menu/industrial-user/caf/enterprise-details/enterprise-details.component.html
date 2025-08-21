@@ -1,160 +1,63 @@
 <form [formGroup]="enterpriseForm" (ngSubmit)="onSave()" class="enterprise-form">
 
-  <!-- Constitution -->
-  <app-ilogi-select
-    fieldId="constitution"
-    fieldLabel="Constitution of the Enterprise"
-    [selectOptions]="constitutionOptions"
-    [submitted]="submitted"
-    (onChangeControl)="enterpriseForm.get('constitution')?.setValue($event)"
+  <app-ilogi-select fieldId="constitution" fieldLabel="Constitution of the Enterprise"
+    [selectOptions]="constitutionOptions" [submitted]="submitted" formControlName="constitution"
     [placeholder]="'Select Constitution'"
     [mandatory]="true">
   </app-ilogi-select>
+<div class="mt-4" >
 
-  <!-- Enterprise Name -->
-  <app-ilogi-input
-    fieldId="enterpriseName"
-    fieldLabel="Enterprise Name"
-    [placeholder]="'Enter Enterprise name'"
-    [submitted]="submitted"
+  <app-ilogi-input fieldId="enterpriseName" formControlName="enterpriseName" fieldLabel="Enterprise Name" [placeholder]="'Enter Enterprise name'"
+  [submitted]="submitted" [mandatory]="true">
+</app-ilogi-input>
+</div>
+  <app-ilogi-input fieldId="businessPan" formControlName="businessPan" fieldLabel="Business PAN No" [placeholder]="'Enter Business PAN No'"
+    [submitted]="submitted" [mandatory]="true">
+  </app-ilogi-input>
+  <app-ilogi-input fieldId="registeredAddress" formControlName="registeredAddress" fieldLabel="Enterprise's Registered Address"
+    [placeholder]="'Enter Registered Address'" type="textarea">
+  </app-ilogi-input>
+  <app-ilogi-input fieldId="habitation" formControlName="habitation" fieldLabel="Habitation/ Area/ Building"
+    [placeholder]="'Enter Habitation/ Area/ Building'">
+  </app-ilogi-input>
+  <app-ilogi-input fieldId="pin" formControlName="pin" fieldLabel="Pin" [submitted]="submitted" [placeholder]="'Enter Pin'"
     [mandatory]="true">
   </app-ilogi-input>
-
-  <!-- PAN -->
-  <app-ilogi-input
-    fieldId="businessPan"
-    fieldLabel="Business PAN No"
-    [placeholder]="'Enter Business PAN No'"
-    [submitted]="submitted"
+  <app-ilogi-input fieldId="postOffice" formControlName="postOffice" fieldLabel="Post Office" [submitted]="submitted"
+    [placeholder]="'Enter Post Office'" [mandatory]="true">
+  </app-ilogi-input>
+  <app-ilogi-input fieldId="policeStation" formControlName="policeStation" fieldLabel="Police Station" [submitted]="submitted"
+    [placeholder]="'Enter Police Station'" [mandatory]="true">
+  </app-ilogi-input>
+  <app-ilogi-input fieldId="repName" formControlName="repName" fieldLabel="Name" [submitted]="submitted" [placeholder]="'Enter repName'"
     [mandatory]="true">
   </app-ilogi-input>
-
-  <!-- Registered Address -->
-  <app-ilogi-input
-    fieldId="registeredAddress"
-    fieldLabel="Enterprise's Registered Address"
-    [placeholder]="'Enter Registered Address'"
-    type="textarea"
-    >
+  <app-ilogi-input fieldId="designation" formControlName="designation" fieldLabel="Designation" [placeholder]="'Enter Designation'">
   </app-ilogi-input>
-
-  <!-- Habitation -->
-  <app-ilogi-input
-    fieldId="habitation"
-    fieldLabel="Habitation/ Area/ Building"
-    [placeholder]="'Enter Habitation/ Area/ Building'"
-    >
-  </app-ilogi-input>
-
-  <!-- Pin -->
-  <app-ilogi-input
-    fieldId="pin"
-    fieldLabel="Pin"
-    [submitted]="submitted"
-    [placeholder]="'Enter Pin'"
+  <app-ilogi-input fieldId="aadhar" formControlName="aadhar" fieldLabel="Aadhar No" [submitted]="submitted" [placeholder]="'Enter Aadhar No'"
     [mandatory]="true">
   </app-ilogi-input>
-
-  <!-- Post Office -->
-  <app-ilogi-input
-    fieldId="postOffice"
-    fieldLabel="Post Office"
-    [submitted]="submitted"
-    [placeholder]="'Enter Post Office'"
+  <app-ilogi-input fieldId="mobile" formControlName="mobile" fieldLabel="Mobile No" [submitted]="submitted" [placeholder]="'Enter Mobile No'"
     [mandatory]="true">
   </app-ilogi-input>
-
-  <!-- Police Station -->
-  <app-ilogi-input
-    fieldId="policeStation"
-    fieldLabel="Police Station"
-    [submitted]="submitted"
-    [placeholder]="'Enter Police Station'"
+  <app-ilogi-input fieldId="phone" formControlName="phone" fieldLabel="Phone No" [placeholder]="'Enter Phone No'">
+  </app-ilogi-input>
+  <app-ilogi-input fieldId="email" formControlName="email" fieldLabel="Email Id" [submitted]="submitted" [placeholder]="'Enter Email Id'"
     [mandatory]="true">
   </app-ilogi-input>
+  <div class="mt-4" >
 
-  <!-- Rep Name -->
-  <app-ilogi-input
-    fieldId="repName"
-    fieldLabel="Name"
-    [submitted]="submitted"
-    [placeholder]="'Enter repName'"
-    [mandatory]="true">
-  </app-ilogi-input>
-
-  <!-- Designation -->
-  <app-ilogi-input
-    fieldId="designation"
-    fieldLabel="Designation"
-    [placeholder]="'Enter Designation'"
-    >
-  </app-ilogi-input>
-
-  <!-- Aadhar -->
-  <app-ilogi-input
-    fieldId="aadhar"
-    fieldLabel="Aadhar No"
-    [submitted]="submitted"
-    [placeholder]="'Enter Aadhar No'"
-    [mandatory]="true">
-  </app-ilogi-input>
-
-  <!-- Mobile -->
-  <app-ilogi-input
-    fieldId="mobile"
-    fieldLabel="Mobile No"
-    [submitted]="submitted"
-    [placeholder]="'Enter Mobile No'"
-    [mandatory]="true">
-  </app-ilogi-input>
-
-  <!-- Phone -->
-  <app-ilogi-input
-    fieldId="phone"
-    fieldLabel="Phone No"
-    [placeholder]="'Enter Phone No'"
- >
-  </app-ilogi-input>
-
-  <!-- Email -->
-  <app-ilogi-input
-    fieldId="email"
-    fieldLabel="Email Id"
-    [submitted]="submitted"
-    [placeholder]="'Enter Email Id'"
-    [mandatory]="true">
-  </app-ilogi-input>
-
-  <!-- Alternate Mobile -->
-  <app-ilogi-input
-     fieldId="altMobile"
-    fieldLabel="Alternate Mobile No"
-    [placeholder]="'Enter Alternate Mobile No'"
-    >
-  </app-ilogi-input>
-
-  <!-- Proposal For -->
-  <app-ilogi-select
-    fieldId="proposalFor"
-    fieldLabel="Proposal For"
-    [placeholder]="'Proposal For'"
-    [selectOptions]="proposalOptions"
-    [submitted]="submitted"
-    [mandatory]="true">
-  </app-ilogi-select>
-
-  <!-- Commissioning Date -->
-  <app-ilogi-input-date
-    fieldId="commissioningDate"
-    fieldLabel="Proposed Date of Commissioning"
-    [submitted]="submitted"
-    (onDateChange)="enterpriseForm.get('commissioningDate')?.setValue($event)"
-    [mandatory]="true">
-  </app-ilogi-input-date>
-
-  <!-- Actions -->
-  <div class="form-actions">
-    <button type="button" class="btn btn-primary">Save As Draft</button>
-    <button type="submit" class="btn btn-success">Save</button>
+    <app-ilogi-input fieldId="altMobile" formControlName="altMobile" fieldLabel="Alternate Mobile No" [placeholder]="'Enter Alternate Mobile No'">
+    </app-ilogi-input>
   </div>
+  <app-ilogi-select fieldId="proposalFor" formControlName="proposalFor" fieldLabel="Proposal For" [placeholder]="'Proposal For'"
+    [selectOptions]="proposalOptions" [submitted]="submitted" [mandatory]="true">
+  </app-ilogi-select>
+  <app-ilogi-input-date fieldId="commissioningDate" formControlName="commissioningDate" fieldLabel="Proposed Date of Commissioning" [submitted]="submitted"
+    (onDateChange)="enterpriseForm.get('commissioningDate')?.setValue($event)" [mandatory]="true">
+  </app-ilogi-input-date>
+<div class="form-actions">
+  <button type="button" class="btn btn-primary" (click)="onSave(true)">Save As Draft</button>
+  <button type="submit" class="btn btn-success">Submit</button>
+</div>
 </form>
