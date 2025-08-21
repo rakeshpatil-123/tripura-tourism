@@ -21,6 +21,9 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                 path: 'registration',
                 loadComponent: () =>
                     import('./auth/registration/registration.component').then(m => m.RegistrationComponent)
+            },{
+                path: 'admin',
+                loadComponent: () => import('./auth/admin-login/admin-login.component').then(m => m.AdminLoginComponent)
             }
             
         ]

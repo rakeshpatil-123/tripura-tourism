@@ -1,0 +1,50 @@
+<div class="admin-login-container">
+  <div class="card">
+    <h2 class="title">Admin Login</h2>
+    <p class="subtitle">Sign in with your admin account</p>
+
+    <form [formGroup]="adminLoginForm" (ngSubmit)="onSubmit()" class="form">
+
+      <app-ilogi-input
+        fieldId="user_name"
+        fieldLabel="Username or Email"
+        [mandatory]="true"
+        formControlName="user_name"
+        type="text"
+        placeholder="Enter username or email"
+      ></app-ilogi-input>
+
+      <app-ilogi-input
+        fieldId="password"
+        fieldLabel="Password"
+        [mandatory]="true"
+        formControlName="password"
+        type="password"
+        placeholder="Enter password"
+      ></app-ilogi-input>
+
+      <!-- Captcha -->
+      <div class="captcha-box">
+        <span class="captcha-code">{{ captchaCode }}</span>
+        <button type="button" class="refresh-btn" (click)="generateCaptcha()">↻</button>
+      </div>
+
+      <input  
+        type="text"
+        placeholder="Enter captcha"
+        formControlName="captchaInput"
+        class="captcha-input"
+      />
+
+      <small class="error-text" *ngIf="captchaError">{{ captchaError }}</small>
+
+      <button
+        type="submit"
+        class="btn-submit"
+        [disabled]="loading || !adminLoginForm.valid"
+      >
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+    </form>
+  </div>
+</div>

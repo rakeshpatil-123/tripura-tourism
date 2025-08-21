@@ -71,6 +71,10 @@ export class GenericService {
     return this.http.post(`${this.baseUrl}/api/user/register`, userData);
   }
 
+  loginAdmin(adminData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/user/login`, adminData);
+  }
+
   getSiteKey(): string {
     return this.reCaptcha_key;
   }
@@ -112,17 +116,21 @@ export class GenericService {
   //   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams);
   // }
 
-getByConditions(conditionParams: any, apiObject: string): Observable<any> {
-  const token = localStorage.getItem('token'); 
-  let headers = new HttpHeaders();
+  getByConditions(conditionParams: any, apiObject: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
 
-  if (token) {
-    headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
+      headers,
+    });
   }
-
-  return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, { headers });
-}
-
 
   getByConditionsExternal(
     conditionParams: any,
@@ -213,41 +221,40 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   }
 
   storeSessionData(response: any, rememberme: boolean): void {
-  if (response['user'] && response['token']) {
-    // Clear existing storage
-    localStorage.clear();
+    if (response['user'] && response['token']) {
+      // Clear existing storage
+      localStorage.clear();
 
-    // Required keys from response
-    const keysToStore = [
-      'token',
-      'id',
-      'name_of_enterprise',
-      'authorized_person_name',
-      'email_id',
-      'mobile_no',
-      'user_name',
-      'bin',
-      'registered_enterprise_address',
-      'registered_enterprise_city',
-      'user_type',
-      'status'
-    ];
+      // Required keys from response
+      const keysToStore = [
+        'token',
+        'id',
+        'name_of_enterprise',
+        'authorized_person_name',
+        'email_id',
+        'mobile_no',
+        'user_name',
+        'bin',
+        'registered_enterprise_address',
+        'registered_enterprise_city',
+        'user_type',
+        'status',
+      ];
 
-    keysToStore.forEach((key) => {
-      if (response['user'][key] || response[key]) {
-        const value =
-          typeof response['user'][key] === 'object'
-            ? JSON.stringify(response['user'][key])
-            : this.encryptData(response['user'][key] || response[key]);
-        localStorage.setItem(key, value);
-      }
-    });
+      keysToStore.forEach((key) => {
+        if (response['user'][key] || response[key]) {
+          const value =
+            typeof response['user'][key] === 'object'
+              ? JSON.stringify(response['user'][key])
+              : this.encryptData(response['user'][key] || response[key]);
+          localStorage.setItem(key, value);
+        }
+      });
 
-    this.setLoginStatus(true);
-    this.router.navigate(['dashboard/home']);
+      this.setLoginStatus(true);
+      this.router.navigate(['dashboard/home']);
+    }
   }
-}
-
 
   // storeSessionData(response: any, rememberme: boolean): void {
   //   if (response['result'] && response['token']) {
@@ -294,8 +301,8 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   // }
 
   postWithoutAuth(apiObject: string, body: any = {}): Observable<any> {
-  return this.http.post(`${this.baseUrl}/${apiObject}`, body);
-}
+    return this.http.post(`${this.baseUrl}/${apiObject}`, body);
+  }
 
   removeSessionData(): void {
     localStorage.clear();
@@ -316,7 +323,7 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
       error: (error) => {
         console.error(error);
         // if (error.status === 403) {
-          this.removeSessionData();
+        this.removeSessionData();
         // }
       },
     });

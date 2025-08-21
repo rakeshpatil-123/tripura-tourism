@@ -13,5 +13,9 @@ export const routes: Routes = [
         path: 'auth',
         loadChildren: () =>
             import('./page-content/page-content.routes').then(m => m.PAGE_CONTENT_ROUTES)
+    },
+    {
+        path: 'admin',
+        loadChildren: () => import('./page-content/auth/admin-login/admin-login.component').then(m => m.AdminLoginComponent)
     }
 ];
