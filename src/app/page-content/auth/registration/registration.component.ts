@@ -22,9 +22,7 @@ export class RegistrationComponent {
   registrationForm: FormGroup;
 
   userTypeOptions = [
-    { value: 'department', name: 'Department', id: 'department' },
-    { value: 'citizen', name: 'Citizen', id: 'citizen' },
-    { value: 'individual', name: 'Individual', id: 'individual' }
+    { value: 'Individual', name: 'Individual', id: 'Individual' }
   ];
 
   constructor(
@@ -40,7 +38,7 @@ export class RegistrationComponent {
       user_name: ['', []],
       registered_enterprise_address: ['', []],
       registered_enterprise_city: ['', []],
-      user_type: ['department', []], 
+      user_type: ['Individual', []], 
       password: ['', []],
       confirmPassword: ['', []]
     }, {
