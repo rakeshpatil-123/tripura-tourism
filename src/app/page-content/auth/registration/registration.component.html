@@ -5,50 +5,55 @@
       <h2 class="title">New User Registration</h2>
       <p class="subtitle">Fill in your details to register</p>
 
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form enterprise-form">
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form ">
+        <div class="enterprise-form">
 
-        <!-- Enterprise Name -->
-        <app-ilogi-input fieldId="name_of_enterprise" fieldLabel="Name of Enterprise" [mandatory]="true"
-          formControlName="name_of_enterprise" placeholder="Enter enterprise name"></app-ilogi-input>
+          <!-- Enterprise Name -->
+          <app-ilogi-input fieldId="name_of_enterprise" fieldLabel="Name of Enterprise" [mandatory]="true"
+            formControlName="name_of_enterprise" placeholder="Enter enterprise name"></app-ilogi-input>
 
-        <!-- Authorized Person -->
-        <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
-          formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
+          <!-- Authorized Person -->
+          <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
+            formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
 
-        <!-- Email -->
-        <app-ilogi-input fieldId="email_id" fieldLabel="Email ID" [mandatory]="true" formControlName="email_id"
-          placeholder="Enter email" type="email"></app-ilogi-input>
+          <!-- Email -->
+          <app-ilogi-input fieldId="email_id" fieldLabel="Email ID" [mandatory]="true" formControlName="email_id"
+            placeholder="Enter email" type="email"></app-ilogi-input>
 
-        <!-- Mobile -->
-        <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
-          placeholder="Enter mobile number" type="tel"></app-ilogi-input>
+          <!-- Mobile -->
+          <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
+            placeholder="Enter mobile number" type="tel"></app-ilogi-input>
 
-        <!-- Username -->
-        <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
-          placeholder="Choose a username"></app-ilogi-input>
+          <!-- Username -->
+          <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
+            placeholder="Choose a username"></app-ilogi-input>
 
-        <!-- Address -->
-        <app-ilogi-input fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
-          [mandatory]="true" formControlName="registered_enterprise_address"
-          placeholder="Enter full address"></app-ilogi-input>
+          <!-- City -->
+          <app-ilogi-input fieldId="registered_enterprise_city" fieldLabel="City" [mandatory]="true"
+            formControlName="registered_enterprise_city" placeholder="Enter city"></app-ilogi-input>
+        </div>
+<div class="single-field">
 
-        <!-- City -->
-        <app-ilogi-input fieldId="registered_enterprise_city" fieldLabel="City" [mandatory]="true"
-          formControlName="registered_enterprise_city" placeholder="Enter city"></app-ilogi-input>
+  <!-- Address -->
+  <app-ilogi-input fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
+  [mandatory]="true" formControlName="registered_enterprise_address"
+  placeholder="Enter full address"></app-ilogi-input>
+  
+  
+  <!-- User Type -->
+  <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
+  [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
+</div>
+        <div class="enterprise-form">
+          <!-- Password -->
+          <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
+            type="password" placeholder="Enter password"></app-ilogi-input>
 
-        <!-- User Type -->
-        <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
-          [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
-
-        <!-- Password -->
-        <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
-          type="password" placeholder="Enter password"></app-ilogi-input>
-
-        <!-- Confirm Password -->
-        <app-ilogi-input fieldId="confirmPassword" fieldLabel="Confirm Password" [mandatory]="true"
-          formControlName="confirmPassword" type="password" placeholder="Re-enter password"
-          errorMessage="Passwords do not match"></app-ilogi-input>
-
+          <!-- Confirm Password -->
+          <app-ilogi-input fieldId="confirmPassword" fieldLabel="Confirm Password" [mandatory]="true"
+            formControlName="confirmPassword" type="password" placeholder="Re-enter password"
+            errorMessage="Passwords do not match"></app-ilogi-input>
+        </div>
         <!-- Submit Button -->
         <div class="form-actions">
           <button type="submit" class="btn-submit btn btn-primary" [disabled]="!registrationForm.valid">

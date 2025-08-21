@@ -1,0 +1,347 @@
+$nav-gradient: linear-gradient(to right, #001a4d, #004aad, #0066cc, #00b4d8);
+$nav-height: 70px;
+$white: #ffffff;
+$hover-color: #fed7aa;
+$underline-gradient: linear-gradient(to right, #fb923c, #fbbf24);
+$mobile-bg: rgba(0, 26, 77, 0.98);
+
+@mixin button-reset {
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition($properties: all, $duration: 0.3s, $timing: ease) {
+  transition: $properties $duration $timing;
+}
+
+.main-navigation {
+  background: $nav-gradient;
+  height: 6vh;
+  @include flex-center;
+  padding: 0 24px;
+  max-width: 1440px;
+  min-width: 100vw;
+  margin: 0 auto;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  top: 10vh;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  overflow: visible;
+}
+
+.pattern-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+}
+
+.pattern-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'2\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+}
+
+.bg-element-1,
+.bg-element-2 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(32px);
+  animation: pulse 2s infinite;
+}
+
+.bg-element-1 {
+  top: 0;
+  left: 0;
+  width: 128px;
+  height: 128px;
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), transparent);
+}
+
+.bg-element-2 {
+  bottom: 0;
+  right: 0;
+  width: 160px;
+  height: 160px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), transparent);
+  animation-delay: 1s;
+}
+
+.nav-container {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+  position: relative;
+
+  &.hidden {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    display: flex;
+  }
+}
+
+.dropdown-container {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 40px;
+    z-index: 1001;
+    pointer-events: auto;
+  }
+}
+
+.nav-button {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $white;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  @include transition;
+  padding: 12px 8px;
+  position: relative;
+
+  &:hover {
+    color: $hover-color;
+    .nav-underline {
+      width: 100%;
+    }
+  }
+
+  &.active {
+    color: $hover-color;
+    .nav-underline {
+      width: 100%;
+    }
+  }
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  @include transition(transform);
+}
+
+.nav-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: $underline-gradient;
+  @include transition(width);
+  border-radius: 9999px;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 20px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  @include transition;
+
+  &:hover {
+    background-color: #f3f4f6;
+    color: #1e40af;
+    padding-left: 25px;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.mobile-menu-btn {
+  @include button-reset;
+  display: block;
+  padding: 12px;
+  border-radius: 12px;
+  color: $white;
+  @include transition;
+  position: relative;
+  z-index: 1002;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}
+
+.hamburger-icon {
+  width: 26px;
+  height: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger-line {
+  height: 2px;
+  width: 100%;
+  background-color: currentColor;
+  border-radius: 1px;
+  @include transition(all, 0.3s, cubic-bezier(0.645, 0.045, 0.355, 1));
+  transform-origin: center;
+
+  &.line-1-active {
+    transform: translateY(9px) rotate(45deg);
+  }
+
+  &.line-2-active {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  &.line-3-active {
+    transform: translateY(-9px) rotate(-45deg);
+  }
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $mobile-bg;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  overflow-y: auto;
+  padding-top: 150px;
+}
+
+.mobile-menu-content {
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.mobile-menu-section {
+  margin-bottom: 8px;
+}
+
+.mobile-nav-button {
+  @include button-reset;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  color: $white;
+  font-size: 18px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  @include transition;
+  margin-bottom: 8px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $hover-color;
+  }
+
+  &.active {
+    background: rgba(251, 146, 60, 0.2);
+    color: $hover-color;
+  }
+
+  &.has-dropdown .mobile-chevron {
+    &.rotated {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.mobile-chevron {
+  width: 20px;
+  height: 20px;
+  @include transition(transform);
+}
+
+.mobile-dropdown-items {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-top: -8px;
+  margin-bottom: 8px;
+  overflow: visible;
+}
+
+.mobile-dropdown-item {
+  display: block;
+  padding: 14px 24px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  @include transition;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $white;
+    padding-left: 32px;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 1024px) {
+  .main-navigation {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-navigation {
+    height: 60px;
+    padding: 0 12px;
+  }
+  .mobile-menu-overlay {
+    padding-top: 140px;
+  }
+}
+
+@media print {
+  .main-navigation {
+    display: none;
+  }
+}

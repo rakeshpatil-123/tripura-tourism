@@ -59,9 +59,13 @@
 
       <!-- Desktop Actions -->
       <div class="header-actions" *ngIf="!isMobile">
-        <a routerLink="auth/login" routerLinkActive="router-link-active"  class="action-button outline">Login</a>
-        <a routerLink="auth/signup" routerLinkActive="router-link-active"  class="action-button solid">Sign Up</a>
+
+      
         <a routerLink="auth/admin" routerLinkActive="router-link-active"  class="action-button solid">Admin</a>
+
+        <a href="auth/login" routerLinkActive="router-link-active"  class="action-button outline">Login</a>
+        <a href="auth/registration" routerLinkActive="router-link-active"  class="action-button solid">Sign Up</a>
+
       </div>
 
       <!-- Overlays -->
