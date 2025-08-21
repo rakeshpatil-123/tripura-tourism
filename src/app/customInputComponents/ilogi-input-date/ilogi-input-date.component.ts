@@ -87,9 +87,9 @@ export class IlogiInputDateComponent
   isDisabled = false;
   dateRangeError = '';
 
-  // Date range properties
-  minDate: Date = new Date();
-  maxDate: Date = new Date();
+  today: Date = new Date();
+  minDate!: Date;
+  maxDate!: Date;
 
   // ControlValueAccessor callbacks
   private onChange: (value: Date | null) => void = () => {};
@@ -97,10 +97,14 @@ export class IlogiInputDateComponent
 
   constructor(private cdr: ChangeDetectorRef, private datePipe: DatePipe) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
+    const currentYear = new Date().getFullYear();
+    this.minDate = new Date(currentYear - 100, 0, 1);
+    this.maxDate = new Date(currentYear + 100, 11, 31);
     if (this.fieldId) {
       this.errorFieldId = `invalid-input-${this.fieldId}`;
     }
+
     this.setupDateRange();
   }
 
@@ -114,17 +118,20 @@ export class IlogiInputDateComponent
 
   private setupDateRange(): void {
     const today = new Date();
-
+    const currentYear = new Date().getFullYear();
     // Set max date
     if (this.allowFutureDates && this.futureMonthsRange > 0) {
       this.maxDate = new Date();
       this.maxDate.setMonth(this.maxDate.getMonth() + this.futureMonthsRange);
     } else {
-      this.maxDate = new Date();
+      // Default: today + 100 years
+      this.maxDate = new Date(
+        new Date().setFullYear(new Date().getFullYear() + 35)
+      );
     }
 
     // Set min date
-    this.minDate = new Date();
+    this.minDate = new Date(currentYear - 100, 0, 1);
     this.minDate.setMonth(this.minDate.getMonth() - this.monthsRange);
 
     this.updateErrorMessages();
@@ -176,45 +183,34 @@ export class IlogiInputDateComponent
   }
 
   // Handle date changes from date picker
-  onDateChange(value: Date | null): void {
-    this.dateRangeError = '';
-    this.onTouched(); // Mark as touched when user interacts
+onDateChange(value: Date | null): void {
+  this.dateRangeError = '';
+  this.onTouched(); // Mark as touched when user interacts
 
-    if (value) {
-      const selectedDate = new Date(value);
-      const today = new Date();
-      today.setHours(23, 59, 59, 999);
+  if (value) {
+    const selectedDate = new Date(value);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
 
-      const pastLimitDate = new Date();
-      pastLimitDate.setMonth(pastLimitDate.getMonth() - this.monthsRange);
-      pastLimitDate.setHours(0, 0, 0, 0);
+    // Past limit -> 100 years ago
+    const pastLimitDate = new Date();
+    pastLimitDate.setFullYear(pastLimitDate.getFullYear() - 100);
+    pastLimitDate.setHours(0, 0, 0, 0);
 
-      // Check future date validation
-      if (!this.allowFutureDates && selectedDate > today) {
+    // ✅ Future date validation
+    if (!this.allowFutureDates && selectedDate > today) {
+      this.dateRangeError = this.futureDateErrorMessage;
+      this.value = null;
+      this.onChange(null);
+      this.cdr.detectChanges();
+      return;
+    } else if (this.allowFutureDates && this.futureMonthsRange > 0) {
+      const futureLimitDate = new Date();
+      futureLimitDate.setMonth(futureLimitDate.getMonth() + this.futureMonthsRange);
+      futureLimitDate.setHours(23, 59, 59, 999);
+
+      if (selectedDate > futureLimitDate) {
         this.dateRangeError = this.futureDateErrorMessage;
-        this.value = null;
-        this.onChange(null);
-        this.cdr.detectChanges();
-        return;
-      } else if (this.allowFutureDates && this.futureMonthsRange > 0) {
-        const futureLimitDate = new Date();
-        futureLimitDate.setMonth(
-          futureLimitDate.getMonth() + this.futureMonthsRange
-        );
-        futureLimitDate.setHours(23, 59, 59, 999);
-
-        if (selectedDate > futureLimitDate) {
-          this.dateRangeError = this.futureDateErrorMessage;
-          this.value = null;
-          this.onChange(null);
-          this.cdr.detectChanges();
-          return;
-        }
-      }
-
-      // Check past date validation
-      if (selectedDate < pastLimitDate) {
-        this.dateRangeError = this.pastDateErrorMessage;
         this.value = null;
         this.onChange(null);
         this.cdr.detectChanges();
@@ -222,11 +218,22 @@ export class IlogiInputDateComponent
       }
     }
 
-    // If validation passes, set the value
-    this.value = value;
-    this.onChange(this.value); // Notify Angular forms of the change
-    this.cdr.detectChanges();
+    // ✅ Past date validation (100 years limit)
+    if (selectedDate < pastLimitDate) {
+      this.dateRangeError = `Date cannot be older than 100 years`;
+      this.value = null;
+      this.onChange(null);
+      this.cdr.detectChanges();
+      return;
+    }
   }
+
+  // If validation passes, set the value
+  this.value = value;
+  this.onChange(this.value); // Notify Angular forms of the change
+  this.cdr.detectChanges();
+}
+
 
   // Handle blur event
   onBlur(event: Event): void {

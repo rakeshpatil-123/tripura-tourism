@@ -4,58 +4,28 @@
     <span *ngIf="mandatory" class="required-indicator">*</span>
   </label>
 
-  <div
-    *ngIf="readonly"
-    class="readonly-display"
-    [attr.id]="fieldId"
-    [attr.aria-label]="fieldLabel"
-  >
+  <div *ngIf="readonly" class="readonly-display" [attr.id]="fieldId" [attr.aria-label]="fieldLabel">
     {{ value ? (value | date : "dd/MM/yyyy") : "" }}
   </div>
 
   <ng-container *ngIf="!readonly">
     <div class="date-input-container">
-      <input
-        matInput
-        [matDatepicker]="picker"
-        [value]="value"
-        (dateChange)="onDateChange($event.value)"
-        [placeholder]="placeholder"
-        [id]="fieldId"
-        (click)="picker.open()"
-        (mouseenter)="showErrorOnFieldHover()"
-        (mouseleave)="hideErrorOnFieldHoverOut()"
-        (blur)="onBlur($event)"
-        class="form-control date-input"
-        [ngClass]="{
+      <input matInput [matDatepicker]="picker" [value]="value" (dateChange)="onDateChange($event.value)"
+        [placeholder]="placeholder" [id]="fieldId" (click)="picker.open()" (mouseenter)="showErrorOnFieldHover()"
+        (mouseleave)="hideErrorOnFieldHoverOut()" (blur)="onBlur($event)" class="form-control date-input" [ngClass]="{
           'is-invalid': (submitted && errors) || dateRangeError
-        }"
-        [attr.aria-invalid]="
+        }" [attr.aria-invalid]="
           (submitted && errors) || dateRangeError ? 'true' : 'false'
-        "
-        [attr.aria-describedby]="errorFieldId"
-        [disabled]="isDisabled"
-        [min]="minDate"
-        [max]="maxDate"
-      />
-      <mat-icon
-        matSuffix
-        class="calendar-icon"
-        (click)="picker.open()"
-        [attr.aria-label]="'Open date picker'"
-        tabindex="-1"
-      >
+        " [attr.aria-describedby]="errorFieldId" [disabled]="isDisabled" [min]="minDate" [max]="maxDate" />
+      <mat-icon matSuffix class="calendar-icon" (click)="picker.open()" [attr.aria-label]="'Open date picker'"
+        tabindex="-1">
         calendar_today
       </mat-icon>
     </div>
   </ng-container>
 
-  <div
-    *ngIf="submitted && hasErrors"
-    class="invalid-input"
-    [id]="errorFieldId"
-    [ngClass]="{ 'show-error': isHovered || submitted }"
-  >
+  <div *ngIf="submitted && hasErrors" class="invalid-input" [id]="errorFieldId"
+    [ngClass]="{ 'show-error': isHovered || submitted }">
     <ng-container *ngFor="let item of errors | keyvalue; let i = index">
       <div *ngIf="i === 0" class="x-error-msg-text">
         {{ errorMessages[item.key] || item.value?.message }}
@@ -66,17 +36,9 @@
     </div>
   </div>
 
-  <div
-    *ngIf="dateRangeError"
-    class="invalid-input"
-    [ngClass]="{ 'show-error': true }"
-  >
+  <div *ngIf="dateRangeError" class="invalid-input" [ngClass]="{ 'show-error': true }">
     <div class="x-error-msg-text">{{ dateRangeError }}</div>
   </div>
 
-  <mat-datepicker
-    [startAt]="maxDate"
-    class="date-picker"
-    #picker
-  ></mat-datepicker>
+  <mat-datepicker [startAt]="today" class="date-picker" #picker></mat-datepicker>
 </div>

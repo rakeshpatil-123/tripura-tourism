@@ -76,10 +76,10 @@
 
 .enterprise-form {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); // 👈 3 equal columns
+  grid-template-columns: repeat(2, 1fr); // 👈 3 equal columns
 //   gap: 1.5rem; // space between fields
 column-gap: 1.5rem;
-row-gap: 6px;
+row-gap: 2rem;
 
   // Make form-actions full width (buttons row ke niche)
   .form-actions {

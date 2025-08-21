@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders,HttpParams } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
@@ -122,6 +122,22 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
 
   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, { headers });
 }
+
+// getDataByConditions(queryParams: any, apiObject: string): Observable<any> {
+//   const token = localStorage.getItem('token'); 
+//   let headers = new HttpHeaders();
+
+//   if (token) {
+//     headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+//   }
+
+//   let params = new HttpParams();
+//   Object.keys(queryParams).forEach(key => {
+//     params = params.set(key, queryParams[key]);
+//   });
+
+//   return this.http.post(`${this.baseUrl}/${apiObject}`, { headers, params });
+// }
 
 
   getByConditionsExternal(
