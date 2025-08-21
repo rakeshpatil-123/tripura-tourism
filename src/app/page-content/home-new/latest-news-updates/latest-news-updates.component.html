@@ -1,0 +1,128 @@
+<section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-green-100 rounded-full px-6 py-3 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell text-blue-600" [innerHTML]="bellSvgSafe"></svg>
+        <span class="text-gray-700 font-medium">Latest Updates</span>
+      </div>
+      <h2 class="font-merriweather font-bold text-3xl sm:text-4xl text-gray-900 mb-4">
+        Latest News & Updates
+      </h2>
+      <p class="font-open-sans text-xl text-gray-600 max-w-3xl mx-auto">
+        Stay informed about the latest developments, policy updates, and achievements in Tripura's investment ecosystem.
+      </p>
+    </div>
+    <div class="mb-16">
+      <h3 class="font-merriweather font-bold text-2xl text-gray-900 mb-8">
+        Featured Stories
+      </h3>
+      <div class="relative bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="relative h-96 lg:h-80">
+          <div *ngFor="let story of stories; let i = index" class="absolute inset-0 transition-opacity duration-500" [ngClass]="i === currentSlide ? 'opacity-100' : 'opacity-0'">
+            <div class="grid grid-cols-1 lg:grid-cols-2 h-full">
+              <div class="relative">
+                <img [src]="story.image" [alt]="story.alt" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent lg:hidden"></div>
+              </div>
+              <div class="p-8 lg:p-12 flex flex-col justify-center relative lg:static absolute inset-0 lg:bg-transparent bg-gradient-to-t from-black/80 to-transparent text-white lg:text-gray-900">
+                <div class="flex items-center space-x-3 mb-4">
+                  <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="story.categoryBgColor + ' ' + story.categoryTextColor">{{ story.category }}</span>
+                  <div class="flex items-center space-x-2 text-sm text-gray-500 lg:text-gray-500 text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar" [innerHTML]="calendarSvgSafe"></svg>
+                    <span>{{ story.date }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock" [innerHTML]="clockSvgSafe"></svg>
+                    <span>{{ story.readTime }}</span>
+                  </div>
+                </div>
+                <h3 class="font-merriweather font-bold text-2xl lg:text-3xl mb-4 leading-tight">
+                  {{ story.title }}
+                </h3>
+                <p class="font-open-sans text-lg lg:text-gray-600 text-gray-200 mb-6 leading-relaxed">
+                  {{ story.description }}
+                </p>
+                <div class="flex flex-wrap gap-2 mb-6">
+                  <span *ngFor="let tag of story.tags" class="px-3 py-1 rounded-full text-xs font-medium" [ngClass]="story.tagBgColor + ' ' + story.tagTextColor">{{ tag }}</span>
+                </div>
+                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2 w-fit" (click)="readStory(story.title)">
+                  <span>Read Full Story</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right" [innerHTML]="arrowRightSvgSafe"></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="absolute top-1/2 left-4 transform -translate-y-1/2">
+            <button class="bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-200" (click)="prevSlide()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left text-gray-600" [innerHTML]="chevronLeftSvgSafe"></svg>
+            </button>
+          </div>
+          <div class="absolute top-1/2 right-4 transform -translate-y-1/2">
+            <button class="bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-200" (click)="nextSlide()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right text-gray-600" [innerHTML]="chevronRightSvgSafe"></svg>
+            </button>
+          </div>
+          <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <button *ngFor="let story of stories; let i = index" class="w-3 h-3 rounded-full transition-colors duration-200" [ngClass]="i === currentSlide ? 'bg-orange-500' : 'bg-white/50'" (click)="goToSlide(i)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mb-12">
+      <div class="flex flex-wrap justify-center gap-3">
+        <button *ngFor="let filter of filters" class="flex items-center space-x-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300" [ngClass]="filter.active ? 'bg-orange-500 text-white shadow-lg' : 'bg-white text-gray-600 hover:bg-gray-50 shadow-md'" (click)="selectFilter(filter.label)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide" [innerHTML]="filter.iconSvgSafe"></svg>
+          <span>{{ filter.label }}</span>
+          <span class="px-2 py-1 rounded-full text-xs" [ngClass]="filter.active ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'">{{ filter.count }}</span>
+        </button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+      <article *ngFor="let article of articles" class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group cursor-pointer">
+        <div class="flex items-start space-x-4 mb-4">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center" [ngClass]="article.iconBgColor + ' ' + article.iconTextColor">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide" [innerHTML]="article.iconSvgSafe"></svg>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar" [innerHTML]="calendarSvgSafe"></svg>
+              <span>{{ article.date }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock" [innerHTML]="clockSvgSafe"></svg>
+              <span>{{ article.readTime }}</span>
+            </div>
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="article.categoryBgColor + ' ' + article.categoryTextColor">{{ article.category }}</span>
+          </div>
+        </div>
+        <h3 class="font-merriweather font-bold text-lg text-gray-900 mb-3 group-hover:text-orange-600 transition-colors duration-300 leading-tight">
+          {{ article.title }}
+        </h3>
+        <p class="font-open-sans text-gray-600 mb-4 leading-relaxed">
+          {{ article.description }}
+        </p>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span *ngFor="let tag of article.tags" class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">{{ tag }}</span>
+        </div>
+        <button class="text-orange-500 hover:text-orange-600 font-semibold text-sm flex items-center space-x-1 group-hover:translate-x-1 transition-transform duration-200" (click)="readStory(article.title)">
+          <span>Read More</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right" [innerHTML]="arrowRightSvgSafe"></svg>
+        </button>
+      </article>
+    </div>
+    <div class="bg-gradient-to-r from-blue-900 to-green-800 rounded-2xl p-8 text-center">
+      <h3 class="font-merriweather font-bold text-2xl text-white mb-4">
+        Stay Updated with SWAGAT 2.0
+      </h3>
+      <p class="font-open-sans text-blue-100 mb-6 max-w-2xl mx-auto">
+        Subscribe to our newsletter and get the latest updates on policies, achievements, and investment opportunities delivered to your inbox.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+        <input type="email" placeholder="Enter your email address" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-transparent" #emailInput />
+        <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center space-x-2" (click)="subscribe(emailInput.value)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell" [innerHTML]="bellSvgSafe"></svg>
+          <span>Subscribe</span>
+        </button>
+      </div>
+      <p class="font-open-sans text-xs text-blue-200 mt-4">
+        Join 5,000+ investors and stakeholders who trust our updates
+      </p>
+    </div>
+  </div>
+</section>

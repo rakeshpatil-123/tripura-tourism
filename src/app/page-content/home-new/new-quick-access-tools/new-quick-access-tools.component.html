@@ -1,0 +1,24 @@
+<section class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="font-merriweather font-bold text-3xl sm:text-4xl text-gray-900 mb-4">
+        Quick Access Tools & Dashboard
+      </h2>
+      <p class="font-open-sans text-xl text-gray-600 max-w-3xl mx-auto">
+        Access essential tools, track applications, and monitor performance through our comprehensive dashboard.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <button *ngFor="let tool of tools" 
+              class="{{tool.bgColor}} {{tool.hoverBgColor}} text-white p-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl group text-left"
+              (click)="onToolClick(tool)">
+        <div class="flex items-start justify-between mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide group-hover:scale-110 transition-transform duration-200" [innerHTML]="tool.iconSvgSafe"></svg>
+          <span class="bg-white/20 px-2 py-1 rounded-full text-xs font-semibold">{{ tool.badge }}</span>
+        </div>
+        <h4 class="font-merriweather font-semibold text-lg mb-2">{{ tool.title }}</h4>
+        <p class="font-open-sans text-sm opacity-90">{{ tool.description }}</p>
+      </button>
+    </div>
+  </div>
+</section>

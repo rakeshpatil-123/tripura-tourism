@@ -1,0 +1,103 @@
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-4xl font-semibold text-gray-900 mb-4">
+        Performance Analytics
+      </h1>
+      <h2 class="text-lg text-slate-600 mb-8">
+        Real-time insights into SWAGAT 2.0 performance and efficiency metrics
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-white rounded-2xl shadow-lg border border-gray-100 mb-12">
+      <div *ngFor="let metric of metrics" class="text-center">
+        <div class="flex items-center justify-center mb-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide text-blue-600" [innerHTML]="metric.iconSvgSafe"></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 mb-2">{{ metric.value }}</div>
+        <div class="text-sm text-slate-600 mb-3">{{ metric.label }}</div>
+        <div class="flex items-center justify-center space-x-1">
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up mr-1" [innerHTML]="metric.trendIconSvgSafe"></svg>
+            {{ metric.trend }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="flex space-x-8 border-b border-gray-200 mb-8">
+      <button class="pb-4 px-2 text-sm font-medium transition-colors duration-200"
+              [ngClass]="activeTab === 'Department Performance' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
+              (click)="selectTab('Department Performance')">
+        Department Performance
+      </button>
+      <button class="pb-4 px-2 text-sm font-medium transition-colors duration-200"
+              [ngClass]="activeTab === 'Recent Achievements' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
+              (click)="selectTab('Recent Achievements')">
+        Recent Achievements
+      </button>
+    </div>
+    <div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-6">Department-wise Performance Summary</h3>
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="text-left py-4 px-6 font-medium text-gray-900">Department Name</th>
+                <th class="text-right py-4 px-6 font-medium text-gray-900">Applications</th>
+                <th class="text-right py-4 px-6 font-medium text-gray-900">Approvals</th>
+                <th class="text-right py-4 px-6 font-medium text-gray-900">Avg. Processing Time</th>
+                <th class="text-right py-4 px-6 font-medium text-gray-900">Success Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dept of departments; let i = index" class="border-t border-gray-100 hover:bg-gray-50 transition-colors duration-200" [ngClass]="i % 2 === 0 ? 'bg-slate-50' : 'bg-white'">
+                <td class="py-4 px-6">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building text-blue-600" [innerHTML]="dept.iconSvgSafe"></svg>
+                    </div>
+                    <span class="font-medium text-gray-900">{{ dept.name }}</span>
+                  </div>
+                </td>
+                <td class="text-right py-4 px-6 text-gray-700">{{ dept.applications }}</td>
+                <td class="text-right py-4 px-6 text-gray-700">{{ dept.approvals }}</td>
+                <td class="text-right py-4 px-6 text-gray-700">{{ dept.avgProcessingTime }}</td>
+                <td class="text-right py-4 px-6"><span class="font-semibold text-emerald-600">{{ dept.successRate }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="mt-16 bg-gradient-to-r from-blue-900 to-green-800 rounded-2xl p-8 text-white">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 class="text-2xl font-bold mb-4">Performance Insights</h3>
+          <p class="text-blue-100 mb-6 leading-relaxed">
+            SWAGAT 2.0 continues to set new benchmarks in government service delivery. Our data-driven approach ensures continuous improvement and transparency.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+                    (click)="viewReports()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart3" [innerHTML]="barChartSvgSafe"></svg>
+              <span>View Detailed Reports</span>
+            </button>
+            <button class="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-all duration-300 flex items-center space-x-2"
+                    (click)="customAnalytics()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter" [innerHTML]="filterSvgSafe"></svg>
+              <span>Custom Analytics</span>
+            </button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div *ngFor="let insight of insights" class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold {{insight.color}} mb-1">{{ insight.value }}</div>
+            <div class="text-sm text-blue-200">{{ insight.label }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,58 @@
+<section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-200/30 to-red-200/30 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-200/30 to-green-200/30 rounded-full blur-3xl"></div>
+  </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center space-x-2 bg-gradient-to-r from-orange-100 to-blue-100 rounded-full px-6 py-3 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up text-orange-500">
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+          <polyline points="16 7 22 7 22 13"></polyline>
+        </svg>
+        <span class="text-gray-700 font-medium">Key Performance Metrics</span>
+      </div>
+      <h2 class="font-merriweather font-bold text-3xl sm:text-4xl text-gray-900 mb-4">Tripura's Investment Success Story</h2>
+      <p class="font-open-sans text-xl text-gray-600 max-w-3xl mx-auto">Witness the remarkable growth and achievements that make Tripura a premier investment destination in Northeast India.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div *ngFor="let metric of metrics; let i = index" #metricCard [@cardAnimation]="{ value: cardState, params: { delay: i * 0.2 } }" class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 text-center transition-all duration-700 transform hover:shadow-2xl hover:-translate-y-2">
+        <div class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300" [ngClass]="[metric.gradientFrom, metric.gradientTo, 'bg-gradient-to-br']">
+          <svg *ngIf="metric.icon === 'trending-up'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up text-white">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+          <svg *ngIf="metric.icon === 'users'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users text-white">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <svg *ngIf="metric.icon === 'building'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building text-white">
+            <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M12 6h.01"></path>
+            <path d="M12 10h.01"></path>
+            <path d="M12 14h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M16 14h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M8 14h.01"></path>
+          </svg>
+        </div>
+        <div class="text-5xl font-bold text-gray-900 mb-3 font-mono tracking-tight value">{{metric.value}}</div>
+        <div class="font-merriweather font-semibold text-xl text-gray-800 mb-2">{{metric.title}}</div>
+        <div class="font-open-sans text-gray-600 mb-6">{{metric.subtitle}}</div>
+      </div>
+    </div>
+    <div class="mt-16 text-center">
+      <div class="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
+        <h3 class="font-merriweather font-bold text-2xl text-gray-900 mb-4">Leading Northeast India's Economic Transformation</h3>
+        <p class="font-open-sans text-gray-600 max-w-3xl mx-auto mb-6">These numbers represent more than statistics – they showcase real businesses, real jobs, and real opportunities that are transforming Tripura into a dynamic investment destination.</p>
+        <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105" (click)="onExploreClick()">Explore Investment Opportunities</button>
+      </div>
+    </div>
+  </div>
+</section>
