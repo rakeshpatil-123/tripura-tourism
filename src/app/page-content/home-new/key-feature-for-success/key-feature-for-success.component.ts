@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { gsap } from 'gsap';
 
 interface Feature {
   gradientFrom: string;
@@ -33,9 +34,11 @@ interface SmallFeature {
   templateUrl: './key-feature-for-success.component.html',
   styleUrls: ['./key-feature-for-success.component.scss']
 })
-export class KeyFeatureForSuccessComponent implements OnInit {
-  checkSvg = `<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path>`;
+export class KeyFeatureForSuccessComponent implements AfterViewInit {
+  @ViewChildren('featureCard') featureCards!: QueryList<ElementRef>;
+  @ViewChildren('smallFeatureCard') smallFeatureCards!: QueryList<ElementRef>;
 
+  checkSvg = `<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path>`;
   checkSvgSafe: SafeHtml | undefined;
 
   features: Feature[] = [
@@ -104,9 +107,9 @@ export class KeyFeatureForSuccessComponent implements OnInit {
     }
   ];
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer, private el: ElementRef) {}
 
-  ngOnInit(): void {
+  ngAfterViewInit() {
     this.features.forEach(feature => {
       feature.iconSvgSafe = this.sanitizer.bypassSecurityTrustHtml(feature.iconSvg);
     });
@@ -114,20 +117,103 @@ export class KeyFeatureForSuccessComponent implements OnInit {
       smallFeature.iconSvgSafe = this.sanitizer.bypassSecurityTrustHtml(smallFeature.iconSvg);
     });
     this.checkSvgSafe = this.sanitizer.bypassSecurityTrustHtml(this.checkSvg);
+
+    this.setupIntersectionObserver();
+    this.setupHoverAnimations();
+  }
+
+  setupIntersectionObserver() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log('Component is 40% visible, triggering animations');
+            this.animateCards();
+          } else {
+            console.log('Component out of view, resetting animations');
+            this.resetAnimations();
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(this.el.nativeElement);
+  }
+
+  animateCards() {
+    // Animate large feature cards
+    this.featureCards.forEach((card, index) => {
+      gsap.fromTo(
+        card.nativeElement,
+        { opacity: 0, y: 100 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power1.out',
+          delay: index * 0.1,
+          onComplete: () => console.log(`Feature card ${index} animation completed`)
+        }
+      );
+    });
+
+    // Animate small feature cards
+    this.smallFeatureCards.forEach((card, index) => {
+      gsap.fromTo(
+        card.nativeElement,
+        { opacity: 0, y: 100 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power1.out',
+          delay: index * 0.1 + 0.3, // Slight offset after large cards
+          onComplete: () => console.log(`Small feature card ${index} animation completed`)
+        }
+      );
+    });
+  }
+
+  resetAnimations() {
+    this.featureCards.forEach((card) => {
+      gsap.set(card.nativeElement, { opacity: 0, y: 100 });
+    });
+    this.smallFeatureCards.forEach((card) => {
+      gsap.set(card.nativeElement, { opacity: 0, y: 100 });
+    });
+  }
+
+  setupHoverAnimations() {
+    this.featureCards.forEach((card) => {
+      const iconContainer = card.nativeElement.querySelector('.icon-container');
+      card.nativeElement.addEventListener('mouseenter', () => {
+        gsap.to(iconContainer, {
+          scale: 1.2,
+          rotate: 10,
+          duration: 0.3,
+          ease: 'power1.out'
+        });
+      });
+      card.nativeElement.addEventListener('mouseleave', () => {
+        gsap.to(iconContainer, {
+          scale: 1,
+          rotate: 0,
+          duration: 0.3,
+          ease: 'power1.out'
+        });
+      });
+    });
   }
 
   onExplore(title: string): void {
     console.log(`Exploring feature: ${title}`);
-    // Add logic to show/hide or navigate as needed
   }
 
   onStartApplication(): void {
     console.log('Starting application now');
-    // Add navigation or modal show logic
   }
 
   onScheduleConsultation(): void {
     console.log('Scheduling consultation');
-    // Add navigation or modal show logic
   }
 }
