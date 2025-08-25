@@ -46,7 +46,7 @@
         </div>
 
         <app-ilogi-file-upload [formControlName]="'ownerDetailsPhoto'" accept="image/png,image/jpg,image/jpeg"
-          label="Upload Photo"></app-ilogi-file-upload>
+          label="Upload Photo" (change)="onOwnerPhotoSelected($event)"></app-ilogi-file-upload>
 
         <button *ngIf="form.get('ownerDetailsPhoto')?.value" type="button"
           class="btn-remove-attach browse-btn ml-2 pl-3 pr-3 add-new-btn" (click)="removeFile('ownerDetailsPhoto')">

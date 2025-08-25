@@ -226,6 +226,18 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  onOwnerPhotoSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.ownerPhotoPreview = e.target.result;
+        this.form.get('ownerDetailsPhoto')?.setValue(file);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   setFileUrlAsValue(controlName: string, url: string): void {
     if (!url) return;
 
