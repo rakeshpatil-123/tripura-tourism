@@ -185,10 +185,29 @@ export class EnterpriseDetailsComponent implements OnInit {
         },
         error: (err: any) => {
           console.error('API Error:', err);
-          this.apiService.openSnackBar(
-            'Failed to save enterprise details.',
-            'error'
-          );
+
+          const errorResponse = err?.error; 
+          if (errorResponse?.errors) {
+            const allErrors: string[] = [];
+
+            Object.keys(errorResponse.errors).forEach((key) => {
+              const fieldErrors = errorResponse.errors[key];
+              if (Array.isArray(fieldErrors)) {
+                allErrors.push(...fieldErrors);
+              }
+            });
+
+            allErrors.forEach((msg, index) => {
+              setTimeout(() => {
+                this.apiService.openSnackBar(msg, 'error');
+              }, index * 1200); 
+            });
+          } else {
+            this.apiService.openSnackBar(
+              errorResponse?.message || 'Something went wrong!',
+              'error'
+            );
+          }
         },
       });
     // } else {
