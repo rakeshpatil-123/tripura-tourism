@@ -1,7 +1,7 @@
-<div>
-
+<div class="form-container">
   <form [formGroup]="form" novalidate class="mb-5">
 
+    <!-- Raw Materials -->
     <div class="mt-2 mb-2">
       <span class="header-color">List of Raw Materials to be Used</span>
     </div>
@@ -19,50 +19,39 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let rawMaterial of rawMaterials.controls; let i = index" [formGroupName]="i">
-              <td> {{ i + 1 }} </td>
+            <tr *ngFor="let rm of rawMaterials.controls; let i = index" [formGroupName]="i">
+              <td>{{ i + 1 }}</td>
 
               <td>
-                <div class="row no-padding-first-last mt-3">
-                  <div class="col-md-12">
-                    <div class="form-group form-group-margin">
-                      <app-ilogi-input fieldId="rawMaterialsNameOfRawMaterialInput-{{i}}" fieldLabel="Raw Material"
-                        formControlName="nameOfRawMaterial" placeholder="Enter" maxlength="255"></app-ilogi-input>
-                    </div>
-                  </div>
+                <div class="mt-3">
+                  <app-ilogi-input fieldLabel="Raw Material" formControlName="raw_material_name" placeholder="Enter"
+                    maxlength="255"></app-ilogi-input>
                 </div>
               </td>
+              <div class="mt-3"  >
+
+                <td>
+                  <app-ilogi-input fieldLabel="Quantity/Month" formControlName="raw_material_quantity_per_month"
+                    placeholder="Enter"></app-ilogi-input>
+                </td>
+              </div>
+
 
               <td>
-                <div class="row no-padding-first-last mt-3">
-                  <div class="col-md-12">
-                    <div class="form-group form-group-margin">
-                      <app-ilogi-input fieldId="rawMaterialsQuantityPerMonthInput-{{i}}" fieldLabel="Quantity/Month"
-                        formControlName="quantityPerMonth" placeholder="Enter"></app-ilogi-input>
-                    </div>
-                  </div>
-                </div>
+                <app-ilogi-select fieldLabel="Unit" [selectOptions]="unitOptions" placeholder="Select Unit"
+                  formControlName="raw_material_unit"></app-ilogi-select>
               </td>
 
               <td>
-                <div class="row no-padding-first-last">
-                  <div class="col-md-12">
-                    <div class="form-group form-group-margin">
-                      <app-ilogi-select fieldId="rawMaterialsUnitInput-{{i}}" fieldLabel="Unit"
-                        [selectOptions]="unitOptions" formControlName="unit"></app-ilogi-select>
-                    </div>
-                  </div>
-                </div>
-              </td>
+              <div class="mt-3"  >
 
-              <td class="input-mid-td">
-                <div class="input-mid mt-3">
-                  <a class="input-micro clkable add-new-btn" (click)="removeRawMaterial(i)">
-                    <i class="fa fa-trash-o blackiconcolor-red"></i>
-                    <span class="ml-1">Remove</span>
-                  </a>
+                <button type="button" class="btn btn-danger btn-sm" (click)="removeRawMaterial(i)">Remove</button>
                 </div>
               </td>
+            </tr>
+
+            <tr *ngIf="rawMaterials.length === 0">
+              <td colspan="5">No raw materials added.</td>
             </tr>
           </tbody>
         </table>
@@ -76,29 +65,26 @@
 
     <hr>
 
-    <div class="mb-2">
-    </div>
+    <!-- Thrust Sector -->
     <div class="mt-2 mb-2">
       <div class="row no-padding-first-last">
         <div class="col-md-4">
-          <div class="form-group">
-            <app-ilogi-select fieldId="MajorRawMaterialUsed" fieldLabel="Thrust Sector"
-              [selectOptions]="thrustSectorOptions" formControlName="MajorRawMaterialUsed"
-              [mandatory]="true"></app-ilogi-select>
-          </div>
+          <app-ilogi-select fieldLabel="Thrust Sector" [selectOptions]="thrustSectorOptions"
+            formControlName="thrustSector" [mandatory]="true" placeholder="Select Thrust Sector"></app-ilogi-select>
         </div>
       </div>
     </div>
 
     <hr>
 
-    <div class="mt-2">
+    <!-- Products -->
+    <div class="mt-2 mb-2">
       <span class="header-color">List of Product & by-products/Finished Products</span>
     </div>
 
     <div class="mt-2 mb-5">
       <div class="container large-container grid-container no-padding-first-last">
-        <table formArrayName="products" class="table table-bordered grid-table ">
+        <table formArrayName="products" class="table table-bordered grid-table">
           <thead class="table-primary">
             <tr>
               <th>SL No</th>
@@ -110,77 +96,63 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let product of products.controls; let i = index" [formGroupName]="i">
-              <td> {{ i + 1 }} </td>
+            <tr *ngFor="let p of products.controls; let i = index" [formGroupName]="i">
+              <td>{{ i + 1 }}</td>
 
               <td>
-                <div class="row no-padding-first-last">
-                  <div class="col-md-12">
-                    <div class="form-group form-group-margin">
-                      <app-ilogi-input fieldId="productsNameOfProductInput-{{i}}" fieldLabel="Product"
-                        formControlName="nameOfProduct" placeholder="Enter" maxlength="255"></app-ilogi-input>
-                    </div>
-                  </div>
-                </div>
+              <div class="mt-3"  >
+                
+                <app-ilogi-input fieldLabel="Product" formControlName="product_name" placeholder="Enter"
+                  maxlength="255"></app-ilogi-input>
+              </div>
               </td>
 
               <td>
-                <div class="row no-padding-first-last">
-                  <div class="col-md-12">
-                    <div class="form-group form-group-margin">
-                      <app-ilogi-input fieldId="productsProductionCapacityInput-{{i}}" fieldLabel="Capacity/Month"
-                        formControlName="productionCapacity" placeholder="Enter" maxlength="255"></app-ilogi-input>
-                    </div>
+              <div class="mt-3"  >
+                
+                <app-ilogi-input fieldLabel="Capacity/Month" formControlName="product_production_capacity_per_month"
+                  placeholder="Enter"></app-ilogi-input>
                   </div>
-                </div>
               </td>
 
               <td>
-                <div class="row no-padding-first-last">
-                  <div class="col-md-12">
-                    <div class="form-group form-group-margin">
-                      <app-ilogi-input fieldId="productsAvgProductionPerMonthInput-{{i}}" fieldLabel="Production/Month"
-                        formControlName="avgProductionPerMonth" placeholder="Enter" maxlength="255"></app-ilogi-input>
-                    </div>
+              <div class="mt-3"  >
+
+                <app-ilogi-input fieldLabel="Production/Month" formControlName="product_average_production_per_month"
+                  placeholder="Enter"></app-ilogi-input>
                   </div>
-                </div>
               </td>
 
               <td>
-                <div class="row no-padding-first-last">
-                  <div class="col-md-12">
-                    <div class="form-group form-group-margin">
-                      <app-ilogi-select fieldId="productsUnitInput-{{i}}" fieldLabel="Unit"
-                        [selectOptions]="unitOptions" formControlName="unit"></app-ilogi-select>
-                    </div>
-                  </div>
-                </div>
+                <app-ilogi-select fieldLabel="Unit" [selectOptions]="unitOptions" placeholder="Select Unit"
+                  formControlName="unit"></app-ilogi-select>
               </td>
 
-              <td class="input-mid-td">
-                <div class="input-mid">
-                  <a class="input-micro clkable add-new-btn" (click)="removeProduct(i)">
-                    <i class="fa fa-trash-o blackiconcolor-red"></i>
-                    <span class="ml-1">Remove</span>
-                  </a>
+              <td>
+              <div class="mt-3"  >
+                
+                <button type="button" class="btn btn-danger btn-sm" (click)="removeProduct(i)">Remove</button>
                 </div>
               </td>
             </tr>
+
+            <tr *ngIf="products.length === 0">
+              <td colspan="6">No products added.</td>
+            </tr>
           </tbody>
         </table>
-        <div class="pull-right mt-2 mb color-666666 clkable" (click)="addProduct()">
+
+        <div class="pull-right mt-2 color-666666 clkable" (click)="addProduct()">
           <i class="fa fa-plus"></i>
           <span class="font-weight-bold ml-2">ADD NEW</span>
         </div>
       </div>
-
     </div>
-    
-    
+
   </form>
+
   <div class="form-actions ">
-    <button type="button" class="btn btn-primary">Save As Draft</button>
-    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-primary" (click)="saveAsDraft()">Save As Draft</button>
+    <button type="button" class="btn btn-success" (click)="onSubmit()">Submit</button>
   </div>
 </div>
-

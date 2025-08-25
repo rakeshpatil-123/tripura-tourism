@@ -1,40 +1,18 @@
-<!-- <form [formGroup]="form" novalidate>
+<form [formGroup]="form" novalidate>
 
   <div class="mt-2">
     <span class="heder-color">GENERAL</span>
   </div>
 
+  <!-- Self Certification (Form III) -->
   <div class="row no-padding-first-last">
     <div class="col-md-4 mt-2">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="selfCertification">Self Certification Form <span class="red-font">*</span></label>
-
-            <div *ngIf="form.get('selfCertification')?.value as file; else uploadSelfCert">
-              <span class="apply-ellipsis">{{ file.name }}</span>
-              <span class="ml-1 clkable-decorate">
-                <a target="__blank" download [href]="'https://swaagatbackend.tripura.gov.in/sites/default/files/' + file.name">
-                  <img src="/assets/img/swagat-download.svg" alt="swagat-download" class="cus-footer-logo-img-first download-label"> Download
-                </a>
-              </span>
-              <button class="button button3 ml-2" (click)="removeFile('selfCertification')">
-                REMOVE
-              </button>
-            </div>
-
-            <ng-template #uploadSelfCert>
-              <app-ilogi-file-upload
-                [formControlName]="'selfCertification'"
-                accept=".png,.jpg,.jpeg,.pdf"
-                label="Choose File"
-              ></app-ilogi-file-upload>
-            </ng-template>
-          </div>
-        </div>
+      <div class="form-group form-group-margin">
+        <label for="selfCertification">Self Certification Form (Form III) <span class="red-font">*</span></label>
+        <app-ilogi-file-upload [formControlName]="'selfCertification'" accept=".png,.jpg,.jpeg,.pdf"
+          label="Choose File"></app-ilogi-file-upload>
       </div>
     </div>
-
     <div class="col-md-4 mt-5">
       <a href="/assets/documents/Self Certification - Form III.docx" target="__blank" class="btn download-btn ml-1">
         Download Form III Sample
@@ -42,43 +20,47 @@
     </div>
   </div>
 
+  <!-- Do you have trees? -->
   <div class="row no-padding-first-last mt-2">
     <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="haveTree">Do you have trees in the land for industry? <span class="red-font">*</span></label>
-            <app-ilogi-radio
-              fieldId="haveTree"
-              fieldLabel=""
-              [radioOptions]="yesNoOptions"
-              [formControlName]="'haveTree'"
-              [submitted]="submitted"
-            ></app-ilogi-radio>
-          </div>
-        </div>
+      <div class="form-group form-group-margin">
+        <label>Do you have trees in the land for industry? <span class="red-font">*</span></label>
+        <app-ilogi-radio [radioOptions]="yesNoOptions" [formControlName]="'haveTree'"
+          [submitted]="submitted"></app-ilogi-radio>
       </div>
     </div>
   </div>
 
-  <div class="row no-padding-first-last" *ngIf="form.get('haveTree')?.value === '1'">
+  <!-- Type of Tree -->
+  <div class="row no-padding-first-last" *ngIf="form.get('haveTree')?.value === 'YES'">
     <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="typeOfTree">Type of Tree <span class="red-font">*</span></label>
-            <app-ilogi-radio
-              fieldId="typeOfTree"
-              fieldLabel=""
-              [radioOptions]="[
-                { value: 'Exempted', name: 'Exempted' },
-                { value: 'Non-Exempted', name: 'Non-Exempted' }
-              ]"
-              [formControlName]="'typeOfTree'"
-              [submitted]="submitted"
-            ></app-ilogi-radio>
-          </div>
-        </div>
+      <div class="form-group form-group-margin">
+        <label>Type of Tree <span class="red-font">*</span></label>
+        <app-ilogi-radio [radioOptions]="[
+            { value: 'EXEMPTED', name: 'Exempted' },
+            { value: 'NON_EXEMPTED', name: 'Non-Exempted' }
+          ]" [formControlName]="'typeOfTree'" [submitted]="submitted"></app-ilogi-radio>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conditional File Uploads -->
+  <div class="row no-padding-first-last mt-2" *ngIf="form.get('haveTree')?.value === 'YES'">
+    <div class="col-md-4" *ngIf="form.get('typeOfTree')?.value === 'EXEMPTED'">
+      <div class="form-group form-group-margin">
+        <label>Self Certificate Format 3A <span class="red-font">*</span></label>
+        <app-ilogi-file-upload [formControlName]="'self_certificate_format_3A'" accept=".png,.jpg,.jpeg,.pdf"
+          label="Upload File" (onRemove)="removeFile('self_certificate_format_3A')">
+        </app-ilogi-file-upload>
+      </div>
+    </div>
+
+    <div class="col-md-4" *ngIf="form.get('typeOfTree')?.value === 'NON_EXEMPTED'">
+      <div class="form-group form-group-margin">
+        <label>Tree Registration Certificate <span class="red-font">*</span></label>
+        <app-ilogi-file-upload [formControlName]="'tree_registration_certificate'" accept=".png,.jpg,.jpeg,.pdf"
+          label="Upload File" (onRemove)="removeFile('tree_registration_certificate')">
+        </app-ilogi-file-upload>
       </div>
     </div>
   </div>
@@ -90,338 +72,170 @@
   </div>
 
   <div class="row top-space no-padding-first-last mt-2">
+    <!-- Owner PAN -->
     <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="panNo">Owner PAN <span class="red-font">*</span></label>
-
-            <div *ngIf="form.get('panNo')?.value as file; else uploadPan">
-              <span class="apply-ellipsis">{{ file.name }}</span>
-              <span class="ml-1 clkable-decorate">
-                <a target="__blank" download [href]="'https://swaagatbackend.tripura.gov.in/sites/default/files/' + file.name">
-                  <img src="/assets/img/swagat-download.svg" alt="swagat-download" class="cus-footer-logo-img-first download-label"> Download
-                </a>
-              </span>
-              <button class="button button3 ml-1" (click)="removeFile('panNo')">REMOVE</button>
-            </div>
-
-            <ng-template #uploadPan>
-              <app-ilogi-file-upload
-                [formControlName]="'panNo'"
-                accept=".png,.jpg,.jpeg,.pdf"
-                label="Choose File"
-              ></app-ilogi-file-upload>
-            </ng-template>
-          </div>
-        </div>
+      <div class="form-group form-group-margin">
+        <label>Owner PAN <span class="red-font">*</span></label>
+        <app-ilogi-file-upload [formControlName]="'owner_pan_pdf'" accept=".png,.jpg,.jpeg,.pdf"
+          label="Choose File"></app-ilogi-file-upload>
       </div>
     </div>
 
+    <!-- Owner Aadhar -->
     <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="adharNo">Owner Aadhar</label>
-            <app-ilogi-file-upload
-              [formControlName]="'adharNo'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
+      <div class="form-group form-group-margin">
+        <label>Owner Aadhar</label>
+        <app-ilogi-file-upload [formControlName]="'owner_aadhar_pdf'" accept=".png,.jpg,.jpeg,.pdf" label="Choose File"
+          (onRemove)="removeFile('owner_aadhar_pdf')">
+        </app-ilogi-file-upload>
       </div>
     </div>
 
+    <!-- Udyog Aadhar -->
     <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="udyogAdhar">Udyog Aadhar</label>
-            <app-ilogi-file-upload
-              [formControlName]="'udyogAdhar'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
+      <div class="form-group form-group-margin">
+        <label>Udyog Aadhar</label>
+        <app-ilogi-file-upload [formControlName]="'udyog_aadhar'" accept=".png,.jpg,.jpeg,.pdf" label="Choose File"
+          (onRemove)="removeFile('udyog_aadhar')">
+        </app-ilogi-file-upload>
       </div>
     </div>
   </div>
 
+  <!-- Input Fields -->
   <div class="row top-space no-padding-first-last mt-1">
     <div class="col-md-4">
-      <app-ilogi-input
-        fieldId="panNoText"
-        fieldLabel="Input PAN"
-        [mandatory]="true"
-        [formControlName]="'panNoText'"
-        placeholder="Enter Number"
-        maxlength="10"
-      ></app-ilogi-input>
+      <app-ilogi-input fieldLabel="PAN Number" [mandatory]="true" formControlName="owner_pan_number"
+        placeholder="Enter Number" maxlength="10"></app-ilogi-input>
     </div>
     <div class="col-md-4">
-      <app-ilogi-input
-        fieldId="adharNoText"
-        fieldLabel="Input Owner Aadhar Number"
-        [formControlName]="'adharNoText'"
-        placeholder="Enter Number"
-        maxlength="12"
-      ></app-ilogi-input>
+      <app-ilogi-input fieldLabel="Aadhar Number" formControlName="owner_aadhar_number" placeholder="Enter Number"
+        maxlength="12"></app-ilogi-input>
     </div>
     <div class="col-md-4">
-      <app-ilogi-input
-        fieldId="udyogAdharText"
-        fieldLabel="Input Udyog Aadhar Number"
-        [formControlName]="'udyogAdharText'"
-        placeholder="Enter Number"
-        maxlength="255"
-      ></app-ilogi-input>
+      <app-ilogi-input fieldLabel="Udyog Aadhar Number" formControlName="udyog_aadhar_number" placeholder="Enter Number"
+        maxlength="255"></app-ilogi-input>
     </div>
   </div>
 
   <div class="row top-space no-padding-first-last mt-4">
     <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="gst">GST</label>
-            <app-ilogi-file-upload
-              [formControlName]="'gst'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
-      </div>
+      <app-ilogi-file-upload [formControlName]="'gst_certificate_pdf'" label="GST Certificate"
+        accept=".png,.jpg,.jpeg,.pdf" (onRemove)="removeFile('gst_certificate_pdf')">
+      </app-ilogi-file-upload>
     </div>
     <div class="col-md-4">
-      <app-ilogi-input-date
-        fieldId="udyogAdharDate"
-        fieldLabel="Udyog Aadhar Date"
-        [formControlName]="'udyogAdharDate'"
-        placeholder="DD/MM/YYYY"
-      ></app-ilogi-input-date>
+      <app-ilogi-input-date fieldLabel="Udyog Aadhar Date" formControlName="udyog_aadhar_registration_date"
+        placeholder="DD/MM/YYYY"></app-ilogi-input-date>
     </div>
   </div>
   <div class="row top-space no-padding-first-last">
     <div class="col-md-4">
-      <app-ilogi-input
-        fieldId="gstText"
-        fieldLabel="Input GST Number"
-        [formControlName]="'gstText'"
-        placeholder="Enter Number"
-        maxlength="255"
-      ></app-ilogi-input>
+      <app-ilogi-input fieldLabel="GST Number" formControlName="gst_number" placeholder="Enter Number"
+        maxlength="255"></app-ilogi-input>
     </div>
   </div>
-
 
   <hr>
 
   <div class="mt-2">
     <span class="heder-color">UNIT RELATED ATTACHMENTS</span>
   </div>
+  <div class="grid-container mb-4">
 
-  <div class="row top-space no-padding-first-last mt-2">
-    <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="combinedBuilding">Combined building plan including all floor plans and combined site plan</label>
-            <app-ilogi-file-upload
-              [formControlName]="'combinedBuilding'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
+    <!-- Combined Building Plan -->
+    <div class="row top-space no-padding-first-last mt-2 ">
+      <div class="">
+        <app-ilogi-file-upload [formControlName]="'combinedBuilding'" label="Combined Building Plan"
+          accept=".png,.jpg,.jpeg,.pdf" (onRemove)="removeFile('combinedBuilding')">
+        </app-ilogi-file-upload>
+      </div>
+    </div>
+
+    <!-- Land Details -->
+    <div class="row top-space no-padding-first-last mt-2">
+      <div class="">
+        <app-ilogi-file-upload [formControlName]="'landRegistrationDeed'" label="Land Details"
+          accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
+      </div>
+    </div>
+
+    <!-- Registration Details -->
+    <div class="row top-space no-padding-first-last mt-2">
+      <div class="">
+        <app-ilogi-file-upload [formControlName]="'partnershipDetails'" label="Registration Details"
+          accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
+      </div>
+    </div>
+
+    <!-- Process Flow Chart -->
+    <div class="row top-space no-padding-first-last mt-2">
+      <div class="">
+        <app-ilogi-file-upload [formControlName]="'processFlowChart'" label="Process Flow Chart (Diagram / write up)"
+          accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
+      </div>
+    </div>
+
+    <!-- Detail Project Report -->
+    <div class="row top-space no-padding-first-last mt-2">
+      <div class="">
+        <app-ilogi-file-upload [formControlName]="'detailProjectReport'" label="Detail Project Report (DPR)"
+          accept=".png,.jpg,.jpeg,.pdf" (onRemove)="removeFile('detailProjectReport')">
+        </app-ilogi-file-upload>
+      </div>
+    </div>
+
+    <!-- Property Tax Clearance Certificate -->
+    <div class="row top-space no-padding-first-last mt-2">
+      <div class="">
+        <app-ilogi-file-upload [formControlName]="'propertyTaxClearanceCertificate'"
+          label="Property Tax Clearance Certificate" accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
       </div>
     </div>
   </div>
 
-  <div class="row top-space no-padding-first-last">
-    <div class="col-md-8 pl-0">
-      <table class="table table-bordered mt-3">
-        <col width="10"><col width="160"><col width="110">
-        <thead>
-          <tr>
-            <th>Sl. No.</th>
-            <th>File Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let doc of additionalDocuments; let i = index">
-            <th>{{ doc.slNo }}.</th>
-            <td>{{ doc.file?.name || 'Unknown' }}</td>
-            <td>
-              <span class="clkable-decorate">
-                <a target="__blank" [href]="'https://swaagatbackend.tripura.gov.in/sites/default/files/' + doc.file?.name" download>
-                  <img src="/assets/img/swagat-download.svg" alt="swagat-download" class="cus-footer-logo-img-first download-label"> Download
-                </a>
-              </span>
-              <span class="remove-label add-new-btn" (click)="removeAdditionalDocument(i)">
-                <i class="fa fa-times fa-xs pl-2"></i> Remove
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+ <!-- Upload Additional Document -->
+<div class="row no-padding-first-last mt-2">
+  <div class="col-md-4">
+    <app-ilogi-file-upload
+      [formControlName]="'otherSupportingDoc'"
+      label="Upload Additional Document"
+      accept=".png,.jpg,.jpeg,.pdf,.doc,.docx"
+      (fileSelected)="onAdditionalDocSelected($event)">
+    </app-ilogi-file-upload>
   </div>
+</div>
 
-  <div class="row top-space no-padding-first-last mt-2">
-    <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="landRegistrationDeed">Land Details</label>
-            <app-ilogi-file-upload
-              [formControlName]="'landRegistrationDeed'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- Table: Show Single Additional Document -->
+<div class="row no-padding-first-last mt-3" *ngIf="additionalDoc.file">
+  <div class="col-md-8">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Document</th>
+          <th>File Name</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ additionalDoc.name }}</td>
+          <td>{{ additionalDoc.file.name }}</td>
+          <td>
+            <a class="c-link" (click)="removeAdditionalDoc()">Remove</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
-  <div class="row top-space no-padding-first-last">
-    <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="partnershipDetails">Registration Details</label>
-            <app-ilogi-file-upload
-              [formControlName]="'partnershipDetails'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="processFlowChart">Process Flow Chart (Diagram / write up)</label>
-            <app-ilogi-file-upload
-              [formControlName]="'processFlowChart'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="detailProjectReport">Detail Project Report (DPR)</label>
-            <app-ilogi-file-upload
-              [formControlName]="'detailProjectReport'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row no-padding-first-last mt-2">
-    <div class="col-md-4">
-      <div class="row no-padding-first-last">
-        <div class="col-md-12">
-          <div class="form-group form-group-margin">
-            <label for="propertyTaxClearanceCertificate">Property Tax Clearance Certificate</label>
-            <app-ilogi-file-upload
-              [formControlName]="'propertyTaxClearanceCertificate'"
-              accept=".png,.jpg,.jpeg,.pdf"
-              label="Choose File"
-            ></app-ilogi-file-upload>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 
   <hr>
 
-  <span class="show-data"><label class="mt-4">Upload Other documents</label></span>
-
-  <div class="row no-padding-first-last mt-2">
-    <div class="col-md-4">
-      <app-ilogi-input
-        fieldId="additionalDocumentName"
-        fieldLabel="Documents Name"
-        [formControlName]="'additionalDocumentName'"
-        placeholder="Enter"
-        maxlength="255"
-      ></app-ilogi-input>
-    </div>
-    <div class="col-md-4">
-      <div class="form-group form-group-margin">
-        <label for="additionalDocument">Documents</label>
-        <app-ilogi-file-upload
-          [formControlName]="'additionalDocument'"
-          accept=".png,.jpg,.jpeg,.pdf"
-          label="Choose File"
-        ></app-ilogi-file-upload>
-      </div>
-    </div>
-    <div class="col-md-4 d-flex align-items-end">
-      <button
-        type="button"
-        class="btn btn-primary btn-sm"
-        (click)="addAdditionalDocument()"
-        [disabled]="!form.get('additionalDocumentName')?.value || !form.get('additionalDocument')?.value"
-      >
-        Add
-      </button>
-    </div>
+  <!-- Submit Buttons -->
+  <div class="form-actions">
+    <button type="button" class="btn btn-primary" (click)="saveAsDraft()">Save As Draft</button>
+    <button type="button" class="btn btn-success" (click)="onSubmit()">Submit</button>
   </div>
-
-  <div class="row no-padding-first-last mt-3">
-    <div class="col-md-8 no-padding-first-last">
-      <table class="table table-bordered grid-table">
-        <thead>
-          <tr>
-            <th>Sl. No.</th>
-            <th>Document Name</th>
-            <th>File Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let doc of additionalDocuments; let i = index">
-            <td>{{ doc.slNo }}</td>
-            <td><div class="apply-ellipsis ml-2">{{ doc.name }}</div></td>
-            <td><div class="apply-ellipsis ml-2">{{ doc.file?.name }}</div></td>
-            <td>
-              <a class="c-link"><i class="fa fa-eye"></i> View </a>
-              <span class="remove-btn">|</span>
-              <a class="c-link remove-btn" (click)="removeAdditionalDocument(i)">
-                <i class="fa fa-times fa-xs pl-2"></i> Remove
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="mt-4 mb-4"><hr></div>
 
 </form>
-
-<div class="form-actions">
-  <button type="button" class="btn btn-primary">Save As Draft</button>
-  <button type="submit" class="btn btn-success">Save</button>
-</div> -->
-
-hi attachment

@@ -1,5 +1,5 @@
 // management.component.ts
-import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 
 // Import your custom components
@@ -25,11 +25,14 @@ import { GenericService } from '../../../../_service/generic/generic.service';
   templateUrl: './management.component.html',
   styleUrls: ['./management.component.scss'],
 })
+export class ManagementComponent implements OnInit, OnDestroy {
+  ownerPhotoPreview: string | null = null;
+  managerPhotoPreview: string | null = null;
+  signatureOwnerPreview: string | null = null;
+  signatureOccupierPreview: string | null = null;
+  signatureManagerPreview: string | null = null;
 
-
-export class ManagementComponent implements OnDestroy{
-
-    private blobUrls: Map<File, string> = new Map();
+  private blobUrls: Map<File, string> = new Map();
   form: FormGroup;
 
   statusOfPersonOptions = [
@@ -57,46 +60,49 @@ export class ManagementComponent implements OnDestroy{
   ];
 
   yesNoOptions = [
-    { id: '1', name: 'Yes' },
-    { id: '0', name: 'No' },
+    { id: 'YES', name: 'Yes' },
+    { id: 'NO', name: 'No' },
   ];
 
-  
-
-  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef, private apiService : GenericService) {
-
-    
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private apiService: GenericService
+  ) {
     this.form = this.fb.group({
       // Owner Details
-      name: ['', Validators.required],
-      fatherName: ['', Validators.required],
-      residentialAddress: ['', Validators.required],
-      policeStation: ['', Validators.required],
-      pin: ['', Validators.required],
-      mobile: ['', Validators.required],
-      alternateMobileNo: [''],
-      dob: ['', Validators.required],
-      statusOfPerson: ['', Validators.required],
-      socialStatus: ['', Validators.required],
-      minority: ['', Validators.required],
-      differentlyAbled: ['', Validators.required],
-      aadharNo: ['', Validators.required],
-      employerPhoto: [null, Validators.required],
+      ownerDetailsName: ['', Validators.required],
+      ownerDetailsFathersName: ['', Validators.required],
+      ownerDetailsResidentialAddress: ['', Validators.required],
+      ownerDetailsPoliceStation: ['', Validators.required],
+      ownerDetailsPin: ['', Validators.required],
+      ownerDetailsMobile: ['', Validators.required],
+      ownerDetailsAlternateMobile: [''],
+      ownerDetailsAadharNo: ['', Validators.required],
+      ownerDetailsStatus: ['', Validators.required],
+      ownerDetailsEmail: ['', [Validators.required, Validators.email]],
+      ownerDetailsDob: ['', Validators.required],
+      ownerDetailsSocialStatus: ['', Validators.required],
+      ownerDetailsIsDifferentlyAbled: ['', Validators.required],
+      ownerDetailsIsWomenEntrepreneur: ['', Validators.required],
+      ownerDetailsIsMinority: ['', Validators.required],
+      ownerDetailsPhoto: [null, Validators.required],
 
       // Manager Details
-      managerName: ['', Validators.required],
-      managerFatherName: ['', Validators.required],
-      managerResidentialAddress: ['', Validators.required],
-      managerPoliceStation: ['', Validators.required],
-      managerPin: ['', Validators.required],
-      managerMobile: ['', Validators.required],
-      managerAadharNo: ['', Validators.required],
-      managerDOB: ['', Validators.required],
-      managerEmployerPhoto: [null, Validators.required],
+      managerDetailsName: ['', Validators.required],
+      managerDetailsFathersName: ['', Validators.required],
+      managerDetailsResidentialAddress: ['', Validators.required],
+      managerDetailsPoliceStation: ['', Validators.required],
+      managerDetailsPin: ['', Validators.required],
+      managerDetailsMobile: ['', Validators.required],
+      managerDetailsAadharNo: ['', Validators.required],
+      managerDetailsDob: [''],
+      managerDetailsPhoto: [null, Validators.required],
 
-      signedAuthorizationDocument: [null, Validators.required],
-      signatureOfOccupierOfFactory: [null, Validators.required],
-      signatureOfManagerOfFactory: [null, Validators.required],
+      // Signatures
+      signatureAuthorizationOfOwner: [null, Validators.required],
+      factoryOccupiersSignature: [null, Validators.required],
+      factoryManagersSignature: [null, Validators.required],
 
       // Arrays
       partnerDetails: this.fb.array([]),
@@ -105,175 +111,343 @@ export class ManagementComponent implements OnDestroy{
     });
   }
 
-  buildFormData(isDraft: boolean = false): FormData {
-  const formData = new FormData();
-  const raw = this.form.getRawValue();
+  ngOnInit(): void {
+    this.loadExistingData();
+    console.log(this.ownerPhotoPreview, 'owner photo');
+  }
 
-  if (isDraft) {
-      formData.append('save_data', '1'); // 👈 only for draft
+  loadExistingData(): void {
+    this.apiService
+      .getByConditions({}, 'api/caf/management-details-view')
+      .subscribe({
+        next: (res: any) => {
+          if (res && res.status === 1) {
+            this.patchFormWithData(res);
+          } else {
+            console.warn('Invalid or empty response:', res);
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching management details:', err);
+        },
+      });
+  }
+
+  patchFormWithData(data: any): void {
+    console.log('🔴 patchFormWithData called with data:', data);
+
+    if (!data || !data.management_details) {
+      console.warn('No data or management_details found to patch.');
+      return;
     }
 
+    const management = data.management_details;
 
-  // Owner details
-  formData.append("owner_details_name", raw.name);
-  formData.append("owner_details_fathers_name", raw.fatherName);
-  formData.append("owner_details_residential_address", raw.residentialAddress);
-  formData.append("owner_details_police_station", raw.policeStation);
-  formData.append("owner_details_pin", raw.pin);
-  formData.append("owner_details_mobile", raw.mobile);
-  formData.append("owner_details_alternate_mobile", raw.alternateMobileNo || '');
-  formData.append("owner_details_aadhar_no", raw.aadharNo);
-  formData.append("owner_details_status", raw.statusOfPerson);
-  formData.append("owner_details_email", raw.email || '');
-  formData.append("owner_details_dob", this.formatDate(raw.dob));
-  formData.append("owner_details_social_status", raw.socialStatus);
-  formData.append("owner_details_is_differently_abled", raw.differentlyAbled);
-  formData.append("owner_details_is_women_entrepreneur", raw.womenEntrepreneur || 'NO');
-  formData.append("owner_details_is_minority", raw.minority);
+    console.log('Owner photo URL:', management.owner_details_photo);
 
-  if (raw.employerPhoto) {
-    formData.append("owner_details_photo", raw.employerPhoto);
-  }
+    this.ownerPhotoPreview = management.owner_details_photo || null;
+    console.log(this.ownerPhotoPreview, 'owner photo after assignment');
 
-  // Manager details
-  formData.append("manager_details_name", raw.managerName);
-  formData.append("manager_details_fathers_name", raw.managerFatherName);
-  formData.append("manager_details_residential_address", raw.managerResidentialAddress);
-  formData.append("manager_details_police_station", raw.managerPoliceStation);
-  formData.append("manager_details_pin", raw.managerPin);
-  formData.append("manager_details_mobile", raw.managerMobile);
-  formData.append("manager_details_aadhar_no", raw.managerAadharNo);
-  formData.append("manager_details_dob", this.formatDate(raw.managerDOB));
-  
-  if (raw.managerEmployerPhoto) {
-    formData.append("manager_details_photo", raw.managerEmployerPhoto);
-  }
+    this.ownerPhotoPreview = management.owner_details_photo || null;
+    this.managerPhotoPreview = management.manager_details_photo || null;
+    this.signatureOwnerPreview =
+      management.signature_authorization_of_owner || null;
+    this.signatureOccupierPreview =
+      management.factory_occupiers_signature || null;
+    this.signatureManagerPreview =
+      management.factory_managers_signature || null;
 
-  // Files
-  if (raw.signedAuthorizationDocument) {
-    formData.append("signature_authorization_of_owner", raw.signedAuthorizationDocument);
-  }
-  if (raw.signatureOfOccupierOfFactory) {
-    formData.append("factory_occupiers_signature", raw.signatureOfOccupierOfFactory);
-  }
-  if (raw.signatureOfManagerOfFactory) {
-    formData.append("factory_managers_signature", raw.signatureOfManagerOfFactory);
-  }
+    this.form.patchValue({
+      ownerDetailsName: management.owner_details_name || '',
+      ownerDetailsFathersName: management.owner_details_fathers_name || '',
+      ownerDetailsResidentialAddress:
+        management.owner_details_residential_address || '',
+      ownerDetailsPoliceStation: management.owner_details_police_station || '',
+      ownerDetailsPin: management.owner_details_pin || '',
+      ownerDetailsMobile: management.owner_details_mobile || '',
+      ownerDetailsAlternateMobile:
+        management.owner_details_alternate_mobile || '',
+      ownerDetailsAadharNo:
+        management.owner_aadhar_no || management.owner_details_aadhar_no || '',
+      ownerDetailsStatus: management.owner_details_status || '',
+      ownerDetailsEmail: management.owner_details_email || '',
+      ownerDetailsDob: management.owner_details_dob
+        ? new Date(management.owner_details_dob)
+        : null,
+      ownerDetailsSocialStatus: management.owner_details_social_status || '',
+      ownerDetailsIsDifferentlyAbled:
+        management.owner_details_is_differently_abled || 'NO',
+      ownerDetailsIsWomenEntrepreneur:
+        management.owner_details_is_women_entrepreneur || 'NO',
+      ownerDetailsIsMinority: management.owner_details_is_minority || 'NO',
 
-  // Partner details array
-  raw.partnerDetails.forEach((p: any, i: number) => {
-    formData.append(`partner_details[${i}][name]`, p.name);
-    formData.append(`partner_details[${i}][fathers_name]`, p.fatherName);
-    formData.append(`partner_details[${i}][age]`, p.age || '');
-    formData.append(`partner_details[${i}][sex]`, p.sex || '');
-    formData.append(`partner_details[${i}][social_status]`, p.socialStatus || '');
-    formData.append(`partner_details[${i}][profession]`, p.profession || '');
-    formData.append(`partner_details[${i}][permanent_address]`, p.permanentAddress || '');
-    formData.append(`partner_details[${i}][mobile_no]`, p.mobile);
-    formData.append(`partner_details[${i}][date_of_birth]`, this.formatDate(p.dob));
-    formData.append(`partner_details[${i}][date_of_joining]`, this.formatDate(p.dateOfJoining));
-    if (p.idProof) formData.append(`partner_details[${i}][id_proof]`, p.idProof);
-    if (p.signature) formData.append(`partner_details[${i}][signature]`, p.signature);
-  });
-
-  // Directors
-  raw.boardOfDirectors.forEach((d: any, i: number) => {
-    formData.append(`board_of_directors[${i}][name]`, d.name);
-    formData.append(`board_of_directors[${i}][permanent_address]`, d.permanentAddress || '');
-    formData.append(`board_of_directors[${i}][mobile_number]`, d.mobile);
-  });
-
-  // Chief Administrative Heads
-  raw.chiefAdministrativeHead.forEach((c: any, i: number) => {
-    formData.append(`chief_administrative_heads[${i}][name]`, c.name);
-    formData.append(`chief_administrative_heads[${i}][permanent_address]`, c.permanentAddress);
-    formData.append(`chief_administrative_heads[${i}][mobile_number]`, c.mobile);
-  });
-
-  return formData;
-}
-
-private formatDate(date: any): string {
-  if (!date) return '';
-  const d = new Date(date);
-  return d.toISOString().split('T')[0]; // YYYY-MM-DD
-}
-  saveAsDraft(): void {
-    // if (this.form.invalid) {
-    //   this.form.markAllAsTouched();
-    //   return;
-    // }
-    const payload = this.buildFormData(true);
-    this.apiService.getByConditions(payload, 'api/caf/management-details-store' ).subscribe({
-      next: (res) => {
-        console.log('Draft Saved:', res);
-        alert('Form saved as draft successfully!');
-      },
-      error: (err) => console.error('Error saving draft:', err),
+      managerDetailsName: management.manager_details_name || '',
+      managerDetailsFathersName: management.manager_details_fathers_name || '',
+      managerDetailsResidentialAddress:
+        management.manager_details_residential_address || '',
+      managerDetailsPoliceStation:
+        management.manager_details_police_station || '',
+      managerDetailsPin: management.manager_details_pin || '',
+      managerDetailsMobile: management.manager_details_mobile || '',
+      managerDetailsAadharNo: management.manager_details_aadhar_no || '',
+      managerDetailsDob: management.manager_details_dob
+        ? new Date(management.manager_details_dob)
+        : null,
     });
+
+    // // ✅ Set file previews from URLs
+    // this.setFileUrlAsValue('ownerDetailsPhoto', management.owner_details_photo);
+    // this.setFileUrlAsValue('managerDetailsPhoto', management.manager_details_photo);
+    // this.setFileUrlAsValue('signatureAuthorizationOfOwner', management.signature_authorization_of_owner);
+    // this.setFileUrlAsValue('factoryOccupiersSignature', management.factory_occupiers_signature);
+    // this.setFileUrlAsValue('factoryManagersSignature', management.factory_managers_signature);
+
+    // Clear and repopulate arrays
+    this.partnerDetails.clear();
+    if (data.partner_details && Array.isArray(data.partner_details)) {
+      data.partner_details.forEach((p: any) => this.addPartner(p));
+    }
+
+    this.boardOfDirectors.clear();
+    if (data.board_of_directors && Array.isArray(data.board_of_directors)) {
+      data.board_of_directors.forEach((d: any) => this.addDirector(d));
+    }
+
+    this.chiefAdministrativeHead.clear();
+    if (
+      data.chief_administrative_heads &&
+      Array.isArray(data.chief_administrative_heads)
+    ) {
+      data.chief_administrative_heads.forEach((c: any) =>
+        this.addChiefAdministrativeHead(c)
+      );
+    }
+
+    this.cdr.markForCheck();
   }
 
-onSubmit(): void {
-  console.log('Submit clicked');
+  setFileUrlAsValue(controlName: string, url: string): void {
+    if (!url) return;
 
-  // if (this.form.invalid) {
-  //   console.log('Form is invalid', this.form.errors, this.form);
-  //   // this.form.markAllAsTouched();
+    const fileName = url.split('/').pop() || 'file';
 
-  //   // Add this: check which controls are invalid
-  //   Object.keys(this.form.controls).forEach(key => {
-  //     const ctrl = this.form.get(key);
-  //     if (ctrl?.invalid) {
-  //       console.log(`Invalid control: ${key}`, ctrl.errors, ctrl.value);
-  //     }
-  //   });
+    const dummy = new File([''], fileName);
+    this.form.get(controlName)?.setValue(dummy);
 
-  //   return;
-  // }
+    // Then fetch real file and update
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => {
+        const file = new File([blob], fileName, { type: blob.type });
+        this.form.get(controlName)?.setValue(file);
+        this.cdr.detectChanges();
+      })
+      .catch((err) => {
+        console.warn(`Failed to load file from URL: ${url}`, err);
+      });
+  }
+  setFileAsValue(controlName: string, url: string): void {
+    console.warn(
+      `File URL received for ${controlName}: ${url}. Cannot auto-fill file input for security.`
+    );
+  }
 
-  console.log('Form is valid, submitting...');
-  const payload = this.buildFormData(false);
-  console.log('Payload:', payload); // Check if FormData has data
+  buildFormData(isDraft: boolean = false): FormData {
+    const formData = new FormData();
+    const raw = this.form.getRawValue();
 
-  this.apiService.getByConditions(payload, 'api/caf/management-details-store').subscribe({
-    next: (res: any) => {
-      console.log('Form Submitted:', res);
-      alert('Form submitted successfully!');
-    },
-    error: (err: any) => {
-      console.error('Error submitting form:', err);
-      alert('Submission failed. Check console.');
-    },
-  });
-}
-  // ngOnInit(): void {
-  //   this.form.patchValue({
-  //     name: 'Deeptanu Bhowmik',
-  //     fatherName: 'Rabindra Bhowmik',
-  //     residentialAddress: 'Joynagar',
-  //     policeStation: 'West P.S',
-  //     pin: '799001',
-  //     mobile: '7085542194',
-  //     dob: new Date('2001-01-01'),
-  //     statusOfPerson: 'Managing Director',
-  //     minority: '0',
-  //     differentlyAbled: '0',
-  //     aadharNo: '654376544321',
+    if (isDraft) {
+      formData.append('save_data', '1');
+    }
 
-  //     managerName: 'Moumita Sinha',
-  //     managerFatherName: 'Surajit Sinha',
-  //     managerResidentialAddress: 'Behind Hindi H. S School',
-  //     managerPoliceStation: 'West P.S',
-  //     managerPin: '799005',
-  //     managerMobile: '9233108616',
-  //     managerAadharNo: '552303161494',
-  //     managerDOB: new Date('1999-01-08'),
-  //   });
+    // Owner Details
+    formData.append('owner_details_name', raw.ownerDetailsName);
+    formData.append('owner_details_fathers_name', raw.ownerDetailsFathersName);
+    formData.append(
+      'owner_details_residential_address',
+      raw.ownerDetailsResidentialAddress
+    );
+    formData.append(
+      'owner_details_police_station',
+      raw.ownerDetailsPoliceStation
+    );
+    formData.append('owner_details_pin', raw.ownerDetailsPin);
+    formData.append('owner_details_mobile', raw.ownerDetailsMobile);
+    formData.append(
+      'owner_details_alternate_mobile',
+      raw.ownerDetailsAlternateMobile || ''
+    );
+    formData.append('owner_details_aadhar_no', raw.ownerDetailsAadharNo);
+    formData.append('owner_details_status', raw.ownerDetailsStatus);
+    formData.append('owner_details_email', raw.ownerDetailsEmail);
+    formData.append('owner_details_dob', this.formatDate(raw.ownerDetailsDob));
+    formData.append(
+      'owner_details_social_status',
+      raw.ownerDetailsSocialStatus
+    );
+    formData.append(
+      'owner_details_is_differently_abled',
+      raw.ownerDetailsIsDifferentlyAbled
+    );
+    formData.append(
+      'owner_details_is_women_entrepreneur',
+      raw.ownerDetailsIsWomenEntrepreneur
+    );
+    formData.append('owner_details_is_minority', raw.ownerDetailsIsMinority);
 
-  //   this.addChiefAdministrativeHead();
-  //   this.addChiefAdministrativeHead();
-  // }
+    if (raw.ownerDetailsPhoto) {
+      formData.append('owner_details_photo', raw.ownerDetailsPhoto);
+    }
 
+    // Manager Details
+    formData.append('manager_details_name', raw.managerDetailsName);
+    formData.append(
+      'manager_details_fathers_name',
+      raw.managerDetailsFathersName
+    );
+    formData.append(
+      'manager_details_residential_address',
+      raw.managerDetailsResidentialAddress
+    );
+    formData.append(
+      'manager_details_police_station',
+      raw.managerDetailsPoliceStation
+    );
+    formData.append('manager_details_pin', raw.managerDetailsPin);
+    formData.append('manager_details_mobile', raw.managerDetailsMobile);
+    formData.append('manager_details_aadhar_no', raw.managerDetailsAadharNo);
+    formData.append(
+      'manager_details_dob',
+      this.formatDate(raw.managerDetailsDob)
+    );
+
+    if (raw.managerDetailsPhoto) {
+      formData.append('manager_details_photo', raw.managerDetailsPhoto);
+    }
+
+    // Signature Files
+    if (raw.signatureAuthorizationOfOwner) {
+      formData.append(
+        'signature_authorization_of_owner',
+        raw.signatureAuthorizationOfOwner
+      );
+    }
+    if (raw.factoryOccupiersSignature) {
+      formData.append(
+        'factory_occupiers_signature',
+        raw.factoryOccupiersSignature
+      );
+    }
+    if (raw.factoryManagersSignature) {
+      formData.append(
+        'factory_managers_signature',
+        raw.factoryManagersSignature
+      );
+    }
+
+    // Partner Details
+    raw.partnerDetails.forEach((p: any, i: number) => {
+      formData.append(`partner_details[${i}][name]`, p.name);
+      formData.append(
+        `partner_details[${i}][fathers_name]`,
+        p.fatherName || ''
+      );
+      formData.append(`partner_details[${i}][age]`, p.age || '');
+      formData.append(`partner_details[${i}][sex]`, p.sex || '');
+      formData.append(
+        `partner_details[${i}][social_status]`,
+        p.socialStatus || ''
+      );
+      formData.append(`partner_details[${i}][profession]`, p.profession || '');
+      formData.append(
+        `partner_details[${i}][permanent_address]`,
+        p.permanentAddress || ''
+      );
+      formData.append(`partner_details[${i}][mobile_no]`, p.mobile || '');
+      formData.append(
+        `partner_details[${i}][date_of_birth]`,
+        this.formatDate(p.dob)
+      );
+      formData.append(
+        `partner_details[${i}][date_of_joining]`,
+        this.formatDate(p.dateOfJoining)
+      );
+      if (p.idProof)
+        formData.append(`partner_details[${i}][id_proof]`, p.idProof);
+      if (p.signature)
+        formData.append(`partner_details[${i}][signature]`, p.signature);
+    });
+
+    // Board of Directors
+    raw.boardOfDirectors.forEach((d: any, i: number) => {
+      formData.append(`board_of_directors[${i}][name]`, d.name);
+      formData.append(
+        `board_of_directors[${i}][permanent_address]`,
+        d.permanentAddress || ''
+      );
+      formData.append(
+        `board_of_directors[${i}][mobile_number]`,
+        d.mobile || ''
+      );
+    });
+
+    // Chief Administrative Heads
+    raw.chiefAdministrativeHead.forEach((c: any, i: number) => {
+      formData.append(`chief_administrative_heads[${i}][name]`, c.name);
+      formData.append(
+        `chief_administrative_heads[${i}][permanent_address]`,
+        c.permanentAddress || ''
+      );
+      formData.append(
+        `chief_administrative_heads[${i}][mobile_number]`,
+        c.mobile || ''
+      );
+    });
+
+    return formData;
+  }
+
+  private formatDate(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toISOString().split('T')[0]; // YYYY-MM-DD
+  }
+
+  saveAsDraft(): void {
+    const payload = this.buildFormData(true);
+    this.submitForm(payload, true);
+  }
+
+  onSubmit(): void {
+    const payload = this.buildFormData(false);
+    this.submitForm(payload, false);
+  }
+
+  private submitForm(payload: FormData, isDraft: boolean): void {
+    this.apiService
+      .getByConditions(payload, 'api/caf/management-details-store')
+      .subscribe({
+        next: (res) => {
+          console.log('API Success:', res);
+          const message = isDraft
+            ? 'Draft saved successfully!'
+            : 'Management details submitted successfully!';
+          this.apiService.openSnackBar(message, 'success');
+        },
+        error: (err) => {
+          console.error('API Error:', err);
+          this.apiService.openSnackBar(
+            'Failed to save management details.',
+            'error'
+          );
+        },
+      });
+  }
+
+  // --- Form Array Getters ---
   get partnerDetails(): FormArray {
     return this.form.get('partnerDetails') as FormArray;
   }
@@ -286,21 +460,47 @@ onSubmit(): void {
     return this.form.get('chiefAdministrativeHead') as FormArray;
   }
 
-  addPartner(): void {
-    this.partnerDetails.push(
+  // --- Array Methods ---
+  addPartner(data?: any): void {
+    const group = this.fb.group({
+      name: [data?.name || '', Validators.required],
+      fatherName: [data?.fathers_name || ''],
+      age: [data?.age || ''],
+      sex: [data?.sex || ''],
+      socialStatus: [data?.social_status || ''],
+      profession: [data?.profession || ''],
+      permanentAddress: [data?.permanent_address || ''],
+      mobile: [data?.mobile_no || '', Validators.required],
+      dob: [data?.date_of_birth ? new Date(data.date_of_birth) : ''],
+      dateOfJoining: [
+        data?.date_of_joining ? new Date(data.date_of_joining) : '',
+      ],
+      idProof: [data?.id_proof ? this.createFileFromUrl(data.id_proof, "id_proof.png") : null],
+      signature: [
+        data?.signature ? this.createFileFromUrl(data.signature, "signature.png") : null,
+      ],
+    });
+    this.partnerDetails.push(group);
+    this.cdr.markForCheck();
+  }
+
+  addDirector(data?: any): void {
+    this.boardOfDirectors.push(
       this.fb.group({
-        name: ['', Validators.required],
-        fatherName: ['', Validators.required],
-        age: [''],
-        sex: [''],
-        socialStatus: [''],
-        profession: [''],
-        permanentAddress: [''],
-        mobile: ['', Validators.required],
-        dob: ['', Validators.required],
-        dateOfJoining: [''],
-        idProof: [null],
-        signature: [null],
+        name: [data?.name || '', Validators.required],
+        permanentAddress: [data?.permanent_address || ''],
+        mobile: [data?.mobile_number || '', Validators.required],
+      })
+    );
+    this.cdr.markForCheck();
+  }
+
+  addChiefAdministrativeHead(data?: any): void {
+    this.chiefAdministrativeHead.push(
+      this.fb.group({
+        name: [data?.name || '', Validators.required],
+        permanentAddress: [data?.permanent_address || '', Validators.required],
+        mobile: [data?.mobile_number || '', Validators.required],
       })
     );
     this.cdr.markForCheck();
@@ -311,30 +511,8 @@ onSubmit(): void {
     this.cdr.markForCheck();
   }
 
-  addDirector(): void {
-    this.boardOfDirectors.push(
-      this.fb.group({
-        name: ['', Validators.required],
-        permanentAddress: [''],
-        mobile: ['', Validators.required],
-      })
-    );
-    this.cdr.markForCheck();
-  }
-
   removeDirector(index: number): void {
     this.boardOfDirectors.removeAt(index);
-    this.cdr.markForCheck();
-  }
-
-  addChiefAdministrativeHead(): void {
-    this.chiefAdministrativeHead.push(
-      this.fb.group({
-        name: ['', Validators.required],
-        permanentAddress: ['', Validators.required],
-        mobile: ['', Validators.required],
-      })
-    );
     this.cdr.markForCheck();
   }
 
@@ -348,8 +526,8 @@ onSubmit(): void {
     this.cdr.markForCheck();
   }
 
-getImageUrl(file: File | string | null): string {
-    if (!file) return 'assets/img/profile-picture.jpg';
+  getImageUrl(file: File | string | null): string {
+    if (!file) return '';
 
     if (file instanceof File) {
       if (this.blobUrls.has(file)) {
@@ -360,11 +538,40 @@ getImageUrl(file: File | string | null): string {
       return url;
     }
 
+    // If it's a string (URL), return it directly
     return file;
   }
 
-    ngOnDestroy(): void {
-    this.blobUrls.forEach(url => URL.revokeObjectURL(url));
+private async createFileFromUrl(url: string, filename: string): Promise<File | null> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error("Failed to fetch file from URL:", response.statusText);
+      return null;
+    }
+
+    const blob = await response.blob();
+    // You can set type as blob.type or force specific MIME type
+    const file = new File([blob], filename, { type: blob.type });
+    return file;
+  } catch (error) {
+    console.error("Error converting URL to File:", error);
+    return null;
+  }
+}
+
+
+  ngOnDestroy(): void {
+    this.blobUrls.forEach((url) => URL.revokeObjectURL(url));
     this.blobUrls.clear();
+  }
+  getFileName(file: File | string | null): string {
+    if (!file) return '';
+    if (file instanceof File) return file.name;
+    return file.split('/').pop() || 'file';
+  }
+
+  onImageError(event: any): void {
+    event.target.src = 'assets/img/profile-picture.jpg';
   }
 }
