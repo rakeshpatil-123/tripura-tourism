@@ -27,10 +27,10 @@ interface FeedbackForm {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './user-experience-success-stories.component.html',
-  styleUrls: ['./user-experience-success-stories.component.scss']
+  styleUrls: ['./user-experience-success-stories.component.scss'],
 })
 export class UserExperienceSuccessStoriesComponent {
-  currentSlide: number = 0;
+ currentSlide: number = 0;
   
   testimonials: Testimonial[] = [
     {
@@ -90,58 +90,35 @@ export class UserExperienceSuccessStoriesComponent {
     experience: ''
   };
 
-  /**
-   * Navigate to next slide
-   */
   nextSlide(): void {
     if (this.currentSlide < this.testimonials.length - 1) {
       this.currentSlide++;
     }
   }
 
-  /**
-   * Navigate to previous slide
-   */
   previousSlide(): void {
     if (this.currentSlide > 0) {
       this.currentSlide--;
     }
   }
 
-  /**
-   * Navigate to specific slide by index
-   * @param index - Target slide index
-   */
   goToSlide(index: number): void {
     if (index >= 0 && index < this.testimonials.length) {
       this.currentSlide = index;
     }
   }
 
-  /**
-   * Generate array of boolean values for rating stars
-   * @param rating - Rating value (1-5)
-   * @returns Array of 5 boolean values indicating filled/empty stars
-   */
   getRatingStars(rating: number): boolean[] {
     return Array(5).fill(false).map((_, index) => index < rating);
   }
 
-  /**
-   * Set rating value for feedback form
-   * @param rating - Rating value (1-5)
-   */
   setRating(rating: number): void {
     if (rating >= 1 && rating <= 5) {
       this.feedbackForm.rating = rating;
     }
   }
 
-  /**
-   * Handle feedback form submission
-   */
   submitFeedback(): void {
-    // Validate form data
     if (!this.feedbackForm.name.trim()) {
       alert('Please enter your name');
       return;
@@ -157,22 +134,16 @@ export class UserExperienceSuccessStoriesComponent {
       return;
     }
 
-    // Log feedback data (replace with actual API call)
     console.log('Feedback submitted:', {
       ...this.feedbackForm,
       submittedAt: new Date().toISOString()
     });
 
-    // Show success message
     alert('Thank you for your feedback! Your input helps us improve our services.');
     
-    // Reset form to initial state
     this.resetForm();
   }
 
-  /**
-   * Reset feedback form to initial values
-   */
   private resetForm(): void {
     this.feedbackForm = {
       name: '',
@@ -181,17 +152,4 @@ export class UserExperienceSuccessStoriesComponent {
       experience: ''
     };
   }
-
-  /**
-   * Auto-advance slides (optional feature)
-   * Uncomment and call in ngOnInit if auto-advance is desired
-   */
-  // private startAutoAdvance(): void {
-  //   setInterval(() => {
-  //     this.nextSlide();
-  //     if (this.currentSlide === this.testimonials.length - 1) {
-  //       this.currentSlide = 0;
-  //     }
-  //   }, 5000); // Advance every 5 seconds
-  // }
 }

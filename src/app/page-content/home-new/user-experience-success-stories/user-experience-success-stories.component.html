@@ -1,8 +1,8 @@
 <div class="success-stories-container">
-  <!-- Title and Subtitle -->
+  <!-- Header Section -->
   <div class="header-section">
     <h1 class="main-title">User Experience & Success Stories</h1>
-    <p class="subtitle">Discover how SWAGAT 2.0 has transformed investment experiences across Tripura</p>
+    <p class="subtitle">Discover how SWAGAT 2.0 has revolutionized investment experiences across Tripura with seamless processes and impactful results.</p>
   </div>
 
   <!-- Statistics Cards -->
@@ -34,105 +34,93 @@
     <h2 class="section-title">Investor Testimonials</h2>
     <div class="testimonials-slider">
       <div class="testimonial-container" [style.transform]="'translateX(-' + currentSlide * 100 + '%)'">
-        <div class="testimonial-card" *ngFor="let testimonial of testimonials">
-          <div class="testimonial-header">
-            <span class="experience-badge" [ngClass]="testimonial.badgeClass">{{testimonial.experience}}</span>
-            <div class="rating">
-              <span *ngFor="let star of getRatingStars(testimonial.rating)" 
-                    class="star" [ngClass]="{'filled': star}">★</span>
-            </div>
-          </div>
-          <p class="testimonial-text">{{testimonial.text}}</p>
-          <div class="testimonial-author">
-            <div class="author-info">
-              <h4 class="author-name">{{testimonial.author}}</h4>
-              <p class="author-title">{{testimonial.title}}</p>
-              <p class="author-industry">{{testimonial.industry}}</p>
-              <p class="testimonial-date">{{testimonial.date}}</p>
-            </div>
-          </div>
-          <div class="project-impact">
-            <h5>Project Impact</h5>
-            <div class="impact-stats">
-              <div class="impact-item">
-                <span class="impact-label">Investment:</span>
-                <span class="impact-value">{{testimonial.investment}}</span>
-              </div>
-              <div class="impact-item">
-                <span class="impact-label">Jobs Created:</span>
-                <span class="impact-value">{{testimonial.jobsCreated}}</span>
+        <div class="testimonial-slide" *ngFor="let testimonial of testimonials">
+          <div class="testimonial-card">
+            <div class="testimonial-header">
+              <span class="experience-badge" [ngClass]="testimonial.badgeClass">{{testimonial.experience}}</span>
+              <div class="rating">
+                <span *ngFor="let star of getRatingStars(testimonial.rating)" class="star" [ngClass]="{'filled': star}">★</span>
               </div>
             </div>
-            <span class="success-story-label">Success Story</span>
+            <p class="testimonial-text">{{testimonial.text}}</p>
+            <div class="testimonial-author">
+              <div class="author-info">
+                <h4 class="author-name">{{testimonial.author}}</h4>
+                <p class="author-title">{{testimonial.title}}</p>
+                <p class="author-industry">{{testimonial.industry}}</p>
+                <p class="testimonial-date">{{testimonial.date}}</p>
+              </div>
+            </div>
+            <div class="project-impact">
+              <h5>Project Impact</h5>
+              <div class="impact-stats">
+                <div class="impact-item">
+                  <span class="impact-label">Investment:</span>
+                  <span class="impact-value">{{testimonial.investment}}</span>
+                </div>
+                <div class="impact-item">
+                  <span class="impact-label">Jobs Created:</span>
+                  <span class="impact-value">{{testimonial.jobsCreated}}</span>
+                </div>
+              </div>
+              <span class="success-story-label">Success Story</span>
+            </div>
           </div>
         </div>
       </div>
-      
       <!-- Navigation Buttons -->
       <button class="nav-btn prev-btn" (click)="previousSlide()" [disabled]="currentSlide === 0">‹</button>
       <button class="nav-btn next-btn" (click)="nextSlide()" [disabled]="currentSlide === testimonials.length - 1">›</button>
-      
       <!-- Dots Indicator -->
       <div class="dots-container">
-        <span *ngFor="let dot of testimonials; let i = index" 
-              class="dot" 
-              [class.active]="i === currentSlide"
-              (click)="goToSlide(i)"></span>
+        <span *ngFor="let dot of testimonials; let i = index" class="dot" [class.active]="i === currentSlide" (click)="goToSlide(i)"></span>
       </div>
     </div>
   </div>
 
-  <!-- Feedback Form -->
+  <!-- Feedback Section -->
   <div class="feedback-section">
     <div class="feedback-container">
       <div class="feedback-form-card">
         <h2 class="section-title">Share Your Experience</h2>
         <form class="feedback-form" (ngSubmit)="submitFeedback()">
           <div class="form-group">
-            <label>Your Name</label>
+            <label class="form-label">Your Name</label>
             <input type="text" [(ngModel)]="feedbackForm.name" name="name" class="form-input" placeholder="Enter your full name">
           </div>
-          
           <div class="form-group">
-            <label>Company Name</label>
+            <label class="form-label">Company Name</label>
             <input type="text" [(ngModel)]="feedbackForm.company" name="company" class="form-input" placeholder="Enter your company name">
           </div>
-          
           <div class="form-group">
-            <label>Overall Satisfaction Rating</label>
+            <label class="form-label">Overall Satisfaction Rating</label>
             <div class="rating-input">
-              <span *ngFor="let star of [1,2,3,4,5]; let i = index" 
-                    class="rating-star" 
-                    [class.selected]="i < feedbackForm.rating"
-                    (click)="setRating(i + 1)">★</span>
+              <div class="rating-stars">
+                <span *ngFor="let star of [1,2,3,4,5]; let i = index" class="rating-star" [class.selected]="i < feedbackForm.rating" (click)="setRating(i + 1)">★</span>
+              </div>
               <span class="rating-text">{{feedbackForm.rating}}/5 Stars</span>
             </div>
           </div>
-          
           <div class="form-group">
-            <label>Your Experience</label>
-            <textarea [(ngModel)]="feedbackForm.experience" 
-                     name="experience" 
-                     class="form-textarea" 
-                     placeholder="Share your detailed experience with our services..."
-                     rows="4"></textarea>
+            <label class="form-label">Your Experience</label>
+            <textarea [(ngModel)]="feedbackForm.experience" name="experience" class="form-textarea" placeholder="Share your detailed experience with our services..." rows="5"></textarea>
           </div>
-          
           <button type="submit" class="submit-btn">Submit Feedback</button>
         </form>
       </div>
-      
       <div class="feedback-info-card">
-        <h3>Why Your Feedback Matters</h3>
+        <h3 class="info-title">
+          <span class="info-icon">!</span>
+          Why Your Feedback Matters
+        </h3>
         <ul class="feedback-benefits">
-          <li>Helps us improve our services continuously</li>
-          <li>Guides other investors in their decision-making</li>
-          <li>Influences policy improvements and new initiatives</li>
-          <li>Builds transparency and trust in the system</li>
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Helps us improve our services continuously</li>
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Guides other investors in their decision-making</li>
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Influences policy improvements and new initiatives</li>
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Builds transparency and trust in the system</li>
         </ul>
-        
         <div class="feedback-stats">
-          <h4>Feedback Statistics</h4>
+          <h4 class="stats-title">Feedback Statistics</h4>
           <div class="stats-list">
             <div class="stats-item">• 1,200+ reviews collected</div>
             <div class="stats-item">• 96% positive feedback</div>
