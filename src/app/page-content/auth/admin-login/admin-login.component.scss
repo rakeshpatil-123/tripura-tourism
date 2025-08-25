@@ -1,0 +1,115 @@
+.admin-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 1rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #e9ecef;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  // gap: 4px;
+}
+
+.btn-submit {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #0069d9;
+  }
+
+  &:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+}
+
+::ng-deep .form-group {
+  margin-bottom: 0.5rem;
+}
+::ng-deep .mat-input-element {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
+.captcha-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 4px;
+}
+
+.captcha-code {
+  background: #ffffff;
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.refresh-btn {
+  margin-left: 10px;
+  cursor: pointer;
+  border: none;
+  font-size: 20px;
+}
+
+.captcha-input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+
+  background-color: #ffffff; 
+  color: #000000;          
+  font-size: 14px;
+}
+
+.captcha-input::placeholder {
+  color: #666; 
+}
+
+
+.error-text {
+  color: red;
+  font-size: 12px;
+}
