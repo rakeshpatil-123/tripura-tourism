@@ -1,0 +1,72 @@
+<h2 mat-dialog-title class="dialog-header">
+  <span>Service Master</span>
+  <button mat-icon-button mat-dialog-close class="close-btn" aria-label="Close dialog">
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+<mat-dialog-content>
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading service details...</p>
+  </div>
+
+  <table *ngIf="!loading && serviceDetails" class="details-table mat-elevation-z2">
+    <tr>
+      <td><b>Department</b></td>
+      <td>{{serviceDetails.department_id}}</td>
+    </tr>
+    <tr>
+      <td><b>Service Name</b></td>
+      <td><b>{{serviceDetails.service_title_or_description}}</b></td>
+    </tr>
+    <tr>
+      <td><b>NOC Name</b></td>
+      <td>{{serviceDetails.noc_name}}</td>
+    </tr>
+    <tr>
+      <td><b>NOC Short Name</b></td>
+      <td>{{serviceDetails.noc_short_name}}</td>
+    </tr>
+    <tr>
+      <td><b>NOC Type</b></td>
+      <td>{{serviceDetails.noc_type}}</td>
+    </tr>
+    <tr>
+      <td><b>Payment Type</b></td>
+      <td>{{serviceDetails.noc_payment_type}}</td>
+    </tr>
+    <tr>
+      <td><b>Target Days</b></td>
+      <td>{{serviceDetails.target_days}}</td>
+    </tr>
+    <tr>
+      <td><b>NOC Validity</b></td>
+      <td>{{serviceDetails.noc_validity}} days</td>
+    </tr>
+    <tr>
+      <td><b>NSW License ID</b></td>
+      <td>{{serviceDetails.nsw_license_id}}</td>
+    </tr>
+    <tr>
+      <td><b>Status</b></td>
+      <td>
+        <span
+          [ngClass]="{'active-status': serviceDetails.status === 1, 'inactive-status': serviceDetails.status !== 1}">
+          {{ serviceDetails.status === 1 ? 'Active' : 'Inactive' }}
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Created At</b></td>
+      <td>{{serviceDetails.created_at | date:'medium'}}</td>
+    </tr>
+    <tr>
+      <td><b>Updated At</b></td>
+      <td>{{serviceDetails.updated_at | date:'medium'}}</td>
+    </tr>
+  </table>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="accent" mat-dialog-close>Close</button>
+</mat-dialog-actions>

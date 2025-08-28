@@ -84,6 +84,12 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./user-profile/user-profile.component').then(
             (m) => m.UserProfileComponent
           ),
+      },{
+        path: 'admin-services',
+        loadComponent: () =>
+          import('./admin-services/admin-services.component').then(
+            (m) => m.AdminServicesComponent
+          ),
       },
     ],
   },

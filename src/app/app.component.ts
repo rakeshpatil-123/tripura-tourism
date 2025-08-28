@@ -12,7 +12,7 @@ import { GenericService } from './_service/generic/generic.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, HeaderComponent, LoaderComponent, FooterComponent , FontAwesomeModule],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, LoaderComponent, FooterComponent , FontAwesomeModule, ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
