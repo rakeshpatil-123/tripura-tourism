@@ -1,4 +1,3 @@
-// ilogi-file-upload.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef } from '@angular/core';
 import { ReactiveFormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -28,37 +27,34 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
 
   @Output() fileSelected = new EventEmitter<File>();
   @Output() fileCleared = new EventEmitter<void>();
+  @Output() onRemove = new EventEmitter<string>(); // 👈 New: Tell parent "file removed"
 
   selectedFile: File | null = null;
   error: string | null = null;
 
-  // Callbacks required by ControlValueAccessor
+  // ControlValueAccessor callbacks
   onChange = (file: File | null) => {};
   onTouched = () => {};
 
-  // Write value from form model
   writeValue(file: File | null): void {
     this.selectedFile = file;
   }
 
-  // Register callback for value changes
   registerOnChange(fn: (file: File | null) => void): void {
     this.onChange = fn;
   }
 
-  // Register callback for touch
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
-  // Disable the control
   setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }
 
   onButtonClick(): void {
     if (this.disabled) return;
-    this.fileInput.nativeElement.click();
+    this.fileInput?.nativeElement.click(); // ✅ Safe call
   }
 
   onFileSelected(event: Event): void {
@@ -76,16 +72,23 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
       }
 
       this.selectedFile = file;
-      this.onChange(file);        // Notify Angular form
-      this.onTouched();           // Mark as touched
+      this.onChange(file);
+      this.onTouched();
       this.fileSelected.emit(file);
     }
   }
 
+  // ✅ Fixed: Safe clear + emit onRemove
   clearFile(): void {
+    if (this.fileInput?.nativeElement) {
+      this.fileInput.nativeElement.value = ''; // Only if exists
+    }
+
     this.selectedFile = null;
-    this.fileInput.nativeElement.value = '';
-    this.onChange(null);          // Update form value
+    this.onChange(null);
+    this.onTouched();
     this.fileCleared.emit();
+
+    this.onRemove.emit(this.name); // or use a better identifier if needed
   }
 }

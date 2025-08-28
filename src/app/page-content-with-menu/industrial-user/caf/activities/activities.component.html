@@ -1,119 +1,133 @@
-<!-- <div class="container">
-  <form [formGroup]="activityForm" novalidate>
-    <div class="row mb-3">
-      <div class="col-md-6 col-sm-12">
-        <label for="search">Search</label>
-        <input type="text" id="search" class="form-control" placeholder="Search" />
-      </div>
+<div class="container mt-4">
+<form [formGroup]="activityForm" novalidate>
+
+  <div class="mt-2 mb-4 form-head">
+    <span class="heder-color">Enterprise Activities</span>
+  </div>
+
+  <!-- Company Activity Radio -->
+  <app-ilogi-radio
+    formControlName="companyActivity"
+    fieldLabel="Company Activity"
+    [mandatory]="true"
+    [radioOptions]="activityOptions"
+  ></app-ilogi-radio>
+
+  <!-- NIC Code Selection Section -->
+  <div class="row mt-3">
+    <div class="col-md-4 form-con">
+      <app-ilogi-select
+        formControlName="nic2DigitCode"
+        fieldLabel="NIC 2-Digit Code"
+        [selectOptions]="nic2SelectOptions"
+        placeholder="Select 2-digit code"
+        [mandatory]="true"
+        (change)="onNic2Change($event.value)"
+      ></app-ilogi-select>
     </div>
 
-    <div class="row mb-3">
-      <div class="col-md-6 col-sm-12">
-        <label>Activity of Enterprise</label>
-        <app-ilogi-radio
-          fieldId="companyActivity"
-          fieldLabel="Activity of Enterprise"
-          [radioOptions]="activityOptions"
-          [formControlName]="'companyActivity'"
-          [submitted]="submitted"
-          [mandatory]="true"
-        ></app-ilogi-radio>
-      </div>
+    <div class="col-md-4 form-con">
+      <app-ilogi-select
+        formControlName="nic4DigitCode"
+        fieldLabel="NIC 4-Digit Code"
+        [selectOptions]="nic4SelectOptions"
+        placeholder="Select 4-digit code"
+        [mandatory]="true"
+        (change)="onNic4Change($event.value)"
+        [disabled]="nic4SelectOptions.length === 0"
+      ></app-ilogi-select>
     </div>
 
-    <div class="row mb-3">
-      <div class="col-md-6 col-sm-12">
-        <app-ilogi-select
-          fieldId="nic2DigitCode"
-          fieldLabel="NIC 2 Digit Code"
-          [selectOptions]="nic2SelectOptions"
-          [formControlName]="'nic2DigitCode'"
-          [placeholder]="'Select NIC 2 Digit Code'"
-          (change)="onNic2Change($event.value)"
-          [submitted]="submitted"
-          [mandatory]="true"
-        ></app-ilogi-select>
-      </div>
+    <div class="col-md-4 form-con">
+      <app-ilogi-select
+        formControlName="nic5DigitCode"
+        fieldLabel="NIC 5-Digit Code"
+        [selectOptions]="nic5SelectOptions"
+        placeholder="Select 5-digit code"
+        [mandatory]="true"
+        [disabled]="nic5SelectOptions.length === 0"
+      ></app-ilogi-select>
     </div>
+  </div>
 
-    <div class="row mb-3">
-      <div class="col-md-6 col-sm-12">
-        <app-ilogi-select
-          fieldId="nic4DigitCode"
-          fieldLabel="NIC 4 Digit Code"
-          [selectOptions]="nic4SelectOptions"
-          [formControlName]="'nic4DigitCode'"
-          [placeholder]="'Select NIC 4 Digit Code'"
-          (change)="onNic4Change($event.value)"
-          [submitted]="submitted"
-          [mandatory]="true"
-        ></app-ilogi-select>
-      </div>
-    </div>
+  <!-- Add Button -->
+  <div class="mt-3">
+    <button type="button" class="btn btn-primary" (click)="addActivity()">
+      Add NIC Code
+    </button>
+  </div>
 
-    <div class="row mb-3">
-      <div class="col-md-6 col-sm-12">
-        <app-ilogi-select
-          fieldId="nic5DigitCode"
-          fieldLabel="NIC 5 Digit Code"
-          [selectOptions]="nic5SelectOptions"
-          [placeholder]="'Select NIC 5 Digit Code'"
-          [formControlName]="'nic5DigitCode'"
-          [submitted]="submitted"
-          [mandatory]="true"
-        ></app-ilogi-select>
-      </div>
-    </div>
+  <!-- Activities Table -->
+  <div class="mt-4">
+    <h6>Added NIC Codes</h6>
+    <div class="table-responsive">
+      <table class="table table-bordered grid-table">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" style="width: 25%;">2-Digit Code</th>
+            <th scope="col" style="width: 25%;">4-Digit Code</th>
+            <th scope="col" style="width: 35%;">5-Digit Code</th>
+            <th scope="col" style="width: 15%;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- If no activities -->
+          <tr *ngIf="activities.length === 0">
+            <td colspan="4" class="text-center text-muted">No NIC codes added yet.</td>
+          </tr>
 
-    <div class="row mb-3">
-      <div class="col-md-6 col-sm-12 d-flex justify-content-center">
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="addActivity()"
-          [disabled]="!activityForm.valid"
-        >
-          Add More Activities
-        </button>
-      </div>
-    </div>
+          <!-- Render each activity -->
+          <tr *ngFor="let act of activities; let i = index">
+            <td>
+              <strong>{{ act.nic_2_digit_code }}</strong><br>
+              <small class="text-muted">{{ act.nic_2_digit_code_description }}</small>
+            </td>
 
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <table class="table table-bordered">
-          <thead class="table-primary">
-            <tr>
-              <th>Sl. No.</th>
-              <th>Activity of Enterprise *</th>
-              <th>NIC 2 Digit Code *</th>
-              <th>NIC 4 Digit Code *</th>
-              <th>NIC 5 Digit Code *</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let act of activities; let i = index">
-              <td>{{ act.slNo }} </td>
-              <td>{{ act.companyActivity }}</td>
-              <td>{{ act.nic2DigitLabel }}</td>
-              <td>{{ act.nic4DigitLabel }}</td>
-              <td>{{ act.nic5DigitLabel }}</td>
-              <td>
-                <a (click)="removeActivity(i)" class="text-danger" style="cursor: pointer;">
-                  <i class="fa fa-trash-o"></i> Remove
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            <td>
+              <div *ngFor="let four of act.nic_4_digit_codes">
+                <strong>{{ four.nic_4_digit_code }}</strong><br>
+                <small class="text-muted">{{ four.nic_4_digit_code_description }}</small>
+                <hr style="margin: 0.5rem 0;" *ngIf="!lastItem($any(act.nic_4_digit_codes), four)">
+              </div>
+            </td>
+
+            <td>
+              <div *ngFor="let four of act.nic_4_digit_codes; let j = index">
+                <div *ngFor="let five of four.nic_5_digit_codes">
+                  <strong>{{ five.nic_5_digit_code }}</strong><br>
+                  <small class="text-muted">{{ five.nic_5_digit_code_description }}</small>
+                  <hr style="margin: 0.5rem 0;" *ngIf="!lastItem(four.nic_5_digit_codes, five)">
+                </div>
+                <!-- Add separator between multiple 4-digit groups -->
+                <hr style="border-color: #ddd; margin: 1rem 0;" *ngIf="j < act.nic_4_digit_codes.length - 1">
+              </div>
+            </td>
+
+            <td class="text-center">
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="removeActivity(i)"
+                title="Remove this NIC entry"
+              >
+                Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </form>
-  <div class="form-actions">
-  <button type="button" class="btn btn-primary">Save As Draft</button>
-  <button type="submit" class="btn btn-success">Save</button>
+  </div>
+
+  <!-- Submit Buttons -->
+  <div class="form-actions mt-4">
+    <button type="button" class="btn btn-primary" (click)="saveAsDraft()">
+      Save As Draft
+    </button>
+    <button type="button" class="btn btn-success" (click)="onSubmit()">
+      Submit
+    </button>
+  </div>
+
+</form>
 </div>
-</div> -->
-
-
-hi activity

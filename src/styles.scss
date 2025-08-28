@@ -394,12 +394,15 @@ body.sidebar-open {
 
 .page-head{
   width: fit-content;
-  // padding: 8px 12px;
   color: #2e2e2e;
   font-size: 1rem;
   font-weight: 800;
-  // background-color: #ff9100;
-  border-radius: 3px;
+}
+.form-head{
+  width: fit-content;
+  color: #2e2e2e;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 .warn{
   color: var(--color-poppy-red, #dc3545);

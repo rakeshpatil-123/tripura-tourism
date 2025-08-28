@@ -1,55 +1,86 @@
 // activities.component.ts
 import { Component, Input, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { NicCode } from './models/nic-code.model';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IlogiRadioComponent } from '../../../../customInputComponents/ilogi-radio/ilogi-radio.component';
-import {
-  IlogiSelectComponent,
-  SelectOption,
-} from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
+import { IlogiSelectComponent, SelectOption } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { CommonModule } from '@angular/common';
+import { GenericService } from '../../../../_service/generic/generic.service';
+
+interface Nic2Digit {
+  nic_2_digit_code: string;
+  nic_2_digit_code_description: string;
+}
+
+interface Nic4Digit {
+  nic_4_digit_code: string;
+  nic_4_digit_code_description: string;
+}
+
+interface Nic5Digit {
+  nic_5_digit_code: string;
+  nic_5_digit_code_description: string;
+}
+
+interface NicEntry {
+  nic_2_digit_code: string;
+  nic_2_digit_code_description: string;
+  nic_4_digit_codes: {
+    nic_4_digit_code: string;
+    nic_4_digit_code_description: string;
+    nic_5_digit_codes: Nic5Digit[];
+  }[];
+}
 
 @Component({
   selector: 'app-enterprise-activity',
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.scss'],
-  imports: [IlogiRadioComponent, IlogiSelectComponent, ReactiveFormsModule, CommonModule],
+  imports: [CommonModule, ReactiveFormsModule, IlogiRadioComponent, IlogiSelectComponent],
   standalone: true,
 })
 export class ActivitiesComponent implements OnInit {
   @Input() submitted = false;
 
   activityForm: FormGroup;
-  activities: any[] = [];
+  activities: NicEntry[] = [];
 
-  // Radio options for Activity
+  // Options for dropdowns
+  nic2DigitOptions: Nic2Digit[] = [];
+  nic4DigitOptions: Nic4Digit[] = [];
+  nic5DigitOptions: Nic5Digit[] = [];
+
+  // SelectOptions for ilogi-select
+  get nic2SelectOptions(): SelectOption[] {
+    return this.nic2DigitOptions.map(opt => ({
+      id: opt.nic_2_digit_code,
+      name: `${opt.nic_2_digit_code} - ${opt.nic_2_digit_code_description}`
+    }));
+  }
+
+  get nic4SelectOptions(): SelectOption[] {
+    return this.nic4DigitOptions.map(opt => ({
+      id: opt.nic_4_digit_code,
+      name: `${opt.nic_4_digit_code} - ${opt.nic_4_digit_code_description}`
+    }));
+  }
+
+  get nic5SelectOptions(): SelectOption[] {
+    return this.nic5DigitOptions.map(opt => ({
+      id: opt.nic_5_digit_code,
+      name: `${opt.nic_5_digit_code} - ${opt.nic_5_digit_code_description}`
+    }));
+  }
   activityOptions = [
-    { value: 'Manufacturing', name: 'Manufacturing' },
-    { value: 'Services', name: 'Services' },
-  ];
+  { value: 'Manufacturing', name: 'Manufacturing' },
+  { value: 'Services', name: 'Services' },
+];
 
-  // NIC Options (internal model)
-  nic2DigitOptions: NicCode[] = [
-    { value: '4182', label: '10-Manufacture of food products' },
-    { value: '4110', label: '05-Mining of coal and lignite' },
-    {
-      value: '4121',
-      label: '06-Extraction of crude petroleum and natural gas',
-    },
-    { value: '4128', label: '07-Mining of metal ores' },
-  ];
-
-  nic4DigitOptions: NicCode[] = [];
-  nic5DigitOptions: NicCode[] = [];
-
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private apiService: GenericService
+  ) {
     this.activityForm = this.fb.group({
-      companyActivity: ['Manufacturing', Validators.required], // default to Manufacturing
+      companyActivity: ['Manufacturing', Validators.required],
       nic2DigitCode: ['', Validators.required],
       nic4DigitCode: ['', Validators.required],
       nic5DigitCode: ['', Validators.required],
@@ -57,125 +88,247 @@ export class ActivitiesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Initialize nic4/nic5 as empty until selection
+    this.loadNic2DigitCodes();
+    this.loadExistingData();
+  }
+
+  // --- Load NIC 2-digit codes ---
+  loadNic2DigitCodes(): void {
+    this.apiService.getByConditions({}, 'api/fetch-all-nic-2-digit-codes-with-description').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.nic2DigitOptions = res.data;
+          console.log(' Loaded NIC 2-digit codes:', this.nic2DigitOptions);
+        } else {
+          this.apiService.openSnackBar('Failed to load NIC 2-digit codes.', 'error');
+        }
+      },
+      error: (err) => {
+        console.error(' API Error (NIC 2-digit):', err);
+        this.apiService.openSnackBar('Could not load NIC 2-digit codes.', 'error');
+      }
+    });
+  }
+
+  // --- On NIC 2-digit change → load 4-digit codes ---
+  onNic2Change(value: string): void {
+    this.resetAfter2Digit();
+    if (!value) return;
+
+    const payload = { nic_2_digit_code: value };
+    this.apiService.getByConditions(payload, 'api/fetch-all-nic-4-digit-codes-with-description').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.nic4DigitOptions = res.data;
+          console.log(' Loaded NIC 4-digit codes:', this.nic4DigitOptions);
+        } else {
+          this.apiService.openSnackBar('No 4-digit codes found.', 'info');
+        }
+      },
+      error: (err) => {
+        console.error(' API Error (NIC 4-digit):', err);
+        this.apiService.openSnackBar('Failed to load 4-digit codes.', 'error');
+      }
+    });
+  }
+
+  // --- On NIC 4-digit change → load 5-digit codes ---
+  onNic4Change(value: string): void {
+    this.resetAfter4Digit();
+    if (!value) return;
+
+    const payload = { nic_4_digit_code: value };
+    this.apiService.getByConditions(payload, 'api/fetch-all-nic-5-digit-codes-with-description').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.nic5DigitOptions = res.data;
+          console.log(' Loaded NIC 5-digit codes:', this.nic5DigitOptions);
+        } else {
+          this.apiService.openSnackBar('No 5-digit codes found.', 'info');
+        }
+      },
+      error: (err) => {
+        console.error(' API Error (NIC 5-digit):', err);
+        this.apiService.openSnackBar('Failed to load 5-digit codes.', 'error');
+      }
+    });
+  }
+
+  // --- Reset dependent fields ---
+  private resetAfter2Digit(): void {
+    this.activityForm.get('nic4DigitCode')?.reset();
+    this.activityForm.get('nic5DigitCode')?.reset();
     this.nic4DigitOptions = [];
     this.nic5DigitOptions = [];
   }
 
-  // Getters: Convert NicCode[] → SelectOption[] for ilogi-select
-  get nic2SelectOptions(): SelectOption[] {
-    return this.nic2DigitOptions.map((opt) => ({
-      id: opt.value,
-      name: opt.label,
-    }));
-  }
-
-  get nic4SelectOptions(): SelectOption[] {
-    return this.nic4DigitOptions.map((opt) => ({
-      id: opt.value,
-      name: opt.label,
-    }));
-  }
-
-  get nic5SelectOptions(): SelectOption[] {
-    return this.nic5DigitOptions.map((opt) => ({
-      id: opt.value,
-      name: opt.label,
-    }));
-  }
-
-  // When NIC 2-digit changes → update NIC 4-digit options
-  onNic2Change(value: string): void {
-    this.activityForm.get('nic4DigitCode')?.reset();
+  private resetAfter4Digit(): void {
     this.activityForm.get('nic5DigitCode')?.reset();
     this.nic5DigitOptions = [];
-
-    // Example mapping: 10-Manufacture of food products
-    if (value === '4182') {
-      this.nic4DigitOptions = [
-        { value: '4183', label: '1010-Processing and preserving of meat' },
-        {
-          value: '4193',
-          label:
-            '1020-Processing and preserving of fish, crustaceans and molluscs',
-        },
-        {
-          value: '4202',
-          label: '1030-Processing and preserving of fruit and vegetables',
-        },
-      ];
-    } else if (value === '4110') {
-      this.nic4DigitOptions = [
-        { value: '4111', label: '0510-Coal mining' },
-        { value: '4112', label: '0520-Lignite mining' },
-      ];
-    } else {
-      this.nic4DigitOptions = [];
-    }
   }
 
-  // When NIC 4-digit changes → update NIC 5-digit options
-  onNic4Change(value: string): void {
-    this.activityForm.get('nic5DigitCode')?.reset();
-
-    if (value === '4183') {
-      this.nic5DigitOptions = [
-        { value: '4184', label: '10101-Mutton-slaughtering, preparation' },
-        { value: '4185', label: '10102-Beef-slaughtering, preparation' },
-        { value: '4186', label: '10103-Pork-slaughtering, preparation' },
-      ];
-    } else if (value === '4193') {
-      this.nic5DigitOptions = [
-        { value: '4194', label: '10201-Fish processing and canning' },
-        { value: '4195', label: '10202-Production of fish meal' },
-      ];
-    } else {
-      this.nic5DigitOptions = [];
-    }
-  }
-
-  // Add current activity to list
+  // --- Add current selection to table ---
   addActivity(): void {
-  console.log('Add button clicked');
-  console.log('Form valid?', this.activityForm.valid);
-  console.log('Form value:', this.activityForm.value);
+    if (this.activityForm.invalid) {
+      this.activityForm.markAllAsTouched();
+      this.apiService.openSnackBar('Please fill all required fields.', 'error');
+      return;
+    }
 
-  if (this.activityForm.valid) {
-    const formValue = this.activityForm.value;
+    const raw = this.activityForm.value;
 
-    const activity = {
-      slNo: this.activities.length + 1,
-      companyActivity: formValue.companyActivity,
-      nic2DigitCode: formValue.nic2DigitCode,
-      nic2DigitLabel: this.getNicLabel(formValue.nic2DigitCode, this.nic2SelectOptions),
-      nic4DigitCode: formValue.nic4DigitCode,
-      nic4DigitLabel: this.getNicLabel(formValue.nic4DigitCode, this.nic4SelectOptions),
-      nic5DigitCode: formValue.nic5DigitCode,
-      nic5DigitLabel: this.getNicLabel(formValue.nic5DigitCode, this.nic5SelectOptions)
+    // Find full descriptions
+    const nic2 = this.nic2DigitOptions.find(n => n.nic_2_digit_code === raw.nic2DigitCode);
+    const nic4 = this.nic4DigitOptions.find(n => n.nic_4_digit_code === raw.nic4DigitCode);
+    const nic5 = this.nic5DigitOptions.find(n => n.nic_5_digit_code === raw.nic5DigitCode);
+
+    if (!nic2 || !nic4 || !nic5) {
+      this.apiService.openSnackBar('Invalid selection. Please try again.', 'error');
+      return;
+    }
+
+    // Check if this 2-digit code already exists
+    const exists = this.activities.find(a => a.nic_2_digit_code === nic2.nic_2_digit_code);
+    if (exists) {
+      this.apiService.openSnackBar('This 2-digit NIC code is already added.', 'error');
+      return;
+    }
+
+    // Create 4-digit group
+    const newEntry: NicEntry = {
+      nic_2_digit_code: nic2.nic_2_digit_code,
+      nic_2_digit_code_description: nic2.nic_2_digit_code_description,
+      nic_4_digit_codes: [
+        {
+          nic_4_digit_code: nic4.nic_4_digit_code,
+          nic_4_digit_code_description: nic4.nic_4_digit_code_description,
+          nic_5_digit_codes: [nic5]
+        }
+      ]
     };
 
-    console.log('New activity:', activity);
-    this.activities.push(activity);
-    console.log('Current activities:', this.activities);
+    this.activities.push(newEntry);
+    this.resetFormAndOptions();
+  }
 
+  // --- Remove activity ---
+  removeActivity(index: number): void {
+    const item = this.activities[index];
+    this.activities.splice(index, 1);
+
+    // If not draft, delete from backend
+    if (item.nic_2_digit_code) {
+      const payload = { nic_2_digit_code: String(item.nic_2_digit_code) };
+      this.apiService.getByConditions(payload, 'api/nic-digit-code-delete').subscribe({
+        next: (res) => {
+          if (res?.status === 1) {
+            this.apiService.openSnackBar('NIC code deleted successfully.', 'success');
+          }
+        },
+        error: (err) => {
+          console.error(' Delete failed:', err);
+          this.apiService.openSnackBar('Failed to delete NIC code.', 'error');
+        }
+      });
+    }
+  }
+
+  // --- Reset form and options ---
+  private resetFormAndOptions(): void {
     this.activityForm.reset();
     this.activityForm.get('companyActivity')?.setValue('Manufacturing');
     this.nic4DigitOptions = [];
     this.nic5DigitOptions = [];
   }
-}
 
-  // Remove activity from list
-  removeActivity(index: number): void {
-    this.activities.splice(index, 1);
-    // Re-index slNo
-    this.activities.forEach((act, i) => (act.slNo = i + 1));
+  // --- Load existing data from backend ---
+  loadExistingData(): void {
+    this.apiService.getByConditions({}, 'api/nic-digit-code-view').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.activities = res.data.map((item: any) => ({
+            nic_2_digit_code: item.nic_2_digit_code,
+            nic_2_digit_code_description: item.nic_2_digit_code_description,
+            nic_4_digit_codes: (item.nic_4_digit_codes || []).map((four: any) => ({
+              nic_4_digit_code: four.nic_4_digit_code,
+              nic_4_digit_code_description: four.nic_4_digit_code_description,
+              nic_5_digit_codes: (four.nic_5_digit_codes || []).map((five: any) => ({
+                nic_5_digit_code: five.nic_5_digit_code,
+                nic_5_digit_code_description: five.nic_5_digit_code_description
+              }))
+            }))
+          }));
+          console.log(' Loaded existing NIC data:', this.activities);
+        }
+      },
+      error: (err) => {
+        console.error(' Failed to load existing NIC data:', err);
+      }
+    });
   }
 
-  // Utility: Get label from id + options
-  getNicLabel(value: any, options: SelectOption[]): string {
-    if (!value || !options) return '';
-    const option = options.find((opt) => opt.id === value);
-    return option ? option.name : value;
+ private buildPayload(isDraft: boolean): any {
+  const payload: any = {
+    nic_codes: this.activities.map(activity => ({
+      nic_2_digit_code: String(activity.nic_2_digit_code),
+      nic_2_digit_code_description: activity.nic_2_digit_code_description,
+      nic_4_digit_codes: activity.nic_4_digit_codes.map(four => ({
+        nic_4_digit_code: String(four.nic_4_digit_code),
+        nic_4_digit_code_description: four.nic_4_digit_code_description,
+        nic_5_digit_codes: four.nic_5_digit_codes.map(five => ({
+          nic_5_digit_code: String(five.nic_5_digit_code),
+          nic_5_digit_code_description: five.nic_5_digit_code_description
+        }))
+      }))
+    }))
+  };
+
+  if (isDraft) {
+    payload.save_data = '1';
+  }
+
+  return payload;
+}
+
+  // --- Save as Draft ---
+  saveAsDraft(): void {
+    const payload = this.buildPayload(true);
+    this.submitToBackend(payload, 'api/nic-digit-code-store', true);
+  }
+
+  // --- Submit ---
+  onSubmit(): void {
+    if (this.activities.length === 0) {
+      this.apiService.openSnackBar('Please add at least one NIC code.', 'error');
+      return;
+    }
+
+    const payload = this.buildPayload(false);
+    this.submitToBackend(payload, 'api/nic-digit-code-store', false);
+  }
+
+  lastItem(array: any[], item: any): boolean {
+  return array[array.length - 1] === item;
+}
+  // --- Submit to backend ---
+  private submitToBackend(payload: any, endpoint: string, isDraft: boolean): void {
+    this.apiService.getByConditions(payload, endpoint).subscribe({
+      next: (res) => {
+        if (res?.status === 1) {
+          const message = isDraft
+            ? 'NIC codes saved as draft!'
+            : 'NIC codes submitted successfully!';
+          this.apiService.openSnackBar(message, 'success');
+          if (!isDraft) {
+            this.activities = []; // optional: reset after submit
+          }
+        }
+      },
+      error: (err: any) => {
+        console.error(' API Error:', err);
+        const errorMsg = err?.error?.message || 'Something went wrong!';
+        this.apiService.openSnackBar(errorMsg, 'error');
+      }
+    });
   }
 }
