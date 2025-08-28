@@ -134,7 +134,7 @@ export class ClearenceComponent {
 
   // Table inputs
   pageSize = 5;
-  searchable = true;
+  searchable = false  ;
   showPagination = true;
 
   // Handle row actions
