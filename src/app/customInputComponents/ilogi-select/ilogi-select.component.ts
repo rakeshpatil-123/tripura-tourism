@@ -212,10 +212,18 @@ export class IlogiSelectComponent
     return !!this.errors && Object.keys(this.errors).length > 0;
   }
 
+  // writeValue(value: any): void {
+  //   this.value = value;
+  //   this.cdr.detectChanges();
+  // }
   writeValue(value: any): void {
+  this.value = value;
+  // Delay to ensure options are rendered
+  setTimeout(() => {
     this.value = value;
     this.cdr.detectChanges();
-  }
+  }, 100);
+}
 
   registerOnChange(fn: (value: any) => void): void {
     this.onChange = fn;

@@ -1,7 +1,7 @@
 // management.component.ts
 import { Component, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 // Import your custom components
 import { IlogiInputComponent } from '../../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiFileUploadComponent } from '../../../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
@@ -63,11 +63,16 @@ export class ManagementComponent implements OnInit, OnDestroy {
     { id: 'YES', name: 'Yes' },
     { id: 'NO', name: 'No' },
   ];
+  womenEntrepreneurOptions = [
+    { id: 'YES', name: 'Yes' },
+    { id: 'NO', name: 'No' },
+  ];
 
   constructor(
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
-    private apiService: GenericService
+    private apiService: GenericService,
+    private sanitizer: DomSanitizer
   ) {
     this.form = this.fb.group({
       // Owner Details
@@ -86,8 +91,7 @@ export class ManagementComponent implements OnInit, OnDestroy {
       ownerDetailsIsDifferentlyAbled: ['', Validators.required],
       ownerDetailsIsWomenEntrepreneur: ['', Validators.required],
       ownerDetailsIsMinority: ['', Validators.required],
-      ownerDetailsPhoto: [null, Validators.required],
-
+      ownerDetailsPhoto: ['', Validators.required],
       // Manager Details
       managerDetailsName: ['', Validators.required],
       managerDetailsFathersName: ['', Validators.required],
@@ -113,7 +117,6 @@ export class ManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadExistingData();
-    console.log(this.ownerPhotoPreview, 'owner photo');
   }
 
   loadExistingData(): void {
@@ -134,19 +137,12 @@ export class ManagementComponent implements OnInit, OnDestroy {
   }
 
   patchFormWithData(data: any): void {
-    console.log('🔴 patchFormWithData called with data:', data);
-
     if (!data || !data.management_details) {
       console.warn('No data or management_details found to patch.');
       return;
     }
 
     const management = data.management_details;
-
-    console.log('Owner photo URL:', management.owner_details_photo);
-
-    this.ownerPhotoPreview = management.owner_details_photo || null;
-    console.log(this.ownerPhotoPreview, 'owner photo after assignment');
 
     this.ownerPhotoPreview = management.owner_details_photo || null;
     this.managerPhotoPreview = management.manager_details_photo || null;
@@ -167,8 +163,7 @@ export class ManagementComponent implements OnInit, OnDestroy {
       ownerDetailsMobile: management.owner_details_mobile || '',
       ownerDetailsAlternateMobile:
         management.owner_details_alternate_mobile || '',
-      ownerDetailsAadharNo:
-        management.owner_aadhar_no || management.owner_details_aadhar_no || '',
+      ownerDetailsAadharNo: management.owner_aadhar_no || '',
       ownerDetailsStatus: management.owner_details_status || '',
       ownerDetailsEmail: management.owner_details_email || '',
       ownerDetailsDob: management.owner_details_dob
@@ -195,14 +190,6 @@ export class ManagementComponent implements OnInit, OnDestroy {
         : null,
     });
 
-    // // ✅ Set file previews from URLs
-    // this.setFileUrlAsValue('ownerDetailsPhoto', management.owner_details_photo);
-    // this.setFileUrlAsValue('managerDetailsPhoto', management.manager_details_photo);
-    // this.setFileUrlAsValue('signatureAuthorizationOfOwner', management.signature_authorization_of_owner);
-    // this.setFileUrlAsValue('factoryOccupiersSignature', management.factory_occupiers_signature);
-    // this.setFileUrlAsValue('factoryManagersSignature', management.factory_managers_signature);
-
-    // Clear and repopulate arrays
     this.partnerDetails.clear();
     if (data.partner_details && Array.isArray(data.partner_details)) {
       data.partner_details.forEach((p: any) => this.addPartner(p));
@@ -232,40 +219,56 @@ export class ManagementComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.ownerPhotoPreview = e.target.result;
+        // debugger;
         this.form.get('ownerDetailsPhoto')?.setValue(file);
       };
       reader.readAsDataURL(file);
     }
   }
-
-  setFileUrlAsValue(controlName: string, url: string): void {
-    if (!url) return;
-
-    const fileName = url.split('/').pop() || 'file';
-
-    const dummy = new File([''], fileName);
-    this.form.get(controlName)?.setValue(dummy);
-
-    // Then fetch real file and update
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-        return res.blob();
-      })
-      .then((blob) => {
-        const file = new File([blob], fileName, { type: blob.type });
-        this.form.get(controlName)?.setValue(file);
-        this.cdr.detectChanges();
-      })
-      .catch((err) => {
-        console.warn(`Failed to load file from URL: ${url}`, err);
-      });
+  onManagerPhotoSelected(event: any) {
+    const file = event.target?.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.managerPhotoPreview = e.target.result;
+        this.form.get('managerDetailsPhoto')?.setValue(file);
+        this.cdr.markForCheck();
+      };
+      reader.onerror = (err) => {
+        console.error('Error reading manager photo file', err);
+      };
+      reader.readAsDataURL(file);
+    }
   }
-  setFileAsValue(controlName: string, url: string): void {
-    console.warn(
-      `File URL received for ${controlName}: ${url}. Cannot auto-fill file input for security.`
-    );
-  }
+
+  // setFileUrlAsValue(controlName: string, url: string): void {
+  //   if (!url) return;
+
+  //   const fileName = url.split('/').pop() || 'file';
+
+  //   const dummy = new File([''], fileName);
+  //   this.form.get(controlName)?.setValue(dummy);
+
+  //   // Then fetch real file and update
+  //   fetch(url)
+  //     .then((res) => {
+  //       if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+  //       return res.blob();
+  //     })
+  //     .then((blob) => {
+  //       const file = new File([blob], fileName, { type: blob.type });
+  //       this.form.get(controlName)?.setValue(file);
+  //       this.cdr.detectChanges();
+  //     })
+  //     .catch((err) => {
+  //       console.warn(`Failed to load file from URL: ${url}`, err);
+  //     });
+  // }
+  // setFileAsValue(controlName: string, url: string): void {
+  //   console.warn(
+  //     `File URL received for ${controlName}: ${url}. Cannot auto-fill file input for security.`
+  //   );
+  // }
 
   buildFormData(isDraft: boolean = false): FormData {
     const formData = new FormData();
@@ -292,9 +295,9 @@ export class ManagementComponent implements OnInit, OnDestroy {
       'owner_details_alternate_mobile',
       raw.ownerDetailsAlternateMobile || ''
     );
-    formData.append('owner_details_aadhar_no', raw.ownerDetailsAadharNo);
+    formData.append('owner_aadhar_no', raw.ownerDetailsAadharNo);
     formData.append('owner_details_status', raw.ownerDetailsStatus);
-    formData.append('owner_details_email', raw.ownerDetailsEmail);
+    formData.append('owner_details_email', (raw.ownerDetailsEmail || '').trim());
     formData.append('owner_details_dob', this.formatDate(raw.ownerDetailsDob));
     formData.append(
       'owner_details_social_status',
@@ -306,7 +309,7 @@ export class ManagementComponent implements OnInit, OnDestroy {
     );
     formData.append(
       'owner_details_is_women_entrepreneur',
-      raw.ownerDetailsIsWomenEntrepreneur
+      raw.ownerDetailsIsWomenEntrepreneur || 'NO'
     );
     formData.append('owner_details_is_minority', raw.ownerDetailsIsMinority);
 
@@ -433,10 +436,16 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.submitForm(payload, true);
   }
 
-  onSubmit(): void {
-    const payload = this.buildFormData(false);
-    this.submitForm(payload, false);
+ onSubmit(): void {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    this.apiService.openSnackBar('Please fix all errors in the form.', 'error');
+    return;
   }
+
+  const payload = this.buildFormData(false);
+  this.submitForm(payload, false);
+}
 
   private submitForm(payload: FormData, isDraft: boolean): void {
     this.apiService
@@ -449,12 +458,31 @@ export class ManagementComponent implements OnInit, OnDestroy {
             : 'Management details submitted successfully!';
           this.apiService.openSnackBar(message, 'success');
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('API Error:', err);
-          this.apiService.openSnackBar(
-            'Failed to save management details.',
-            'error'
-          );
+
+          const errorResponse = err?.error;
+          if (errorResponse?.errors) {
+            const allErrors: string[] = [];
+
+            Object.keys(errorResponse.errors).forEach((key) => {
+              const fieldErrors = errorResponse.errors[key];
+              if (Array.isArray(fieldErrors)) {
+                allErrors.push(...fieldErrors);
+              }
+            });
+
+            allErrors.forEach((msg, index) => {
+              setTimeout(() => {
+                this.apiService.openSnackBar(msg, 'error');
+              }, index * 1200);
+            });
+          } else {
+            this.apiService.openSnackBar(
+              errorResponse?.message || 'Something went wrong!',
+              'error'
+            );
+          }
         },
       });
   }
@@ -487,9 +515,15 @@ export class ManagementComponent implements OnInit, OnDestroy {
       dateOfJoining: [
         data?.date_of_joining ? new Date(data.date_of_joining) : '',
       ],
-      idProof: [data?.id_proof ? this.createFileFromUrl(data.id_proof, "id_proof.png") : null],
+      idProof: [
+        data?.id_proof
+          ? this.createFileFromUrl(data.id_proof, 'id_proof.png')
+          : null,
+      ],
       signature: [
-        data?.signature ? this.createFileFromUrl(data.signature, "signature.png") : null,
+        data?.signature
+          ? this.createFileFromUrl(data.signature, 'signature.png')
+          : null,
       ],
     });
     this.partnerDetails.push(group);
@@ -538,40 +572,30 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  getImageUrl(file: File | string | null): string {
-    if (!file) return '';
-
-    if (file instanceof File) {
-      if (this.blobUrls.has(file)) {
-        return this.blobUrls.get(file)!;
-      }
-      const url = URL.createObjectURL(file);
-      this.blobUrls.set(file, url);
-      return url;
-    }
-
-    // If it's a string (URL), return it directly
-    return file;
+  getImageUrl(photo: string): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl(photo);
   }
 
-private async createFileFromUrl(url: string, filename: string): Promise<File | null> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error("Failed to fetch file from URL:", response.statusText);
+  private async createFileFromUrl(
+    url: string,
+    filename: string
+  ): Promise<File | null> {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error('Failed to fetch file from URL:', response.statusText);
+        return null;
+      }
+
+      const blob = await response.blob();
+      // You can set type as blob.type or force specific MIME type
+      const file = new File([blob], filename, { type: blob.type });
+      return file;
+    } catch (error) {
+      console.error('Error converting URL to File:', error);
       return null;
     }
-
-    const blob = await response.blob();
-    // You can set type as blob.type or force specific MIME type
-    const file = new File([blob], filename, { type: blob.type });
-    return file;
-  } catch (error) {
-    console.error("Error converting URL to File:", error);
-    return null;
   }
-}
-
 
   ngOnDestroy(): void {
     this.blobUrls.forEach((url) => URL.revokeObjectURL(url));

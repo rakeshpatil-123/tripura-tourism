@@ -130,7 +130,7 @@ export class EnterpriseDetailsComponent implements OnInit {
 
   onSave(isDraft: boolean = false): void {
     this.submitted = true;
-    console.log(this.enterpriseForm.value, ' jahfjks');
+    // console.log(this.enterpriseForm.value, ' jahfjks');
 
     // if (this.enterpriseForm.valid) {
     const formValue = this.enterpriseForm.value;
@@ -160,7 +160,7 @@ export class EnterpriseDetailsComponent implements OnInit {
       payload.save_data = 1;
     }
 
-    console.log('Final Payload:', payload);
+    // console.log('Final Payload:', payload);
 
     this.apiService
       .getByConditions(
@@ -169,7 +169,7 @@ export class EnterpriseDetailsComponent implements OnInit {
       )
       .subscribe({
         next: (res: any) => {
-          console.log('API Success:', res);
+          // console.log('API Success:', res);
           // this.genericService.openSnackBar('Something went wrong while saving unit details', 'Error');
           if (isDraft) {
             this.apiService.openSnackBar(

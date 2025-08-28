@@ -182,7 +182,6 @@ export class AttachmentComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  // ✅ Build FormData payload
   buildPayload(isDraft: boolean = false): FormData {
     const formData = new FormData();
 
@@ -190,7 +189,6 @@ export class AttachmentComponent implements OnInit {
       formData.append('save_data', '1');
     }
 
-    // Just append all form values (only non-null files and strings)
     const raw = this.form.getRawValue();
 
     // === GENERAL ===
@@ -256,13 +254,11 @@ export class AttachmentComponent implements OnInit {
         raw.propertyTaxClearanceCertificate
       );
 
-    // === Additional Docs ===
-  // Single additional document
+   
 if (this.additionalDoc.file instanceof File) {
   formData.append('other_supporting_docuement1_pdf', this.additionalDoc.file);
 }
 
-    // ✅ === Add delete flags ===
     this.filesToDelete.forEach((flag) => {
       formData.append(flag, 'delete');
     });
@@ -314,8 +310,31 @@ if (this.additionalDoc.file instanceof File) {
           const message = isDraft ? 'Draft saved!' : 'Submitted!';
           this.apiService.openSnackBar(message, 'success');
         },
-        error: (err) => {
-          this.apiService.openSnackBar('Save failed.', 'error');
+         error: (err: any) => {
+          console.error('API Error:', err);
+
+          const errorResponse = err?.error; 
+          if (errorResponse?.errors) {
+            const allErrors: string[] = [];
+
+            Object.keys(errorResponse.errors).forEach((key) => {
+              const fieldErrors = errorResponse.errors[key];
+              if (Array.isArray(fieldErrors)) {
+                allErrors.push(...fieldErrors);
+              }
+            });
+
+            allErrors.forEach((msg, index) => {
+              setTimeout(() => {
+                this.apiService.openSnackBar(msg, 'error');
+              }, index * 1200); 
+            });
+          } else {
+            this.apiService.openSnackBar(
+              errorResponse?.message || 'Something went wrong!',
+              'error'
+            );
+          }
         },
       });
   }

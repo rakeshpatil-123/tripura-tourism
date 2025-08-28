@@ -1,5 +1,4 @@
-
-<form [formGroup]="form" novalidate class="" >
+<form [formGroup]="form" novalidate class="">
 
   <div class="mt-2 mb-4 form-head">
     <span class="heder-color">Owner Details</span>
@@ -11,36 +10,41 @@
         placeholder="Enter name" maxlength="255"></app-ilogi-input>
 
       <app-ilogi-input fieldId="fatherName" fieldLabel="Father's Name" [mandatory]="true"
-        [formControlName]="'ownerDetailsFathersName'" placeholder="Enter father's name" maxlength="255"></app-ilogi-input>
+        [formControlName]="'ownerDetailsFathersName'" placeholder="Enter father's name"
+        maxlength="255"></app-ilogi-input>
 
-      <app-ilogi-input fieldId="pin" fieldLabel="PIN" [mandatory]="true" [formControlName]="'ownerDetailsPin'" placeholder="Enter PIN"
-        maxlength="6"></app-ilogi-input>
+      <app-ilogi-input fieldId="pin" fieldLabel="PIN" [mandatory]="true" [formControlName]="'ownerDetailsPin'"
+        placeholder="Enter PIN" maxlength="6"></app-ilogi-input>
 
-      <app-ilogi-input fieldId="aadharNo" fieldLabel="Aadhar No" [formControlName]="'ownerDetailsAadharNo'" placeholder="Enter"
-        maxlength="12"></app-ilogi-input>
+      <app-ilogi-input fieldId="aadharNo" fieldLabel="Aadhar No" [formControlName]="'ownerDetailsAadharNo'"
+        placeholder="Enter" maxlength="12"></app-ilogi-input>
     </div>
 
     <div class="col-md-4 form-con">
       <app-ilogi-input type="textarea" fieldId="residentialAddress" fieldLabel="Residential Address" [mandatory]="true"
-        [formControlName]="'ownerDetailsResidentialAddress'" placeholder="Enter residential address" maxlength="255" [rows]="4"></app-ilogi-input>
+        [formControlName]="'ownerDetailsResidentialAddress'" placeholder="Enter residential address" maxlength="255"
+        [rows]="4"></app-ilogi-input>
 
       <app-ilogi-input fieldId="policeStation" fieldLabel="Police Station" [mandatory]="true"
-        [formControlName]="'ownerDetailsPoliceStation'" placeholder="Enter police station" maxlength="255"></app-ilogi-input>
+        [formControlName]="'ownerDetailsPoliceStation'" placeholder="Enter police station"
+        maxlength="255"></app-ilogi-input>
 
       <app-ilogi-input fieldId="mobile" fieldLabel="Mobile" [mandatory]="true" [formControlName]="'ownerDetailsMobile'"
         placeholder="Enter mobile number" maxlength="10"></app-ilogi-input>
 
       <app-ilogi-input fieldId="alternateMobileNo" fieldLabel="Alternate Mobile No"
-        [formControlName]="'ownerDetailsAlternateMobile'" placeholder="Enter alternate mobile number" maxlength="10"></app-ilogi-input>
+        [formControlName]="'ownerDetailsAlternateMobile'" placeholder="Enter alternate mobile number"
+        maxlength="10"></app-ilogi-input>
     </div>
 
     <div class="col-md-4 form-con">
       <div class="form-group form-group-margin">
-        <label for="ownerDetailsPhoto">Photograph</label>
+        <label for="ownerDetailsPhoto">Owner Photograph</label>
         <div class="d-flex align-items-center mb-1">
-          <img  *ngIf="ownerPhotoPreview || form.get('ownerDetailsPhoto')?.value"  [src]="ownerPhotoPreview || getImageUrl(form.get('ownerDetailsPhoto')?.value)" 
-            alt="Owner Photo" class="rounded employer-photo" style="width: 100px; height: 128px; object-fit: cover;" />
-              
+          <img *ngIf="ownerPhotoPreview || form.get('ownerDetailsPhoto')?.value"
+            [src]="ownerPhotoPreview || getImageUrl(form.get('ownerDetailsPhoto')?.value)" alt="Owner Photo"
+            class="rounded employer-photo" style="width: 100px; height: 128px; object-fit: cover;" />
+
           <!-- <img *ngIf="!form.get('ownerDetailsPhoto')?.value" src="assets/img/profile-picture.jpg" alt="Default Photo"
             class="rounded employer-photo" style="width: 100px; height: 128px; object-fit: cover;" /> -->
         </div>
@@ -59,16 +63,27 @@
         </div>
       </div>
     </div>
-    
+
   </div>
 
   <div class="row top-space no-padding-first-last ">
     <div class="col-md-4">
-      <app-ilogi-input-date fieldId="dob" fieldLabel="Date of Birth" [formControlName]="'ownerDetailsDob'" [mandatory]="true"
-        placeholder="DD/MM/YYYY"></app-ilogi-input-date>
+      <app-ilogi-input-date fieldId="dob" fieldLabel="Date of Birth" [formControlName]="'ownerDetailsDob'"
+        [mandatory]="true" placeholder="DD/MM/YYYY"></app-ilogi-input-date>
 
       <app-ilogi-select fieldId="statusOfPerson" fieldLabel="Status of Person" [formControlName]="'ownerDetailsStatus'"
         [selectOptions]="statusOfPersonOptions" placeholder="Select"></app-ilogi-select>
+      <div class="mt-4">
+
+        <app-ilogi-input fieldId="ownerEmail" fieldLabel="Owner Email" [formControlName]="'ownerDetailsEmail'"
+          placeholder="Enter Email" maxlength="100"></app-ilogi-input>
+      </div>
+      <div class="mt-4">
+
+        <app-ilogi-select fieldId="womenEntrepreneur" fieldLabel="Women Entrepreneur"
+          [formControlName]="'ownerDetailsIsWomenEntrepreneur'" [selectOptions]="womenEntrepreneurOptions"
+          placeholder="Select"></app-ilogi-select>
+      </div>
     </div>
 
     <div class="col-md-4">
@@ -78,8 +93,9 @@
       <app-ilogi-select fieldId="minority" fieldLabel="Minority" [formControlName]="'ownerDetailsIsMinority'"
         [selectOptions]="yesNoOptions" placeholder="Select"></app-ilogi-select>
 
-      <app-ilogi-select fieldId="differentlyAbled" fieldLabel="Differently Abled" [formControlName]="'ownerDetailsIsDifferentlyAbled'"
-        [selectOptions]="yesNoOptions" placeholder="Select"></app-ilogi-select>
+      <app-ilogi-select fieldId="differentlyAbled" fieldLabel="Differently Abled"
+        [formControlName]="'ownerDetailsIsDifferentlyAbled'" [selectOptions]="yesNoOptions"
+        placeholder="Select"></app-ilogi-select>
     </div>
 
     <div class="col-md-4"></div>
@@ -93,11 +109,11 @@
 
   <div class="row top-space no-padding-first-last">
     <div class="col-md-4 form-con">
-      <app-ilogi-input fieldId="managerName" fieldLabel="Name" [formControlName]="'managerDetailsName'" placeholder="Enter"
-        maxlength="255"></app-ilogi-input>
-
-      <app-ilogi-input fieldId="managerFatherName" fieldLabel="Father's Name" [formControlName]="'managerDetailsFathersName'"
+      <app-ilogi-input fieldId="managerName" fieldLabel="Name" [formControlName]="'managerDetailsName'"
         placeholder="Enter" maxlength="255"></app-ilogi-input>
+
+      <app-ilogi-input fieldId="managerFatherName" fieldLabel="Father's Name"
+        [formControlName]="'managerDetailsFathersName'" placeholder="Enter" maxlength="255"></app-ilogi-input>
 
       <app-ilogi-input fieldId="managerPin" fieldLabel="PIN" [formControlName]="'managerDetailsPin'" placeholder="Enter"
         maxlength="6"></app-ilogi-input>
@@ -111,26 +127,26 @@
         [formControlName]="'managerDetailsResidentialAddress'" placeholder="Enter" maxlength="255"
         [rows]="4"></app-ilogi-input>
 
-      <app-ilogi-input fieldId="managerPoliceStation" fieldLabel="P.S." [formControlName]="'managerDetailsPoliceStation'"
-        placeholder="Enter" maxlength="255"></app-ilogi-input>
+      <app-ilogi-input fieldId="managerPoliceStation" fieldLabel="P.S."
+        [formControlName]="'managerDetailsPoliceStation'" placeholder="Enter" maxlength="255"></app-ilogi-input>
 
-      <app-ilogi-input-date fieldId="managerDOB" fieldLabel="Date of Birth" [formControlName]="'managerDetailsDob'" 
+      <app-ilogi-input-date fieldId="managerDOB" fieldLabel="Date of Birth" [formControlName]="'managerDetailsDob'"
         placeholder="DD/MM/YYYY"></app-ilogi-input-date>
     </div>
 
     <div class="col-md-4">
       <div class="form-group form-group-margin">
-        <label for="managerDetailsPhoto">Manager Photo</label>
+        <label for="managerDetailsPhoto">Manager Photograph</label>
         <div class="d-flex align-items-center mb-1">
-          <img *ngIf="form.get('managerDetailsPhoto')?.value"
-            [src]="getImageUrl(form.get('managerDetailsPhoto')?.value)" alt="Manager Photo"
+          <img *ngIf="managerPhotoPreview || form.get('managerDetailsPhoto')?.value"
+            [src]="managerPhotoPreview || getImageUrl(form.get('managerDetailsPhoto')?.value)" alt="Manager Photo"
             class="rounded employer-photo" style="width: 100px; height: 128px; object-fit: cover;" />
-          <img *ngIf="!form.get('managerDetailsPhoto')?.value" src="assets/img/profile-picture.jpg" alt="Default Photo"
-            class="rounded employer-photo" style="width: 100px; height: 128px; object-fit: cover;" />
+          <!-- <img *ngIf="!form.get('managerDetailsPhoto')?.value" src="assets/img/profile-picture.jpg" alt="Default Photo"
+            class="rounded employer-photo" style="width: 100px; height: 128px; object-fit: cover;" /> -->
         </div>
 
         <app-ilogi-file-upload [formControlName]="'managerDetailsPhoto'" accept="image/png,image/jpg,image/jpeg"
-          label="Upload Photo"></app-ilogi-file-upload>
+          label="Upload Photo" (change)="onManagerPhotoSelected($event)"></app-ilogi-file-upload>
 
         <button *ngIf="form.get('managerDetailsPhoto')?.value" type="button"
           class="browse-btn ml-2 pl-3 pr-3 add-new-btn" (click)="removeFile('managerDetailsPhoto')">
@@ -158,7 +174,8 @@
 
   <div class="row top-space no-padding-first-last">
     <div class="col-md-4">
-      <app-ilogi-file-upload [formControlName]="'signatureAuthorizationOfOwner'" label="Signature Authorization of Owner"
+      <app-ilogi-file-upload [formControlName]="'signatureAuthorizationOfOwner'"
+        label="Signature Authorization of Owner"
         accept="image/png,image/jpg,image/jpeg,application/pdf"></app-ilogi-file-upload>
     </div>
     <div class="col-md-4">
@@ -182,7 +199,7 @@
         <table formArrayName="partnerDetails" class="table table-bordered grid-table">
           <thead>
             <tr>
-              <th style="width: 70px;" >SL No</th>
+              <th style="width: 70px;">SL No</th>
               <th>Name <span class="red-font">*</span></th>
               <th>Father's Name <span class="red-font">*</span></th>
               <th>Age</th>
@@ -263,41 +280,41 @@
   </div>
   <div class="mt-4 mb-5">
     <div class="container large-container grid-container no-padding-first-last">
-      <div class="table-container" >
-      <table formArrayName="boardOfDirectors" class="table table-bordered grid-table">
-        <thead>
-          <tr>
-            <th style="width: 50px;">SL No</th>
-            <th>Name <span class="red-font">*</span></th>
-            <th>Permanent Address</th>
-            <th>Mobile No <span class="red-font">*</span></th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let group of boardOfDirectors.controls; let i = index" [formGroupName]="i">
-            <td>{{ i + 1 }}</td>
-            <td>
-              <app-ilogi-input [formControlName]="'name'" placeholder="Enter" maxlength="255"></app-ilogi-input>
-            </td>
-            <td>
-              <app-ilogi-input [formControlName]="'permanentAddress'" placeholder="Enter"
-                maxlength="255"></app-ilogi-input>
-            </td>
-            <td>
-              <app-ilogi-input [formControlName]="'mobile'" placeholder="Enter" maxlength="10"></app-ilogi-input>
-            </td>
-            <td>
-              <button type="button" class="btn btn-danger btn-sm" (click)="removeDirector(i)">Remove</button>
-            </td>
-          </tr>
+      <div class="table-container">
+        <table formArrayName="boardOfDirectors" class="table table-bordered grid-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">SL No</th>
+              <th>Name <span class="red-font">*</span></th>
+              <th>Permanent Address</th>
+              <th>Mobile No <span class="red-font">*</span></th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let group of boardOfDirectors.controls; let i = index" [formGroupName]="i">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <app-ilogi-input [formControlName]="'name'" placeholder="Enter" maxlength="255"></app-ilogi-input>
+              </td>
+              <td>
+                <app-ilogi-input [formControlName]="'permanentAddress'" placeholder="Enter"
+                  maxlength="255"></app-ilogi-input>
+              </td>
+              <td>
+                <app-ilogi-input [formControlName]="'mobile'" placeholder="Enter" maxlength="10"></app-ilogi-input>
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm" (click)="removeDirector(i)">Remove</button>
+              </td>
+            </tr>
 
-          <tr *ngIf="boardOfDirectors.length === 0">
-            <td colspan="5">No data exists!</td>
-          </tr>
-        </tbody>
+            <tr *ngIf="boardOfDirectors.length === 0">
+              <td colspan="5">No data exists!</td>
+            </tr>
+          </tbody>
 
-      </table>
+        </table>
       </div>
     </div>
     <div class="pull-right mt-2 color-666666 clkable" (click)="addDirector()">
@@ -313,38 +330,38 @@
   </div>
   <div class="mt-4 mb-5">
     <div class="container large-container grid-container no-padding-first-last">
-      <div class="table-container" >
+      <div class="table-container">
 
-      <table formArrayName="chiefAdministrativeHead" class="table table-bordered grid-table">
-        <thead>
-          <tr>
-            <th style="width: 50px;" >SL No</th>
-            <th>Name <span class="red-font">*</span></th>
-            <th>Permanent Address</th>
-            <th>Mobile No <span class="red-font">*</span></th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let group of chiefAdministrativeHead.controls; let i = index" [formGroupName]="i">
-            <td>{{ i + 1 }}</td>
-            <td>
-              <app-ilogi-input [formControlName]="'name'" placeholder="Enter" maxlength="255"></app-ilogi-input>
-            </td>
-            <td>
-              <app-ilogi-input [formControlName]="'permanentAddress'" placeholder="Enter"
-                maxlength="255"></app-ilogi-input>
-            </td>
-            <td>
-              <app-ilogi-input [formControlName]="'mobile'" placeholder="Enter" maxlength="10"></app-ilogi-input>
-            </td>
-            <td>
-              <button type="button" class="btn btn-danger btn-sm"
-                (click)="removeChiefAdministrativeHead(i)">Remove</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <table formArrayName="chiefAdministrativeHead" class="table table-bordered grid-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">SL No</th>
+              <th>Name <span class="red-font">*</span></th>
+              <th>Permanent Address</th>
+              <th>Mobile No <span class="red-font">*</span></th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let group of chiefAdministrativeHead.controls; let i = index" [formGroupName]="i">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <app-ilogi-input [formControlName]="'name'" placeholder="Enter" maxlength="255"></app-ilogi-input>
+              </td>
+              <td>
+                <app-ilogi-input [formControlName]="'permanentAddress'" placeholder="Enter"
+                  maxlength="255"></app-ilogi-input>
+              </td>
+              <td>
+                <app-ilogi-input [formControlName]="'mobile'" placeholder="Enter" maxlength="10"></app-ilogi-input>
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm"
+                  (click)="removeChiefAdministrativeHead(i)">Remove</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="pull-right mt-2 color-666666 clkable" (click)="addChiefAdministrativeHead()">

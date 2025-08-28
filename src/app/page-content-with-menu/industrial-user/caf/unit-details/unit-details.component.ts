@@ -85,14 +85,27 @@ interface UnitDetailsResponse {
   ],
 })
 export class UnitDetailsComponent implements OnInit {
+  visibility = {
+    showEstateFields: false,
+    showUrbanFields: false,
+    showRuralFields: false,
+  };
   form!: FormGroup;
   submitted = false;
 
   // Table rows for dynamic tables
   projectCostRows = [
-    { label: 'Value of Land as per Sale Deed', controlName: 'land', type: 'number' },
+    {
+      label: 'Value of Land as per Sale Deed',
+      controlName: 'land',
+      type: 'number',
+    },
     { label: 'Value of Building', controlName: 'building', type: 'number' },
-    { label: 'Value of Plant & Machinery or Service Equipment', controlName: 'machinery', type: 'number' },
+    {
+      label: 'Value of Plant & Machinery or Service Equipment',
+      controlName: 'machinery',
+      type: 'number',
+    },
     { label: 'Total Project Cost', controlName: 'totalCost', readonly: true },
   ];
 
@@ -212,18 +225,74 @@ export class UnitDetailsComponent implements OnInit {
     // Auto-calculate totals
     this.form.valueChanges.subscribe((values) => {
       const totalCost =
-        (+values.land || 0) + (+values.building || 0) + (+values.machinery || 0);
-      this.form.get('totalCost')?.setValue(totalCost.toFixed(2), { emitEvent: false });
+        (+values.land || 0) +
+        (+values.building || 0) +
+        (+values.machinery || 0);
+      this.form
+        .get('totalCost')
+        ?.setValue(totalCost.toFixed(2), { emitEvent: false });
 
       const totalEmp =
         (+values.men || 0) +
         (+values.women || 0) +
         (+values.staff || 0) +
         (+values.others || 0);
-      this.form.get('total')?.setValue(totalEmp.toString(), { emitEvent: false });
+      this.form
+        .get('total')
+        ?.setValue(totalEmp.toString(), { emitEvent: false });
     });
 
+    this.form.get('landType')?.valueChanges.subscribe((value) => {
+      if (value === 'Municipality') {
+        this.form.get('areaType')?.setValue('urban', { emitEvent: true });
+      } else if (value === 'Panchayat') {
+        this.form.get('areaType')?.setValue('rural', { emitEvent: true });
+      }
+      this.updateFieldVisibility();
+    });
+
+    this.form.get('areaType')?.valueChanges.subscribe((value) => {
+      this.updateFieldVisibility();
+    });
+    this.updateFieldVisibility();
+
     this.loadUnitDetails();
+  }
+
+  private updateFieldVisibility(): void {
+    const landType = this.form.get('landType')?.value;
+    const areaType = this.form.get('areaType')?.value;
+
+    this.visibility = {
+      showEstateFields: false,
+      showUrbanFields: false,
+      showRuralFields: false,
+    };
+
+    if (landType === 'Industrial Estate') {
+      this.visibility.showEstateFields = true;
+    }
+
+    if (areaType === 'urban' || landType === 'Municipality') {
+      this.visibility.showUrbanFields = true;
+    }
+
+    if (areaType === 'rural' || landType === 'Panchayat') {
+      this.visibility.showRuralFields = true;
+    }
+
+    if (!this.visibility.showEstateFields) {
+      this.form.get('estateName')?.setValue('');
+      this.form.get('estatePlotNo')?.setValue('');
+    }
+    if (!this.visibility.showUrbanFields) {
+      this.form.get('municipality')?.setValue('');
+      this.form.get('wardNo')?.setValue('');
+    }
+    if (!this.visibility.showRuralFields) {
+      this.form.get('block')?.setValue('');
+      this.form.get('gramPanchayat')?.setValue('');
+    }
   }
 
   loadUnitDetails(): void {
@@ -232,7 +301,6 @@ export class UnitDetailsComponent implements OnInit {
         if (res?.data) {
           const data = res.data;
 
-          // ✅ Use patchValue — never recreate the form
           this.form.patchValue({
             // General
             unitName: data.unit_name || '',
@@ -265,36 +333,65 @@ export class UnitDetailsComponent implements OnInit {
             khatianNo: data.land_record_details_khatian_number_new || '',
             plotNoCs: data.land_record_details_plot_number_cs_sabek || '',
             plotNo: data.land_record_details_plot_number_rs_hal || '',
-            classification: data.land_record_details_classification_of_land || '',
-            landArea: parseFloat(data.land_record_details_land_area || '0').toFixed(2),
+            classification:
+              data.land_record_details_classification_of_land || '',
+            landArea: parseFloat(
+              data.land_record_details_land_area || '0'
+            ).toFixed(2),
             details_unit: data.land_record_details_unit || 'Sq Mtr',
 
             // Construction
             loadBearing: data.construction_details_load_bearing_in_sq_mtr || '',
-            buildingSqMtr: data.construction_details_rcc_building_in_sq_mtr || '',
-            otherConstruction: data.construction_details_others_construction || '',
-            sanitaryCount: data.construction_details_sanitary_latrine_count || '',
+            buildingSqMtr:
+              data.construction_details_rcc_building_in_sq_mtr || '',
+            otherConstruction:
+              data.construction_details_others_construction || '',
+            sanitaryCount:
+              data.construction_details_sanitary_latrine_count || '',
             boundaryWall: data.construction_details_boundary_wall_in_mtr || '',
-            powerSupply: data.construction_details_power_supply_agency_at_the_factory || '',
+            powerSupply:
+              data.construction_details_power_supply_agency_at_the_factory ||
+              '',
 
             // Project Cost
-            land: parseFloat(data.investment_details_value_of_land_as_per_sale_deed || '0').toFixed(2),
-            building: parseFloat(data.investment_details_value_of_building || '0').toFixed(2),
-            machinery: parseFloat(data.investment_details_value_of_plant_machinery_or_service_equipment || '0').toFixed(2),
-            totalCost: parseFloat(data.investment_details_total_project_cost || '0').toFixed(2),
+            land: parseFloat(
+              data.investment_details_value_of_land_as_per_sale_deed || '0'
+            ).toFixed(2),
+            building: parseFloat(
+              data.investment_details_value_of_building || '0'
+            ).toFixed(2),
+            machinery: parseFloat(
+              data.investment_details_value_of_plant_machinery_or_service_equipment ||
+                '0'
+            ).toFixed(2),
+            totalCost: parseFloat(
+              data.investment_details_total_project_cost || '0'
+            ).toFixed(2),
 
             // Employment
             men: parseInt(data.employment_details_worker_men_count || '0', 10),
-            women: parseInt(data.employment_details_worker_women_count || '0', 10),
-            staff: parseInt(data.employment_details_management_staff_count || '0', 10),
+            women: parseInt(
+              data.employment_details_worker_women_count || '0',
+              10
+            ),
+            staff: parseInt(
+              data.employment_details_management_staff_count || '0',
+              10
+            ),
             others: parseInt(data.employment_details_others_count || '0', 10),
-            total: parseInt(data.employment_details_total_employment || '0', 10),
+            total: parseInt(
+              data.employment_details_total_employment || '0',
+              10
+            ),
 
             // Financial
             annualTurnover: parseFloat(data.annual_turnover || '0').toFixed(2),
             category: data.category_of_enterprise || '',
             process: data.product_manufacturing_process || '',
             workingSession: data.working_session || '',
+          });
+          setTimeout(() => {
+            this.updateFieldVisibility();
           });
         }
       },
@@ -373,11 +470,15 @@ export class UnitDetailsComponent implements OnInit {
       construction_details_others_construction: raw.otherConstruction || '',
       construction_details_sanitary_latrine_count: raw.sanitaryCount || '',
       construction_details_boundary_wall_in_mtr: raw.boundaryWall || '',
-      construction_details_power_supply_agency_at_the_factory: raw.powerSupply || '',
+      construction_details_power_supply_agency_at_the_factory:
+        raw.powerSupply || '',
 
-      investment_details_value_of_land_as_per_sale_deed: formatDecimal(raw.land),
+      investment_details_value_of_land_as_per_sale_deed: formatDecimal(
+        raw.land
+      ),
       investment_details_value_of_building: formatDecimal(raw.building),
-      investment_details_value_of_plant_machinery_or_service_equipment: formatDecimal(raw.machinery),
+      investment_details_value_of_plant_machinery_or_service_equipment:
+        formatDecimal(raw.machinery),
       investment_details_total_project_cost: formatDecimal(raw.totalCost),
 
       employment_details_worker_men_count: formatInt(raw.men),
@@ -398,18 +499,42 @@ export class UnitDetailsComponent implements OnInit {
 
     console.log('Final Payload:', payload);
 
-    this.apiService.getByConditions(payload, 'api/caf/unit-details-store').subscribe({
-      next: (res) => {
-        console.log('API Success:', res);
-        const message = isDraft
-          ? 'Draft saved successfully!'
-          : 'Unit details submitted successfully!';
-        this.apiService.openSnackBar(message, 'success');
-      },
-      error: (err) => {
-        console.error('API Error:', err);
-        this.apiService.openSnackBar('Failed to save unit details.', 'error');
-      },
-    });
+    this.apiService
+      .getByConditions(payload, 'api/caf/unit-details-store')
+      .subscribe({
+        next: (res) => {
+          console.log('API Success:', res);
+          const message = isDraft
+            ? 'Draft saved successfully!'
+            : 'Unit details submitted successfully!';
+          this.apiService.openSnackBar(message, 'success');
+        },
+        error: (err: any) => {
+          console.error('API Error:', err);
+
+          const errorResponse = err?.error; 
+          if (errorResponse?.errors) {
+            const allErrors: string[] = [];
+
+            Object.keys(errorResponse.errors).forEach((key) => {
+              const fieldErrors = errorResponse.errors[key];
+              if (Array.isArray(fieldErrors)) {
+                allErrors.push(...fieldErrors);
+              }
+            });
+
+            allErrors.forEach((msg, index) => {
+              setTimeout(() => {
+                this.apiService.openSnackBar(msg, 'error');
+              }, index * 1200); 
+            });
+          } else {
+            this.apiService.openSnackBar(
+              errorResponse?.message || 'Something went wrong!',
+              'error'
+            );
+          }
+        },
+      });
   }
 }

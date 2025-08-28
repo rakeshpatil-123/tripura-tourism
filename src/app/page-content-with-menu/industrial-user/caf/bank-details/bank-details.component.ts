@@ -115,14 +115,35 @@ loadExistingData(): void {
           : 'Bank details submitted successfully!';
         this.apiService.openSnackBar(message, 'success');
       },
-      error: (err) => {
-        console.error('API Error:', err);
-        this.apiService.openSnackBar('Failed to save bank details.', 'error');
-      },
+       error: (err: any) => {
+          console.error('API Error:', err);
+
+          const errorResponse = err?.error; 
+          if (errorResponse?.errors) {
+            const allErrors: string[] = [];
+
+            Object.keys(errorResponse.errors).forEach((key) => {
+              const fieldErrors = errorResponse.errors[key];
+              if (Array.isArray(fieldErrors)) {
+                allErrors.push(...fieldErrors);
+              }
+            });
+
+            allErrors.forEach((msg, index) => {
+              setTimeout(() => {
+                this.apiService.openSnackBar(msg, 'error');
+              }, index * 1200); 
+            });
+          } else {
+            this.apiService.openSnackBar(
+              errorResponse?.message || 'Something went wrong!',
+              'error'
+            );
+          }
+        },
     });
   }
 
-  // --- Helper: Access form controls (for template validation)
   get f() {
     return this.bankDetailsForm.controls;
   }

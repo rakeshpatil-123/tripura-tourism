@@ -70,7 +70,7 @@
   </div>
 </div> -->
 
-<div class="form-group">
+<div class="form-group"  >
   <label *ngIf="!hideLabel" [for]="fieldId" [class.bold-label]="readonly">
     {{ fieldLabel }}
     <span *ngIf="mandatory" class="required-indicator">*</span>
@@ -111,7 +111,7 @@
         [attr.aria-describedby]="errorFieldId"
         styleClass="w-full"
       >
-        <ng-template let-option pTemplate="item">
+        <ng-template let-option pTemplate="item"  >
           <span
             [title]="option.name"
           >
