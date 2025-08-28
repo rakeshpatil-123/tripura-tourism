@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { HeaderNewComponent } from './header-new/header-new.component';
-import { NewNavComponent } from './new-nav/new-nav.component';
 import { NewNotificationComponent } from './new-notifcation/new-notification.component';
 import { NewSliderComponent } from './new-slider/new-slider.component';
 import { NewSuccessStorysComponent } from './new-success-storys/new-success-storys.component';
@@ -16,8 +14,6 @@ import { NewOneStopInformationHubComponent } from './new-one-stop-information-hu
   selector: 'app-home-new',
   standalone: true,
   imports: [
-    HeaderNewComponent,
-    NewNavComponent,
     NewNotificationComponent,
     NewSliderComponent,
     NewSuccessStorysComponent,

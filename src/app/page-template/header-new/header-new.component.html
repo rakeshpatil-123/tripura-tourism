@@ -1,0 +1,104 @@
+<div class="brand-header">
+  <div class="logo-section">
+    <img src="assets/logo/SWAAGAT2.0LogoRecreated.png" alt="SWAGAT 2.0 Logo" class="logo">
+  </div>
+
+  <div class="action-section">
+    <ng-container *ngIf="!isLoggedIn">
+      <button 
+        class="action-btn secondary"
+        aria-label="Login"
+        [routerLink]="['/auth/login']"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="main-icon"
+        >
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"></path>
+        </svg>
+        <span>Login</span>
+      </button>
+
+      <!-- NEW REGISTRATION BUTTON -->
+      <button 
+        class="action-btn primary register-btn"
+        aria-label="Register"
+        [routerLink]="['/auth/registration']"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="main-icon"
+        >
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="m19 8 2 2-2 2"></path>
+          <path d="m19 10 2-2-2-2"></path>
+        </svg>
+        <span>Sign Up</span>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn">
+      <button
+        class="action-btn secondary"
+        aria-label="Profile"
+        [routerLink]="['/user/profile']"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="main-icon"
+        >
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Profile</span>
+      </button>
+
+      <button
+        class="action-btn primary"
+        aria-label="Logout"
+        (click)="logout()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="main-icon"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path>
+        </svg>
+        <span>Logout</span>
+      </button>
+    </ng-container>
+  </div>
+</div>
