@@ -95,7 +95,8 @@
 /* Make dropdown same size & look as inputs */
 :host ::ng-deep .p-select {
   font-size: 0.85rem;
-  height: 32px;
+    padding: 7px 8px;
+
   width: 100%;
   background-color: #fff !important;
   color: #3b3b3b;

@@ -119,13 +119,18 @@ export class GenericService {
   getByConditions(conditionParams: any, apiObject: string): Observable<any> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
+    console.log(token,"token");
+    
 
     if (token) {
       headers = headers.set(
         'Authorization',
         `Bearer ${this.decryptData(token)}`
       );
+      console.log(headers, "headers");
+      
     }
+
 
 
     return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
@@ -240,7 +245,7 @@ export class GenericService {
   }
 
   storeSessionData(response: any, rememberme: boolean): void {
-    if (response['user'] && response['token']) {
+    if (response['data'] && response['token']) {
       // Clear existing storage
       localStorage.clear();
 
@@ -261,11 +266,11 @@ export class GenericService {
       ];
 
       keysToStore.forEach((key) => {
-        if (response['user'][key] || response[key]) {
+        if (response['data'][key] || response[key]) {
           const value =
-            typeof response['user'][key] === 'object'
-              ? JSON.stringify(response['user'][key])
-              : this.encryptData(response['user'][key] || response[key]);
+            typeof response['data'][key] === 'object'
+              ? JSON.stringify(response['data'][key])
+              : this.encryptData(response['data'][key] || response[key]);
           localStorage.setItem(key, value);
         }
       });

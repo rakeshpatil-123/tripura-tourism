@@ -243,7 +243,7 @@ export class ActivitiesComponent implements OnInit {
 
   // --- Load existing data from backend ---
   loadExistingData(): void {
-    this.apiService.getByConditions({}, 'api/nic-digit-code-view').subscribe({
+    this.apiService.getByConditions({}, 'caf/activity-view').subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.activities = res.data.map((item: any) => ({
