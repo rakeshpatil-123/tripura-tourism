@@ -58,7 +58,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       id: 'common-application-form',
       title: 'Common Application Form',
       icon: 'track_changes',
-      route: '/dashboard/cafcaf',
+      route: '/dashboard/caf',
       roles: ['admin', 'user', 'moderator', 'guest'],
     },
     // {
