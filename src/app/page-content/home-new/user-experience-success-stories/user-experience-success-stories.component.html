@@ -1,188 +1,133 @@
-<section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16">
-      <h2 class="font-merriweather font-bold text-3xl sm:text-4xl text-gray-900 mb-4">
-        User Experience & Success Stories
-      </h2>
-      <p class="font-open-sans text-xl text-gray-600 max-w-3xl mx-auto">
-        Discover how SWAGAT 2.0 has transformed the investment experience for businesses across Tripura through real testimonials and case studies.
-      </p>
+<div class="success-stories-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1 class="main-title">User Experience & Success Stories</h1>
+    <p class="subtitle">Discover how SWAGAT 2.0 has revolutionized investment experiences across Tripura with seamless processes and impactful results.</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">96%</div>
+      <div class="stat-label">Overall Satisfaction</div>
+      <div class="stat-description">Investors satisfied with services</div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-      <div *ngFor="let metric of metrics" class="bg-white rounded-2xl p-6 shadow-lg text-center border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-        <div class="w-16 h-16 bg-opacity-10 rounded-xl flex items-center justify-center mx-auto mb-4" [ngClass]="metric.iconColor">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide" [innerHTML]="metric.iconSvgSafe"></svg>
+    <div class="stat-card">
+      <div class="stat-number">4.8/5</div>
+      <div class="stat-label">Average Rating</div>
+      <div class="stat-description">Based on 1,200+ reviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">89%</div>
+      <div class="stat-label">Recommendation Rate</div>
+      <div class="stat-description">Would recommend to others</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">15 Days</div>
+      <div class="stat-label">Avg. Processing Time</div>
+      <div class="stat-description">Faster than national average</div>
+    </div>
+  </div>
+
+  <!-- Testimonials Slider -->
+  <div class="testimonials-section">
+    <h2 class="section-title">Investor Testimonials</h2>
+    <div class="testimonials-slider">
+      <div class="testimonial-container" [style.transform]="'translateX(-' + currentSlide * 100 + '%)'">
+        <div class="testimonial-slide" *ngFor="let testimonial of testimonials">
+          <div class="testimonial-card">
+            <div class="testimonial-header">
+              <span class="experience-badge" [ngClass]="testimonial.badgeClass">{{testimonial.experience}}</span>
+              <div class="rating">
+                <span *ngFor="let star of getRatingStars(testimonial.rating)" class="star" [ngClass]="{'filled': star}">★</span>
+              </div>
+            </div>
+            <p class="testimonial-text">{{testimonial.text}}</p>
+            <div class="testimonial-author">
+              <div class="author-info">
+                <h4 class="author-name">{{testimonial.author}}</h4>
+                <p class="author-title">{{testimonial.title}}</p>
+                <p class="author-industry">{{testimonial.industry}}</p>
+                <p class="testimonial-date">{{testimonial.date}}</p>
+              </div>
+            </div>
+            <div class="project-impact">
+              <h5>Project Impact</h5>
+              <div class="impact-stats">
+                <div class="impact-item">
+                  <span class="impact-label">Investment:</span>
+                  <span class="impact-value">{{testimonial.investment}}</span>
+                </div>
+                <div class="impact-item">
+                  <span class="impact-label">Jobs Created:</span>
+                  <span class="impact-value">{{testimonial.jobsCreated}}</span>
+                </div>
+              </div>
+              <span class="success-story-label">Success Story</span>
+            </div>
+          </div>
         </div>
-        <div class="text-3xl font-bold" [ngClass]="metric.iconColor">{{ metric.value }}</div>
-        <div class="font-merriweather font-semibold text-gray-900 mb-1">{{ metric.title }}</div>
-        <div class="font-open-sans text-sm text-gray-600">{{ metric.description }}</div>
+      </div>
+      <!-- Navigation Buttons -->
+      <button class="nav-btn prev-btn" (click)="previousSlide()" [disabled]="currentSlide === 0">‹</button>
+      <button class="nav-btn next-btn" (click)="nextSlide()" [disabled]="currentSlide === testimonials.length - 1">›</button>
+      <!-- Dots Indicator -->
+      <div class="dots-container">
+        <span *ngFor="let dot of testimonials; let i = index" class="dot" [class.active]="i === currentSlide" (click)="goToSlide(i)"></span>
       </div>
     </div>
-    <div class="bg-white rounded-2xl p-8 lg:p-12 shadow-xl border border-gray-100 mb-16">
-      <div class="flex items-center justify-between mb-8">
-        <h3 class="font-merriweather font-bold text-2xl text-gray-900">
-          Investor Testimonials
+  </div>
+
+  <!-- Feedback Section -->
+  <div class="feedback-section">
+    <div class="feedback-container">
+      <div class="feedback-form-card">
+        <h2 class="section-title">Share Your Experience</h2>
+        <form class="feedback-form" (ngSubmit)="submitFeedback()">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input type="text" [(ngModel)]="feedbackForm.name" name="name" class="form-input" placeholder="Enter your full name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Company Name</label>
+            <input type="text" [(ngModel)]="feedbackForm.company" name="company" class="form-input" placeholder="Enter your company name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Overall Satisfaction Rating</label>
+            <div class="rating-input">
+              <div class="rating-stars">
+                <span *ngFor="let star of [1,2,3,4,5]; let i = index" class="rating-star" [class.selected]="i < feedbackForm.rating" (click)="setRating(i + 1)">★</span>
+              </div>
+              <span class="rating-text">{{feedbackForm.rating}}/5 Stars</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Experience</label>
+            <textarea [(ngModel)]="feedbackForm.experience" name="experience" class="form-textarea" placeholder="Share your detailed experience with our services..." rows="5"></textarea>
+          </div>
+          <button type="submit" class="submit-btn">Submit Feedback</button>
+        </form>
+      </div>
+      <div class="feedback-info-card">
+        <h3 class="info-title">
+          <span class="info-icon">!</span>
+          Why Your Feedback Matters
         </h3>
-        <div class="flex space-x-2">
-          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200" aria-label="Previous testimonial" (click)="prevSlide()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left text-gray-600" [innerHTML]="chevronLeftSvgSafe"></svg>
-          </button>
-          <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200" aria-label="Next testimonial" (click)="nextSlide()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right text-gray-600" [innerHTML]="chevronRightSvgSafe"></svg>
-          </button>
-        </div>
-      </div>
-      <div class="overflow-hidden">
-        <div class="flex transition-transform duration-500 ease-in-out" [style.transform]="'translateX(-' + (currentSlide * 100) + '%)'">
-          <div *ngFor="let testimonial of testimonials" class="w-full flex-shrink-0">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-              <div class="lg:col-span-2">
-                <div class="flex items-center mb-6">
-                  <svg *ngFor="let i of [0,1,2,3,4]" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star text-yellow-400" [ngClass]="i < testimonial.rating ? 'fill-current' : ''" [innerHTML]="starSvgSafe"></svg>
-                  <span class="ml-3 text-sm text-gray-600">{{ testimonial.ratingText }}</span>
-                </div>
-                <blockquote class="font-open-sans text-lg text-gray-700 leading-relaxed mb-6 italic">
-                  {{ testimonial.quote }}
-                </blockquote>
-                <div class="flex items-center space-x-4">
-                  <img [src]="testimonial.image" [alt]="testimonial.alt" class="w-16 h-16 rounded-full object-cover" />
-                  <div>
-                    <h4 class="font-merriweather font-bold text-lg text-gray-900">{{ testimonial.author }}</h4>
-                    <p class="font-open-sans text-gray-600">{{ testimonial.company }}</p>
-                    <div class="flex items-center space-x-4 mt-1">
-                      <span class="font-open-sans text-sm text-orange-600 font-medium">{{ testimonial.sector }}</span>
-                      <span class="font-open-sans text-sm text-gray-500">{{ testimonial.date }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-6">
-                <h4 class="font-merriweather font-bold text-xl text-gray-900 mb-6">Project Impact</h4>
-                <div class="space-y-4">
-                  <div class="flex justify-between items-center">
-                    <span class="font-open-sans text-gray-600">Investment:</span>
-                    <span class="font-bold text-xl text-green-600">{{ testimonial.investment }}</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="font-open-sans text-gray-600">Jobs Created:</span>
-                    <span class="font-bold text-xl text-blue-600">{{ testimonial.jobsCreated }}</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="font-open-sans text-gray-600">Rating:</span>
-                    <div class="flex items-center space-x-1">
-                      <svg *ngFor="let i of [0,1,2,3,4]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star text-yellow-400" [ngClass]="i < testimonial.rating ? 'fill-current' : ''" [innerHTML]="starSvgSafe"></svg>
-                    </div>
-                  </div>
-                  <div class="pt-4 border-t border-gray-200">
-                    <span class="inline-block bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-semibold text-sm">Success Story</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="flex justify-center mt-8 space-x-2">
-        <button *ngFor="let testimonial of testimonials; let i = index" class="w-3 h-3 rounded-full transition-colors duration-200" [ngClass]="i === currentSlide ? 'bg-orange-500' : 'bg-gray-300'" (click)="goToSlide(i)" [attr.aria-label]="'Go to testimonial ' + (i + 1)"></button>
-      </div>
-    </div>
-    <div class="mb-16">
-      <h3 class="font-merriweather font-bold text-2xl text-gray-900 mb-8 text-center">
-        Detailed Case Studies
-      </h3>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div *ngFor="let study of caseStudies" class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-          <h4 class="font-merriweather font-bold text-lg text-gray-900 mb-3">{{ study.title }}</h4>
-          <div class="space-y-4">
-            <div>
-              <h5 class="font-open-sans font-semibold text-sm text-gray-700 mb-1">Challenge</h5>
-              <p class="font-open-sans text-sm text-gray-600">{{ study.challenge }}</p>
-            </div>
-            <div>
-              <h5 class="font-open-sans font-semibold text-sm text-gray-700 mb-1">Solution</h5>
-              <p class="font-open-sans text-sm text-gray-600">{{ study.solution }}</p>
-            </div>
-            <div>
-              <h5 class="font-open-sans font-semibold text-sm text-gray-700 mb-1">Outcome</h5>
-              <p class="font-open-sans text-sm text-gray-600">{{ study.outcome }}</p>
-            </div>
-            <div class="flex justify-between items-center pt-4 border-t border-gray-200">
-              <span class="font-open-sans text-xs text-gray-500">Timeline: {{ study.timeline }}</span>
-              <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold text-xs">{{ study.sector }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
-      <h3 class="font-merriweather font-bold text-2xl text-gray-900 mb-6 text-center">
-        Share Your Experience
-      </h3>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <form #feedbackForm="ngForm" (ngSubmit)="submitFeedback(feedbackForm.value)">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block font-open-sans text-sm font-medium text-gray-700 mb-2">Your Name</label>
-                <input type="text" name="name" ngModel class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Enter your name" />
-              </div>
-              <div>
-                <label class="block font-open-sans text-sm font-medium text-gray-700 mb-2">Company Name</label>
-                <input type="text" name="company" ngModel class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Enter company name" />
-              </div>
-            </div>
-            <div class="mt-6">
-              <label class="block font-open-sans text-sm font-medium text-gray-700 mb-2">Overall Satisfaction Rating</label>
-              <div class="flex items-center space-x-2">
-                <button *ngFor="let i of [1,2,3,4,5]" type="button" class="focus:outline-none" (click)="feedbackForm.form.patchValue({ rating: i })">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star text-yellow-400" [ngClass]="feedbackForm.value.rating >= i ? 'fill-current' : ''" [innerHTML]="starSvgSafe"></svg>
-                </button>
-                <span class="ml-3 font-open-sans text-sm text-gray-600">{{ feedbackForm.value.rating || 0 }}/5 Stars</span>
-              </div>
-            </div>
-            <div class="mt-6">
-              <label class="block font-open-sans text-sm font-medium text-gray-700 mb-2">Your Experience</label>
-              <textarea rows="4" name="experience" ngModel class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Share your experience with SWAGAT 2.0..."></textarea>
-            </div>
-            <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center space-x-2 mt-6">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square" [innerHTML]="messageSquareSvgSafe"></svg>
-              <span>Submit Feedback</span>
-            </button>
-          </form>
-        </div>
-        <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6">
-          <h4 class="font-merriweather font-bold text-lg text-gray-900 mb-4">Why Your Feedback Matters</h4>
-          <ul class="space-y-3">
-            <li class="font-open-sans text-sm text-gray-600 flex items-start">
-              <span class="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-              Helps us improve our services continuously
-            </li>
-            <li class="font-open-sans text-sm text-gray-600 flex items-start">
-              <span class="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-              Guides other investors in their decision-making
-            </li>
-            <li class="font-open-sans text-sm text-gray-600 flex items-start">
-              <span class="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-              Influences policy improvements and new initiatives
-            </li>
-            <li class="font-open-sans text-sm text-gray-600 flex items-start">
-              <span class="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-              Builds transparency and trust in the system
-            </li>
-          </ul>
-          <div class="mt-6 p-4 bg-white rounded-lg">
-            <div class="flex items-center space-x-2 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar text-blue-600" [innerHTML]="calendarSvgSafe"></svg>
-              <span class="font-open-sans text-sm font-semibold text-gray-900">Feedback Statistics</span>
-            </div>
-            <div class="text-sm text-gray-600">
-              <p>• 1,200+ reviews collected</p>
-              <p>• 96% positive feedback</p>
-              <p>• Average response time: 24 hours</p>
-            </div>
+        <ul class="feedback-benefits">
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Helps us improve our services continuously</li>
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Guides other investors in their decision-making</li>
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Influences policy improvements and new initiatives</li>
+          <li class="benefit-item"><span class="benefit-icon">✓</span> Builds transparency and trust in the system</li>
+        </ul>
+        <div class="feedback-stats">
+          <h4 class="stats-title">Feedback Statistics</h4>
+          <div class="stats-list">
+            <div class="stats-item">• 1,200+ reviews collected</div>
+            <div class="stats-item">• 96% positive feedback</div>
+            <div class="stats-item">• Average response time: 24 hours</div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
