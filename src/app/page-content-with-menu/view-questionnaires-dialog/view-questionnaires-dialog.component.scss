@@ -1,0 +1,110 @@
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 2px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.dialog-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+}
+
+.close-btn {
+  margin-left: auto;
+  color: #444;
+  transition: transform 0.2s ease;
+}
+
+.close-btn:hover {
+  transform: rotate(90deg);
+  color: #d32f2f;
+}
+
+.heading {
+  color: black !important;
+  font-weight: 900 !important;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: #777;
+  font-size: 15px;
+}
+
+.empty-icon {
+  font-size: 40px;
+  color: #999;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+::ng-deep .custom-table .mat-header-row {
+  background: linear-gradient(45deg, #1976d2, #42a5f5);
+  color: #fff;
+  font-size: 14px;
+}
+
+::ng-deep .custom-table .mat-header-cell {
+  font-weight: 700;
+  padding: 12px;
+  text-align: center;
+}
+
+::ng-deep .custom-table .mat-row {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+::ng-deep .custom-table .mat-row:hover {
+  background-color: #f1f5f9;
+  transform: scale(1.01);
+}
+
+::ng-deep .custom-table .mat-cell {
+  padding: 12px;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .dialog-title {
+    font-size: 16px;
+  }
+
+  ::ng-deep .custom-table .mat-header-cell,
+  ::ng-deep .custom-table .mat-cell {
+    font-size: 12px;
+    padding: 8px;
+  }
+}

@@ -15,6 +15,7 @@ import { GenericService } from './_service/generic/generic.service';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent , FontAwesomeModule, NewNavComponent],
+
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
