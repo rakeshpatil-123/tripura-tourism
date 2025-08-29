@@ -25,52 +25,6 @@
         </div>
       </div>
     </div>
-    <div class="flex space-x-8 border-b border-gray-200 mb-8">
-      <button class="pb-4 px-2 text-sm font-medium transition-colors duration-200"
-              [ngClass]="activeTab === 'Department Performance' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
-              (click)="selectTab('Department Performance')">
-        Department Performance
-      </button>
-      <button class="pb-4 px-2 text-sm font-medium transition-colors duration-200"
-              [ngClass]="activeTab === 'Recent Achievements' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'"
-              (click)="selectTab('Recent Achievements')">
-        Recent Achievements
-      </button>
-    </div>
-    <div>
-      <h3 class="text-xl font-semibold text-gray-900 mb-6">Department-wise Performance Summary</h3>
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="text-left py-4 px-6 font-medium text-gray-900">Department Name</th>
-                <th class="text-right py-4 px-6 font-medium text-gray-900">Applications</th>
-                <th class="text-right py-4 px-6 font-medium text-gray-900">Approvals</th>
-                <th class="text-right py-4 px-6 font-medium text-gray-900">Avg. Processing Time</th>
-                <th class="text-right py-4 px-6 font-medium text-gray-900">Success Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let dept of departments; let i = index" class="border-t border-gray-100 hover:bg-gray-50 transition-colors duration-200" [ngClass]="i % 2 === 0 ? 'bg-slate-50' : 'bg-white'">
-                <td class="py-4 px-6">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building text-blue-600" [innerHTML]="dept.iconSvgSafe"></svg>
-                    </div>
-                    <span class="font-medium text-gray-900">{{ dept.name }}</span>
-                  </div>
-                </td>
-                <td class="text-right py-4 px-6 text-gray-700">{{ dept.applications }}</td>
-                <td class="text-right py-4 px-6 text-gray-700">{{ dept.approvals }}</td>
-                <td class="text-right py-4 px-6 text-gray-700">{{ dept.avgProcessingTime }}</td>
-                <td class="text-right py-4 px-6"><span class="font-semibold text-emerald-600">{{ dept.successRate }}</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
     <div class="mt-16 bg-gradient-to-r from-blue-900 to-green-800 rounded-2xl p-8 text-white">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div>

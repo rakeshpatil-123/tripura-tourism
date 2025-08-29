@@ -10,6 +10,8 @@ interface Sector {
   investment: string;
   jobs: string;
   isActive: boolean;
+  bgClass: string;
+  gradientClass: string;
 }
 
 interface SectorDetail {
@@ -22,6 +24,8 @@ interface SectorDetail {
   policies: { text: string; iconColor: string }[];
   opportunities: { text: string; iconColor: string }[];
   incentives: { text: string; iconColor: string }[];
+  bgClass: string;
+  gradientClass: string;
 }
 
 @Component({
@@ -39,7 +43,9 @@ export class NewFocusSectorComponent implements OnInit {
       title: 'IT & Electronics',
       investment: '₹500 Cr',
       jobs: '15,000 Jobs',
-      isActive: true
+      isActive: true,
+      bgClass: 'bg-it-electronics',
+      gradientClass: 'gradient-it-electronics'
     },
     {
       icon: 'wheat',
@@ -47,7 +53,9 @@ export class NewFocusSectorComponent implements OnInit {
       title: 'Agro-processing',
       investment: '₹300 Cr',
       jobs: '25,000 Jobs',
-      isActive: false
+      isActive: false,
+      bgClass: 'bg-agro-processing',
+      gradientClass: 'gradient-agro-processing'
     },
     {
       icon: 'camera',
@@ -55,7 +63,9 @@ export class NewFocusSectorComponent implements OnInit {
       title: 'Tourism & Hospitality',
       investment: '₹200 Cr',
       jobs: '12,000 Jobs',
-      isActive: false
+      isActive: false,
+      bgClass: 'bg-tourism-hospitality',
+      gradientClass: 'gradient-tourism-hospitality'
     },
     {
       icon: 'shirt',
@@ -63,7 +73,9 @@ export class NewFocusSectorComponent implements OnInit {
       title: 'Textiles & Handloom',
       investment: '₹400 Cr',
       jobs: '20,000 Jobs',
-      isActive: false
+      isActive: false,
+      bgClass: 'bg-textiles-handloom',
+      gradientClass: 'gradient-textiles-handloom'
     },
     {
       icon: 'zap',
@@ -71,7 +83,9 @@ export class NewFocusSectorComponent implements OnInit {
       title: 'Renewable Energy',
       investment: '₹800 Cr',
       jobs: '8,000 Jobs',
-      isActive: false
+      isActive: false,
+      bgClass: 'bg-renewable-energy',
+      gradientClass: 'gradient-renewable-energy'
     },
     {
       icon: 'truck',
@@ -79,7 +93,9 @@ export class NewFocusSectorComponent implements OnInit {
       title: 'Rubber & Plantation',
       investment: '₹350 Cr',
       jobs: '18,000 Jobs',
-      isActive: false
+      isActive: false,
+      bgClass: 'bg-rubber-plantation',
+      gradientClass: 'gradient-rubber-plantation'
     }
   ];
 
@@ -111,7 +127,9 @@ export class NewFocusSectorComponent implements OnInit {
       { text: 'Power subsidy for 5 years', iconColor: 'orange-400' },
       { text: 'Land at concessional rates', iconColor: 'orange-400' },
       { text: 'Single window clearance', iconColor: 'orange-400' }
-    ]
+    ],
+    bgClass: 'bg-it-electronics',
+    gradientClass: 'gradient-it-electronics'
   };
 
   chevronSvg = `<path d="m9 18 6-6-6-6"></path>`;
@@ -143,7 +161,6 @@ export class NewFocusSectorComponent implements OnInit {
   selectSector(sector: Sector): void {
     this.sectors.forEach(s => (s.isActive = false));
     sector.isActive = true;
-    // Update selectedSector based on sector selection (simplified for demo)
     this.selectedSector = {
       icon: sector.icon,
       iconSvg: sector.iconSvg,
@@ -173,7 +190,9 @@ export class NewFocusSectorComponent implements OnInit {
         { text: 'Power subsidy for 5 years', iconColor: 'orange-400' },
         { text: 'Land at concessional rates', iconColor: 'orange-400' },
         { text: 'Single window clearance', iconColor: 'orange-400' }
-      ]
+      ],
+      bgClass: sector.bgClass,
+      gradientClass: sector.gradientClass
     };
     console.log(`Selected sector: ${sector.title}`);
   }
@@ -181,15 +200,5 @@ export class NewFocusSectorComponent implements OnInit {
   applyForInvestment(): void {
     console.log('Applying for investment');
     // Add navigation or form logic
-  }
-
-  downloadProfile(): void {
-    console.log('Downloading sector profile');
-    // Add download logic
-  }
-
-  contactExpert(): void {
-    console.log('Contacting sector expert');
-    // Add contact form or navigation logic
   }
 }

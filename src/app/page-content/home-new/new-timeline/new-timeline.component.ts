@@ -120,7 +120,7 @@ export class NewTimelineComponent implements OnInit {
   ];
 
   selectedStep: Step = this.steps[0];
-  progressWidth: string = '12.5%'; // Initial width for first step
+  progressWidth: string = '12.5%';
 
   clockSvg = `<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>`;
   checkCircleSvg = `<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path>`;
@@ -146,22 +146,19 @@ export class NewTimelineComponent implements OnInit {
     this.steps.forEach(s => (s.isActive = false));
     step.isActive = true;
     this.selectedStep = { ...step };
-    this.progressWidth = `${(index + 1) * 12.5}%`; // Update progress bar (8 steps = 100/8 = 12.5% per step)
+    this.progressWidth = `${(index + 1) * 12.5}%`;
     console.log(`Selected step: ${step.title}`);
   }
 
   contactSupport(): void {
     console.log('Contacting support');
-    // Add contact form or navigation logic
   }
 
   beginApplication(): void {
     console.log('Beginning application');
-    // Add navigation or form logic
   }
 
   downloadGuide(): void {
     console.log('Downloading process guide');
-    // Add download logic
   }
 }

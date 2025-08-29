@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { HeaderComponent } from './page-template/header/header.component';
+import { HeaderNewComponent } from './page-template/header-new/header-new.component';
+import { NewNavComponent } from './page-template/new-nav/new-nav.component';
 import { LoaderComponent } from './page-template/loader/loader.component';
 import { FooterComponent } from './page-template/footer/footer.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -12,7 +13,9 @@ import { GenericService } from './_service/generic/generic.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, HeaderComponent, LoaderComponent, FooterComponent , FontAwesomeModule, ],
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent , FontAwesomeModule, NewNavComponent],
+
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
