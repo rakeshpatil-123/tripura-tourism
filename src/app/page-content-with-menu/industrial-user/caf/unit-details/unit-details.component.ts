@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { IlogiInputComponent } from '../../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiRadioComponent } from '../../../../customInputComponents/ilogi-radio/ilogi-radio.component';
-import { IlogiSelectComponent } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
+import { IlogiSelectComponent, SelectOption } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { DynamicTableComponent } from '../../../../shared/component/dynamic-table/dynamic-table.component';
 import { GenericService } from '../../../../_service/generic/generic.service';
 import { CommonModule } from '@angular/common';
@@ -70,6 +70,18 @@ interface UnitDetailsResponse {
   product_manufacturing_process: string;
 }
 
+interface DistrictResponse {
+  status: number;
+  message: string;
+  districts: { district_code: string, district_name: string }[];
+}
+
+interface SubDivisionResponse {
+  status: number;
+  message: string;
+  subdivision: { sub_lgd_code: string, sub_division: string }[];
+}
+
 @Component({
   selector: 'app-unit-registration-form',
   templateUrl: './unit-details.component.html',
@@ -84,7 +96,11 @@ interface UnitDetailsResponse {
     CommonModule,
   ],
 })
+
+
 export class UnitDetailsComponent implements OnInit {
+
+  
   visibility = {
     showEstateFields: false,
     showUrbanFields: false,
@@ -144,18 +160,16 @@ export class UnitDetailsComponent implements OnInit {
     { id: 'Large', name: 'Large' },
   ];
 
-  // Districts and Subdivisions (should be fetched from API in production)
-  districtOptions = [
-    { id: 'West Tripura', name: 'West Tripura' },
-    { id: 'North Tripura', name: 'North Tripura' },
-  ];
+ districtOptions: SelectOption[] = [];
+subDivisionOptions: SelectOption[] = [];
 
-  subDivisionOptions = [
-    { id: 'Sadar', name: 'Sadar' },
-    { id: 'Khowai', name: 'Khowai' },
-  ];
+loadingDistricts = false;
+loadingSubdivisions = false;
+
 
   constructor(private fb: FormBuilder, private apiService: GenericService) {}
+
+  
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -255,9 +269,62 @@ export class UnitDetailsComponent implements OnInit {
       this.updateFieldVisibility();
     });
     this.updateFieldVisibility();
-
+ this.loadDistricts();
     this.loadUnitDetails();
   }
+
+  private loadDistricts(): void {
+  this.loadingDistricts = true;
+  this.apiService.getByConditions({}, 'api/public/tripura/get-all-districts').subscribe({
+    next: (res: DistrictResponse) => {
+      this.loadingDistricts = false;
+      if (res?.status === 1 && Array.isArray(res.districts)) {
+        this.districtOptions = res.districts.map(d => ({
+          id: d.district_code,
+          name: d.district_name
+        }));
+        console.log('Loaded districts:', this.districtOptions);
+      } else {
+        this.apiService.openSnackBar('Failed to load districts.', 'error');
+      }
+    },
+    error: (err) => {
+      this.loadingDistricts = false;
+      console.error('Error loading districts:', err);
+      this.apiService.openSnackBar('Could not load districts.', 'error');
+    }
+  });
+}
+
+onDistrictChange(district: string): void {
+  this.form.get('subDivision')?.reset(); // reset subdivision when district changes
+  this.subDivisionOptions = [];
+  if (!district) return;
+
+  this.loadingSubdivisions = true;
+
+  const payload = { district };
+
+  this.apiService.getByConditions(payload, 'api/public/tripura/get-sub-subdivisions').subscribe({
+    next: (res: SubDivisionResponse) => {
+      this.loadingSubdivisions = false;
+      if (res?.status === 1 && Array.isArray(res.subdivision)) {
+        this.subDivisionOptions = res.subdivision.map(s => ({
+          id: s.sub_lgd_code,
+          name: s.sub_division
+        }));
+        console.log('Loaded subdivisions:', this.subDivisionOptions);
+      } else {
+        this.apiService.openSnackBar('No subdivisions found for this district.', 'info');
+      }
+    },
+    error: (err) => {
+      this.loadingSubdivisions = false;
+      console.error('Error loading subdivisions:', err);
+      this.apiService.openSnackBar('Failed to load subdivisions.', 'error');
+    }
+  });
+}
 
   private updateFieldVisibility(): void {
     const landType = this.form.get('landType')?.value;
