@@ -1,0 +1,27 @@
+<div class="ilogi-form-group">
+  <label class="ilogi-checkbox-label">
+    {{ fieldLabel }}
+    <span *ngIf="mandatory" class="ilogi-required">*</span>
+  </label>
+  
+  <div class="ilogi-checkbox-container">
+    <div *ngFor="let option of checkboxOptions" class="ilogi-checkbox-option">
+      <input
+        type="checkbox"
+        class="ilogi-checkbox-input"
+        [id]="fieldLabel + '_' + option.value"
+        [value]="option.value"
+        [checked]="isSelected(option.value)"
+        (change)="onCheckboxChange(option.value, $event)"
+        [disabled]="isDisabled"
+      >
+      <label class="ilogi-checkbox-option-label" [for]="fieldLabel + '_' + option.value">
+        {{ option.name }}
+      </label>
+    </div>
+  </div>
+  
+  <div *ngIf="showError" class="ilogi-error-message">
+    {{ errorMessage }}
+  </div>
+</div>

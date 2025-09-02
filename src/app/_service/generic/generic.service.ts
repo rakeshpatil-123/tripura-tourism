@@ -116,10 +116,31 @@ export class GenericService {
   //   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams);
   // }
 
+/**
+ * Get decrypted user ID from localStorage
+ * @returns string - decrypted user ID or null if not found
+ */
+getDecryptedUserId(): string | null {
+  try {
+    const encryptedId = localStorage.getItem('id');
+    if (!encryptedId) {
+      console.warn('User ID not found in localStorage');
+      return null;
+    }
+    
+    // Decrypt the ID using existing decryptData method
+    const decryptedId = this.decryptData(encryptedId);
+    return decryptedId;
+  } catch (error) {
+    console.error('Failed to decrypt user ID:', error);
+    return null;
+  }
+}
+
   getByConditions(conditionParams: any, apiObject: string): Observable<any> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
-    console.log(token,"token");
+    // console.log(token,"token");
     
 
     if (token) {
