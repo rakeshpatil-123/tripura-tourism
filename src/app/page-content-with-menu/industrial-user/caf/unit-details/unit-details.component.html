@@ -11,14 +11,26 @@
     <app-ilogi-input fieldLabel="Email" formControlName="email" [placeholder]="'Email'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Website" formControlName="website" [placeholder]="'Website'"></app-ilogi-input>
 
-    <app-ilogi-select fieldLabel="District" [selectOptions]="districtOptions" formControlName="district"
-      [mandatory]="true" [placeholder]="'Select District'"></app-ilogi-select>
-    <app-ilogi-select fieldLabel="Sub Division" [selectOptions]="subDivisionOptions" formControlName="subDivision"
-      [mandatory]="true" [placeholder]="'Select Sub Division'"></app-ilogi-select>
-  </div>
+   <app-ilogi-select
+  formControlName="district"
+  fieldLabel="District"
+  [selectOptions]="districtOptions"
+  placeholder="Select District"
+  [mandatory]="true"
+  (change)="onDistrictChange($event.value)"
+></app-ilogi-select>
+   <app-ilogi-select
+  formControlName="subDivision"
+  fieldLabel="Subdivision"
+  [selectOptions]="subDivisionOptions"
+  placeholder="Select Subdivision"
+  [mandatory]="true"
+  [disabled]="subDivisionOptions.length === 0"
+></app-ilogi-select>
+</div>
   <app-ilogi-radio fieldLabel="Area Type" formControlName="areaType" [radioOptions]="[
-    {name:'Urban', value:'urban'},
-    {name:'Rural', value:'rural'}
+    {name:'Urban', value:'Urban'},
+    {name:'Rural', value:'Rural'}
   ]">
   </app-ilogi-radio>
   <div class="form-grid mb-3">

@@ -61,6 +61,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/caf',
       roles: ['admin', 'user', 'moderator', 'guest'],
     },
+    {
+      id: 'services',
+      title: 'Services',
+      icon: 'track_changes',
+      route: '/dashboard/services',
+      roles: ['admin', 'user', 'moderator', 'guest'],
+    },
     // {
     //   id: 'external-tracking',
     //   title: 'Common Application Form',

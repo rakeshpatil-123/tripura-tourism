@@ -437,11 +437,11 @@ export class ManagementComponent implements OnInit, OnDestroy {
   }
 
  onSubmit(): void {
-  if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    this.apiService.openSnackBar('Please fix all errors in the form.', 'error');
-    return;
-  }
+  // if (this.form.invalid) {
+  //   this.form.markAllAsTouched();
+  //   this.apiService.openSnackBar('Please fix all errors in the form.', 'error');
+  //   return;
+  // }
 
   const payload = this.buildFormData(false);
   this.submitForm(payload, false);
