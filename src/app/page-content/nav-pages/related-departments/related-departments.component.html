@@ -1,1 +1,33 @@
-<p>related-departments works!</p>
+<div class="container">
+    <h1>Related Departments</h1>
+    <!-- Debugging message to check if data is loaded -->
+    <div *ngIf="!departments || departments.length === 0" style="text-align: center; color: red;">
+        No departments data available. Please check the component data.
+    </div>
+    <table *ngIf="departments && departments.length > 0">
+        <thead>
+            <tr class="header">
+                <th>Sr No</th>
+                <th>Name of the Dept.</th>
+                <th>Address</th>
+                <th>E-mail</th>
+                <th>Web Address</th>
+                <th>Phone Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let dept of departments; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ dept.name }}</td>
+                <td>{{ dept.address }}</td>
+                <td>
+                    <span *ngFor="let email of dept.emails; let isLast = last">
+                        <a [href]="'mailto:' + email">{{ email }}</a>{{ isLast ? '' : ', ' }}
+                    </span>
+                </td>
+                <td><a [href]="dept.website" target="_blank">{{ dept.website }}</a></td>
+                <td>{{ dept.phone }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

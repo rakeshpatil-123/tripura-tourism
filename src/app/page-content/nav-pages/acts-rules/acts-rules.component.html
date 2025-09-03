@@ -1,0 +1,122 @@
+<div class="acts-rules-container">
+  <div class="container">
+    <header class="main-title-section">
+      <h1 class="main-title">Acts, Rules & Policies</h1>
+      <p class="main-subtitle">Explore government acts, policies, and regulations</p>
+    </header>
+    
+    <section class="section swaagat" aria-labelledby="swaagat-header">
+      <h2 class="section-header" id="swaagat-header">
+        <i class="fas fa-file-alt icon"></i>
+        Swaagat 2.0
+      </h2>
+      <div class="section-content">
+        <div class="document-grid" id="documentGrid">
+          <article 
+            *ngFor="let doc of swaagatDocuments" 
+            class="document-card" 
+            tabindex="0" 
+            role="button" 
+            [attr.aria-label]="'Open ' + doc.title" 
+            (click)="openDocument(doc.id)" 
+            (keydown)="handleKeyPress($event, doc.id)">
+            <div class="document-icon">
+              <i [class]="doc.icon" [attr.aria-hidden]="true"></i>
+            </div>
+            <h3 class="document-title">{{ doc.title }}</h3>
+            <div class="document-meta">
+              <span 
+                class="badge" 
+                [class.blue]="doc.badgeClass === 'blue'" 
+                [class.orange]="doc.badgeClass === 'orange'" 
+                [class.green]="doc.badgeClass === 'green'" 
+                [class.red]="doc.badgeClass === 'red'" 
+                [class.pink]="doc.badgeClass === 'pink'">
+                {{ doc.badge }}
+              </span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section policies" aria-labelledby="policies-header">
+      <h2 class="section-header policies" id="policies-header">
+        <i class="fas fa-book icon"></i>
+        Policies
+      </h2>
+      <div class="section-content">
+        <div class="document-grid">
+          <article 
+            *ngFor="let doc of policyDocuments" 
+            class="document-card policy" 
+            tabindex="0" 
+            role="button" 
+            [attr.aria-label]="'Open ' + doc.title" 
+            (click)="openDocument(doc.id)" 
+            (keydown)="handleKeyPress($event, doc.id)">
+            <div class="document-icon">
+              <i [class]="doc.icon" [attr.aria-hidden]="true"></i>
+            </div>
+            <h3 class="document-title">{{ doc.title }}</h3>
+            <div class="document-meta">
+              <span 
+                class="badge" 
+                [class.blue]="doc.badgeClass === 'blue'" 
+                [class.orange]="doc.badgeClass === 'orange'" 
+                [class.green]="doc.badgeClass === 'green'" 
+                [class.red]="doc.badgeClass === 'red'" 
+                [class.pink]="doc.badgeClass === 'pink'">
+                {{ doc.badge }}
+              </span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section rti" aria-labelledby="rti-header">
+      <h2 class="section-header rti" id="rti-header">
+        <i class="fas fa-file-alt icon"></i>
+        RTI
+      </h2>
+      <div class="section-content">
+        <div class="document-grid">
+          <article 
+            *ngFor="let doc of rtiDocuments" 
+            class="document-card rti" 
+            tabindex="0" 
+            role="button" 
+            [attr.aria-label]="'Open ' + doc.title" 
+            (click)="openDocument(doc.id)" 
+            (keydown)="handleKeyPress($event, doc.id)">
+            <div class="document-icon">
+              <i [class]="doc.icon" [attr.aria-hidden]="true"></i>
+            </div>
+            <h3 class="document-title">{{ doc.title }}</h3>
+            <div class="document-meta">
+              <span 
+                class="badge" 
+                [class.blue]="doc.badgeClass === 'blue'" 
+                [class.orange]="doc.badgeClass === 'orange'" 
+                [class.green]="doc.badgeClass === 'green'" 
+                [class.red]="doc.badgeClass === 'red'" 
+                [class.pink]="doc.badgeClass === 'pink'">
+                {{ doc.badge }}
+              </span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <section class="department-orders" aria-labelledby="orders-header">
+      <h2 id="orders-header">Department Government Order(s)</h2>
+      <p class="coming-soon">Orders and notifications will be updated here</p>
+    </section>
+
+    <div class="no-results" [style.display]="showNoResults ? 'block' : 'none'" id="noResults">
+      No documents match your search.
+    </div>
+  </div>
+</div>
