@@ -1,0 +1,62 @@
+<div class="container">
+  <h1>Information Wizard</h1>
+  <form class="info-form">
+    <div class="form-group full-width">
+      <label for="department">Select Department <span class="required">*</span></label>
+      <select id="department" name="department" [(ngModel)]="selectedDepartment" (ngModelChange)="onDepartmentChange()" required>
+        <option value="">Choose a Department</option>
+        <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+      </select>
+    </div>
+    <div class="form-group full-width">
+      <label for="service">Select Service <span class="required">*</span></label>
+      <select id="service" [(ngModel)]="selectedService" required>
+        <option value="">Select</option>
+        <option *ngFor="let service of services" [value]="service">{{ service }}</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="risk">Select Risk Category</label>
+        <select id="risk" [(ngModel)]="selectedRisk">
+          <option value="">Select</option>
+          <option *ngFor="let risk of riskCategories" [value]="risk">{{ risk }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="location">Select Business Location</label>
+        <select id="location" [(ngModel)]="selectedLocation">
+          <option value="">Select</option>
+          <option *ngFor="let location of locations" [value]="location">{{ location }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="investor">Select Investor</label>
+        <select id="investor" [(ngModel)]="selectedInvestor">
+          <option value="">Select</option>
+          <option *ngFor="let investor of investors" [value]="investor">{{ investor }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="employees">Select Number of Employees</label>
+        <select id="employees" [(ngModel)]="selectedEmployees">
+          <option value="">Select</option>
+          <option *ngFor="let empRange of employeeRanges" [value]="empRange">{{ empRange }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group full-width">
+      <label for="hp">Select Number of HP</label>
+      <select id="hp" [(ngModel)]="selectedHp">
+        <option value="">Select</option>
+        <option *ngFor="let hp of hpOptions" [value]="hp">{{ hp }}</option>
+      </select>
+    </div>
+    <div class="buttons">
+      <button type="reset" class="reset" (click)="resetForm()">Reset</button>
+      <button type="submit" class="search" (click)="search()">Search</button>
+    </div>
+  </form>
+</div>

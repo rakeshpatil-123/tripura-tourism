@@ -24,7 +24,19 @@ export const PAGE_CONTENT_ROUTES: Routes = [
             },{
                 path: 'admin',
                 loadComponent: () => import('./auth/admin-login/admin-login.component').then(m => m.AdminLoginComponent)
-            }
+            },{
+                path: 'about-us',
+                loadComponent: () =>
+                    import('./nav-pages/about-us/about-us.component').then(m => m.AboutUsComponent)
+            },{
+                path: 'related-departments',
+                loadComponent: () =>
+                    import('./nav-pages/related-departments/related-departments.component').then(m => m.RelatedDepartmentsComponent)
+            },{
+                path: 'information-wizard',
+                loadComponent: () =>
+                    import('./nav-pages/information-wizard/information-wizard.component').then(m => m.InformationWizardComponent)
+            },
             
         ]
     }

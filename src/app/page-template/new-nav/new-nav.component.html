@@ -4,7 +4,6 @@
   </div>
   <div class="bg-element-1"></div>
 
-  
   <div class="nav-container" [class.hidden]="isMobileMenuOpen">
     <div
       *ngFor="let item of navigationItems; let i = index"
@@ -17,6 +16,7 @@
         class="nav-button"
         [class.active]="item.isActive"
         (click)="onNavItemClick(item, i)"
+        [routerLink]="[item.path]"
         [attr.aria-expanded]="item.hasDropdown ? item.dropdownOpen : null"
         [attr.aria-haspopup]="item.hasDropdown"
       >
@@ -37,6 +37,7 @@
           <a 
             *ngFor="let childItem of item.children"
             class="dropdown-item"
+            [routerLink]="[childItem.path]"
             (click)="onDropdownItemClick(i, childItem)"
             [attr.aria-label]="childItem.label"
           >
@@ -73,6 +74,7 @@
           class="mobile-nav-button"
           [class.active]="item.isActive"
           [class.has-dropdown]="item.hasDropdown"
+          [routerLink]="[item.path]"
           (click)="onNavItemClick(item, i)"
         >
           <span>{{ item.label }}</span>
@@ -87,6 +89,7 @@
           <a 
             *ngFor="let childItem of item.children"
             class="mobile-dropdown-item"
+            [routerLink]="[childItem.path]"
             (click)="onDropdownItemClick(i, childItem)"
           >
             {{ childItem.label }}

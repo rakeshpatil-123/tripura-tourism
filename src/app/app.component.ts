@@ -10,11 +10,12 @@ import { LoaderService } from './_service/loader/loader.service';
 import { ExternalServicesRedirectionTrackingComponent } from './page-content-with-menu/external-services-redirection-tracking/external-services-redirection-tracking.component';
 import { CommonModule } from '@angular/common';
 import { GenericService } from './_service/generic/generic.service';
+import { PageContentComponent } from "./page-content/page-content.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent , FontAwesomeModule, NewNavComponent],
+  imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent, FontAwesomeModule, NewNavComponent, PageContentComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

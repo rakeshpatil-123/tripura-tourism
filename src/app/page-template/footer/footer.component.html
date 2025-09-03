@@ -1,93 +1,53 @@
-<footer class="govt-footer">
-  <!-- Main Footer Content -->
-  <div class="footer-main">
-    <div class="container">
-      <div class="footer-grid">
-        <!-- Government Info Section -->
-        <div class="footer-section govt-info">
-          <div class="govt-logo">
-            <img
-              src="https://image.telanganatoday.com/wp-content/uploads/2025/01/Tripura1_V_jpg--816x480-4g.webp?sw=1680&dsz=816x480&iw=615&p=false&r=1.25"
-              alt="Government Logo"
-              class="logo-img"
-            />
-            <h3 class="govt-name">Government of Tripura</h3>
-          </div>
-          <p class="govt-description">
-            Committed to serving citizens with transparency, efficiency, and
-            excellence. Building a better tomorrow through digital governance
-            and public service.
-          </p>
-          <div class="contact-info">
-            <div class="contact-item">
-              <span class="contact-icon">📧</span>
-              <span>info&#64;government.gov</span>
-            </div>
-            <div class="contact-item">
-              <span class="contact-icon">📞</span>
-              <span>1800-1234-12</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Links -->
-        <div class="footer-section" *ngFor="let section of footerSections">
-          <h4 class="section-title">{{ section.title }}</h4>
-          <ul class="footer-links">
-            <li *ngFor="let link of section.links">
-              <a
-                *ngIf="link.external; else internalLink"
-                [href]="link.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="footer-link"
-              >
-                {{ link.title }}
-                <span class="external-icon">↗</span>
-              </a>
-              <ng-template #internalLink>
-                <a [routerLink]="link.url" class="footer-link">
-                  {{ link.title }}
-                </a>
-              </ng-template>
-            </li>
-          </ul>
-        </div>
+<div class="footer">
+  <div class="container">
+    <!-- Footer Content -->
+    <div class="grid">
+      <!-- Website Policies -->
+      <div class="flex flex-col items-start">
+        <h3>Website Policies</h3>
+        <ul>
+          <li><a routerLink="/disclaimer">Disclaimer</a></li>
+          <li><a routerLink="/privacy-policy">Privacy Policy</a></li>
+          <li><a routerLink="/query-feedback">Query/Feedback</a></li>
+          <li><a routerLink="/terms-conditions">Terms & Conditions</a></li>
+          <li><a routerLink="/setup-business">How to Setup A Business</a></li>
+        </ul>
       </div>
 
-      <!-- Social Media & Additional Links -->
-      <div class="footer-secondary">
-        <div class="social-links">
-          <h5>Follow Us</h5>
-          <div class="social-icons">
-            <a
-              *ngFor="let social of socialLinks"
-              [href]="social.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="social-link"
-              [attr.aria-label]="'Follow us on ' + social.platform"
-              [innerHTML]="social.tag"
-            >
-            </a>
-          </div>
-        </div>
-
-        <div class="accessibility-links">
-          <a routerLink="/accessibility" class="utility-link">Accessibility</a>
-          <a routerLink="/sitemap" class="utility-link">Sitemap</a>
-          <a routerLink="/help" class="utility-link">Help</a>
-          <a routerLink="/feedback" class="utility-link">Feedback</a>
-        </div>
+      <!-- Explore Website -->
+      <div class="flex flex-col items-start">
+        <h3>Explore Website</h3>
+        <ul>
+          <li><a routerLink="/about">About Us</a></li>
+          <li><a routerLink="/online-services">Online Services</a></li>
+          <li><a routerLink="/user-manual">User Manual</a></li>
+          <li><a routerLink="/whats-new">What's New</a></li>
+          <li><a routerLink="/contact">Contact Us</a></li>
+        </ul>
       </div>
-    </div>
-  </div>
 
-  <div class="footer-bottom">
-    <div class="container">
-      <p class="security-text">
-        &copy; {{ currentYear }} Government of Tripura. All rights reserved.
-      </p>
-    </div>
+      <!-- Useful Links -->
+      <div class="flex flex-col items-start">
+        <h3>Useful Links</h3>
+        <ul>
+          <li><a href="https://meity.gov.in" target="_blank">meity.gov.in</a></li>
+          <li><a href="https://india.gov.in" target="_blank">india.gov.in</a></li>
+          <li><a href="https://mygov.in" target="_blank">mygov.in</a></li>
+          <li><a href="https://rtionline.gov.in" target="_blank">rtionline.gov.in</a></li>
+          <li><a href="https://pgportal.gov.in" target="_blank">pgportal.gov.in</a></li>
+          <li><a href="https://portal.cvc.gov.in" target="_blank">portal.cvc.gov.in</a></li>
+          <li><a href="https://x.com" target="_blank">X</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="flex flex-col items-start">
+        <h3>Contact SWAAGAT</h3>
+        <p>For information related to SWAAGAT, please contact:</p>
+        <p>Email: <a href="mailto:swaagat.help@gmail.com">swaagat.help@gmail.com</a></p>
+        <p>Mobile: <a href="tel:+918730891796">+91 8730891796</a>, <a href="tel:+916009248721">+91 6009248721</a></p>
+        <p>(11 AM to 6 PM on all working days)</p>
+      </div>
+    </div>  
   </div>
-</footer>
+</div>

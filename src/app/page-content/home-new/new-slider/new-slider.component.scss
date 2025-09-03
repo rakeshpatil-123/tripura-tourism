@@ -58,16 +58,19 @@ body {
 }
 
 .from-blue-700\/60 {
-  --tw-gradient-from: rgba(29, 78, 216, 0.6);
+  // --tw-gradient-from: rgba(29, 78, 216, 0.6);
+  --tw-gradient-from: rgba(17, 190, 221, 0.6);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(29, 78, 216, 0));
 }
 
 .via-blue-600\/60 {
-  --tw-gradient-stops: var(--tw-gradient-from), rgba(37, 99, 235, 0.6), var(--tw-gradient-to, rgba(37, 99, 235, 0));
+  // --tw-gradient-stops: var(--tw-gradient-from), rgba(37, 99, 235, 0.6), var(--tw-gradient-to, rgba(37, 99, 235, 0));
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(255, 146, 3, 0.6), var(--tw-gradient-to, rgba(37, 99, 235, 0));
 }
 
 .to-teal-700\/60 {
-  --tw-gradient-to: rgba(15, 118, 110, 0.6);
+  // --tw-gradient-to: rgba(15, 118, 110, 0.6);
+  --tw-gradient-to: rgba(17, 190, 221, 0.6);
 }
 
 .random-dot {
