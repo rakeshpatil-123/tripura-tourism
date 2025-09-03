@@ -80,8 +80,8 @@ export class NewNavComponent implements OnDestroy {
       children: []
     },
     {
-      label: 'Act & Rules',
-      path: '/page/act-rules',
+      label: 'Acts & Rules',
+      path: '/page/acts-rules',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,
@@ -119,14 +119,6 @@ export class NewNavComponent implements OnDestroy {
       dropdownOpen: false,
       children: []
     },
-    {
-      label: 'Registration',
-      path: '/page/registration',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    }
   ];
 
   isMobileMenuOpen = false;
