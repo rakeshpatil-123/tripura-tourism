@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 interface NavigationItem {
   label: string;
@@ -13,30 +14,40 @@ interface NavigationItem {
 @Component({
   selector: 'app-new-nav',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './new-nav.component.html',
   styleUrls: ['./new-nav.component.scss']
 })
 export class NewNavComponent implements OnDestroy {
+  constructor(private router: Router) {}
+
   navigationItems: NavigationItem[] = [
     {
       label: 'Home',
-      path: '/',
+      path: '',
+      hasDropdown: false,
+      isActive: true,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'About us',
+      path: '/page/about-us',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,
       children: []
     },
     {
-      label: 'About',
-      path: '/about',
+      label: 'Services',
+      path: '/page/services',
       hasDropdown: true,
       isActive: false,
       dropdownOpen: false,
       children: [
         {
           label: 'Team',
-          path: '/about/team',
+          path: '/page/services/team',
           hasDropdown: false,
           isActive: false,
           dropdownOpen: false,
@@ -44,14 +55,70 @@ export class NewNavComponent implements OnDestroy {
         },
         {
           label: 'History',
-          path: '/about/history',
+          path: '/page/services/history',
           hasDropdown: false,
           isActive: false,
           dropdownOpen: false,
           children: []
         }
       ]
-    }
+    },
+    {
+      label: 'Related Departments',
+      path: '/page/related-departments',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Information Wizard',
+      path: '/page/information-wizard',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Acts & Rules',
+      path: '/page/acts-rules',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Contact Us',
+      path: '/page/contact-us',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Business Regulations',
+      path: '/page/business-regulations',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Feedback & Rating',
+      path: '/page/feedback-rating',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Incentive Calculator',
+      path: '/page/incentive-calculator',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
   ];
 
   isMobileMenuOpen = false;
@@ -107,12 +174,18 @@ export class NewNavComponent implements OnDestroy {
       item.dropdownOpen = !item.dropdownOpen;
     } else {
       this.setActiveItem(index);
+      if (item.path) {
+        this.router.navigate([item.path]);
+      }
     }
   }
 
   onDropdownItemClick(parentIndex: number, childItem: NavigationItem): void {
     this.closeAllDropdowns();
     this.isMobileMenuOpen = false;
+    if (childItem.path) {
+      this.router.navigate([childItem.path]);
+    }
   }
 
   toggleMobileMenu(): void {

@@ -1,0 +1,217 @@
+<div class="form-container">
+  <h2>Investor Query Form</h2>
+  <p class="note">* All fields marked with an asterisk are mandatory</p>
+  <form [formGroup]="investorForm" (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <!-- Company Details Section -->
+      <div class="section-title">Company Details</div>
+
+      <div>
+        <label for="topic">Query Topic *</label>
+        <select id="topic" formControlName="topic" required>
+          <option value="">Select a topic</option>
+          <option value="Investment in Hospitability">Investment in Hospitability</option>
+          <option value="Support given to start-ups">Support given to start-ups</option>
+          <option value="Raw material availability">Raw material availability</option>
+          <option value="Power/Gas availability">Power/Gas availability</option>
+          <option value="Land Allotment">Land Allotment</option>
+          <option value="Investment in Tourism Sector">Investment in Tourism Sector</option>
+          <option value="Investment in Rubber Sector">Investment in Rubber Sector</option>
+          <option value="Other Query">Other Query</option>
+          <option value="Approval Process for new Investment">Approval Process for new Investment</option>
+          <option value="Investment in Health Sector">Investment in Health Sector</option>
+          <option value="Investment in Food Processing Sector">Investment in Food Processing Sector</option>
+          <option value="Investment in Bamboo Sector">Investment in Bamboo Sector</option>
+          <option value="Investment in any other Sector">Investment in any other Sector</option>
+          <option value="Infrastructure availability">Infrastructure availability</option>
+          <option value="Incentives available in state">Incentives available in state</option>
+          <option value="Focus sectors of state">Focus sectors of state</option>
+        </select>
+        <div class="error-message" *ngIf="investorForm.get('topic')?.touched && investorForm.get('topic')?.invalid">
+          Please select a query topic
+        </div>
+      </div>
+
+      <div>
+        <label for="cname">Company Name *</label>
+        <input type="text" id="cname" formControlName="cname" placeholder="Enter company name" required>
+        <div class="error-message" *ngIf="investorForm.get('cname')?.touched && investorForm.get('cname')?.invalid">
+          Please enter a valid company name
+        </div>
+      </div>
+
+      <div>
+        <label for="caddress">Company Address *</label>
+        <textarea id="caddress" formControlName="caddress" placeholder="Enter company address" required></textarea>
+        <div class="error-message" *ngIf="investorForm.get('caddress')?.touched && investorForm.get('caddress')?.invalid">
+          Please enter a valid company address
+        </div>
+      </div>
+
+      <div>
+        <label for="city">City *</label>
+        <input type="text" id="city" formControlName="city" placeholder="Enter city" required>
+        <div class="error-message" *ngIf="investorForm.get('city')?.touched && investorForm.get('city')?.invalid">
+          Please enter a valid city
+        </div>
+      </div>
+
+      <div>
+        <label for="state">State/Province *</label>
+        <select id="state" formControlName="state" required>
+          <option value="">Select a state</option>
+          <option value="Andhra Pradesh">Andhra Pradesh</option>
+          <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+          <option value="Assam">Assam</option>
+          <option value="Bihar">Bihar</option>
+          <option value="Chhattisgarh">Chhattisgarh</option>
+          <option value="Goa">Goa</option>
+          <option value="Gujarat">Gujarat</option>
+          <option value="Haryana">Haryana</option>
+          <option value="Himachal Pradesh">Himachal Pradesh</option>
+          <option value="Jharkhand">Jharkhand</option>
+          <option value="Karnataka">Karnataka</option>
+          <option value="Kerala">Kerala</option>
+          <option value="Madhya Pradesh">Madhya Pradesh</option>
+          <option value="Maharashtra">Maharashtra</option>
+          <option value="Manipur">Manipur</option>
+          <option value="Meghalaya">Meghalaya</option>
+          <option value="Mizoram">Mizoram</option>
+          <option value="Nagaland">Nagaland</option>
+          <option value="Odisha">Odisha</option>
+          <option value="Punjab">Punjab</option>
+          <option value="Rajasthan">Rajasthan</option>
+          <option value="Sikkim">Sikkim</option>
+          <option value="Tamil Nadu">Tamil Nadu</option>
+          <option value="Telangana">Telangana</option>
+          <option value="Tripura">Tripura</option>
+          <option value="Uttar Pradesh">Uttar Pradesh</option>
+          <option value="Uttarakhand">Uttarakhand</option>
+          <option value="West Bengal">West Bengal</option>
+        </select>
+        <div class="error-message" *ngIf="investorForm.get('state')?.touched && investorForm.get('state')?.invalid">
+          Please select a state
+        </div>
+      </div>
+
+      <div>
+        <label for="activities">Present Activities</label>
+        <textarea id="activities" formControlName="activities" placeholder="Describe current business activities"></textarea>
+        <small>Optional: Provide details of your company's current operations</small>
+      </div>
+
+      <div>
+        <label>Area of Interest</label>
+        <div class="radio-group">
+          <label><input type="radio" formControlName="interest" value="Manufacturing"> Manufacturing</label>
+          <label><input type="radio" formControlName="interest" value="Services"> Services</label>
+          <label><input type="radio" formControlName="interest" value="Trading"> Trading</label>
+        </div>
+      </div>
+
+      <div>
+        <label for="sector">Specific Sector of Interest</label>
+        <select id="sector" formControlName="sector">
+          <option value="">Select a sector</option>
+          <option value="Co-Operative Registrar">Co-Operative Registrar</option>
+          <option value="Industries & Commerce">Industries & Commerce</option>
+          <option value="Jalboard Tripura">Jalboard Tripura</option>
+          <option value="Bidyut Bandhu">Bidyut Bandhu</option>
+          <option value="Revenue Department">Revenue Department</option>
+          <option value="PWD(Water & Resources)">PWD (Water & Resources)</option>
+          <option value="Directorate of Fire Service">Directorate of Fire Service</option>
+          <option value="Drugs Control Administration">Drugs Control Administration</option>
+          <option value="Electrical Inspectorate">Electrical Inspectorate</option>
+          <option value="Excise Department">Excise Department</option>
+          <option value="Factories & Boilers Organisation">Factories & Boilers Organisation</option>
+          <option value="Industries & Commerce (Incentive)">Industries & Commerce (Incentive)</option>
+          <option value="IT & Admin">IT & Admin</option>
+          <option value="Directorate of Labour">Directorate of Labour</option>
+          <option value="Land Records & Settlement">Land Records & Settlement</option>
+          <option value="Legal Methodology">Legal Methodology</option>
+          <option value="Partnership Firm Registration">Partnership Firm Registration</option>
+          <option value="PWD(Drinking Water & Sanitation)">PWD (Drinking Water & Sanitation)</option>
+          <option value="Taxes Organization">Taxes Organization</option>
+          <option value="Tripura State Pollution Control Board">Tripura State Pollution Control Board</option>
+          <option value="Tripura State Electricity Corporation Ltd">Tripura State Electricity Corporation Ltd</option>
+          <option value="Tripura Industrial Development Corporation Ltd">Tripura Industrial Development Corporation Ltd</option>
+          <option value="Tripura Forest Department">Tripura Forest Department</option>
+          <option value="Urban Development Department">Urban Development Department</option>
+        </select>
+        <small>Optional: Select your primary sector of interest</small>
+      </div>
+
+      <!-- Applicant Details Section -->
+      <div class="section-title">Applicant Details</div>
+
+      <div>
+        <label for="aname">Full Name *</label>
+        <input type="text" id="aname" formControlName="aname" placeholder="Enter your full name" required>
+        <div class="error-message" *ngIf="investorForm.get('aname')?.touched && investorForm.get('aname')?.invalid">
+          Please enter your full name
+        </div>
+      </div>
+
+      <div>
+        <label for="email">Email Address *</label>
+        <input type="email" id="email" formControlName="email" placeholder="Enter email address" required>
+        <div class="error-message" *ngIf="investorForm.get('email')?.touched && investorForm.get('email')?.invalid">
+          Please enter a valid email address
+        </div>
+      </div>
+
+      <div>
+        <label for="mobile">Mobile Number *</label>
+        <input type="tel" id="mobile" formControlName="mobile" placeholder="Enter mobile number" required>
+        <div class="error-message" *ngIf="investorForm.get('mobile')?.touched && investorForm.get('mobile')?.invalid">
+          Please enter a valid 10-digit mobile number
+        </div>
+      </div>
+
+      <div>
+        <label for="summary">Query Summary *</label>
+        <input type="text" id="summary" formControlName="summary" placeholder="Enter query summary" required>
+        <div class="error-message" *ngIf="investorForm.get('summary')?.touched && investorForm.get('summary')?.invalid">
+          Please provide a query summary
+        </div>
+      </div>
+
+      <div>
+        <label for="details">Query Details *</label>
+        <textarea id="details" formControlName="details" placeholder="Provide detailed information about your query" required></textarea>
+        <div class="error-message" *ngIf="investorForm.get('details')?.touched && investorForm.get('details')?.invalid">
+          Please provide query details
+        </div>
+      </div>
+
+      <div>
+        <label for="file">Attachment</label>
+        <input type="file" id="file" formControlName="file" accept=".pdf,.doc,.docx,.jpg,.png" (change)="onFileChange($event)">
+        <small>Optional: Upload supporting documents (PDF, DOC, JPG, PNG)</small>
+      </div>
+
+      <div>
+        <label for="ref">Reference of Previous Query</label>
+        <select id="ref" formControlName="ref">
+          <option value="">Select a reference (if applicable)</option>
+          <option value="Q123">Q123 - Previous Query</option>
+          <option value="Q124">Q124 - Previous Query</option>
+        </select>
+        <small>Optional: Select if this query relates to a previous submission</small>
+      </div>
+
+      <!-- Captcha (Placeholder, requires third-party integration) -->
+      <div class="captcha">
+        <label for="g-recaptcha">Verification *</label>
+        <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
+        <div class="error-message" *ngIf="captchaError">Please complete the CAPTCHA verification</div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-cancel" (click)="resetForm()">Reset Form</button>
+        <button type="submit" class="btn btn-submit" [disabled]="investorForm.invalid">Submit Query</button>
+      </div>
+    </div>
+  </form>
+</div>  

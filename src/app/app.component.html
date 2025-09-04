@@ -1,5 +1,7 @@
 <app-header-new></app-header-new>
 <app-new-nav *ngIf="!isLoggedIn"></app-new-nav>
-<router-outlet></router-outlet>
+<div style="padding-top: 16vh;">
+    <router-outlet></router-outlet>
+</div>
 <app-footer *ngIf="!isLoggedIn"></app-footer>
 <app-loader *ngIf="showLoader"></app-loader>

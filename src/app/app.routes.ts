@@ -10,7 +10,7 @@ export const routes: Routes = [
                 .then(m => m.PAGE_CONTENT_WITH_MENU_ROUTES)
     },
     {
-        path: 'auth',
+        path: 'page',
         loadChildren: () =>
             import('./page-content/page-content.routes').then(m => m.PAGE_CONTENT_ROUTES)
     },

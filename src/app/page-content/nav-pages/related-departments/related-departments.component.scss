@@ -1,0 +1,136 @@
+body {
+    font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #e2e8f0, #dbeafe);
+    margin: 0;
+    padding: 20px;
+    color: #1e293b;
+}
+
+.container {
+    min-width: 95vw;
+    margin: 5vh auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+h1 {
+    text-align: center;
+    background: #60A5FA;
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 2.2em;
+    font-weight: 600;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.5s ease-in-out;
+}
+
+th, td {
+    padding: 1.2rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background: #60A5FA;
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.08em;
+}
+
+td {
+    font-size: 0.95em;
+    color: #1e293b;
+}
+
+tr {
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+tr:nth-child(even) {
+    background-color: rgba(241, 245, 249, 0.8);
+}
+
+tr:hover {
+    background-color: #e0f2fe;
+    transform: scale(1.01);
+}
+
+.header {
+    background: #60A5FA;
+    color: white;
+}
+
+a {
+    color: #3b82f6;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+    transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        min-width: 95vw;
+        padding: 0 1rem;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    th, td {
+        min-width: 120px;
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.6em;
+        padding: 1rem;
+    }
+}
