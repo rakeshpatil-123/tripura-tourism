@@ -1,69 +1,65 @@
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
-  <div class="absolute inset-0 z-0">
-    <!-- Background Images as divs with background-image -->
+<section class="full-screen-section">
+  <div class="background-container">
     <div *ngFor="let slide of slides; let i = index" 
-         class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
+         class="background-slide"
          [style.background-image]="'url(' + slide.src + ')'"
-         [class.opacity-100]="i === currentSlide"
-         [class.opacity-0]="i !== currentSlide">
+         [class.slide-visible]="i === currentSlide"
+         [class.slide-hidden]="i !== currentSlide">
     </div>
     
-    <!-- Gradient Overlay with reduced opacity -->
-    <div class="absolute inset-0 bg-gradient-to-br from-blue-700/60 via-blue-600/60 to-teal-700/60 z-10">
-      <!-- Animated random dots -->
-      <div class="absolute inset-0 overflow-hidden" #dotContainer>
+    <div class="gradient-overlay">
+      <div class="dot-container" #dotContainer>
         <!-- Dots will be generated dynamically via JavaScript -->
       </div>
     </div>
     
-    <!-- Pattern overlay with reduced opacity -->
-    <div class="absolute inset-0 z-5 opacity-5">
-      <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'2\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
-    </div>
+    <div class="pattern-overlay"></div>
   </div>
-  <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="content-container">
     <div class="text-center">
-      <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles text-orange-400">
+      <div class="badge">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles highlight-icon">
           <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
           <path d="M5 3v4"></path>
           <path d="M19 17v4"></path>
           <path d="M3 5h4"></path>
           <path d="M17 19h4"></path>
         </svg>
-        <span class="text-white font-medium">SWAGAT 2.0 - Digital First Approach</span>
+        <span class="badge-text">SWAGAT 2.0 - Digital First Approach</span>
       </div>
-      <h1 class="font-merriweather font-bold text-4xl sm:text-5xl lg:text-6xl text-white mb-6 leading-tight">
-        <span class="inline-block animate-fade-in-up">
-          <span class="inline-block mr-4 text-orange-400" style="animation-delay: 0s">Cultural</span>
-          <span class="inline-block mr-4" style="animation-delay: 0.1s">Heritage</span>
+      <h1 class="title">
+        <span class="fade-in-up">
+          <!-- <span class="highlight-text" style="animation-delay: 0s">Modern Opportunities</span> -->
+          <span class="highlight-text" style="animation-delay: 0s">Business Dreams in Tripura?</span>
         </span>
         <br />
-        <span class="text-orange-400 animate-fade-in-up" style="animation-delay: 0.3s">Rich Traditions, Modern Opportunities</span>
+        <!-- <span class="subtitle fade-in-up" style="animation-delay: 0.3s">Cultural Heritage, Rich Traditions</span> -->
+        <span class="subtitle fade-in-up" style="animation-delay: 0.3s">Swaagat 2.0: Tripura’s One-Stop Launchpad for Business</span>
       </h1>
-      <p class="font-open-sans text-xl sm:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style="animation-delay: 0.5s">
-        Invest in a state where ancient traditions meet modern aspirations. Tripura's cultural richness creates unique business opportunities in tourism and handicrafts.
+      <p class="description fade-in-up" style="animation-delay: 0.5s">
+        Your gateway to fast, hassle-free business licensing in Tripura, where tradition inspires tourism, handicrafts, manufacturing, and diverse enterprises.
       </p>
-      <div class="flex justify-center mb-12 animate-fade-in-up" style="animation-delay: 0.7s">
-        <button class="group bg-gradient-to-r from-orange-500 to-orange-600 text-white px-10 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-400/40 flex items-center space-x-3 min-w-[280px] justify-center relative overflow-hidden" (click)="onInvestClick()">
-          <span class="relative z-10">Apply Now</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right group-hover:translate-x-1 transition-transform duration-200 relative z-10">
+      <!-- <p class="description fade-in-up" style="animation-delay: 0.5s">
+        Invest in a state where ancient traditions meet modern aspirations. Tripura's cultural richness creates unique business opportunities in tourism and handicrafts.
+      </p> -->
+      <div class="button-container fade-in-up" style="animation-delay: 0.7s">
+        <button class="apply-button" (click)="onInvestClick()">
+          <span>Apply Now</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right arrow-icon">
             <path d="M5 12h14"></path>
             <path d="m12 5 7 7-7 7"></path>
           </svg>
         </button>
       </div>
-      <div class="grid grid-cols-3 gap-6 animate-fade-in-up" style="animation-delay: 0.9s">
-        <div class="text-center group" *ngFor="let stat of stats">
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 group-hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
-            <div class="text-2xl sm:text-3xl font-bold text-orange-400 mb-2 group-hover:text-orange-300 transition-colors duration-300">{{stat.value}}</div>
-            <div class="text-gray-300 font-medium text-sm">{{stat.label}}</div>
-          </div>
+      <div class="stats-grid fade-in-up" style="animation-delay: 0.9s">
+        <div class="stat-card" *ngFor="let stat of stats">
+          <div class="stat-value">{{stat.value}}</div>
+          <div class="stat-label">{{stat.label}}</div>
         </div>
       </div>
     </div>
   </div>
-  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+  <div class="carousel-dots">
     <button *ngFor="let slide of slides; let i = index" 
             class="dot"
             [ngClass]="{'active': i === currentSlide}"
@@ -71,9 +67,7 @@
             (click)="setSlide(i)">
     </button>
   </div>
-  <div class="absolute bottom-8 right-8 z-20">
-    <div class="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-      <div class="w-1 h-3 bg-white/70 rounded-full mt-2 animate-bounce"></div>
-    </div>
+  <div class="scroll-indicator">
+    <div class="scroll-dot"></div>
   </div>
 </section>

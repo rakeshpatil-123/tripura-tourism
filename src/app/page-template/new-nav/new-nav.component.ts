@@ -95,14 +95,14 @@ export class NewNavComponent implements OnDestroy {
       dropdownOpen: false,
       children: []
     },
-    {
-      label: 'Business Regulations',
-      path: '/page/business-regulations',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
+    // {
+    //   label: 'Business Regulations',
+    //   path: '/page/business-regulations',
+    //   hasDropdown: false,
+    //   isActive: false,
+    //   dropdownOpen: false,
+    //   children: []
+    // },
     {
       label: 'Feedback & Rating',
       path: '/page/feedback-rating',
