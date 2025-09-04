@@ -12,8 +12,8 @@
 
   <table *ngIf="!loading && serviceDetails" class="details-table mat-elevation-z2">
     <tr>
-      <td><b>Department</b></td>
-      <td>{{serviceDetails.department_id}}</td>
+      <td><b>Department Name</b></td>
+      <td>{{serviceDetails.department_id}} {{serviceDetails.department_name}}</td>
     </tr>
     <tr>
       <td><b>Service Name</b></td>

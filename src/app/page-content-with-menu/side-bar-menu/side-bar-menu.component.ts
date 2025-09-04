@@ -37,8 +37,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   showSidebar = false;
   expandedSubmenu: string | null = null;
   currentUrl: string = '';
+  currentUserType: string = '';
   routerSubscription: Subscription | undefined;
-
+  userName: string = 'User';
   menuItems: MenuItem[] = [
     {
       id: 'dashboard',
@@ -46,6 +47,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       icon: 'dashboard',
       route: '/dashboard/home',
       roles: ['admin', 'user', 'moderator', 'guest'],
+    },
+    {
+      id: 'Departments',
+      title: 'Departments',
+      icon: 'apartment',
+      route: '/dashboard/departments',
+      roles: ['admin'],
     },
     {
       id: 'Admin Services',
@@ -149,16 +157,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private router: Router, private genericService: GenericService) {}
-
-
-
+  constructor(private router: Router, private genericService: GenericService) {
+    this.currentUserType = localStorage.getItem('userRole') || 'User';
+    this.userName = localStorage.getItem('userName') || 'User';
+  }
 
   ngOnInit(): void {
-    // Get current URL on init
     this.currentUrl = this.router.url;
     this.checkSidebarVisibility(this.currentUrl);
-
     // Subscribe to router events to track URL changes
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))

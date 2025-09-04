@@ -1,0 +1,149 @@
+<div class="dialog-root" @fadeSlideIn>
+  <div class="header">
+    <h2>Renewal Cycles</h2>
+    <button mat-icon-button aria-label="Close" (click)="close()" matTooltip="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="loading-overlay" *ngIf="loading">
+    <mat-spinner diameter="44"></mat-spinner>
+  </div>
+
+  <div class="state state--error" *ngIf="!loading && errorMsg">
+    <mat-icon>error_outline</mat-icon>
+    <div class="state__text">
+      <div class="state__title">Couldn’t load cycles</div>
+      <div class="state__desc">{{ errorMsg }}</div>
+    </div>
+    <button mat-stroked-button color="primary" (click)="fetchRenewalCycles(data.service.id)">
+      Retry
+    </button>
+  </div>
+
+  <div class="state state--empty" *ngIf="!loading && !errorMsg && dataSource.data.length === 0">
+    <mat-icon>inventory_2</mat-icon>
+    <div class="state__text">
+      <div class="state__title">No renewal cycles</div>
+      <div class="state__desc">There are no cycles for this service yet.</div>
+    </div>
+  </div>
+
+  <div class="table-container" *ngIf="!loading && !errorMsg && dataSource.data.length > 0" @listStagger>
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">ID</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)"
+          (mouseenter)="hoverRowId = element.id" (mouseleave)="hoverRowId = null">
+          {{ element.id }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="renewal_title">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">Title</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.renewal_title }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="renewal_period">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">Period</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.renewal_period }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="renewal_target_days">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">Target Days</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.renewal_target_days }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="renewal_window_days">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">Window Days</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.renewal_window_days }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fixed_renewal_start_date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">Start Date</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.fixed_renewal_start_date
+          }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fixed_renewal_end_date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">End Date</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.fixed_renewal_end_date }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="late_fee_applicable">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Late Fee?</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.late_fee_applicable }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="late_fee_fixed_amount">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Late Fee Fixed</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.late_fee_fixed_amount }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="late_fee_calculated_amount">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Late Fee Calculated</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.late_fee_calculated_amount
+          }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="allow_renewal_input_form">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Allow Input Form</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.allow_renewal_input_form
+          }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="is_active">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Status</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">
+          {{ element.is_active ? 'Active' : 'Inactive' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Created At</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.created_at }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="updated_at">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Updated At</th>
+        <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.updated_at }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="header-color">Actions</th>
+        <td mat-cell *matCellDef="let element" class="actions-cell" [@rowHighlight]="rowState(element)">
+          <div class="action-buttons">
+            <button mat-icon-button color="primary" matTooltip="Edit" (click)="updateCycle(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteCycle(element)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="sticky-header"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackById">
+      </tr>
+
+      <tr class="mat-mdc-no-data-row" *matNoDataRow>
+        <td class="no-data" [attr.colspan]="displayedColumns.length">
+          No data available
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="paginator-wrap" *ngIf="!loading && !errorMsg">
+    <mat-paginator [length]="dataSource?.data?.length || 0" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>

@@ -14,6 +14,13 @@ import { AddQuestionnaireDialogComponent } from '../add-questionnaire-dialog/add
 import { ViewQuestionnairesDialogComponent } from '../view-questionnaires-dialog/view-questionnaires-dialog.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ServiceFeeRuleDialogComponent } from '../service-fee-rule-dialog/service-fee-rule-dialog.component';
+import { RenewalCycleComponent } from '../renewal-cycle/renewal-cycle.component';
+import { ViewServiceFeeRuleComponent } from '../view-service-fee-rule/view-service-fee-rule.component';
+import { ViewRenewalCycleDialogComponent } from '../view-renewal-cycle-dialog/view-renewal-cycle-dialog.component';
+import { ViewRenewalFeeRuleComponent } from '../view-renewal-fee-rule/view-renewal-fee-rule.component';
+import { AddRenewalFeeRuleComponent } from '../add-renewal-fee-rule/add-renewal-fee-rule.component';
+import { ViewApprovalFlowDialogComponent } from '../view-approval-flow-dialog/view-approval-flow-dialog.component';
+import { AddApprovalFlowComponent } from '../add-approval-flow/add-approval-flow.component';
 
 export interface Service {
   department_id: string;
@@ -69,10 +76,13 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     'name',
     'department',
     'noc_type',
-    'activeFrom',
+    // 'activeFrom',
     'actions',
     'questionnaire',
     'service_fee_rule',
+    'renewal_cycle',
+    'renewal_fee_rule',
+    'approval_flow',
   ];
   dataSource = new MatTableDataSource<Service>([]);
 
@@ -98,7 +108,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
           this.dataSource.data = res.data.map((item: any) => ({
             ...item,
             name: item.service_title_or_description,
-            department: `Dept-${item.department_id}`,
+            department: item.department_id,
+            department_name: item.department_name,
             noc_type: item.noc_type,
             activeFrom: moment().format('YYYY-MM-DD'),
           }));
@@ -154,7 +165,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
   deleteService(service: Service): void {
-    service;
+    if (!confirm(`Are you sure you want to delete "${service.service_title_or_description}"?`)) return;
+
     this.genericService.deleteAdminService((service as any).id).subscribe({
       next: () => {
         this.genericService.openSnackBar(
@@ -192,7 +204,6 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     // }
   }
 
-  // Questionnaire actions
   addOrEditQuestionnaire(service: Service, mode: 'add' | 'edit'): void {
     const dialogRef = this.dialog.open(AddQuestionnaireDialogComponent, {
       width: '75%',
@@ -246,8 +257,6 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     }
   }
   addOrEditServiceFeeRule(service: Service, mode: 'add' | 'edit'): void {
-    service;
-    mode;
     const dialogRef = this.dialog.open(ServiceFeeRuleDialogComponent, {
       width: '75%',
       maxWidth: '90vw',
@@ -264,5 +273,118 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  viewServiceFeeRule(): void {}
+  viewServiceFeeRule(service: Service): void {
+    const dialogRef = this.dialog.open(ViewServiceFeeRuleComponent, {
+      width: '100vw',
+      maxWidth: '100vw',
+      height: '100vh',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+
+  addOrEditRenewalCycle(service: Service, mode: 'add' | 'edit'): void {
+    const dialogRef = this.dialog.open(RenewalCycleComponent, {
+      width: '75%',
+      maxWidth: '50vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'center-dialog',
+      data: { service, mode },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+
+  viewRenewalCycle(service: Service): void {
+    const dialogRef = this.dialog.open(ViewRenewalCycleDialogComponent, {
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+  addOrEditRenewalFeeRule(service: Service, mode: 'add' | 'edit'): void {
+    const dialogRef = this.dialog.open(AddRenewalFeeRuleComponent, {
+      width: '75%',
+      maxWidth: '75vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'center-dialog',
+      data: { service, mode },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+  viewRenewalFeeRule(service: Service): void {
+    const dialogRef = this.dialog.open(ViewRenewalFeeRuleComponent, {
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+  addOrEditApprovalFlow(service: Service, mode: 'add' | 'edit'): void {
+    const dialogRef = this.dialog.open(AddApprovalFlowComponent, {
+      width: '75%',
+      maxWidth: '27vw',
+      height: 'auto',
+      maxHeight: '96vh',
+      panelClass: 'center-dialog',
+      data: { service, mode },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+  viewApprovalFlow(service: Service): void {
+    const dialogRef = this.dialog.open(ViewApprovalFlowDialogComponent, {
+      width: '80vw',
+      maxWidth: '900px',
+      height: '80vh',
+      maxHeight: '700px',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
 }

@@ -61,19 +61,14 @@ export enum NocType {
 })
 export class AddServiceDialogComponent implements OnInit {
   serviceForm: FormGroup;
-  departments = [
-    { id: 1, name: 'Municipal' },
-    { id: 2, name: 'Energy' },
-    { id: 3, name: 'Transport' },
-    { id: 5, name: 'Labour' },
-  ];
+  departments : any[] = [];
   nocTypes = Object.values(NocType);
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddServiceDialogComponent>,
     private genericService: GenericService,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any 
   ) {
     this.serviceForm = this.fb.group({
       department_id: ['', Validators.required],
@@ -111,6 +106,9 @@ export class AddServiceDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.getAllDepartmentList();
+    
     if (this.data?.id) {
       this.genericService
         .getUpdationDataServiceAdmin({ service_id: this.data.id })
@@ -155,6 +153,22 @@ export class AddServiceDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  getAllDepartmentList(): void {
+    this.genericService.getAllDepartmentNames().subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.departments = res.data;
+        } else {
+          this.departments = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching departments:', err);
+        this.departments = [];
+      }
+    });
+  }
+
   submit(isUpdate: boolean) {
     if (this.serviceForm.valid) {
       const formValue = this.serviceForm.value;
@@ -193,12 +207,18 @@ export class AddServiceDialogComponent implements OnInit {
       if (isUpdate) {
         const finalPayload = { id: this.data.id, ...payload };
         this.genericService.updateAdminService(finalPayload).subscribe({
-          next: () => this.dialogRef.close('updated'),
+          next: () => {
+            this.genericService.openSnackBar('Service updated successfully', 'Success');
+            this.dialogRef.close('updated');
+          },
           error: (err) => console.error(err),
         });
       } else {
         this.genericService.addNewService(payload).subscribe({
-          next: () => this.dialogRef.close('created'),
+          next: () => {
+            this.genericService.openSnackBar('Service created successfully', 'Success');
+            this.dialogRef.close('created');
+          },
           error: (err) => console.error(err),
         });
       }

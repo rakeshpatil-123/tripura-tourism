@@ -34,7 +34,11 @@ export class LoginComponent {
       this.genericService.loginUser(payload).subscribe({
         next: (response) => {
           console.log('Login successful:', response);
-
+          if (response?.token) {
+            localStorage.setItem('userName', response.data.authorized_person_name);
+            localStorage.setItem('userRole', response.data.user_type);
+            localStorage.setItem('token', response.token);
+          }
           this.genericService.storeSessionData(
             response,
             payload.rememberMe || false

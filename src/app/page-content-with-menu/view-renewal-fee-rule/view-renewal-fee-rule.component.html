@@ -1,0 +1,78 @@
+<div class="dialog-header">
+  <h2>Renewal Fee Rules - {{ data.service.name }}</h2>
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="table-container">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="id">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> ID </th>
+      <td mat-cell *matCellDef="let element"> {{ element.id }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="feeType">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Fee Type </th>
+      <td mat-cell *matCellDef="let element"> {{ element.fee_type }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="fixedFee">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Fixed Fee </th>
+      <td mat-cell *matCellDef="let element"> {{ element.fixed_fee || '-' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="condition">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Condition </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.condition_operator }} {{ element.condition_value_start }}
+        <span *ngIf="element.condition_value_end"> - {{ element.condition_value_end }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="calculatedFee">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Calculated Fee </th>
+      <td mat-cell *matCellDef="let element"> {{ element.calculated_fee || '-' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="perUnitFee">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Per Unit Fee </th>
+      <td mat-cell *matCellDef="let element"> {{ element.per_unit_fee || '-' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="priority">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Priority </th>
+      <td mat-cell *matCellDef="let element"> {{ element.priority }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Status </th>
+      <td mat-cell *matCellDef="let element">
+        <span>
+          {{ element.status === 1 ? 'Active' : 'Inactive' }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Created At </th>
+      <td mat-cell *matCellDef="let element"> {{ element.created_at | date:'short' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell class="header-color" *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary" (click)="updateRule(element)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteRule(element.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>

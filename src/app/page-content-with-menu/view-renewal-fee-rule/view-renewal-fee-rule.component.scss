@@ -1,0 +1,78 @@
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e3a8a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px 8px 0 0;
+}
+
+.table-container {
+  padding: 16px;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th.mat-header-cell {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+td.mat-cell {
+  padding: 8px 12px;
+}
+
+.active {
+  color: green;
+  font-weight: 600;
+}
+
+.inactive {
+  color: red;
+  font-weight: 600;
+}
+
+.header-color {
+  color: #111 !important;
+  font-weight: 600;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #1e3a8a;
+  color: #fff;
+  border-radius: 8px 8px 0 0;
+}
+
+.table-container {
+  margin: 20px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.filter-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 20px;
+}
+
+mat-form-field {
+  width: 250px;
+}
+
+button {
+  margin: 0 4px;
+}

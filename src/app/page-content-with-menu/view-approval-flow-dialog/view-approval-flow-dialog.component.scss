@@ -1,0 +1,142 @@
+.approval-flow-table-container {
+  padding: 1rem;
+  max-width: 100%;
+  overflow-x: auto;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: #1e3a8a;
+  }
+
+  .filter-field {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    min-width: 650px;
+
+    th.mat-header-cell {
+      background-color: #1976d2;
+      color: white;
+      font-weight: 500;
+    }
+
+    td.mat-cell,
+    th.mat-header-cell {
+      padding: 12px 8px;
+      font-size: 0.95rem;
+    }
+
+    tr.fade-in-row {
+      animation: fadeIn 0.3s ease-out;
+    }
+  }
+
+  mat-paginator {
+    margin-top: 1rem;
+  }
+}
+
+.approval-flow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 1.3rem;
+  }
+
+  button {
+    min-width: auto;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 9px;
+  height: 100%;
+}
+
+.actions-header {
+  color: #111 !important;
+  font-weight: 600;
+  text-align: center !important;
+}
+
+.action-buttons .icon-btn {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+  color: #000000;
+}
+
+.action-buttons .icon-btn:hover {
+  color: #000000;
+  transform: scale(1.2);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header-color {
+  color: #111 !important;
+  font-weight: 600;
+}
+
+.animated-close-btn {
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: #d32f2f;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+}
+.no-data-row {
+  background-color: #f9f9f9;
+}
+
+.no-data-cell {
+  text-align: center;
+  font-weight: 600;
+  color: #d32f2f;
+  font-size: 1rem;
+  padding: 1.5rem 0;
+}

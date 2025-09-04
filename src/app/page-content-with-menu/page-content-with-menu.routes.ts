@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { PageContentWithMenuComponent } from './page-content-with-menu.component';
+import { authGuard } from '../guards/guards/auth.guard';
 
 export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
   {
@@ -106,6 +107,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./admin-services/admin-services.component').then(
             (m) => m.AdminServicesComponent
           ),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'departments',
+        loadComponent: () =>
+          import('./departments/departments.component').then(
+            (m) => m.DepartmentsComponent,
+          ),
+        canActivate: [authGuard],
       },
     ],
   },

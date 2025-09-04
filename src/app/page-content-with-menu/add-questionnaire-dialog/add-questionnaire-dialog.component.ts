@@ -82,8 +82,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
           [Validators.required, Validators.min(1), Validators.max(100)],
         ],
         maxLength: [
-          100,
-          [Validators.required, Validators.min(1), Validators.max(100)],
+          1000,
+          [Validators.required, Validators.min(1), Validators.max(1000)],
         ],
         pattern: ['^[A-Za-z ]+$'],
         errorMessage: ['Only alphabets allowed'],
