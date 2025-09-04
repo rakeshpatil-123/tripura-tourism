@@ -58,6 +58,7 @@ table{
   position: relative;
   border-bottom: 1px solid #e9ecef;
   min-height: 0;
+  border-radius: 12px;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -80,14 +81,16 @@ table{
   border-collapse: collapse;
   min-width: 800px;
   // background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
 
   th {
-    background: #cfe2ff;
+    background: #2c82aa;
     padding: 12px 16px;
     text-align: left;
     font-weight: 600;
     font-size: 0.85rem;
-    color: #000;
+    color: #fff;
     border-bottom: 2px solid #dee2e6;
     position: sticky;
     top: 0;
@@ -101,10 +104,13 @@ table{
       user-select: none;
       transition: background-color 0.2s ease;
 
-      &:hover {
-        background-color: rgb(7, 10, 83);
-      }
+      // &:hover {
+      //   background-color: rgb(7, 10, 83);
+      // }
     }
+  }
+  th:hover{
+    background-color: #2c82aa!important;
   }
 
   td {
@@ -122,9 +128,9 @@ table{
     background-color: #fcfcfc;
   }
 
-  tbody tr:hover {
-    background-color: #f8f9ff;
-  }
+  // tbody tr:hover {
+  //   background-color: #f8f9ff;
+  // }
 }
 
 .th-content {
@@ -158,9 +164,9 @@ table{
     border: none;
     color: inherit;
 
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
-    }
+    // &:hover {
+    //   background-color: rgba(0, 0, 0, 0.04);
+    // }
   }
 }
 
@@ -492,4 +498,9 @@ td .badge-unknown {
 ::ng-deep .mat-menu-item:hover {
   background-color: #f0f0f0 !important;
   color: #1a1a1a !important;
+}
+
+::ng-deep .mat-mdc-menu-content{
+  padding: 0 !important;
+  background-color: #fff;
 }

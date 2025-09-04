@@ -1,12 +1,8 @@
 <div class="form-group">
-  <!-- <label *ngIf="!hideLabel" [for]="fieldId" [class.bold-label]="readonly">
-    {{ fieldLabel }}
-    <span *ngIf="mandatory" class="required-indicator">*</span>
-  </label> -->
+
 
 
   <p-floatlabel variant="on">
-    <!-- Number, Email, Text -->
     <input
       *ngIf="type !== 'textarea'"
       pInputText
@@ -30,7 +26,6 @@
       autocomplete="off"
     />
 
-    <!-- Textarea -->
     <textarea
       *ngIf="type === 'textarea'"
       pInputTextarea
@@ -52,14 +47,12 @@
       autocomplete="off"
     ></textarea>
 
-    <!-- Floating Label -->
     <label [for]="fieldId">
       {{ fieldLabel }}
       <span *ngIf="mandatory" class="required-indicator">*</span>
     </label>
   </p-floatlabel>
 
-  <!-- Error Message -->
   <div
     *ngIf="submitted && hasErrors"
     class="invalid-input"

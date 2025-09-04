@@ -84,10 +84,7 @@
         [formControlName]="config.key"
         [errors]="getFieldErrors(config.key)"
         [monthsRange]="config.dateConfig?.monthsRange || 6"
-        [futureDateErrorMessage]="
-          config.dateConfig?.futureDateErrorMessage ||
-          'Date cannot be in the future.'
-        "
+       
         [pastDateErrorMessage]="
           config.dateConfig?.pastDateErrorMessage ||
           'Date must be within the specified range.'

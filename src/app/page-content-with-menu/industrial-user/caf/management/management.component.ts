@@ -67,7 +67,7 @@ export class ManagementComponent implements OnInit, OnDestroy {
     { id: 'YES', name: 'Yes' },
     { id: 'NO', name: 'No' },
   ];
-
+  submitted = false;
   constructor(
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
@@ -80,10 +80,10 @@ export class ManagementComponent implements OnInit, OnDestroy {
       ownerDetailsFathersName: ['', Validators.required],
       ownerDetailsResidentialAddress: ['', Validators.required],
       ownerDetailsPoliceStation: ['', Validators.required],
-      ownerDetailsPin: ['', Validators.required],
-      ownerDetailsMobile: ['', Validators.required],
-      ownerDetailsAlternateMobile: [''],
-      ownerDetailsAadharNo: ['', Validators.required],
+     ownerDetailsPin: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]], 
+    ownerDetailsMobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]], 
+    ownerDetailsAlternateMobile: ['', Validators.pattern(/^[0-9]{10}$/)],
+    ownerDetailsAadharNo: ['', [Validators.required, Validators.pattern(/^[0-9]{12}$/)]], 
       ownerDetailsStatus: ['', Validators.required],
       ownerDetailsEmail: ['', [Validators.required, Validators.email]],
       ownerDetailsDob: ['', Validators.required],
@@ -97,9 +97,9 @@ export class ManagementComponent implements OnInit, OnDestroy {
       managerDetailsFathersName: ['', Validators.required],
       managerDetailsResidentialAddress: ['', Validators.required],
       managerDetailsPoliceStation: ['', Validators.required],
-      managerDetailsPin: ['', Validators.required],
-      managerDetailsMobile: ['', Validators.required],
-      managerDetailsAadharNo: ['', Validators.required],
+      managerDetailsPin: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]], 
+    managerDetailsMobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]], 
+    managerDetailsAadharNo: ['', [Validators.required, Validators.pattern(/^[0-9]{12}$/)]], 
       managerDetailsDob: [''],
       managerDetailsPhoto: [null, Validators.required],
 
@@ -241,35 +241,6 @@ export class ManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  // setFileUrlAsValue(controlName: string, url: string): void {
-  //   if (!url) return;
-
-  //   const fileName = url.split('/').pop() || 'file';
-
-  //   const dummy = new File([''], fileName);
-  //   this.form.get(controlName)?.setValue(dummy);
-
-  //   // Then fetch real file and update
-  //   fetch(url)
-  //     .then((res) => {
-  //       if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-  //       return res.blob();
-  //     })
-  //     .then((blob) => {
-  //       const file = new File([blob], fileName, { type: blob.type });
-  //       this.form.get(controlName)?.setValue(file);
-  //       this.cdr.detectChanges();
-  //     })
-  //     .catch((err) => {
-  //       console.warn(`Failed to load file from URL: ${url}`, err);
-  //     });
-  // }
-  // setFileAsValue(controlName: string, url: string): void {
-  //   console.warn(
-  //     `File URL received for ${controlName}: ${url}. Cannot auto-fill file input for security.`
-  //   );
-  // }
-
   buildFormData(isDraft: boolean = false): FormData {
     const formData = new FormData();
     const raw = this.form.getRawValue();
@@ -297,7 +268,10 @@ export class ManagementComponent implements OnInit, OnDestroy {
     );
     formData.append('owner_aadhar_no', raw.ownerDetailsAadharNo);
     formData.append('owner_details_status', raw.ownerDetailsStatus);
-    formData.append('owner_details_email', (raw.ownerDetailsEmail || '').trim());
+    formData.append(
+      'owner_details_email',
+      (raw.ownerDetailsEmail || '').trim()
+    );
     formData.append('owner_details_dob', this.formatDate(raw.ownerDetailsDob));
     formData.append(
       'owner_details_social_status',
@@ -432,20 +406,23 @@ export class ManagementComponent implements OnInit, OnDestroy {
   }
 
   saveAsDraft(): void {
+     this.submitted = true;
     const payload = this.buildFormData(true);
     this.submitForm(payload, true);
   }
 
- onSubmit(): void {
-  // if (this.form.invalid) {
-  //   this.form.markAllAsTouched();
-  //   this.apiService.openSnackBar('Please fix all errors in the form.', 'error');
-  //   return;
-  // }
-
-  const payload = this.buildFormData(false);
-  this.submitForm(payload, false);
-}
+  onSubmit(): void {
+    // if (this.form.invalid) {
+    //   this.form.markAllAsTouched();
+    //   this.apiService.openSnackBar('Please fix all errors in the form.', 'error');
+    //   return;
+    // }
+ this.submitted = true;
+  
+  this.markFormGroupTouched(this.form);
+    const payload = this.buildFormData(false);
+    this.submitForm(payload, false);
+  }
 
   private submitForm(payload: FormData, isDraft: boolean): void {
     this.apiService
@@ -609,5 +586,86 @@ export class ManagementComponent implements OnInit, OnDestroy {
 
   onImageError(event: any): void {
     event.target.src = 'assets/img/profile-picture.jpg';
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup | FormArray): void {
+    Object.keys(formGroup.controls).forEach((key) => {
+      const control = formGroup.get(key);
+      if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markFormGroupTouched(control);
+      } else {
+        control?.markAsTouched();
+      }
+    });
+  }
+
+  // Fix your error message method
+  getErrorMessage(fieldName: string): string {
+    const control = this.form.get(fieldName);
+    if (control?.errors && (control.touched || this.submitted)) {
+      if (control.errors['required']) {
+        return `${this.getFieldLabel(fieldName)} is required`;
+      }
+      if (control.errors['pattern']) {
+        switch (fieldName) {
+          case 'ownerDetailsPin':
+          case 'managerDetailsPin':
+            return 'Pin must be 6 digits';
+          case 'ownerDetailsMobile':
+          case 'ownerDetailsAlternateMobile':
+          case 'managerDetailsMobile':
+            return 'Mobile must be 10 digits';
+          case 'ownerDetailsAadharNo':
+          case 'managerDetailsAadharNo':
+            return 'Aadhar must be 12 digits';
+          default:
+            return 'Invalid format';
+        }
+      }
+      if (control.errors['email']) {
+        return 'Please enter a valid email';
+      }
+    }
+    return '';
+  }
+
+  getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      // Owner Details
+      ownerDetailsName: 'Owner Name',
+      ownerDetailsFathersName: "Owner Father's Name",
+      ownerDetailsResidentialAddress: 'Owner Address',
+      ownerDetailsPoliceStation: 'Owner Police Station',
+      ownerDetailsPin: 'Owner Pin',
+      ownerDetailsMobile: 'Owner Mobile',
+      ownerDetailsAlternateMobile: 'Owner Alternate Mobile',
+      ownerDetailsAadharNo: 'Owner Aadhar',
+      ownerDetailsStatus: 'Owner Status',
+      ownerDetailsEmail: 'Owner Email',
+      ownerDetailsDob: 'Owner Date of Birth',
+      ownerDetailsSocialStatus: 'Owner Social Status',
+      ownerDetailsIsDifferentlyAbled: 'Differently Abled Status',
+      ownerDetailsIsWomenEntrepreneur: 'Women Entrepreneur Status',
+      ownerDetailsIsMinority: 'Minority Status',
+      ownerDetailsPhoto: 'Owner Photo',
+
+      // Manager Details
+      managerDetailsName: 'Manager Name',
+      managerDetailsFathersName: "Manager Father's Name",
+      managerDetailsResidentialAddress: 'Manager Address',
+      managerDetailsPoliceStation: 'Manager Police Station',
+      managerDetailsPin: 'Manager Pin',
+      managerDetailsMobile: 'Manager Mobile',
+      managerDetailsAadharNo: 'Manager Aadhar',
+      managerDetailsDob: 'Manager Date of Birth',
+      managerDetailsPhoto: 'Manager Photo',
+
+      // Signatures
+      signatureAuthorizationOfOwner: 'Owner Authorization Signature',
+      factoryOccupiersSignature: 'Factory Occupier Signature',
+      factoryManagersSignature: 'Factory Manager Signature',
+    };
+
+    return labels[fieldName] || fieldName;
   }
 }

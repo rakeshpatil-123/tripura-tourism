@@ -15,7 +15,8 @@
 }
 
 th{
-  background-color: #cfe2ff;
+  background-color: #2C82AA;
+  color: #fff;
 }
 
 .form-actions {
@@ -93,4 +94,13 @@ th, td {
     background-color: #6c757d;
     opacity: 0.6;
   }
+}
+
+label{
+  color: #fff;
+  background-color: #f38600;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-bottom: 5px;
 }

@@ -463,7 +463,7 @@ isFieldReadonly(questionId: number): boolean {
   // console.log(' Submission Payload:', payload);
 
   this.apiService
-    .getByConditions(payload, 'api/user-service-application-store')
+    .getByConditions(payload, 'api/user/service-application-store')
     .subscribe({
       next: (res) => {
         if (res?.status === 1) {

@@ -66,72 +66,120 @@ export class EnterpriseDetailsComponent implements OnInit {
     this.loadEnterpriseDetails();
   }
 
+  // loadEnterpriseDetails(): void {
+  //   this.apiService
+  //     .getByConditions({}, 'api/caf/core-application-show-enterprise-detail')
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         if (res && res.data) {
+  //           const data = res.data;
+
+  //           this.enterpriseForm = this.fb.group({
+  //             constitution: [
+  //               data.constitution_of_enterprise || '',
+  //               Validators.required,
+  //             ],
+  //             enterpriseName: [data.enterprise_name || '', Validators.required],
+  //             businessPan: [data.business_pan_no || '', Validators.required],
+
+  //             registeredAddress: [data.enterprise_address || ''],
+  //             habitation: [data.habitation_area_building || ''],
+  //             pin: [
+  //               data.pin || '',
+  //               [Validators.required, Validators.pattern(/^[0-9]{6}$/)],
+  //             ],
+  //             postOffice: [data.post_office || '', Validators.required],
+  //             policeStation: [data.police_station || '', Validators.required],
+
+  //             repName: [
+  //               data.authorized_representative_name || '',
+  //               Validators.required,
+  //             ],
+  //             designation: [data.authorized_representative_designation || ''],
+  //             aadhar: [
+  //               data.authorized_representative_aadhar_no || '',
+  //               [Validators.required, Validators.pattern(/^[0-9]{12}$/)],
+  //             ],
+  //             mobile: [
+  //               data.authorized_representative_mobile_no || '',
+  //               [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
+  //             ],
+  //             phone: [data.authorized_representative_phone_no || ''],
+  //             email: [
+  //               data.authorized_representative_email_id || '',
+  //               [Validators.required, Validators.email],
+  //             ],
+  //             altMobile: [
+  //               data.authorized_representative_alternate_mobile_no || '',
+  //             ],
+  //             proposalFor: [data.proposal_for || '', Validators.required],
+  //             commissioningDate: [
+  //               data.proposed_date_of_commissioning
+  //                 ? new Date(data.proposed_date_of_commissioning)
+  //                 : '',
+  //               Validators.required,
+  //             ],
+  //           });
+  //         }
+  //       },
+  //       error: (err: any) => {
+  //         console.error('Failed to load enterprise details:', err);
+  //       },
+  //     });
+  // }
+
   loadEnterpriseDetails(): void {
-    this.apiService
-      .getByConditions({}, 'api/caf/core-application-show-enterprise-detail')
-      .subscribe({
-        next: (res: any) => {
-          if (res && res.data) {
-            const data = res.data;
+  this.apiService
+    .getByConditions({}, 'api/caf/core-application-show-enterprise-detail')
+    .subscribe({
+      next: (res: any) => {
+        if (res && res.data) {
+          const data = res.data;
 
-            this.enterpriseForm = this.fb.group({
-              constitution: [
-                data.constitution_of_enterprise || '',
-                Validators.required,
-              ],
-              enterpriseName: [data.enterprise_name || '', Validators.required],
-              businessPan: [data.business_pan_no || '', Validators.required],
-
-              registeredAddress: [data.enterprise_address || ''],
-              habitation: [data.habitation_area_building || ''],
-              pin: [
-                data.pin || '',
-                [Validators.required, Validators.pattern(/^[0-9]{6}$/)],
-              ],
-              postOffice: [data.post_office || '', Validators.required],
-              policeStation: [data.police_station || '', Validators.required],
-
-              repName: [
-                data.authorized_representative_name || '',
-                Validators.required,
-              ],
-              designation: [data.authorized_representative_designation || ''],
-              aadhar: [
-                data.authorized_representative_aadhar_no || '',
-                [Validators.required, Validators.pattern(/^[0-9]{12}$/)],
-              ],
-              mobile: [
-                data.authorized_representative_mobile_no || '',
-                [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
-              ],
-              phone: [data.authorized_representative_phone_no || ''],
-              email: [
-                data.authorized_representative_email_id || '',
-                [Validators.required, Validators.email],
-              ],
-              altMobile: [
-                data.authorized_representative_alternate_mobile_no || '',
-              ],
-              proposalFor: [data.proposal_for || '', Validators.required],
-              commissioningDate: [
-                data.proposed_date_of_commissioning
-                  ? new Date(data.proposed_date_of_commissioning)
-                  : '',
-                Validators.required,
-              ],
-            });
-          }
-        },
-        error: (err: any) => {
-          console.error('Failed to load enterprise details:', err);
-        },
-      });
-  }
+          this.enterpriseForm.patchValue({
+            constitution: data.constitution_of_enterprise || '',
+            enterpriseName: data.enterprise_name || '',
+            businessPan: data.business_pan_no || '',
+            registeredAddress: data.enterprise_address || '',
+            habitation: data.habitation_area_building || '',
+            pin: data.pin || '',
+            postOffice: data.post_office || '',
+            policeStation: data.police_station || '',
+            repName: data.authorized_representative_name || '',
+            designation: data.authorized_representative_designation || '',
+            aadhar: data.authorized_representative_aadhar_no || '',
+            mobile: data.authorized_representative_mobile_no || '',
+            phone: data.authorized_representative_phone_no || '',
+            email: data.authorized_representative_email_id || '',
+            altMobile: data.authorized_representative_alternate_mobile_no || '',
+            proposalFor: data.proposal_for || '',
+            commissioningDate: data.proposed_date_of_commissioning
+              ? new Date(data.proposed_date_of_commissioning)
+              : '',
+          });
+        }
+      },
+      error: (err: any) => {
+        console.error('Failed to load enterprise details:', err);
+      },
+    });
+}
 
   onSave(isDraft: boolean = false): void {
     this.submitted = true;
-    // console.log(this.enterpriseForm.value, ' jahfjks');
 
+    Object.keys(this.enterpriseForm.controls).forEach((key) => {
+      const control = this.enterpriseForm.get(key);
+      control?.markAsTouched();
+    });
+
+    if (this.enterpriseForm.invalid) {
+      this.apiService.openSnackBar(
+        'Please correct the errors in the form.',
+        'error'
+      );
+      return;
+    }
     // if (this.enterpriseForm.valid) {
     const formValue = this.enterpriseForm.value;
 
@@ -186,7 +234,7 @@ export class EnterpriseDetailsComponent implements OnInit {
         error: (err: any) => {
           console.error('API Error:', err);
 
-          const errorResponse = err?.error; 
+          const errorResponse = err?.error;
           if (errorResponse?.errors) {
             const allErrors: string[] = [];
 
@@ -200,7 +248,7 @@ export class EnterpriseDetailsComponent implements OnInit {
             allErrors.forEach((msg, index) => {
               setTimeout(() => {
                 this.apiService.openSnackBar(msg, 'error');
-              }, index * 1200); 
+              }, index * 1200);
             });
           } else {
             this.apiService.openSnackBar(
@@ -213,5 +261,43 @@ export class EnterpriseDetailsComponent implements OnInit {
     // } else {
     //   console.warn('Form Invalid');
     // }
+  }
+
+  // Add this helper method
+  getErrorMessage(fieldName: string): string {
+    const control = this.enterpriseForm.get(fieldName);
+    if (control?.errors && (control.touched || this.submitted)) {
+      if (control.errors['required']) {
+        return `${this.getFieldLabel(fieldName)} is required`;
+      }
+      if (control.errors['pattern']) {
+        switch (fieldName) {
+          case 'pin':
+            return 'Pin must be 6 digits';
+          case 'aadhar':
+            return 'Aadhar must be 12 digits';
+          case 'mobile':
+            return 'Mobile must be 10 digits';
+          default:
+            return 'Invalid format';
+        }
+      }
+      if (control.errors['email']) {
+        return 'Please enter a valid email';
+      }
+    }
+    return '';
+  }
+
+  getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      pin: 'Pin',
+      email: 'Email',
+      mobile: 'Mobile',
+      aadhar: 'Aadhar',
+      enterpriseName: 'Enterprise Name',
+      // Add more field labels as needed
+    };
+    return labels[fieldName] || fieldName;
   }
 }
