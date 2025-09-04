@@ -70,9 +70,12 @@
     <div class="col-md-4">
       <app-ilogi-input-date fieldId="dob" fieldLabel="Date of Birth" [formControlName]="'ownerDetailsDob'"
         [mandatory]="true" placeholder="DD/MM/YYYY"></app-ilogi-input-date>
+      <div class="mt-4">
 
-      <app-ilogi-select fieldId="statusOfPerson" fieldLabel="Status of Person" [formControlName]="'ownerDetailsStatus'"
-        [selectOptions]="statusOfPersonOptions" placeholder="Select"></app-ilogi-select>
+        <app-ilogi-select fieldId="statusOfPerson" fieldLabel="Status of Person"
+          [formControlName]="'ownerDetailsStatus'" [selectOptions]="statusOfPersonOptions"
+          placeholder="Select"></app-ilogi-select>
+      </div>
       <div class="mt-4">
 
         <app-ilogi-input fieldId="ownerEmail" fieldLabel="Owner Email" [formControlName]="'ownerDetailsEmail'"
@@ -87,15 +90,21 @@
     </div>
 
     <div class="col-md-4">
-      <app-ilogi-select fieldId="socialStatus" fieldLabel="Social Status" [formControlName]="'ownerDetailsSocialStatus'"
-        [selectOptions]="socialStatusOptions" placeholder="Select"></app-ilogi-select>
+      <div class="mt-4">
 
-      <app-ilogi-select fieldId="minority" fieldLabel="Minority" [formControlName]="'ownerDetailsIsMinority'"
-        [selectOptions]="yesNoOptions" placeholder="Select"></app-ilogi-select>
-
-      <app-ilogi-select fieldId="differentlyAbled" fieldLabel="Differently Abled"
-        [formControlName]="'ownerDetailsIsDifferentlyAbled'" [selectOptions]="yesNoOptions"
-        placeholder="Select"></app-ilogi-select>
+        <app-ilogi-select fieldId="socialStatus" fieldLabel="Social Status"
+          [formControlName]="'ownerDetailsSocialStatus'" [selectOptions]="socialStatusOptions"
+          placeholder="Select"></app-ilogi-select>
+      </div>
+      <div class="mt-4">
+        <app-ilogi-select fieldId="minority" fieldLabel="Minority" [formControlName]="'ownerDetailsIsMinority'"
+          [selectOptions]="yesNoOptions" placeholder="Select"></app-ilogi-select>
+      </div>
+      <div class="mt-4">
+        <app-ilogi-select fieldId="differentlyAbled" fieldLabel="Differently Abled"
+          [formControlName]="'ownerDetailsIsDifferentlyAbled'" [selectOptions]="yesNoOptions"
+          placeholder="Select"></app-ilogi-select>
+      </div>
     </div>
 
     <div class="col-md-4"></div>

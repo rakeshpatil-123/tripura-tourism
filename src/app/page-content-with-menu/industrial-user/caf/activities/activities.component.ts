@@ -22,6 +22,7 @@ interface Nic5Digit {
 }
 
 interface NicEntry {
+  id?: number;
   nic_2_digit_code: string;
   nic_2_digit_code_description: string;
   nic_4_digit_codes: {
@@ -44,12 +45,10 @@ export class ActivitiesComponent implements OnInit {
   activityForm: FormGroup;
   activities: NicEntry[] = [];
 
-  // Options for dropdowns
   nic2DigitOptions: Nic2Digit[] = [];
   nic4DigitOptions: Nic4Digit[] = [];
   nic5DigitOptions: Nic5Digit[] = [];
 
-  // SelectOptions for ilogi-select
   get nic2SelectOptions(): SelectOption[] {
     return this.nic2DigitOptions.map(opt => ({
       id: opt.nic_2_digit_code,
@@ -154,7 +153,6 @@ export class ActivitiesComponent implements OnInit {
     });
   }
 
-  // --- Reset dependent fields ---
   private resetAfter2Digit(): void {
     this.activityForm.get('nic4DigitCode')?.reset();
     this.activityForm.get('nic5DigitCode')?.reset();
@@ -167,7 +165,6 @@ export class ActivitiesComponent implements OnInit {
     this.nic5DigitOptions = [];
   }
 
-  // --- Add current selection to table ---
   addActivity(): void {
     if (this.activityForm.invalid) {
       this.activityForm.markAllAsTouched();
@@ -177,7 +174,6 @@ export class ActivitiesComponent implements OnInit {
 
     const raw = this.activityForm.value;
 
-    // Find full descriptions
     const nic2 = this.nic2DigitOptions.find(n => n.nic_2_digit_code === raw.nic2DigitCode);
     const nic4 = this.nic4DigitOptions.find(n => n.nic_4_digit_code === raw.nic4DigitCode);
     const nic5 = this.nic5DigitOptions.find(n => n.nic_5_digit_code === raw.nic5DigitCode);
@@ -187,14 +183,12 @@ export class ActivitiesComponent implements OnInit {
       return;
     }
 
-    // Check if this 2-digit code already exists
     const exists = this.activities.find(a => a.nic_2_digit_code === nic2.nic_2_digit_code);
     if (exists) {
       this.apiService.openSnackBar('This 2-digit NIC code is already added.', 'error');
       return;
     }
 
-    // Create 4-digit group
     const newEntry: NicEntry = {
       nic_2_digit_code: nic2.nic_2_digit_code,
       nic_2_digit_code_description: nic2.nic_2_digit_code_description,
@@ -211,29 +205,32 @@ export class ActivitiesComponent implements OnInit {
     this.resetFormAndOptions();
   }
 
-  // --- Remove activity ---
   removeActivity(index: number): void {
-    const item = this.activities[index];
-    this.activities.splice(index, 1);
+  const item = this.activities[index];
 
-    // If not draft, delete from backend
-    if (item.nic_2_digit_code) {
-      const payload = { nic_2_digit_code: String(item.nic_2_digit_code) };
-      this.apiService.getByConditions(payload, 'api/nic-digit-code-delete').subscribe({
-        next: (res) => {
-          if (res?.status === 1) {
-            this.apiService.openSnackBar('NIC code deleted successfully.', 'success');
-          }
-        },
-        error: (err) => {
-          console.error(' Delete failed:', err);
-          this.apiService.openSnackBar('Failed to delete NIC code.', 'error');
+  if (item.id) {
+    const payload = { id: item.id };
+
+    this.apiService.getByConditions(payload, 'api/caf/activity-delete').subscribe({
+      next: (res) => {
+        if (res?.status === 1) {
+          this.activities.splice(index, 1);
+          this.apiService.openSnackBar('NIC code deleted successfully.', 'success');
+        } else {
+          this.apiService.openSnackBar('Delete failed: ' + res?.message, 'error');
         }
-      });
-    }
+      },
+      error: (err) => {
+        console.error('Delete failed:', err);
+        this.apiService.openSnackBar('Failed to delete NIC code.', 'error');
+      }
+    });
+  } else {
+    this.activities.splice(index, 1);
+    this.apiService.openSnackBar('Entry removed.', 'info');
   }
+}
 
-  // --- Reset form and options ---
   private resetFormAndOptions(): void {
     this.activityForm.reset();
     this.activityForm.get('companyActivity')?.setValue('Manufacturing');
@@ -241,59 +238,118 @@ export class ActivitiesComponent implements OnInit {
     this.nic5DigitOptions = [];
   }
 
-  // --- Load existing data from backend ---
   loadExistingData(): void {
-    this.apiService.getByConditions({}, 'api/nic-digit-code-view').subscribe({
-      next: (res: any) => {
-        if (res?.status === 1 && Array.isArray(res.data)) {
-          this.activities = res.data.map((item: any) => ({
-            nic_2_digit_code: item.nic_2_digit_code,
-            nic_2_digit_code_description: item.nic_2_digit_code_description,
-            nic_4_digit_codes: (item.nic_4_digit_codes || []).map((four: any) => ({
-              nic_4_digit_code: four.nic_4_digit_code,
-              nic_4_digit_code_description: four.nic_4_digit_code_description,
-              nic_5_digit_codes: (four.nic_5_digit_codes || []).map((five: any) => ({
-                nic_5_digit_code: five.nic_5_digit_code,
-                nic_5_digit_code_description: five.nic_5_digit_code_description
-              }))
-            }))
-          }));
-          console.log(' Loaded existing NIC data:', this.activities);
+  this.apiService.getByConditions({}, 'api/caf/activity-view').subscribe({
+    next: (res: any) => {
+      if (res?.status === 1 && Array.isArray(res.data)) {
+        this.activities = res.data
+          .filter((item: any) => item.nic_2_digit_code && item.activity_of_enterprise)
+          .map((item: any) => {
+            const nic2 = this.parseNicCode(item.nic_2_digit_code);
+            const nic4 = this.parseNicCode(item.nic_4_digit_code);
+            const nic5 = this.parseNicCode(item.nic_5_digit_code);
+
+            return {
+              id: item.id, 
+              nic_2_digit_code: nic2.code,
+              nic_2_digit_code_description: nic2.desc,
+              nic_4_digit_codes: [
+                {
+                  nic_4_digit_code: nic4.code,
+                  nic_4_digit_code_description: nic4.desc,
+                  nic_5_digit_codes: [
+                    {
+                      nic_5_digit_code: nic5.code,
+                      nic_5_digit_code_description: nic5.desc
+                    }
+                  ]
+                }
+              ]
+            };
+          });
+
+        console.log('Loaded and parsed existing NIC data:', this.activities);
+
+        if (this.activities.length > 0) {
+          const last = this.activities[this.activities.length - 1];
+          this.activityForm.get('companyActivity')?.setValue(res.data[0].activity_of_enterprise || 'Manufacturing');
         }
-      },
-      error: (err) => {
-        console.error(' Failed to load existing NIC data:', err);
       }
-    });
+    },
+    error: (err) => {
+      console.error('Failed to load existing NIC data:', err);
+      this.apiService.openSnackBar('Could not load existing activities.', 'error');
+    }
+  });
+}
+
+private parseNicCode(fullString: string): { code: string; desc: string } {
+  if (!fullString) return { code: '', desc: '' };
+  const separatorIndex = fullString.indexOf(' - ');
+  if (separatorIndex === -1) {
+    return { code: fullString.trim(), desc: '' };
+  }
+  return {
+    code: fullString.slice(0, separatorIndex).trim(),
+    desc: fullString.slice(separatorIndex + 3).trim() 
+  };
+}
+
+
+private buildPayload(isDraft: boolean): any {
+  if (this.activities.length === 0) {
+    this.apiService.openSnackBar('Please add at least one NIC code.', 'error');
+    return null;
   }
 
- private buildPayload(isDraft: boolean): any {
-  const payload: any = {
-    nic_codes: this.activities.map(activity => ({
-      nic_2_digit_code: String(activity.nic_2_digit_code),
-      nic_2_digit_code_description: activity.nic_2_digit_code_description,
-      nic_4_digit_codes: activity.nic_4_digit_codes.map(four => ({
-        nic_4_digit_code: String(four.nic_4_digit_code),
-        nic_4_digit_code_description: four.nic_4_digit_code_description,
-        nic_5_digit_codes: four.nic_5_digit_codes.map(five => ({
-          nic_5_digit_code: String(five.nic_5_digit_code),
-          nic_5_digit_code_description: five.nic_5_digit_code_description
-        }))
-      }))
-    }))
+  const lastActivity = this.activities[this.activities.length - 1];
+  const fourDigit = lastActivity.nic_4_digit_codes[0];
+  const fiveDigit = fourDigit.nic_5_digit_codes[0];
+
+  const activityOfEnterprise = this.activityForm.get('companyActivity')?.value || 'Manufacturing';
+
+  const payload = {
+    activity_of_enterprise: activityOfEnterprise,
+    nic_2_digit_code: `${lastActivity.nic_2_digit_code} - ${lastActivity.nic_2_digit_code_description}`,
+    nic_4_digit_code: `${fourDigit.nic_4_digit_code} - ${fourDigit.nic_4_digit_code_description}`,
+    nic_5_digit_code: `${fiveDigit.nic_5_digit_code} - ${fiveDigit.nic_5_digit_code_description}`
   };
 
   if (isDraft) {
-    payload.save_data = '1';
+    (payload as any).save_data = '1';
   }
 
   return payload;
 }
 
+
+//  private buildPayload(isDraft: boolean): any {
+//   const activityOfEnterprise = this.activityForm.get('companyActivity')?.value || '';
+
+//   const nicCodes = this.activities.flatMap((activity: NicEntry) =>
+//     activity.nic_4_digit_codes.flatMap((fourDigit) =>
+//       fourDigit.nic_5_digit_codes.map((fiveDigit) => ({
+//         activity_of_enterprise: activityOfEnterprise,
+//         nic_2_digit_code: ` ${activity.nic_2_digit_code_description}`,
+//         nic_4_digit_code: ` ${fourDigit.nic_4_digit_code_description}`,
+//         nic_5_digit_code: ` ${fiveDigit.nic_5_digit_code_description}`
+//       }))
+//     )
+//   );
+
+//   const payload: any = {  nicCodes };
+
+//   if (isDraft) {
+//     payload.save_data = '1';
+//   }
+
+//   return payload;
+// } 
+
   // --- Save as Draft ---
   saveAsDraft(): void {
     const payload = this.buildPayload(true);
-    this.submitToBackend(payload, 'api/nic-digit-code-store', true);
+    this.submitToBackend(payload, 'api/caf/activity-store', true);
   }
 
   // --- Submit ---
@@ -304,7 +360,7 @@ export class ActivitiesComponent implements OnInit {
     }
 
     const payload = this.buildPayload(false);
-    this.submitToBackend(payload, 'api/nic-digit-code-store', false);
+    this.submitToBackend(payload, 'api/caf/activity-store', false);
   }
 
   lastItem(array: any[], item: any): boolean {

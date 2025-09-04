@@ -71,8 +71,8 @@ export class IlogiInputDateComponent
   @Input() errors: { [key: string]: any } | null = null;
 
   @Input() monthsRange: number = 6;
-  @Input() futureDateErrorMessage: string =
-    'Future dates are not allowed. Please select a date within the allowed range.';
+  // @Input() futureDateErrorMessage: string =
+  //   'Future dates are not allowed. Please select a date within the allowed range.';
   @Input() pastDateErrorMessage: string =
     'Date must be within the allowed range. Please select a more recent date.';
   @Input() allowFutureDates: boolean = false;
@@ -138,13 +138,13 @@ export class IlogiInputDateComponent
   }
 
   private updateErrorMessages(): void {
-    if (this.futureDateErrorMessage.includes('allowed range')) {
-      if (this.allowFutureDates && this.futureMonthsRange > 0) {
-        this.futureDateErrorMessage = `Future dates beyond ${this.futureMonthsRange} months are not allowed. Please select a date within the allowed range.`;
-      } else {
-        this.futureDateErrorMessage = `Future dates are not allowed. Please select a date within the last ${this.monthsRange} months.`;
-      }
-    }
+    // if (this.futureDateErrorMessage.includes('allowed range')) {
+    //   if (this.allowFutureDates && this.futureMonthsRange > 0) {
+    //     this.futureDateErrorMessage = `Future dates beyond ${this.futureMonthsRange} months are not allowed. Please select a date within the allowed range.`;
+    //   } else {
+    //     this.futureDateErrorMessage = `Future dates are not allowed. Please select a date within the last ${this.monthsRange} months.`;
+    //   }
+    // }
 
     if (this.pastDateErrorMessage.includes('allowed range')) {
       this.pastDateErrorMessage = `Date must be within the last ${this.monthsRange} months. Please select a more recent date.`;
@@ -197,9 +197,8 @@ onDateChange(value: Date | null): void {
     pastLimitDate.setFullYear(pastLimitDate.getFullYear() - 100);
     pastLimitDate.setHours(0, 0, 0, 0);
 
-    // ✅ Future date validation
     if (!this.allowFutureDates && selectedDate > today) {
-      this.dateRangeError = this.futureDateErrorMessage;
+      // this.dateRangeError = this.futureDateErrorMessage;
       this.value = null;
       this.onChange(null);
       this.cdr.detectChanges();
@@ -210,7 +209,7 @@ onDateChange(value: Date | null): void {
       futureLimitDate.setHours(23, 59, 59, 999);
 
       if (selectedDate > futureLimitDate) {
-        this.dateRangeError = this.futureDateErrorMessage;
+        // this.dateRangeError = this.futureDateErrorMessage;
         this.value = null;
         this.onChange(null);
         this.cdr.detectChanges();
@@ -218,7 +217,6 @@ onDateChange(value: Date | null): void {
       }
     }
 
-    // ✅ Past date validation (100 years limit)
     if (selectedDate < pastLimitDate) {
       this.dateRangeError = `Date cannot be older than 100 years`;
       this.value = null;

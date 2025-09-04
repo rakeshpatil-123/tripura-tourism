@@ -1,0 +1,10 @@
+<div class="swgt-container">
+  <app-dynamic-table
+    [data]="ApplicationData"
+    [columns]="ApplicationColumns"
+    [searchable]="true"
+    [pageSize]="5"
+    [showPagination]="true"
+    (rowAction)="handleRowAction($event)"
+  ></app-dynamic-table>
+</div>

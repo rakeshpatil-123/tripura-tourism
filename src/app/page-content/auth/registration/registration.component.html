@@ -22,7 +22,7 @@
 
           <!-- Mobile -->
           <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
-            placeholder="Enter mobile number" type="tel"></app-ilogi-input>
+            placeholder="Enter mobile number" type="number"></app-ilogi-input>
 
           <!-- Username -->
           <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
@@ -47,11 +47,11 @@
         <div class="enterprise-form">
           <!-- Password -->
           <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
-            type="password" placeholder="Enter password"></app-ilogi-input>
+            type="text" placeholder="Enter password"></app-ilogi-input>
 
           <!-- Confirm Password -->
           <app-ilogi-input fieldId="confirmPassword" fieldLabel="Confirm Password" [mandatory]="true"
-            formControlName="confirmPassword" type="password" placeholder="Re-enter password"
+            formControlName="confirmPassword" type="text" placeholder="Re-enter password"
             errorMessage="Passwords do not match"></app-ilogi-input>
         </div>
         <!-- Submit Button -->

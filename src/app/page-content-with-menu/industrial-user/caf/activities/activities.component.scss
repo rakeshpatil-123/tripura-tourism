@@ -107,6 +107,20 @@ label {
     opacity: 0.6;
   }
 }
+.btn-success {
+  border: none;
+  padding: 0.375rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  font-weight: 500;
+
+
+
+  &:disabled {
+    background-color: #6c757d;
+    opacity: 0.6;
+  }
+}
 
 // Search input
 #search {
@@ -144,4 +158,8 @@ label {
     font-size: 0.8125rem;
     padding: 0.35rem 0.8rem;
   }
+}
+
+th{
+  background-color: #cfe2ff;
 }

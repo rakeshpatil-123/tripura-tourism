@@ -85,7 +85,7 @@
 
 :host ::ng-deep .p-floatlabel input,
 :host ::ng-deep .p-floatlabel  .p-textarea {
-  height: 32px;
+  // height: 32px;
   // width: 200px;
   padding: 10px 8px;
   font-size: 0.8rem; 
@@ -116,6 +116,63 @@
   color: #2C82AA;
   padding: 0 4px; 
 }
+.required-indicator {
+  color: var(--color-poppy-red, #dc3545);
+  margin-left: 0.25rem;
+}
+
+:host ::ng-deep .p-floatlabel {
+  font-size: 0.85rem; 
+  background-color: transparent;
+}
+
+:host ::ng-deep .p-floatlabel input,
+:host ::ng-deep .p-floatlabel .p-textarea {
+  padding: 10px 8px;
+  font-size: 0.8rem; 
+  background-color: #fff;
+  color: #3b3b3b;
+  border: 1px solid #b8b8b8;
+  
+  /* ✅ Style for readonly */
+  &[readonly] {
+    background-color: #f5f5f5; /* Light gray background */
+    color: #666;              /* Darker text */
+    cursor: not-allowed;      /* Show not-allowed cursor */
+    opacity: 0.9;             /* Slightly faded */
+    
+    &:focus {
+      border-color: #b8b8b8;  /* Keep border same as normal */
+      outline: none;          /* No focus outline */
+    }
+  }
+}
+
+:host ::ng-deep .p-floatlabel label {
+  color: #2C82AA; 
+  font-size: 0.75rem; 
+  background-color: #fff !important;
+}
+
+:host ::ng-deep .p-floatlabel input::placeholder {
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 500;
+}
+
+:host ::ng-deep .p-floatlabel input:focus,
+:host ::ng-deep .p-floatlabel textarea:focus {
+  border: 1px solid #2C82AA;
+}
+
+:host ::ng-deep .p-floatlabel input:focus ~ label,
+:host ::ng-deep .p-floatlabel input.p-filled ~ label,
+:host ::ng-deep .p-floatlabel textarea:focus ~ label {
+  background-color: white;
+  color: #2C82AA;
+  padding: 0 4px; 
+}
+
 .required-indicator {
   color: var(--color-poppy-red, #dc3545);
   margin-left: 0.25rem;

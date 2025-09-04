@@ -58,6 +58,21 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           ),
       },
       {
+        path: 'services',
+        loadComponent: () =>
+          import('./industrial-user/allServices/services.component').then(
+            (m) => m.ServicesComponent
+          ),
+      },
+      {
+        path: 'service-application/:id',
+        loadComponent: () =>
+          import(
+            './industrial-user/service-application/service-application.component'
+          ).then((m) => m.ServiceApplicationComponent),
+      },
+   
+      {
         path: 'upload-existing-licence',
         loadComponent: () =>
           import(
@@ -83,6 +98,13 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         loadComponent: () =>
           import('./user-profile/user-profile.component').then(
             (m) => m.UserProfileComponent
+          ),
+      },
+      {
+        path: 'admin-services',
+        loadComponent: () =>
+          import('./admin-services/admin-services.component').then(
+            (m) => m.AdminServicesComponent
           ),
       },
     ],

@@ -116,16 +116,42 @@ export class GenericService {
   //   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams);
   // }
 
+/**
+ * Get decrypted user ID from localStorage
+ * @returns string - decrypted user ID or null if not found
+ */
+getDecryptedUserId(): string | null {
+  try {
+    const encryptedId = localStorage.getItem('id');
+    if (!encryptedId) {
+      console.warn('User ID not found in localStorage');
+      return null;
+    }
+    
+    // Decrypt the ID using existing decryptData method
+    const decryptedId = this.decryptData(encryptedId);
+    return decryptedId;
+  } catch (error) {
+    console.error('Failed to decrypt user ID:', error);
+    return null;
+  }
+}
+
   getByConditions(conditionParams: any, apiObject: string): Observable<any> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
+    // console.log(token,"token");
+    
 
     if (token) {
       headers = headers.set(
         'Authorization',
         `Bearer ${this.decryptData(token)}`
       );
+      console.log(headers, "headers");
+      
     }
+
 
 
     return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
@@ -133,18 +159,18 @@ export class GenericService {
     });
   }
 
-// getDataByConditions(queryParams: any, apiObject: string): Observable<any> {
-//   const token = localStorage.getItem('token'); 
-//   let headers = new HttpHeaders();
+  // getDataByConditions(queryParams: any, apiObject: string): Observable<any> {
+  //   const token = localStorage.getItem('token');
+  //   let headers = new HttpHeaders();
 
 //   if (token) {
 //     headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
 //   }
 
-//   let params = new HttpParams();
-//   Object.keys(queryParams).forEach(key => {
-//     params = params.set(key, queryParams[key]);
-//   });
+  //   let params = new HttpParams();
+  //   Object.keys(queryParams).forEach(key => {
+  //     params = params.set(key, queryParams[key]);
+  //   });
 
 //   return this.http.post(`${this.baseUrl}/${apiObject}`, { headers, params });
 // }
@@ -240,7 +266,7 @@ export class GenericService {
   }
 
   storeSessionData(response: any, rememberme: boolean): void {
-    if (response['user'] && response['token']) {
+    if (response['data'] && response['token']) {
       // Clear existing storage
       localStorage.clear();
 
@@ -261,11 +287,11 @@ export class GenericService {
       ];
 
       keysToStore.forEach((key) => {
-        if (response['user'][key] || response[key]) {
+        if (response['data'][key] || response[key]) {
           const value =
-            typeof response['user'][key] === 'object'
-              ? JSON.stringify(response['user'][key])
-              : this.encryptData(response['user'][key] || response[key]);
+            typeof response['data'][key] === 'object'
+              ? JSON.stringify(response['data'][key])
+              : this.encryptData(response['data'][key] || response[key]);
           localStorage.setItem(key, value);
         }
       });
@@ -570,5 +596,205 @@ export class GenericService {
         );
       }
     }
+  }
+
+  getAdminServices() {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/fetch-all-services`,
+      {},
+      { headers }
+    );
+  }
+
+  addNewService(body: any) {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Accept-Language', 'en-US,en;q=0.7');
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(this.baseUrl + '/api/service-master-store', body, {
+      headers,
+    });
+  }
+  getUpdationDataServiceAdmin(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept-Language': 'en-US,en;q=0.7',
+    });
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/fetch-service-details`,
+      body,
+      { headers }
+    );
+  }
+
+  updateAdminService(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(`${this.baseUrl}/api/service-master-update`, body, {
+      headers,
+    });
+  }
+
+  deleteAdminService(serviceId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(
+      `${this.baseUrl}/api/service-master-delete`,
+      { id: serviceId },
+      { headers }
+    );
+  }
+
+  saveQuestionnaire(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/service-questionnaire-store`,
+      payload,
+      { headers }
+    );
+  }
+
+  updateQuestionnaire(payload: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/service-questionnaire-update`,
+      payload,
+      { headers }
+    );
+  }
+
+  getServiceQuestionnaires(service_id: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/service-questionnaire-view`,
+      { service_id: service_id },
+      { headers }
+    );
+  }
+
+  deleteServiceQuestionnaires(serviceId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/service-questionnaire-delete`,
+      { id: serviceId },
+      { headers }
+    );
+  }
+
+  getColumns(table: string): Observable<string[]> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<string[]>(
+      `${this.baseUrl}/api/table-columns`,
+      { table },
+      { headers }
+    );
+  }
+
+  deleteDepartment(departmentId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.request(
+      'delete',
+      `${this.baseUrl}/api/department-destroy-department`,
+      {
+        body: { id: departmentId },
+        headers,
+      }
+    );
   }
 }

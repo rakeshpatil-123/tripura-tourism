@@ -1,0 +1,100 @@
+<div class="admin-services-container">
+  <div class="header">
+    <h1>Admin Services</h1>
+    <button color="accent" class="submit-btn" mat-raised-button (click)="openAddServiceDialog()">
+      <mat-icon>add</mat-icon> <span>Add New Service</span>
+    </button>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 custom-table">
+    <ng-container matColumnDef="sno">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let element; let i = index">
+        {{ i + 1 }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Service Name </th>
+      <td mat-cell *matCellDef="let element" matTooltip="{{element.name}}">
+        {{element.name}}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="department">
+      <th mat-header-cell *matHeaderCellDef> Department Name </th>
+      <td mat-cell *matCellDef="let element" matTooltip="{{element.department}}"> {{element.department}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="noc_type">
+      <th mat-header-cell *matHeaderCellDef> NOC Type </th>
+      <td mat-cell *matCellDef="let element" matTooltip="{{element.noc_type}}"> {{element.noc_type}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="activeFrom">
+      <th mat-header-cell *matHeaderCellDef> Active From </th>
+      <td mat-cell *matCellDef="let element" matTooltip="{{element.activeFrom | date}}"> {{element.activeFrom | date}}
+      </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="center-header"> Actions </th>
+      <td mat-cell *matCellDef="let element" class="actions-cell center-cell">
+        <button mat-icon-button color="primary" (click)="viewService(element)" matTooltip="View {{element.name}}">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button mat-icon-button color="accent" (click)="editService(element)" matTooltip="Edit {{element.name}}">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteService(element)" matTooltip="Delete {{element.name}}">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="questionnaire">
+      <th mat-header-cell *matHeaderCellDef class="center-header"> Questionnaire </th>
+      <td mat-cell *matCellDef="let element" class="questionnaire-cell center-cell">
+        <button mat-icon-button color="primary" (click)="addOrEditQuestionnaire(element, 'add')"
+          matTooltip="Add Questionnaire">
+          <mat-icon>post_add</mat-icon>
+        </button>
+
+        <button mat-icon-button color="accent" (click)="viewQuestionnaire(element)" matTooltip="View Questionnaires">
+          <mat-icon>assignment</mat-icon>
+        </button>
+
+        <!-- Edit -->
+        <!-- <button mat-icon-button color="primary" 
+            (click)="addOrEditQuestionnaire(element, 'edit')" 
+            matTooltip="Edit Questionnaire">
+      <mat-icon>edit_note</mat-icon>
+    </button> -->
+
+        <!-- Delete -->
+        <!-- <button mat-icon-button color="warn" 
+            (click)="deleteQuestionnaire(element)" 
+            matTooltip="Delete Questionnaires">
+      <mat-icon>delete_forever</mat-icon>
+    </button> -->
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="service_fee_rule">
+      <th mat-header-cell *matHeaderCellDef class="center-header"> Service Fee Rule </th>
+      <td mat-cell *matCellDef="let element" class="questionnaire-cell center-cell">
+        <button mat-icon-button color="primary" (click)="addOrEditServiceFeeRule(element, 'add')"
+          matTooltip="Add Service Fee Rule">
+          <mat-icon>post_add</mat-icon>
+        </button>
+
+        <button mat-icon-button color="accent" (click)="viewServiceFeeRule()" matTooltip="View Service Fee Rule">
+          <mat-icon>assignment</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="row-hover"></tr>
+
+  </table>
+</div>

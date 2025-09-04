@@ -8,7 +8,7 @@ import { NewTimelineComponent } from './new-timeline/new-timeline.component';
 import { NewQuickAccessToolsComponent } from './new-quick-access-tools/new-quick-access-tools.component';
 import { NewPerformanceAnalyticsComponent } from './new-performance-analytics/new-performance-analytics.component';
 import { UserExperienceSuccessStoriesComponent } from './user-experience-success-stories/user-experience-success-stories.component';
-import { NewOneStopInformationHubComponent } from './new-one-stop-information-hub/new-one-stop-information-hub.component';
+// import { NewOneStopInformationHubComponent } from './new-one-stop-information-hub/new-one-stop-information-hub.component';
 
 @Component({
   selector: 'app-home-new',
@@ -23,7 +23,7 @@ import { NewOneStopInformationHubComponent } from './new-one-stop-information-hu
     NewQuickAccessToolsComponent,
     NewPerformanceAnalyticsComponent,
     UserExperienceSuccessStoriesComponent,
-    NewOneStopInformationHubComponent,
+    // NewOneStopInformationHubComponent,
   ],
   templateUrl: './home-new.component.html',
   styleUrl: './home-new.component.scss',

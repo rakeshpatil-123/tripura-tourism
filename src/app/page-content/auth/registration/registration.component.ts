@@ -22,7 +22,7 @@ export class RegistrationComponent {
   registrationForm: FormGroup;
 
   userTypeOptions = [
-    { value: 'Individual', name: 'Individual', id: 'Individual' }
+    { value: 'individual', name: 'Individual', id: 'individual' }
   ];
 
   constructor(
