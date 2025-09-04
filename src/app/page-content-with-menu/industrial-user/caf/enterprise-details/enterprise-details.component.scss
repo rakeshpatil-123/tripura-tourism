@@ -129,3 +129,16 @@ row-gap: 2rem;
     opacity: 0.6;
   }
 }
+
+.is-invalid {
+  border: 1px solid red !important;
+}
+
+.text-danger {
+  color: red;
+  font-size: 0.875em;
+}
+.error-msg {
+  color: red;
+  font-size: 0.785em;
+}

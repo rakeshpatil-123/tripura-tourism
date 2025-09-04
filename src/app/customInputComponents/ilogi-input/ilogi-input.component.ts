@@ -331,11 +331,10 @@ onInputChange(event: Event): void {
 
   if (this.type === 'number') {
     value = value === '' ? null : parseFloat(value);
-    // Don't set input value to null — keep it as string for binding
   }
 
-  this.value = value; // Store as number/null internally
-  this.onChange(this.value); // Send number/null to form control
+  this.value = value; 
+  this.onChange(this.value); 
   this.onTouched();
 }
 

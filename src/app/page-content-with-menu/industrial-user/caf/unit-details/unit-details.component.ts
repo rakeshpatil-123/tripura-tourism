@@ -604,4 +604,39 @@ onDistrictChange(district: string): void {
         },
       });
   }
+
+getErrorMessage(fieldName: string): string {
+  const control = this.form.get(fieldName);
+  if (control?.errors && (control.touched || this.submitted)) {
+    if (control.errors['required']) {
+      return `${this.getFieldLabel(fieldName)} is required`;
+    }
+    if (control.errors['pattern']) {
+      switch (fieldName) {
+        case 'pinNo':  
+          return 'Pin must be 6 digits';
+        case 'contactNo':  
+          return 'Mobile must be 10 digits';
+        case 'email':  
+          return 'Please enter valid email';
+        default:
+          return 'Invalid format';
+      }
+    }
+    if (control.errors['email']) {
+      return 'Please enter a valid email';
+    }
+  }
+  return '';
+}
+
+getFieldLabel(fieldName: string): string {
+  const labels: { [key: string]: string } = {
+    pinNo: 'Pin',
+    email: 'Email',
+    contactNo: 'Mobile',  
+  };
+  return labels[fieldName] || fieldName;
+}
+
 }

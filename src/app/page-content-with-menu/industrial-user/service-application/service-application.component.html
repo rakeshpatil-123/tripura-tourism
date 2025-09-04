@@ -4,83 +4,53 @@
   <ng-container *ngIf="loading; else formTemplate">
     <div class="text-center">Loading form...</div>
   </ng-container>
-
   <ng-template #formTemplate>
-    <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-application-form">
 
       <!-- Render each group -->
+      <h1 class="page-head mb-2">Service Application</h1>
+      <hr>
       <div *ngFor="let group of Object.keys(groupedQuestions)" class="mb-5">
-        <h5 class="mb-4 info-head">{{ group }}</h5>
+
+        <h5 class="mb-2 info-head">{{ group }}</h5>
         <div class="row">
-          <div
-            *ngFor="let q of groupedQuestions[group]"
-            class="mb-3"
-            [style.width]="q.display_width"
-          >
+          <div *ngFor="let q of groupedQuestions[group]" class="mb-3" [style.width]="q.display_width">
             <!-- Text / Number / Email / Textarea -->
-            <app-ilogi-input
-              *ngIf="
+            <app-ilogi-input *ngIf="
                 q.question_type === 'text' ||
                 q.question_type === 'number' ||
                 q.question_type === 'email' ||
                 q.question_type === 'textarea'
-              "
-              [formControlName]="q.id"
-              [fieldLabel]="q.question_label"
-              [mandatory]="q.is_required === 'yes'"
-              [type]="q.question_type"
-              [errorMessages]="{
+              " [formControlName]="q.id" [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+              [type]="q.question_type" [errorMessages]="{
                 pattern: q.validation_rule?.errorMessage || 'Invalid input.'
-              }"
-              [readonly]="isFieldReadonly(q.id)"
-            ></app-ilogi-input>
+              }" [readonly]="isFieldReadonly(q.id)"></app-ilogi-input>
 
             <!-- Date -->
-            <app-ilogi-input-date
-              *ngIf="q.question_type === 'date'"
-              [formControlName]="q.id"
-              [fieldLabel]="q.question_label"
-              [mandatory]="q.is_required === 'yes'"
-              [submitted]="serviceForm.touched"
-               [readonly]="isFieldReadonly(q.id)" 
-            ></app-ilogi-input-date>
+            <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
+              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" [submitted]="serviceForm.touched"
+              [readonly]="isFieldReadonly(q.id)"></app-ilogi-input-date>
 
             <!-- File Upload -->
-            <app-ilogi-file-upload
-              *ngIf="q.question_type === 'file'"
-              [formControlName]="q.id"
-              [label]="q.question_label"
-              [accept]="q.validation_rule?.pattern || '*'"
-              [maxFileSize]="5 * 1024 * 1024"
-            ></app-ilogi-file-upload>
+            <app-ilogi-file-upload *ngIf="q.question_type === 'file'" [formControlName]="q.id"
+              [label]="q.question_label" [accept]="q.validation_rule?.pattern || '*'"
+              [maxFileSize]="5 * 1024 * 1024"></app-ilogi-file-upload>
 
             <!-- Radio -->
-            <app-ilogi-radio
-              *ngIf="q.question_type === 'radio' && q.options"
-              [formControlName]="q.id"
-              [fieldLabel]="q.question_label"
-              [mandatory]="q.is_required === 'yes'"
-              [radioOptions]="q.parsedOptions || []"
-            ></app-ilogi-radio>
+            <app-ilogi-radio *ngIf="q.question_type === 'radio' && q.options" [formControlName]="q.id"
+              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+              [radioOptions]="q.parsedOptions || []"></app-ilogi-radio>
 
             <!-- Select -->
-            <app-ilogi-select
-              *ngIf="q.question_type === 'select'"
-              [formControlName]="q.id"
-              [fieldLabel]="q.question_label"
-              [mandatory]="q.is_required === 'yes'"
+            <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
+              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
               [selectOptions]="convertToSelectOptionFormat(parseOptions(q.options))"
-              placeholder="Select..."
-            ></app-ilogi-select>
+              placeholder="Select..."></app-ilogi-select>
 
             <!-- Checkbox -->
-            <app-ilogi-checkbox
-              *ngIf="q.question_type === 'checkbox' && q.options"
-              [formControlName]="q.id"
-              [fieldLabel]="q.question_label"
-              [mandatory]="q.is_required === 'yes'"
-              [checkboxOptions]="q.parsedOptions || []"
-            ></app-ilogi-checkbox>
+            <app-ilogi-checkbox *ngIf="q.question_type === 'checkbox' && q.options" [formControlName]="q.id"
+              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+              [checkboxOptions]="q.parsedOptions || []"></app-ilogi-checkbox>
 
           </div>
         </div>

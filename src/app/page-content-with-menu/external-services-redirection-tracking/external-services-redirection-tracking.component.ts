@@ -24,7 +24,6 @@ interface FieldConfig {
   conditionalValue?: string;
   dateConfig?: {
     monthsRange?: number;
-    futureDateErrorMessage?: string;
     pastDateErrorMessage?: string;
   };
 }
@@ -201,7 +200,6 @@ export class ExternalServicesRedirectionTrackingComponent implements OnInit {
       },
       dateConfig: {
         monthsRange: 6,
-        futureDateErrorMessage: 'Date of death cannot be in the future.',
         pastDateErrorMessage: 'Date of death must be within the last 6 months.'
       }
     },
