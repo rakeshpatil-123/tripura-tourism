@@ -1,7 +1,7 @@
 .header-color {
   font-weight: 600;
-   color: #2C82AA;
-
+   color: #252525;
+font-size: 0.875rem;
 }
 
 .red-font {
@@ -71,7 +71,10 @@ hr {
 }
 
 th{
-    font-size: 0.9rem;
+    font-size: 0.785rem;
+      background-color: #2C82AA;
+  color: #fff;
+  font-weight: 600;
 }
 
 td{

@@ -1,30 +1,30 @@
 <form [formGroup]="form" novalidate>
 
   <div class="mt-2">
-    <span class="heder-color">GENERAL</span>
+    <span class="header-color">GENERAL</span>
   </div>
 
   <!-- Self Certification (Form III) -->
   <div class="row no-padding-first-last">
     <div class="col-md-4 mt-2">
       <div class="form-group form-group-margin">
-        <label for="selfCertification">Self Certification Form (Form III) <span class="red-font">*</span></label>
+        <label for="selfCertification">Self Certification Form (Form III) <span class="text-danger">*</span></label>
         <app-ilogi-file-upload [formControlName]="'selfCertification'" accept=".png,.jpg,.jpeg,.pdf"
           label="Choose File"></app-ilogi-file-upload>
       </div>
     </div>
-    <div class="col-md-4 mt-5">
+    <!-- <div class="col-md-4 mt-5">
       <a href="/assets/documents/Self Certification - Form III.docx" target="__blank" class="btn download-btn ml-1">
         Download Form III Sample
       </a>
-    </div>
+    </div> -->
   </div>
 
   <!-- Do you have trees? -->
   <div class="row no-padding-first-last mt-2">
     <div class="col-md-4">
       <div class="form-group form-group-margin">
-        <label>Do you have trees in the land for industry? <span class="red-font">*</span></label>
+        <label>Do you have trees in the land for industry? <span class="text-danger">*</span></label>
         <app-ilogi-radio [radioOptions]="yesNoOptions" [formControlName]="'haveTree'"
           [submitted]="submitted"></app-ilogi-radio>
       </div>
@@ -35,7 +35,7 @@
   <div class="row no-padding-first-last" *ngIf="form.get('haveTree')?.value === 'YES'">
     <div class="col-md-4">
       <div class="form-group form-group-margin">
-        <label>Type of Tree <span class="red-font">*</span></label>
+        <label>Type of Tree <span class="text-danger">*</span></label>
         <app-ilogi-radio [radioOptions]="[
             { value: 'EXEMPTED', name: 'Exempted' },
             { value: 'NON_EXEMPTED', name: 'Non-Exempted' }
@@ -48,7 +48,7 @@
   <div class="row no-padding-first-last mt-2" *ngIf="form.get('haveTree')?.value === 'YES'">
     <div class="col-md-4" *ngIf="form.get('typeOfTree')?.value === 'EXEMPTED'">
       <div class="form-group form-group-margin">
-        <label>Self Certificate Format 3A <span class="red-font">*</span></label>
+        <label>Self Certificate Format 3A <span class="text-danger">*</span></label>
         <app-ilogi-file-upload [formControlName]="'self_certificate_format_3A'" accept=".png,.jpg,.jpeg,.pdf"
           label="Upload File" (onRemove)="removeFile('self_certificate_format_3A')">
         </app-ilogi-file-upload>
@@ -57,7 +57,7 @@
 
     <div class="col-md-4" *ngIf="form.get('typeOfTree')?.value === 'NON_EXEMPTED'">
       <div class="form-group form-group-margin">
-        <label>Tree Registration Certificate <span class="red-font">*</span></label>
+        <label>Tree Registration Certificate <span class="text-danger">*</span></label>
         <app-ilogi-file-upload [formControlName]="'tree_registration_certificate'" accept=".png,.jpg,.jpeg,.pdf"
           label="Upload File" (onRemove)="removeFile('tree_registration_certificate')">
         </app-ilogi-file-upload>
@@ -75,7 +75,7 @@
     <!-- Owner PAN -->
     <div class="col-md-4">
       <div class="form-group form-group-margin">
-        <label>Owner PAN <span class="red-font">*</span></label>
+        <label>Owner PAN <span class="text-danger">*</span></label>
         <app-ilogi-file-upload [formControlName]="'owner_pan_pdf'" accept=".png,.jpg,.jpeg,.pdf"
           label="Choose File"></app-ilogi-file-upload>
       </div>

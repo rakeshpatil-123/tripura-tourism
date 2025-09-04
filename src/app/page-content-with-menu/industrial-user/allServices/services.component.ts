@@ -70,7 +70,7 @@ export class ServicesComponent {
       actions: [
         {
           label: 'Apply',
-          icon: 'add',
+          // icon: 'add',
           color: 'primary',
           onClick: (row: any) => {
             this.onApply(row);

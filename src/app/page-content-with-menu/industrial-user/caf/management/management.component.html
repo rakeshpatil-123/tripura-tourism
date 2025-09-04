@@ -28,9 +28,15 @@
       <app-ilogi-input fieldId="policeStation" fieldLabel="Police Station" [mandatory]="true"
         [formControlName]="'ownerDetailsPoliceStation'" placeholder="Enter police station"
         maxlength="255"></app-ilogi-input>
+      <div>
 
-      <app-ilogi-input fieldId="mobile" fieldLabel="Mobile" [mandatory]="true" [formControlName]="'ownerDetailsMobile'"
-        placeholder="Enter mobile number" maxlength="10"></app-ilogi-input>
+        <app-ilogi-input fieldId="mobile" fieldLabel="Mobile" [mandatory]="true"
+          [formControlName]="'ownerDetailsMobile'" placeholder="Enter mobile number" maxlength="10"></app-ilogi-input>
+
+        <div *ngIf="getErrorMessage('ownerDetailsMobile')" class="text-danger small mt-1">
+          {{ getErrorMessage('ownerDetailsMobile') }}
+        </div>
+      </div>
 
       <app-ilogi-input fieldId="alternateMobileNo" fieldLabel="Alternate Mobile No"
         [formControlName]="'ownerDetailsAlternateMobile'" placeholder="Enter alternate mobile number"

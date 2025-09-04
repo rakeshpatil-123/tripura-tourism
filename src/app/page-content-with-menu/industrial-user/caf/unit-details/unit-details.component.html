@@ -7,27 +7,29 @@
       [placeholder]="'Post Office'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Unit Address" formControlName="unitAddress" [mandatory]="true"
       [placeholder]="'Unit Address'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Contact No" formControlName="contactNo" [placeholder]="'Contact No'"></app-ilogi-input>
-    <app-ilogi-input fieldLabel="Email" formControlName="email" [placeholder]="'Email'"></app-ilogi-input>
+    <div>
+
+      <app-ilogi-input fieldLabel="Contact No" formControlName="contactNo"
+        [placeholder]="'Contact No'" maxlength="10" [mandatory]="true" ></app-ilogi-input>
+      <div *ngIf="getErrorMessage('contactNo')" class="error-msg">
+        {{ getErrorMessage('contactNo') }}
+      </div>
+    </div>
+    <div>
+
+      <app-ilogi-input fieldLabel="Email" formControlName="email" [placeholder]="'Email'"></app-ilogi-input>
+      <div *ngIf="getErrorMessage('email')" class="error-msg">
+        {{ getErrorMessage('email') }}
+      </div>
+    </div>
     <app-ilogi-input fieldLabel="Website" formControlName="website" [placeholder]="'Website'"></app-ilogi-input>
 
-   <app-ilogi-select
-  formControlName="district"
-  fieldLabel="District"
-  [selectOptions]="districtOptions"
-  placeholder="Select District"
-  [mandatory]="true"
-  (change)="onDistrictChange($event.value)"
-></app-ilogi-select>
-   <app-ilogi-select
-  formControlName="subDivision"
-  fieldLabel="Subdivision"
-  [selectOptions]="subDivisionOptions"
-  placeholder="Select Subdivision"
-  [mandatory]="true"
-  [disabled]="subDivisionOptions.length === 0"
-></app-ilogi-select>
-</div>
+    <app-ilogi-select formControlName="district" fieldLabel="District" [selectOptions]="districtOptions"
+      placeholder="Select District" [mandatory]="true" (change)="onDistrictChange($event.value)"></app-ilogi-select>
+    <app-ilogi-select formControlName="subDivision" fieldLabel="Subdivision" [selectOptions]="subDivisionOptions"
+      placeholder="Select Subdivision" [mandatory]="true"
+      [disabled]="subDivisionOptions.length === 0"></app-ilogi-select>
+  </div>
   <app-ilogi-radio fieldLabel="Area Type" formControlName="areaType" [radioOptions]="[
     {name:'Urban', value:'Urban'},
     {name:'Rural', value:'Rural'}
@@ -55,9 +57,15 @@
   </div>
 
 
-  <div class="form-grid mb-3" > 
-    <app-ilogi-input fieldLabel="Pin Code" formControlName="pinNo" [mandatory]="true"
-      [placeholder]="'Pin Code'"></app-ilogi-input>
+  <div class="form-grid mb-3">
+    <div>
+
+      <app-ilogi-input fieldLabel="Pin Code" formControlName="pinNo" [mandatory]="true"
+        [placeholder]="'Pin Code'" maxlength="6"></app-ilogi-input>
+      <div *ngIf="getErrorMessage('pinNo')" class="error-msg">
+        {{ getErrorMessage('pinNo') }}
+      </div>
+    </div>
     <app-ilogi-input fieldLabel="Fax" formControlName="fax" [placeholder]="'Fax'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Police Station" formControlName="policeStation" [mandatory]="true"
       [placeholder]="'Police Station'"></app-ilogi-input>
@@ -94,8 +102,8 @@
     <app-ilogi-select fieldLabel="Land Record Details Unit" formControlName="details_unit" [mandatory]="true"
       [placeholder]="'Unit'" [selectOptions]="land_record_details_unit"></app-ilogi-select>
 
-    <app-ilogi-input fieldLabel="Land Floor Building (Sq. Mtr)" formControlName="landFloor"
-      [placeholder]="'Land Floor Building (Sq. Mtr)'"></app-ilogi-input>
+    <!-- <app-ilogi-input fieldLabel="Land Floor Building (Sq. Mtr)" formControlName="landFloor"
+      [placeholder]="'Land Floor Building (Sq. Mtr)'"></app-ilogi-input> -->
     <app-ilogi-input fieldLabel="Sanitary Latrine Count" formControlName="sanitaryCount"
       [placeholder]="'Sanitary Latrine Count'"></app-ilogi-input>
     <app-ilogi-input fieldLabel="Boundary Wall (Mtr)" formControlName="boundaryWall"
@@ -120,7 +128,7 @@
     <app-ilogi-input fieldLabel="Product Manufacturing Process" formControlName="process" [mandatory]="true"
       [placeholder]="'Product Manufacturing Process'"></app-ilogi-input>
 
-        <app-ilogi-select fieldLabel="Category Enterprise" formControlName="category" [mandatory]="true"
+    <app-ilogi-select fieldLabel="Category Enterprise" formControlName="category" [mandatory]="true"
       [placeholder]="'Category Enterprise'" [selectOptions]="category_of_enterprise"></app-ilogi-select>
   </div>
 
