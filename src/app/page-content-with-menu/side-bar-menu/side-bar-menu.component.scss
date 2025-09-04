@@ -11,10 +11,10 @@ $mobile-breakpoint: 1024px;
 ====================== */
 .sidebar {
   position: fixed;
-  top: $top-navbar-height;
+  top: 10vh;
   left: 0;
   width: $sidebar-width-expanded;
-  height: calc(100vh - #{$top-navbar-height});
+  height: 90vh;
   background-color: var(--color-secondary, #ffffff);
   border-right: 1px solid var(--color-border-light, #e9ecef);
   z-index: 1000;
