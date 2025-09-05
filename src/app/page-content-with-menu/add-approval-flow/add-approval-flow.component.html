@@ -1,0 +1,72 @@
+<h2 class="header-service">
+  <mat-icon class="service-icon">work_outline</mat-icon>
+  {{ this.data.service?.name || this.data.row.service.name }}
+</h2>
+<div class="approval-flow-container" [formGroup]="approvalFlowForm">
+  <div class="header">
+    <div class="title">
+      <mat-icon>{{ mode === 'add' ? 'add_task' : 'edit_note' }}</mat-icon>
+      <h5>{{ mode === 'add' ? 'Add Approval Flow' : 'Edit Approval Flow' }}</h5>
+    </div>
+    <button mat-icon-button class="close-btn" (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <mat-form-field appearance="outline" class="full-width fade-in">
+    <mat-label>Service ID</mat-label>
+    <input matInput formControlName="service_id" type="number" placeholder="Enter Service ID" autocomplete="off" />
+    <mat-icon matSuffix color="primary">article</mat-icon>
+  </mat-form-field>
+
+  <div formArrayName="steps" class="steps-container">
+    <ng-container *ngFor="let step of steps.controls; let i = index" [formGroupName]="i">
+      <mat-card class="step-card mat-elevation-z3 fade-in-up">
+        <div class="step-header">
+          <h3><mat-icon>layers</mat-icon> Step {{ i + 1 }}</h3>
+          <button mat-icon-button color="warn" class="close-btn" (click)="removeStep(i)" *ngIf="steps.length > 1">
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        </div>
+
+        <!-- Step Type -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Step Type</mat-label>
+          <mat-select formControlName="step_type">
+            <mat-option *ngFor="let type of stepTypes" [value]="type">{{ type }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Department</mat-label>
+          <mat-select formControlName="department_id" placeholder="Select Department">
+            <mat-option *ngFor="let dept of departments" [value]="dept.id">
+              {{ dept.name }}
+            </mat-option>
+            <mat-option *ngIf="departments.length === 0" [value]="null" disabled>
+              No departments found
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="approvalFlowForm.get('department_id')?.hasError('required')">
+            Department is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Hierarchy Level</mat-label>
+          <mat-select formControlName="hierarchy_level">
+            <mat-option *ngFor="let level of hierarchyLevels" [value]="level">{{ level }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-card>
+    </ng-container>
+  </div>
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button color="accent" (click)="addStep()" class="add-step-btn">
+      <mat-icon>add_circle</mat-icon>
+      Add Step
+    </button>
+    <button mat-flat-button color="accent" class="submit-btn" (click)="submit()">
+      {{ mode === 'add' ? 'Save Flow' : 'Update Flow' }}
+    </button>
+  </mat-dialog-actions>
+</div>

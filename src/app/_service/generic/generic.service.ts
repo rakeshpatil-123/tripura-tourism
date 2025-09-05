@@ -629,7 +629,7 @@ getDecryptedUserId(): string | null {
       );
     }
 
-    return this.http.post(this.baseUrl + '/api/service-master-store', body, {
+    return this.http.post(this.baseUrl + '/api/admin/service-master-store', body, {
       headers,
     });
   }
@@ -666,7 +666,7 @@ getDecryptedUserId(): string | null {
       );
     }
 
-    return this.http.post(`${this.baseUrl}/api/service-master-update`, body, {
+    return this.http.post(`${this.baseUrl}/api/admin/service-master-update`, body, {
       headers,
     });
   }
@@ -683,7 +683,7 @@ getDecryptedUserId(): string | null {
     }
 
     return this.http.post(
-      `${this.baseUrl}/api/service-master-delete`,
+      `${this.baseUrl}/api/admin/service-master-delete`,
       { id: serviceId },
       { headers }
     );
@@ -700,7 +700,7 @@ getDecryptedUserId(): string | null {
       );
     }
     return this.http.post<any>(
-      `${this.baseUrl}/api/service-questionnaire-store`,
+      `${this.baseUrl}/api/admin/service-questionnaire-store`,
       payload,
       { headers }
     );
@@ -718,7 +718,7 @@ getDecryptedUserId(): string | null {
     }
 
     return this.http.post<any>(
-      `${this.baseUrl}/api/service-questionnaire-update`,
+      `${this.baseUrl}/api/admin/service-questionnaire-update`,
       payload,
       { headers }
     );
@@ -753,7 +753,7 @@ getDecryptedUserId(): string | null {
     }
 
     return this.http.post<any>(
-      `${this.baseUrl}/api/service-questionnaire-delete`,
+      `${this.baseUrl}/api/admin/service-questionnaire-delete`,
       { id: serviceId },
       { headers }
     );
@@ -777,7 +777,39 @@ getDecryptedUserId(): string | null {
     );
   }
 
-  deleteDepartment(departmentId: number): Observable<any> {
+  getAllDepartmentNames(): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department-get-all-departments`,
+      {},
+      { headers }
+    );
+  }
+
+  addDepartment(body: any) {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Accept-Language', 'en-US,en;q=0.7');
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(this.baseUrl + '/api/department-store-department', body, {
+      headers,
+    });
+  }
+
+  updateDepartment(body: any): Observable<any> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
 
@@ -788,13 +820,327 @@ getDecryptedUserId(): string | null {
       );
     }
 
-    return this.http.request(
-      'delete',
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department-update-department`,
+      body,
+      { headers }
+    );
+  }
+
+  getDepartmentDetails(departmentId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department-show-department`,
+      { id: departmentId },
+      { headers }
+    );
+  }
+
+
+  deleteDepartment(departmentId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+    }
+
+    return this.http.post(
       `${this.baseUrl}/api/department-destroy-department`,
-      {
-        body: { id: departmentId },
+      { id: departmentId },
+      { headers }
+    );
+  }
+
+
+
+
+  addServiceFeeRule(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(`${this.baseUrl}/api/admin/service-fee-rule-store`, body, {
         headers,
       }
+    );
+  }
+
+  updateServiceFeeRule(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-fee-rule-update`,
+      body,
+      { headers }
+    );
+  }
+
+  getServiceFeeRule(serviceId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/service-fee-rule-view`,
+      { service_id: serviceId },
+      { headers }
+    );
+  }
+
+  deleteServiceFeeRule(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    const body = { id };
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-fee-rule-delete`,
+      body,
+      { headers }
+    );
+  }
+
+  addRenewalCycle(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(`${this.baseUrl}/api/admin/renewal-cycle-store`, body, {
+      headers,
+    });
+  }
+
+  getRenewalCycle(serviceId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/renewal-cycle-view`,
+      { service_id: serviceId },
+      { headers }
+    );
+  }
+
+  updateRenewalCycle(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/renewal-cycle-update`,
+      body,
+      { headers }
+    );
+  }
+
+  deleteRenewalCycle(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    const body = { id };
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/renewal-cycle-delete`,
+      body,
+      { headers }
+    );
+  }
+
+  addRenewalFeeRule(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post(`${this.baseUrl}/api/admin/renewal-fee-rule-store`, body, {
+      headers,
+    });
+  }
+
+  getRenewalFeeRule(serviceId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/renewal-fee-rule-view`,
+      { service_id: serviceId },
+      { headers }
+    );
+  }
+
+  updateRenewalFeeRule(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/renewal-fee-rule-update`,
+      body,
+      { headers }
+    );
+  }
+
+  deleteRenewalFeeRule(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    const body = { id };
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/renewal-fee-rule-delete`,
+      body,
+      { headers }
+    );
+  }
+
+  getApprovalFlow(serviceId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post<any>(
+      `${this.baseUrl}/api/service-approval-flow-view`,
+      { service_id: serviceId },
+      { headers }
+    );
+  }
+
+
+  addApprovalFlow(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders().set('Accept', 'application/json');
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+    }
+
+    return this.http.post(`${this.baseUrl}/api/admin/service-approval-flow-store`, body, { headers });
+  }
+
+  updateApprovalFlow(body: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-approval-flow-update`,
+      body,
+      { headers }
+    );
+  }
+
+  deleteApprovalFlow(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    const body = { id };
+
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-approval-flow-delete`,
+      body,
+      { headers }
     );
   }
 }

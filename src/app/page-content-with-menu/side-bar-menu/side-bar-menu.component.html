@@ -13,8 +13,8 @@
   
   <div class="user-profile" *ngIf="!isCollapsed">
     <div class="user-info">
-      <div class="user-name">Joydeep Debnath</div>
-      <div class="user-role">{{ userRole.toUpperCase() }}</div>
+      <div class="user-name"><b>{{ userName }}</b></div>
+      <div class="user-role">{{ currentUserType.toUpperCase() }}</div>
     </div>
     <div class="user-status">
       <span class="status-indicator online"></span>

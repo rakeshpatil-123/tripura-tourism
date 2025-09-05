@@ -8,93 +8,123 @@
 
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 custom-table">
     <ng-container matColumnDef="sno">
-      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <th mat-header-cell *matHeaderCellDef>No.</th>
       <td mat-cell *matCellDef="let element; let i = index">
         {{ i + 1 }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Service Name </th>
+      <th mat-header-cell *matHeaderCellDef>Service Name</th>
       <td mat-cell *matCellDef="let element" matTooltip="{{element.name}}">
-        {{element.name}}
+        {{ element.name }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="department">
-      <th mat-header-cell *matHeaderCellDef> Department Name </th>
-      <td mat-cell *matCellDef="let element" matTooltip="{{element.department}}"> {{element.department}} </td>
+      <th mat-header-cell *matHeaderCellDef>Department</th>
+      <td mat-cell *matCellDef="let element" matTooltip="{{element.department_name}}">
+        {{ element.department_name }}
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="noc_type">
-      <th mat-header-cell *matHeaderCellDef> NOC Type </th>
-      <td mat-cell *matCellDef="let element" matTooltip="{{element.noc_type}}"> {{element.noc_type}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="activeFrom">
-      <th mat-header-cell *matHeaderCellDef> Active From </th>
-      <td mat-cell *matCellDef="let element" matTooltip="{{element.activeFrom | date}}"> {{element.activeFrom | date}}
+      <th mat-header-cell *matHeaderCellDef>NOC Type</th>
+      <td mat-cell *matCellDef="let element" matTooltip="{{element.noc_type}}">
+        {{ element.noc_type }}
       </td>
     </ng-container>
 
 
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef class="center-header"> Actions </th>
-      <td mat-cell *matCellDef="let element" class="actions-cell center-cell">
-        <button mat-icon-button color="primary" (click)="viewService(element)" matTooltip="View {{element.name}}">
-          <mat-icon>visibility</mat-icon>
-        </button>
-        <button mat-icon-button color="accent" (click)="editService(element)" matTooltip="Edit {{element.name}}">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="deleteService(element)" matTooltip="Delete {{element.name}}">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="questionnaire">
-      <th mat-header-cell *matHeaderCellDef class="center-header"> Questionnaire </th>
-      <td mat-cell *matCellDef="let element" class="questionnaire-cell center-cell">
-        <button mat-icon-button color="primary" (click)="addOrEditQuestionnaire(element, 'add')"
-          matTooltip="Add Questionnaire">
-          <mat-icon>post_add</mat-icon>
+      <th mat-header-cell *matHeaderCellDef class="center-header">Actions</th>
+      <td mat-cell *matCellDef="let element" class="center-cell">
+        <button mat-icon-button [matMenuTriggerFor]="mainMenu" matTooltip="More Actions">
+          <mat-icon>more_vert</mat-icon>
         </button>
 
-        <button mat-icon-button color="accent" (click)="viewQuestionnaire(element)" matTooltip="View Questionnaires">
-          <mat-icon>assignment</mat-icon>
-        </button>
+     <mat-menu #mainMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="serviceMenu">
+            <mat-icon>build_circle</mat-icon> Service Creation Form
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="questionnaireMenu">
+            <mat-icon>assignment</mat-icon> Service Questionnaires
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="feeRuleMenu">
+            <mat-icon>payments</mat-icon> Service Fee Rule
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="renewalCycleMenu">
+            <mat-icon>autorenew</mat-icon> Renewal Cycle
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="renewalFeeMenu">
+            <mat-icon>receipt_long</mat-icon> Renewal Fee Rule
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="approvalMenu">
+            <mat-icon>rule</mat-icon> Approval Flow
+          </button>
+        </mat-menu>
+        <mat-menu #serviceMenu="matMenu">
+          <button mat-menu-item (click)="handleAction('service','view',element)">
+            <mat-icon>visibility</mat-icon> View
+          </button>
+          <button mat-menu-item (click)="handleAction('service','add',element)">
+            <mat-icon>add_circle</mat-icon> Add
+          </button>
+          <button mat-menu-item (click)="handleAction('service','edit',element)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+        </mat-menu>
 
-        <!-- Edit -->
-        <!-- <button mat-icon-button color="primary" 
-            (click)="addOrEditQuestionnaire(element, 'edit')" 
-            matTooltip="Edit Questionnaire">
-      <mat-icon>edit_note</mat-icon>
-    </button> -->
+        <mat-menu #questionnaireMenu="matMenu">
+          <button mat-menu-item (click)="handleAction('questionnaire','view',element)">
+            <mat-icon>assignment</mat-icon> View
+          </button>
+          <button mat-menu-item (click)="handleAction('questionnaire','add',element)">
+            <mat-icon>post_add</mat-icon> Add
+          </button>
+        </mat-menu>
 
-        <!-- Delete -->
-        <!-- <button mat-icon-button color="warn" 
-            (click)="deleteQuestionnaire(element)" 
-            matTooltip="Delete Questionnaires">
-      <mat-icon>delete_forever</mat-icon>
-    </button> -->
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="service_fee_rule">
-      <th mat-header-cell *matHeaderCellDef class="center-header"> Service Fee Rule </th>
-      <td mat-cell *matCellDef="let element" class="questionnaire-cell center-cell">
-        <button mat-icon-button color="primary" (click)="addOrEditServiceFeeRule(element, 'add')"
-          matTooltip="Add Service Fee Rule">
-          <mat-icon>post_add</mat-icon>
-        </button>
+        <mat-menu #feeRuleMenu="matMenu">
+          <button mat-menu-item (click)="handleAction('feeRule','view',element)">
+            <mat-icon>assignment</mat-icon> View
+          </button>
+          <button mat-menu-item (click)="handleAction('feeRule','add',element)">
+            <mat-icon>add_circle</mat-icon> Add
+          </button>
+        </mat-menu>
 
-        <button mat-icon-button color="accent" (click)="viewServiceFeeRule()" matTooltip="View Service Fee Rule">
-          <mat-icon>assignment</mat-icon>
-        </button>
+        <mat-menu #renewalCycleMenu="matMenu">
+          <button mat-menu-item (click)="handleAction('renewalCycle','view',element)">
+            <mat-icon>assignment</mat-icon> View
+          </button>
+          <button mat-menu-item (click)="handleAction('renewalCycle','add',element)">
+            <mat-icon>autorenew</mat-icon> Add
+          </button>
+        </mat-menu>
+
+        <mat-menu #renewalFeeMenu="matMenu">
+          <button mat-menu-item (click)="handleAction('renewalFee','view',element)">
+            <mat-icon>assignment</mat-icon> View
+          </button>
+          <button mat-menu-item (click)="handleAction('renewalFee','add',element)">
+            <mat-icon>add_circle</mat-icon> Add
+          </button>
+        </mat-menu>
+
+        <mat-menu #approvalMenu="matMenu">
+          <button mat-menu-item (click)="handleAction('approvalFlow','view',element)">
+            <mat-icon>visibility</mat-icon> View
+          </button>
+          <button mat-menu-item (click)="handleAction('approvalFlow','add',element)">
+            <mat-icon>add_circle</mat-icon> Add
+          </button>
+          <!-- <button mat-menu-item (click)="handleAction('approvalFlow','edit',element)">
+            <mat-icon>edit</mat-icon> Edit
+          </button> -->
+        </mat-menu>
       </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="row-hover"></tr>
-
   </table>
 </div>

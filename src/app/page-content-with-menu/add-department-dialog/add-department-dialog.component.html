@@ -1,0 +1,73 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="title">
+      <mat-icon>
+        {{ mode === 'view' ? 'visibility' : mode === 'edit' ? 'edit' : 'add_circle' }}
+      </mat-icon>
+      <h3>
+        {{ mode === 'add' ? 'Add Department' : mode === 'edit' ? 'Update Department' : 'Department Details' }}
+      </h3>
+    </div>
+
+    <button mat-icon-button class="close-btn" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div *ngIf="mode === 'view'" class="view-container fade-in">
+    <div *ngIf="isLoadingDetails" class="loading">
+      <mat-icon class="spin">autorenew</mat-icon> Loading details...
+    </div>
+    <mat-card *ngIf="!isLoadingDetails && departmentDetails" class="details-card">
+      <div class="dept-header">
+        <mat-icon class="dept-icon">business</mat-icon>
+        <h2>Department Details</h2>
+      </div>
+
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Department ID:</span>
+          <span class="value">{{ departmentDetails.id }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Department Name:</span>
+          <span class="value">{{ departmentDetails.name }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Department Details:</span>
+          <span class="value desc">
+            {{ departmentDetails.details || 'No details available' }}
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <form *ngIf="mode !== 'view'" [formGroup]="departmentForm" (ngSubmit)="onSubmit()" class="dialog-form fade-in">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Department Name</mat-label>
+      <input matInput placeholder="Enter department name" formControlName="name" />
+      <mat-icon matSuffix color="primary">business</mat-icon>
+      <mat-error *ngIf="departmentForm.get('name')?.hasError('required')">
+        Department name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Details</mat-label>
+      <textarea matInput placeholder="Enter details" formControlName="details" rows="3"></textarea>
+      <mat-icon matSuffix color="primary">description</mat-icon>
+    </mat-form-field>
+
+    <div class="dialog-actions">
+      <button mat-raised-button type="button" class="cancel-btn" (click)="close()">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary" type="submit" class="submit-btn" [disabled]="isSubmitting">
+        {{ mode === 'add' ? 'Create' : 'Update' }}
+      </button>
+    </div>
+  </form>
+
+</div>

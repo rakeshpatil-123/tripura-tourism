@@ -14,6 +14,14 @@ import { AddQuestionnaireDialogComponent } from '../add-questionnaire-dialog/add
 import { ViewQuestionnairesDialogComponent } from '../view-questionnaires-dialog/view-questionnaires-dialog.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ServiceFeeRuleDialogComponent } from '../service-fee-rule-dialog/service-fee-rule-dialog.component';
+import { RenewalCycleComponent } from '../renewal-cycle/renewal-cycle.component';
+import { ViewServiceFeeRuleComponent } from '../view-service-fee-rule/view-service-fee-rule.component';
+import { ViewRenewalCycleDialogComponent } from '../view-renewal-cycle-dialog/view-renewal-cycle-dialog.component';
+import { ViewRenewalFeeRuleComponent } from '../view-renewal-fee-rule/view-renewal-fee-rule.component';
+import { AddRenewalFeeRuleComponent } from '../add-renewal-fee-rule/add-renewal-fee-rule.component';
+import { ViewApprovalFlowDialogComponent } from '../view-approval-flow-dialog/view-approval-flow-dialog.component';
+import { AddApprovalFlowComponent } from '../add-approval-flow/add-approval-flow.component';
+import { MatMenuModule } from "@angular/material/menu";
 
 export interface Service {
   department_id: string;
@@ -60,6 +68,7 @@ export interface Service {
     MatTooltipModule,
     MatButtonModule,
     MatCheckboxModule,
+    MatMenuModule
   ],
 })
 export class AdminServicesComponent implements OnInit, OnDestroy {
@@ -69,10 +78,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     'name',
     'department',
     'noc_type',
-    'activeFrom',
-    'actions',
-    'questionnaire',
-    'service_fee_rule',
+    'actions'
   ];
   dataSource = new MatTableDataSource<Service>([]);
 
@@ -98,7 +104,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
           this.dataSource.data = res.data.map((item: any) => ({
             ...item,
             name: item.service_title_or_description,
-            department: `Dept-${item.department_id}`,
+            department: item.department_id,
+            department_name: item.department_name,
             noc_type: item.noc_type,
             activeFrom: moment().format('YYYY-MM-DD'),
           }));
@@ -153,8 +160,10 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   deleteService(service: Service): void {
-    service;
+    if (!confirm(`Are you sure you want to delete "${service.service_title_or_description}"?`)) return;
+
     this.genericService.deleteAdminService((service as any).id).subscribe({
       next: () => {
         this.genericService.openSnackBar(
@@ -177,22 +186,42 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteDepartment(department: any) {
-    department;
-    // if (confirm(`Are you sure you want to delete "${department.name}"?`)) {
-    //   this.genericService.deleteDepartment(department.id).subscribe({
-    //     next: (res: any) => {
-    //       console.log('Department deleted successfully:', res);
-    //       this.loadServices();
-    //     },
-    //     error: (err: any) => {
-    //       console.error('Error deleting department:', err);
-    //     },
-    //   });
-    // }
+  handleAction(type: string, action: 'view' | 'add' | 'edit', service: Service) {
+    switch (type) {
+      case 'service':
+        if (action === 'view') this.viewService(service);
+        if (action === 'add') this.openAddServiceDialog();
+        if (action === 'edit') this.editService(service);
+        break;
+
+      case 'questionnaire':
+        if (action === 'view') this.viewQuestionnaire(service);
+        if (action === 'add') this.addOrEditQuestionnaire(service, 'add');
+        if (action === 'edit') this.addOrEditQuestionnaire(service, 'edit');
+        break;
+
+      case 'feeRule':
+        if (action === 'view') this.viewServiceFeeRule(service);
+        if (action === 'add') this.addOrEditServiceFeeRule(service, 'add');
+        break;
+
+      case 'renewalCycle':
+        if (action === 'view') this.viewRenewalCycle(service);
+        if (action === 'add') this.addOrEditRenewalCycle(service, 'add');
+        break;
+
+      case 'renewalFee':
+        if (action === 'view') this.viewRenewalFeeRule(service);
+        if (action === 'add') this.addOrEditRenewalFeeRule(service, 'add');
+        break;
+
+      case 'approvalFlow':
+        if (action === 'view') this.viewApprovalFlow(service);
+        if (action === 'add') this.addOrEditApprovalFlow(service, 'add');
+        break;
+    }
   }
 
-  // Questionnaire actions
   addOrEditQuestionnaire(service: Service, mode: 'add' | 'edit'): void {
     const dialogRef = this.dialog.open(AddQuestionnaireDialogComponent, {
       width: '75%',
@@ -220,34 +249,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteQuestionnaire(service: Service): void {
-    if (
-      confirm(
-        `Delete all questionnaires for "${service.service_title_or_description}"?`
-      )
-    ) {
-      this.genericService
-        .deleteServiceQuestionnaires((service as any).id)
-        .subscribe({
-          next: () => {
-            this.genericService.openSnackBar(
-              'Questionnaires deleted successfully.',
-              'Success'
-            );
-            this.loadServices();
-          },
-          error: () => {
-            this.genericService.openSnackBar(
-              'Error deleting questionnaires.',
-              'Error'
-            );
-          },
-        });
-    }
-  }
   addOrEditServiceFeeRule(service: Service, mode: 'add' | 'edit'): void {
-    service;
-    mode;
     const dialogRef = this.dialog.open(ServiceFeeRuleDialogComponent, {
       width: '75%',
       maxWidth: '90vw',
@@ -264,5 +266,96 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  viewServiceFeeRule(): void {}
+  viewServiceFeeRule(service: Service): void {
+    this.dialog.open(ViewServiceFeeRuleComponent, {
+      width: '100vw',
+      maxWidth: '100vw',
+      height: '100vh',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+  }
+
+  addOrEditRenewalCycle(service: Service, mode: 'add' | 'edit'): void {
+    const dialogRef = this.dialog.open(RenewalCycleComponent, {
+      width: '75%',
+      maxWidth: '50vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'center-dialog',
+      data: { service, mode },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+
+  viewRenewalCycle(service: Service): void {
+    this.dialog.open(ViewRenewalCycleDialogComponent, {
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+  }
+  addOrEditRenewalFeeRule(service: Service, mode: 'add' | 'edit'): void {
+    const dialogRef = this.dialog.open(AddRenewalFeeRuleComponent, {
+      width: '75%',
+      maxWidth: '75vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'center-dialog',
+      data: { service, mode },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+  viewRenewalFeeRule(service: Service): void {
+    this.dialog.open(ViewRenewalFeeRuleComponent, {
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+  }
+  addOrEditApprovalFlow(service: Service, mode: 'add' | 'edit'): void {
+    const dialogRef = this.dialog.open(AddApprovalFlowComponent, {
+      width: '85%',
+      maxWidth: '1000px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'approval-flow-dialog',
+      data: { service, mode },
+      autoFocus: false,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+  viewApprovalFlow(service: Service): void {
+    this.dialog.open(ViewApprovalFlowDialogComponent, {
+      width: '80vw',
+      maxWidth: '900px',
+      height: '80vh',
+      maxHeight: '700px',
+      panelClass: 'full-screen-dialog',
+      data: { service },
+    });
+  }
 }

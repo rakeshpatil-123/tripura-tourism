@@ -1,0 +1,186 @@
+.approval-flow-container {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f9fafb;
+}
+
+.approval-flow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1e3a8a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 28px;
+      color: #2563eb;
+    }
+  }
+}
+
+.animated-close-btn {
+  color: #e72929;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    color: #b91c1c;
+    transform: scale(1.08);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+
+.filter-field {
+  width: 100%;
+
+  mat-icon {
+    color: #2563eb;
+  }
+}
+
+.table-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    min-width: 650px;
+    border-spacing: 0;
+
+    th.mat-header-cell {
+      background-color: #3949ab;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    td.mat-cell {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .fade-in-row {
+      animation: fadeIn 0.4s ease-out;
+    }
+  }
+
+  mat-paginator {
+    margin-top: 15px;
+  }
+}
+
+.actions-header {
+  text-align: center !important;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 9px;
+  height: 100%;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #374151;
+  font-size: 20px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+  border-radius: 50%;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.icon-btn.edit:hover {
+  color: #059669;
+}
+
+.icon-btn.delete:hover {
+  color: #dc2626;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  color: #6b7280;
+
+  mat-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: #9ca3af;
+  }
+
+  p {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .approval-flow-container {
+    padding: 15px;
+
+    .approval-flow-header h2 {
+      font-size: 22px;
+    }
+
+    .table-container {
+      padding: 15px;
+    }
+  }
+}
+
+.header-color {
+  font-weight: 999;
+  color: #000000;
+  font-size: 0.875rem;
+}

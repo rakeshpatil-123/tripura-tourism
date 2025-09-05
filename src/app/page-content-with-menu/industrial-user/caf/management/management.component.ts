@@ -219,7 +219,6 @@ export class ManagementComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.ownerPhotoPreview = e.target.result;
-        // debugger;
         this.form.get('ownerDetailsPhoto')?.setValue(file);
       };
       reader.readAsDataURL(file);
