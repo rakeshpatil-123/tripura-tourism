@@ -152,8 +152,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       per_unit_fee: raw.per_unit_fee ? String(raw.per_unit_fee) : null,
       priority: String(raw.priority ?? 1),
       status: String(raw.status ?? '1'),
-      service_id: String(this.data.rules.service_id ?? this.data.service?.id ?? raw.service_id ?? '1'),
-      renewal_cycle_id: this.data.mode === 'edit' ? String(this.apiRules[0].renewal_cycle_id) : String(raw.renewal_cycle_id ?? null),
+      service_id: String(this.data?.rules?.service_id ?? this.data?.service?.id ?? raw?.service_id ?? 1),
+      renewal_cycle_id: this.data.mode === 'edit' ? (this.apiRules[0].renewal_cycle_id) : (raw.renewal_cycle_id ?? null),
       rules: raw.rules ?? 'base_fee + (units * per_unit_fee)',
       created_at: this.data.mode === 'edit' ? this.apiRules[0].created_at : created_at,
     };
