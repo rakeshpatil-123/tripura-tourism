@@ -1,0 +1,49 @@
+<div class="applications-container">
+  <h2 class="page-head">Applications</h2>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center">
+    🔍 Loading applications...
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="!isLoading && columns.length === 0 && applications.length === 0" class="text-center text-muted">
+    <p>No applications found for this service.</p>
+  </div>
+
+  <!-- Table -->
+  <app-dynamic-table
+    *ngIf="!isLoading && columns.length > 0"
+    [data]="applications"
+    [columns]="columns"
+    [pageSize]="10"
+    [showPagination]="true"
+    [searchable]="true"
+  >
+  </app-dynamic-table>
+
+  <!-- Status Action Modal -->
+  <div *ngIf="statusModal.visible" class="modal-overlay">
+    <div class="modal-content">
+      <h3>{{ statusModal.title }}</h3>
+
+      <form [formGroup]="remarkForm" (ngSubmit)="onSubmitStatus()">
+        <app-ilogi-input
+          formControlName="remarks"
+          fieldLabel="Remarks"
+          [mandatory]="true"
+          placeholder="Enter remarks for this action"
+        ></app-ilogi-input>
+
+        <div class="modal-actions">
+          <button type="button" (click)="closeModal()" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="remarkForm.invalid" class="btn btn-primary">
+            Confirm
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

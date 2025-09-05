@@ -5,9 +5,8 @@
       <h2 class="title">New User Registration</h2>
       <p class="subtitle">Fill in your details to register</p>
 
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form ">
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form">
         <div class="enterprise-form">
-
           <!-- Enterprise Name -->
           <app-ilogi-input fieldId="name_of_enterprise" fieldLabel="Name of Enterprise" [mandatory]="true"
             formControlName="name_of_enterprise" placeholder="Enter enterprise name"></app-ilogi-input>
@@ -32,18 +31,45 @@
           <app-ilogi-input fieldId="registered_enterprise_city" fieldLabel="City" [mandatory]="true"
             formControlName="registered_enterprise_city" placeholder="Enter city"></app-ilogi-input>
         </div>
-<div class="single-field">
 
-  <!-- Address -->
-  <app-ilogi-input fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
-  [mandatory]="true" formControlName="registered_enterprise_address"
-  placeholder="Enter full address"></app-ilogi-input>
-  
-  
-  <!-- User Type -->
-  <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
-  [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
-</div>
+        <div class="single-field">
+          <!-- Address -->
+          <app-ilogi-input fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
+            [mandatory]="true" formControlName="registered_enterprise_address"
+            placeholder="Enter full address"></app-ilogi-input>
+          
+          <!-- District -->
+          <app-ilogi-select fieldId="district_id" fieldLabel="District" [mandatory]="true" 
+            formControlName="district_id" [selectOptions]="districts" 
+           placeholder="Select district">
+          </app-ilogi-select>
+
+          <!-- Subdivision -->
+          <app-ilogi-select fieldId="subdivision_id" fieldLabel="Subdivision" [mandatory]="true" 
+            formControlName="subdivision_id" [selectOptions]="subdivisions" 
+             placeholder="Select subdivision" 
+            [disabled]="!districts.length || loadingDistricts">
+          </app-ilogi-select>
+
+          <!-- ULB -->
+          <app-ilogi-select fieldId="ulb_id" fieldLabel="ULB" [mandatory]="true" 
+            formControlName="ulb_id" [selectOptions]="ulbs" 
+             placeholder="Select ULB" 
+            [disabled]="!subdivisions.length || loadingSubdivisions">
+          </app-ilogi-select>
+
+          <!-- Ward -->
+          <app-ilogi-select fieldId="ward_id" fieldLabel="Ward" [mandatory]="true" 
+            formControlName="ward_id" [selectOptions]="wards" 
+             placeholder="Select ward" 
+            [disabled]="!ulbs.length || loadingUlbs">
+          </app-ilogi-select>
+
+          <!-- User Type -->
+          <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
+            [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
+        </div>
+
         <div class="enterprise-form">
           <!-- Password -->
           <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
@@ -54,6 +80,7 @@
             formControlName="confirmPassword" type="text" placeholder="Re-enter password"
             errorMessage="Passwords do not match"></app-ilogi-input>
         </div>
+
         <!-- Submit Button -->
         <div class="form-actions">
           <button type="submit" class="btn-submit btn btn-primary" [disabled]="!registrationForm.valid">
@@ -61,6 +88,7 @@
           </button>
         </div>
       </form>
+
       <span class="text-center small mt-2">Already Registered? <a href="/auth/login">Login</a></span>
     </div>
   </div>
