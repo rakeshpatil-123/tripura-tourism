@@ -72,7 +72,28 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
             './industrial-user/service-application/service-application.component'
           ).then((m) => m.ServiceApplicationComponent),
       },
-   
+      {
+        path: 'departmental-services',
+        loadComponent: () =>
+          import(
+            '../page-content-with-menu/departmental-services/departmental-services.component'
+          ).then((m) => m.DepartmentalServicesComponent),
+      },
+      {
+        path: 'all-service-application/:departmentId/:serviceId',
+        loadComponent: () =>
+          import(
+            '../page-content-with-menu/all-service-applications/applications.component'
+          ).then((m) => m.ApplicationsComponent),
+      },
+      {
+        path: 'service-view/:applicationId',
+        loadComponent: () =>
+          import('./service-view/service-view.component').then(
+            (m) => m.ServiceViewComponent
+          ),
+      },
+
       {
         path: 'upload-existing-licence',
         loadComponent: () =>

@@ -1,0 +1,39 @@
+<!-- Custom Modal Overlay -->
+<div class="modal-overlay" *ngIf="isVisible">
+    <div class="modal-wrapper">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <h3>Confirm Action</h3>
+                <button class="modal-close" (click)="onCancel()">&times;</button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <p>
+                    <strong>Are you sure you want to {{ getActionLabel() }} this application?</strong>
+                </p>
+
+                <div class="remarks-section">
+                    <label for="remarks">Remarks *</label>
+                    <app-ilogi-input type="textarea" fieldLabel="Remarks" placeholder="Enter your remarks..."
+                        formControlName="remarks" [mandatory]="true"  />
+                </div>
+
+                <div *ngIf="!remarks?.trim()" class="error">
+                    Remarks are required.
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="onCancel()">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" [disabled]="!remarks?.trim()" (click)="onSubmit()">
+                    {{ getActionLabel() }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
