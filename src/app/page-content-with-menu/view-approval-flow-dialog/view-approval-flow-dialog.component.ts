@@ -73,10 +73,10 @@ export class ViewApprovalFlowDialogComponent implements OnInit {
   editFlow(row: any) {
     row.service = this.data.service;
     const dialogRef = this.dialog.open(AddApprovalFlowComponent, {
-      width: '75%',
-      maxWidth: '27vw',
+      width: '85%',
+      maxWidth: '1000px',
       height: 'auto',
-      maxHeight: '96vh',
+      maxHeight: '90vh',
       panelClass: 'center-dialog',
       data: { row, mode: 'edit' },
     });
