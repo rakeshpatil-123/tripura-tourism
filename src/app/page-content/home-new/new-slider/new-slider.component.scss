@@ -46,7 +46,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-image: linear-gradient(to bottom right, rgba(248, 150, 3, 0.922), rgba(226, 222, 218, 0.949), rgba(255, 191, 0, 0.944));
+  background-image: linear-gradient(to bottom right, rgba(248, 150, 3, 0.705), rgba(226, 222, 218, 0.881), rgba(255, 191, 0, 0.629));
   z-index: 10;
 }
 
@@ -124,12 +124,12 @@
 
   @media (min-width: 640px) {
     font-size: 3rem;
-    line-height: 1;
+    line-height: 1.2;
   }
 
   @media (min-width: 1024px) {
     font-size: 3.75rem;
-    line-height: 1;
+    line-height: 1.2;
   }
 }
 

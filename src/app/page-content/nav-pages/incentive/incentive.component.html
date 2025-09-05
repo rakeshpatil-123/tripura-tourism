@@ -1,0 +1,225 @@
+<div class="container">
+  <header class="header">
+    <h1>Tripura Industrial Investment Promotion Incentive Scheme</h1>
+    <p>(Government of Tripura - Industrial Investment Promotion Scheme 2017)</p>
+  </header>
+
+  <div class="accordion" *ngFor="let section of accordionSections; let i = index">
+    <div class="accordion-header" [ngClass]="{'active': section.isOpen}" (click)="toggleAccordion(i)">
+      <div class="accordion-title">
+        <fa-icon [icon]="section.icon" class="accordion-icon"></fa-icon>
+        {{ section.title }}
+      </div>
+      <div class="accordion-toggle">{{ section.isOpen ? '+' : '+' }}</div>
+    </div>
+    <div class="accordion-content" [ngClass]="{'active': section.isOpen}">
+      <div class="accordion-body">
+        <ng-container [ngSwitch]="section.id">
+          <!-- General Information -->
+          <div *ngSwitchCase="'general-info'">
+            <p class="section-description">
+              Enterprise classification based on investment in plant & machinery and annual turnover:
+            </p>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Enterprise Category</th>
+                    <th>Investment in Plant & Annual Turnover</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Micro Enterprises</strong></td>
+                    <td>A micro enterprise, where the investment in plant and machinery or equipment does not exceed one crore rupees and turnover does not exceed five crore rupees.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Small Enterprises</strong></td>
+                    <td>A small enterprise, where the investment in plant and machinery or equipment does not exceed ten crore rupees and turnover does not exceed fifty crore rupees.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Medium Enterprises</strong></td>
+                    <td>A medium enterprise, where the investment in plant and machinery or equipment does not exceed fifty crore rupees and turnover does not exceed two hundred and fifty crore rupees.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Large Enterprises</strong></td>
+                    <td>A large enterprise, where the investment in plant and machinery or equipment is more than fifty crore rupees and turnover is more than two hundred and fifty crore rupees.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <a href="#" class="btn btn-success">
+              <fa-icon icon="download" class="btn-icon-img button-icon"></fa-icon>
+              Download Scheme Document (PDF)
+            </a>
+            <div class="alert">
+              <p class="alert-text"><strong>Important:</strong> The investment limits and turnover criteria determine your enterprise category and eligible benefits.</p>
+            </div>
+          </div>
+
+          <!-- Eligibility Certificates -->
+          <div *ngSwitchCase="'eligibility-certificates'">
+            <p class="section-description">
+              Choose the appropriate application form based on your enterprise age and benefit requirements:
+            </p>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Proforma No.</th>
+                    <th>Type</th>
+                    <th>Particulars</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Proforma I</strong></td>
+                    <td>More than 5 years</td>
+                    <td>Application Form for obtaining Eligibility Certificate</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Proforma IA</strong></td>
+                    <td>Less than 5 years</td>
+                    <td>Application Form for obtaining Eligibility Certificate for availing Incentive (except Procurement Preference and Exemption from Earnest Money and Security Deposits)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Proforma IB</strong></td>
+                    <td>Less than 5 years</td>
+                    <td>Application Form for obtaining Eligibility Certificate for availing Procurement Preference benefit.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Proforma IC</strong></td>
+                    <td>Less than 5 years</td>
+                    <td>Application Form for obtaining Eligibility Certificate in respect of Exemption from Earnest Money and Security Deposits.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Benefit Claims -->
+          <div *ngSwitchCase="'benefit-claims'">
+            <p class="section-description">
+              Application forms for claiming various industrial incentives and subsidies:
+            </p>
+            <h3 style="color: var(--primary-blue); margin: 1.5rem 0 1rem 0; font-size: 1.1rem;">
+              Prescribed Proforma for submission of Applications under Tripura Industrial Investment Promotion Claim (Amendment) Scheme, 2017
+            </h3>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Proforma No.</th>
+                    <th>Particulars</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Proforma II</td>
+                    <td>Application Form for claiming Capital Investment Subsidy</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma III</td>
+                    <td>Application Form for claiming Industrial Promotion Subsidy</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma IV</td>
+                    <td>Application Form for claiming Partial Re-imbursement of Power Charges</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma V</td>
+                    <td>Application Form for claiming Partial Re-imbursement of Interest on Working Capital Loan</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma VI</td>
+                    <td>Application Form for claiming Re-imbursement of Standard Certification Charges/ Fees</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma VII</td>
+                    <td>Application Form for claiming Employment Cost Subsidy</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma VIII</td>
+                    <td>Application Form for claiming on fees paid for credit guarantee coverage of loan under CGTMSE</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma IX</td>
+                    <td>Application Form for claiming Export Promotion Subsidy</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma X</td>
+                    <td>Application Form for claiming subsidy for participation in fares and exhibitions</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma XI</td>
+                    <td>Application Form for claiming State Transport Subsidy</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 style="color: var(--green); margin: 2rem 0 1rem 0; font-size: 1.1rem;">
+              Proforma of Application Forms for claiming of Special Incentives by Industrial Enterprises Which continued operation for 5 years
+            </h3>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Proforma No.</th>
+                    <th>Particulars</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Proforma II</td>
+                    <td>Application Form for claiming Capital Investment Subsidy</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma III</td>
+                    <td>Application Form for claiming Industrial Promotion Subsidy</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma IV</td>
+                    <td>Application Form for claiming Re-imbursement of Power Charges</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma V</td>
+                    <td>Application Form for claiming Employment Cost Subsidy</td>
+                  </tr>
+                  <tr>
+                    <td>Proforma VI</td>
+                    <td>Application Form for claiming Wages Subsidy</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- User Manual & Guidelines -->
+          <div *ngSwitchCase="'user-manual'">
+            <p class="section-description">
+              Complete step-by-step guide for applying and claiming industrial incentives:
+            </p>
+            <a href="#" class="btn btn-success">
+              <fa-icon icon="download" class="btn-icon-img button-icon"></fa-icon>
+              Download User Manual (PDF)
+            </a>
+          </div>
+
+          <!-- Apply Online -->
+          <div *ngSwitchCase="'apply-online'">
+            <div class="alert">
+              <p class="alert-text"><strong>Note:</strong> Ensure you have all required documents before starting your online application.</p>
+            </div>
+            <p class="section-description">
+              Submit your application through our secure online portal:
+            </p>
+            <a href="#" class="btn btn-primary">
+              <fa-icon icon="external-link-alt" class="btn-icon-img button-icon"></fa-icon>
+              Start Online Application
+            </a>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

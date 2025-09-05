@@ -11,11 +11,12 @@ import { ExternalServicesRedirectionTrackingComponent } from './page-content-wit
 import { CommonModule } from '@angular/common';
 import { GenericService } from './_service/generic/generic.service';
 import { PageContentComponent } from "./page-content/page-content.component";
+import { MiniFooterComponent } from './page-template/mini-footer/mini-footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent, FontAwesomeModule, NewNavComponent, PageContentComponent],
+  imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent, FontAwesomeModule, NewNavComponent, PageContentComponent,MiniFooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

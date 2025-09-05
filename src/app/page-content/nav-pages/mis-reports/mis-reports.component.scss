@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8fafc !important;
+  color: #333333 !important;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header (matched with incentive component) */
+.header {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  text-align: center;
+  padding: 3rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.header h1 {
+  font-size: 2.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Cards container */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin: 0 40px 40px;
+}
+
+/* Card style */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px;
+  min-height: 120px;
+  border-radius: 16px;
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out, background-color 0.4s ease-in-out;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  background-color: #ffffff !important;
+  color: #333333 !important;
+}
+
+/* Card icons */
+.card-icon {
+  font-size: 40px;
+  margin-right: 16px;
+  color: #ffffff !important;
+  transition: color 0.4s ease-in-out;
+}
+
+/* Icon and text color on hover */
+.orange:hover .card-icon, .orange:hover { color: #f97316 !important; }
+.blue:hover .card-icon, .blue:hover { color: #2563eb !important; }
+.yellow:hover .card-icon, .yellow:hover { color: #facc15 !important; }
+.green:hover .card-icon, .green:hover { color: #16a34a !important; }
+.purple:hover .card-icon, .purple:hover { color: #7c3aed !important; }
+.teal:hover .card-icon, .teal:hover { color: #14b8a6 !important; }
+
+/* Card colors */
+.orange { background: #fb923c !important; }
+.blue { background: #3b82f6 !important; }
+.yellow { background: #fde047 !important; }
+.green { background: #22c55e !important; }
+.purple { background: #9333ea !important; }
+.teal { background: #2dd4bf !important; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 0 24px 32px;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cards {
+    grid-template-columns: 1fr;
+    margin: 0 16px 24px;
+    gap: 16px;
+  }
+
+  .header {
+    padding: 2rem 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.3rem;
+  }
+
+  .card {
+    padding: 20px;
+    min-height: 100px;
+    font-size: 14px;
+  }
+
+  .card-icon {
+    font-size: 36px;
+  }
+}
