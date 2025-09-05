@@ -65,7 +65,16 @@ export class GenericService {
     return this.http.post(`${this.baseUrl}/api/user/login`, credentials);
   }
 
-  
+   getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+    }
+
+    return headers;
+  }
 
   registerUser(userData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/api/user/register`, userData);
@@ -1142,6 +1151,13 @@ getDecryptedUserId(): string | null {
       `${this.baseUrl}/api/admin/service-approval-flow-delete`,
       body,
       { headers }
+    );
+  }
+  getDepartmentalUserProfile(): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/get-profile`,
+      {},
+      { headers: this.getHeaders() }
     );
   }
 }

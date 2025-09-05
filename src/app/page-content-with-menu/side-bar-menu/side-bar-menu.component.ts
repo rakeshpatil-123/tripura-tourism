@@ -40,20 +40,21 @@ export class SidebarComponent implements OnInit, OnDestroy {
   currentUserType: string = '';
   routerSubscription: Subscription | undefined;
   userName: string = 'User';
+  filteredMenuItems: MenuItem[] = [];
   menuItems: MenuItem[] = [
     {
       id: 'dashboard',
       title: 'Dashboard',
       icon: 'dashboard',
       route: '/dashboard/home',
-      roles: ['admin', 'user', 'moderator', 'guest'],
+      roles: ['admin', 'individual', 'department', 'user', 'moderator', 'guest'],
     },
     {
       id: 'Departments',
       title: 'Departments',
       icon: 'apartment',
       route: '/dashboard/departments',
-      roles: ['admin'],
+      roles: ['admin', 'department'],
     },
     {
       id: 'Admin Services',
@@ -63,25 +64,32 @@ export class SidebarComponent implements OnInit, OnDestroy {
       roles: ['admin'],
     },
     {
+      id: 'Departmental User',
+      title: 'Departmental User',
+      icon: 'groups',
+      route: '/dashboard/departmental-user',
+      roles: ['admin', 'department'],
+    },
+    {
       id: 'common-application-form',
       title: 'Common Application Form',
       icon: 'track_changes',
       route: '/dashboard/caf',
-      roles: ['admin', 'user', 'moderator', 'guest'],
+      roles: ['individual', 'user', 'moderator', 'guest'],
     },
     {
       id: 'services',
       title: 'Services',
       icon: 'track_changes',
       route: '/dashboard/services',
-      roles: ['admin', 'user', 'moderator', 'guest'],
+      roles: ['individual', 'department','user', 'moderator', 'guest'],
     },
     {
       id: 'Departmental services',
       title: 'Departmental Services',
       icon: 'track_changes',
       route: '/dashboard/departmental-services',
-      roles: ['admin', 'user', 'moderator', 'guest'],
+      roles: ['department', 'individual', 'user', 'moderator', 'guest'],
     },
     // {
     //   id: 'external-tracking',
@@ -109,21 +117,21 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Upload Existing Licence',
       icon: 'dynamic_form',
       route: '/dashboard/upload-existing-licence',
-      roles: ['admin'],
+      roles: ['individual',],
     },
     {
       id: 'Renewal List',
       title: 'Renewal List',
       icon: 'dynamic_form',
       route: '/dashboard/renewal-list',
-      roles: ['admin'],
+      roles: ['individual',],
     },
     {
       id: 'Inspection List',
       title: 'Inspection List',
       icon: 'dynamic_form',
       route: '/dashboard/inspection-list',
-      roles: ['admin'],
+      roles: ['individual'],
     },
 
     {
@@ -131,27 +139,27 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Application List',
       icon: 'dynamic_form',
       route: '/dashboard/application-list',
-      roles: ['admin'],
+      roles: ['individual',],
     },
     {
       id: 'reports',
       title: 'Reports',
       icon: 'assessment',
-      roles: ['admin', 'moderator'],
+      roles: ['individual', 'department', 'moderator'],
       children: [
         {
           id: 'sales-report',
           title: 'Usage Report',
           icon: 'trending_up',
           route: '/reports/sales',
-          roles: ['admin', 'moderator'],
+          roles: [ 'moderator', 'individual', 'department', ],
         },
         {
           id: 'user-report',
           title: 'Engagement',
           icon: 'people_outline',
           route: '/reports/users',
-          roles: ['admin'],
+          roles: ['individual', 'department',],
         },
       ],
     },
@@ -160,7 +168,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Profile',
       icon: 'dynamic_form',
       route: '/dashboard/user-profile',
-      roles: ['admin'],
+      roles: ['admin', 'individual', 'department',],
     },
   ];
 
@@ -171,6 +179,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.currentUrl = this.router.url;
+    this.filterMenuItems();
     this.checkSidebarVisibility(this.currentUrl);
     // Subscribe to router events to track URL changes
     this.routerSubscription = this.router.events
@@ -231,10 +240,29 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   canAccess(item: MenuItem): boolean {
-    return item.roles.includes(this.userRole);
+    return item.roles.includes(this.currentUserType);
   }
 
   logout(): void {
     this.genericService.logoutUser(); 
   }
+  filterMenuItems(): void {
+    if (!this.userRole) {
+      this.filteredMenuItems = [];
+      return;
+    }
+
+    this.filteredMenuItems = this.menuItems
+      .map(item => {
+        const children = item.children
+          ? item.children.filter(child => child.roles.includes(this.userRole!))
+          : [];
+
+        return { ...item, children };
+      })
+      .filter(item =>
+        item.roles.includes(this.userRole!) || item.children.length > 0
+      );
+  }
+
 }

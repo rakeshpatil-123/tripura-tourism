@@ -22,6 +22,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import(
             './external-services-redirection-tracking/external-services-redirection-tracking.component'
           ).then((m) => m.ExternalServicesRedirectionTrackingComponent),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
       },
       {
         path: 'application-list',
@@ -29,6 +31,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import(
             './industrial-user/application-list/application-list.component'
           ).then((m) => m.ApplicationSearchPageComponent),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
       },
       {
         path: 'renewal-list',
@@ -36,6 +40,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import(
             './industrial-user/renewal-of-licance/renewal-of-licance.component'
           ).then((m) => m.RenewalOfLicanceComponent),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
       },
       {
         path: 'inspection-list',
@@ -43,6 +49,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./industrial-user/inspection/inspection.component').then(
             (m) => m.InspectionComponent
           ),
+          canActivate: [authGuard],
+          data: { roles: ['individual'] }
       },
       {
         path: 'appeal-list',
@@ -50,6 +58,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./industrial-user/appeal/appeal.component').then(
             (m) => m.AppealComponent
           ),
+          canActivate: [authGuard],
+          data: { roles: ['individual'] }
       },
       {
         path: 'caf',
@@ -57,6 +67,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./industrial-user/caf/caf.component').then(
             (m) => m.ApplicationFormComponent
           ),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
       },
       {
         path: 'services',
@@ -64,6 +76,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./industrial-user/allServices/services.component').then(
             (m) => m.ServicesComponent
           ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
       },
       {
         path: 'service-application/:id',
@@ -71,6 +85,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import(
             './industrial-user/service-application/service-application.component'
           ).then((m) => m.ServiceApplicationComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
       },
       {
         path: 'departmental-services',
@@ -78,6 +94,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import(
             '../page-content-with-menu/departmental-services/departmental-services.component'
           ).then((m) => m.DepartmentalServicesComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
       },
       {
         path: 'all-service-application/:departmentId/:serviceId',
@@ -85,6 +103,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import(
             '../page-content-with-menu/all-service-applications/applications.component'
           ).then((m) => m.ApplicationsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
       },
       {
         path: 'service-view/:applicationId',
@@ -92,6 +112,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./service-view/service-view.component').then(
             (m) => m.ServiceViewComponent
           ),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
       },
 
       {
@@ -100,6 +122,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import(
             './industrial-user/upload-existing-licence/upload-existing-licence.component'
           ).then((m) => m.UploadExistingLicenceComponent),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
       },
       {
         path: 'example-form',
@@ -107,6 +131,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./example-form/example-form.component').then(
             (m) => m.ExampleFormComponent
           ),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
       },
       // {
       //   path: 'demo',
@@ -121,6 +147,8 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./user-profile/user-profile.component').then(
             (m) => m.UserProfileComponent
           ),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'department', 'individual'] }
       },
       {
         path: 'admin-services',
@@ -129,6 +157,16 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
             (m) => m.AdminServicesComponent
           ),
         canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
+      {
+        path: 'departmental-user',
+        loadComponent: () =>
+          import('./departmental-users/departmental-users.component').then(
+            (m) => m.DepartmentalUsersComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'department'] }
       },
       {
         path: 'departments',
@@ -137,6 +175,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
             (m) => m.DepartmentsComponent,
           ),
         canActivate: [authGuard],
+        data: { roles: ['admin', 'department'] }
       },
     ],
   },

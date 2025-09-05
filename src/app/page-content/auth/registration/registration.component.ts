@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiSelectComponent, SelectOption } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
@@ -39,18 +39,32 @@ interface Ward {
   styleUrls: ['./registration.component.scss']
 })
 export class RegistrationComponent implements OnInit {
+  @Input() sourcePage: string | null = null;
+  isSpecialRequired(): boolean {
+    return this.sourcePage === 'departmental-users';
+  }
   registrationForm: FormGroup;
   districts: SelectOption[] = [];
   subdivisions: SelectOption[] = [];
   ulbs: SelectOption[] = [];
   wards: SelectOption[] = [];
+  departments: SelectOption[] = [];
   loadingDistricts = false;
   loadingSubdivisions = false;
   loadingUlbs = false;
   loadingWards = false;
-
+  hierarchyLevels = [
+    { id: 'block', name: 'Block' },
+    { id: 'subdivision', name: 'Subdivision' },
+    { id: 'district', name: 'District' },
+    { id: 'state1', name: 'State 1' },
+    { id: 'state2', name: 'State 2' },
+    { id: 'state3', name: 'State 3' },
+  ];
   userTypeOptions = [
-    { value: 'individual', name: 'Individual', id: 'individual' }
+    { value: 'individual', name: 'Individual', id: 'individual' },
+    { value: 'admin', name: 'Admin', id: 'admin' },
+    { value: 'department', name: 'Department', id: 'department' },
   ];
 
   constructor(
@@ -58,9 +72,11 @@ export class RegistrationComponent implements OnInit {
     private genericService: GenericService,  
     private router: Router
   ) {
+    const isRequired = this.sourcePage === 'departmental-users';
+    if (isRequired) {this.userTypeOptions.push({value: 'department',name: 'Department', id: 'department'}); }
     this.registrationForm = this.fb.group({
       name_of_enterprise: ['', []],
-      authorized_person_name: ['', []],
+      authorized_person_name: ['', []], 
       email_id: ['', []],
       mobile_no: ['', []],
       user_name: ['', []],
@@ -72,7 +88,10 @@ export class RegistrationComponent implements OnInit {
       district_id: ['', []],
       subdivision_id: ['', []],
       ulb_id: ['', []],
-      ward_id: ['', []]
+      ward_id: ['', []],
+      hierarchy_level: ['', []],
+      department_id: ['', []],
+      designation: ['', []],
     }, {
       validators: this.passwordMatchValidator
     });
@@ -81,6 +100,7 @@ export class RegistrationComponent implements OnInit {
   ngOnInit(): void {
     this.loadDistricts();
     this.setupCascadingDropdowns();
+    this.getAllDepartmentList();
   }
 
   setupCascadingDropdowns(): void {
@@ -228,16 +248,42 @@ export class RegistrationComponent implements OnInit {
         next: (res : any) => {
           console.log('Registration Success:', res);
           this.genericService.openSnackBar('Registration successful!', 'Success');
-          this.router.navigate(['auth/login']);
+          this.router.navigate(['page/login']);
           this.registrationForm.reset();
         },
-        error: (err : any) => {
+        error: (err: any) => {
           console.error('Registration Failed:', err);
-          this.genericService.openSnackBar('Registration failed. Try again.', 'Error');
+
+          let errorMessage = 'Registration failed. Try again.';
+          if (err.error && err.error.errors) {
+            const validationMessages = Object.values(err.error.errors)
+              .flat()
+              .join(', ');
+
+            errorMessage = validationMessages || err.error.message || errorMessage;
+          } else if (err.error && err.error.message) {
+            errorMessage = err.error.message;
+          }
+          this.genericService.openSnackBar(errorMessage, 'Error');
         }
       });
     } else {
       this.genericService.openSnackBar('Please fill all required fields', 'Error');
     }
+  }
+  getAllDepartmentList(): void {
+   this.genericService.getByConditions({}, 'api/department-get-all-departments').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.departments = res.data;
+        } else {
+          this.departments = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching departments:', err);
+        this.departments = [];
+      }
+    });
   }
 }

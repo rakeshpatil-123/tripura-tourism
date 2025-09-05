@@ -65,11 +65,20 @@
             [disabled]="!ulbs.length || loadingUlbs">
           </app-ilogi-select>
 
-          <!-- User Type -->
           <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
             [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
         </div>
-
+        <div>
+          <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" [mandatory]="true"
+            formControlName="hierarchy_level" [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
+          </app-ilogi-select>
+          <app-ilogi-select fieldId="department_id" fieldLabel="Department" [mandatory]="true" formControlName="department_id"
+            [selectOptions]="departments" placeholder="Select department">
+          </app-ilogi-select>
+          <app-ilogi-input fieldId="designation" fieldLabel="Designation" [mandatory]="true" formControlName="designation"
+            placeholder="Enter designation">
+          </app-ilogi-input>
+        </div>
         <div class="enterprise-form">
           <!-- Password -->
           <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
@@ -89,7 +98,7 @@
         </div>
       </form>
 
-      <span class="text-center small mt-2">Already Registered? <a href="/auth/login">Login</a></span>
+      <span class="text-center small mt-2">Already Registered? <a href="/page/login">Login</a></span>
     </div>
   </div>
 </div>

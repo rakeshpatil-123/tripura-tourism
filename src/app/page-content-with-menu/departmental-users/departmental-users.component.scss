@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  background: #f9fafb;
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+p-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+p-table ::ng-deep .p-datatable-thead>tr>th {
+  background-color: #1e3a8a;
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+}
+
+p-table ::ng-deep .p-datatable-tbody>tr>td {
+  background-color: #ffffff;
+  color: #1f2937;
+  font-weight: 500;
+}

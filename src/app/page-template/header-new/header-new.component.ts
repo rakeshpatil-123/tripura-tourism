@@ -59,7 +59,7 @@ export class HeaderNewComponent implements OnInit, OnDestroy, AfterViewInit {
     localStorage.removeItem('token');
     this.isLoggedIn = false;
     this.genericService.setLoginStatus(false);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/page/login']);
   }
 
   navigateToRegister() {

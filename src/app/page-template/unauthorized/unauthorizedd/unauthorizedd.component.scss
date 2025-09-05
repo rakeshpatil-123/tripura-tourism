@@ -13,17 +13,36 @@
     margin-bottom: 20px;
   }
 
-  .back-btn {
-    display: inline-block;
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  button {
     padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 14px;
+  }
+
+  .back-btn {
     background-color: #1976d2;
     color: #fff;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background 0.3s ease;
 
     &:hover {
       background-color: #115293;
+    }
+  }
+
+  .login-btn {
+    background-color: #2e7d32;
+    color: #fff;
+
+    &:hover {
+      background-color: #1b5e20;
     }
   }
 }

@@ -80,19 +80,22 @@
 
     <div class="form-row">
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>NOC Date</mat-label>
-        <input matInput formControlName="label_noc_date" [matDatepicker]="nocDate">
-        <mat-datepicker-toggle matSuffix [for]="nocDate"></mat-datepicker-toggle>
-        <mat-datepicker #nocDate></mat-datepicker>
+        <mat-label>NOC Date Label</mat-label>
+        <input matInput type="text" formControlName="label_noc_date" placeholder="Enter NOC Date Label" />
+      
+        <mat-error *ngIf="serviceForm.get('label_noc_date')?.hasError('required')">
+          NOC Date Label is required
+        </mat-error>
       </mat-form-field>
 
+
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>NOC Document</mat-label>
+        <mat-label>NOC Document Label</mat-label>
         <input matInput formControlName="label_noc_doc">
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>NOC Number</mat-label>
+        <mat-label>NOC Number Label</mat-label>
         <input matInput formControlName="label_noc_no">
       </mat-form-field>
     </div>
@@ -106,12 +109,11 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Valid Till Date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="label_valid_till">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
+        <mat-label>Valid Till Date Label</mat-label>
+        <input matInput type="text" formControlName="label_valid_till" placeholder="Enter label name" />
+      
         <mat-error *ngIf="serviceForm.get('label_valid_till')?.hasError('required')">
-          Valid Till Date is required
+          Valid Till Date Label is required
         </mat-error>
       </mat-form-field>
 
@@ -121,7 +123,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>NSW License ID</mat-label>
+        <mat-label>NSW License ID Label</mat-label>
         <input matInput formControlName="nsw_license_id">
       </mat-form-field>
     </div>
