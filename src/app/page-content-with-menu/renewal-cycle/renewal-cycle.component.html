@@ -1,0 +1,117 @@
+<div class="renewal-container">
+  <div class="dialog-header">
+    <h4><b>{{ data.mode === 'edit' ? 'Update Renewal Cycle' : 'Add Renewal Cycle' }}</b></h4>
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="renewalForm" (ngSubmit)="submit()">
+    <div class="grid-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Renewal Title</mat-label>
+        <input matInput formControlName="renewal_title" placeholder="e.g. Annual Renewal" />
+        <mat-error *ngIf="renewalForm.get('renewal_title')?.hasError('required')">
+          Renewal Title is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Renewal Period</mat-label>
+        <mat-select formControlName="renewal_period">
+          <mat-option value="monthly">Monthly</mat-option>
+          <mat-option value="quarterly">Quarterly</mat-option>
+          <mat-option value="half_yearly">Half-Yearly</mat-option>
+          <mat-option value="annually">Annually</mat-option>
+          <mat-option value="biannual">Biannual</mat-option>
+          <mat-option value="biennial">Biennial</mat-option>
+          <mat-option value="triennial">Triennial</mat-option>
+          <mat-option value="5year">5 Year</mat-option>
+          <mat-option value="custom">Custom</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field *ngIf="renewalForm.get('renewal_period')?.value === 'custom'" appearance="outline"
+      class="full-width">
+      <mat-label>Custom Period</mat-label>
+      <input matInput formControlName="renewal_period_custom" placeholder="e.g. 2 months" />
+    </mat-form-field>
+
+    <div class="grid-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Target Days</mat-label>
+        <input matInput type="number" formControlName="renewal_target_days" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Window Days</mat-label>
+        <input matInput type="number" formControlName="renewal_window_days" />
+      </mat-form-field>
+    </div>
+
+    <div class="grid-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="picker1" formControlName="fixed_renewal_start_date" [min]="today" readonly
+          (click)="picker1.open()" />
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="picker2" formControlName="fixed_renewal_end_date"
+          [min]="renewalForm.get('fixed_renewal_start_date')?.value" readonly (click)="picker2.open()" />
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="grid-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Late Fee Applicable</mat-label>
+        <mat-select formControlName="late_fee_applicable" (selectionChange)="onLateFeeChange($event.value)">
+          <mat-option value="yes">Yes</mat-option>
+          <mat-option value="no">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Allow Renewal Input Form</mat-label>
+        <mat-select formControlName="allow_renewal_input_form">
+          <mat-option value="yes">Yes</mat-option>
+          <mat-option value="no">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Active</mat-label>
+        <mat-select formControlName="is_active">
+          <mat-option value="1">Active</mat-option>
+          <mat-option value="0">Inactive</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <ng-container *ngIf="showLateFeeFields">
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Fixed Late Fee</mat-label>
+          <input matInput type="number" formControlName="late_fee_fixed_amount" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Calculated Late Fee (Multiplier)</mat-label>
+          <input matInput type="number" step="0.1" formControlName="late_fee_calculated_amount" />
+        </mat-form-field>
+      </div>
+    </ng-container>
+
+    <div class="actions">
+      <button mat-raised-button color="warn" type="button" (click)="cancel()">Cancel</button>
+      <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Saving...' : (data.mode === 'edit' ? 'Update Renewal Cycle' : 'Save Renewal Cycle') }}
+      </button>
+    </div>
+  </form>
+</div>
