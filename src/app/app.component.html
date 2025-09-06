@@ -3,7 +3,7 @@
 <div style="padding-top: 16vh;">
     <router-outlet></router-outlet>
 </div>
-<app-logo-footer/>
+<app-logo-footer *ngIf="!isLoggedIn"/>
 <app-footer *ngIf="!isLoggedIn"></app-footer>
 <app-mini-footer></app-mini-footer>
 <app-loader *ngIf="showLoader"></app-loader>
