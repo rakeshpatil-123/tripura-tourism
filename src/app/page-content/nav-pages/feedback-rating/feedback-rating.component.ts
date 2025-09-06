@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-feedback-rating',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './feedback-rating.component.html',
-  styleUrl: './feedback-rating.component.scss'
+  styleUrls: ['./feedback-rating.component.scss']
 })
 export class FeedbackRatingComponent {
   // Form data model
@@ -63,7 +66,13 @@ export class FeedbackRatingComponent {
     { value: '5', label: 'Excellent' }
   ];
 
-  constructor() {}
+  // Font Awesome icons
+  faUser = faUser;
+  faEnvelope = faEnvelope;
+
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faUser, faEnvelope);
+  }
 
   // Update character count for textareas
   onFeedbackInput(event: Event): void {
