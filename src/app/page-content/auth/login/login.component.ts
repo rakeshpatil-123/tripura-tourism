@@ -43,6 +43,8 @@ export class LoginComponent {
           );
           localStorage.setItem('userName', response.data.authorized_person_name);
           localStorage.setItem('userRole', response.data.user_type);
+          localStorage.setItem('deptId', response.data.department_id || '');
+          localStorage.setItem('deptName', response.data.department_name || '');
           this.genericService.openSnackBar('Login successful!', 'Success');
           this.genericService.setLoginStatus(true);
           this.loginForm.reset();

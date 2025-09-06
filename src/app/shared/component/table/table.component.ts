@@ -434,6 +434,7 @@ import { FormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { IlogiSelectComponent } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 
 export type ColumnType =
   | 'text'
@@ -477,6 +478,7 @@ export interface TableColumn {
 
   renderComponent?: Type<any>;
   renderComponentInputs?: { [key: string]: any };
+  
 }
 
 export interface TableRowAction {
@@ -489,7 +491,7 @@ export interface TableRowAction {
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatMenuModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatMenuModule, MatButtonModule, IlogiSelectComponent],
 })
 export class DynamicTableComponent implements OnChanges {
   @Input() data: any[] = [];
@@ -497,7 +499,15 @@ export class DynamicTableComponent implements OnChanges {
   @Input() pageSize: number = 10;
   @Input() showPagination: boolean = true;
   @Input() searchable: boolean = true;
+@Input() filterColumnKey?: string;           // e.g., 'status'
+@Input() filterLabel: string = '';   // Label for dropdown
+@Input() filterOptions: Array<{ id: any; name: string }> = [];  // Options
+@Input() filterPlaceholder: string = 'Select...'; // Placeholder
 
+ @Input() selectedFilterValue: any = null;
+//   get selectedFilterValue(): any {
+//   return this._selectedFilterValue;
+// }
   @Output() rowAction = new EventEmitter<TableRowAction>();
 
   filteredData: any[] = [];
@@ -535,27 +545,59 @@ export class DynamicTableComponent implements OnChanges {
     return a < b ? a : b;
   }
 
+  // applyFilters(): void {
+  //   let result = [...this.data];
+
+  //   if (this.searchable && this.searchTerm) {
+  //     const term = this.searchTerm.toLowerCase();
+  //     result = result.filter((row) =>
+  //       Object.values(row).some((val) =>
+  //         String(val).toLowerCase().includes(term)
+  //       )
+  //     );
+  //   }
+
+  //   if (this.sortColumn) {
+  //     const col = this.columns.find((c) => c.key === this.sortColumn);
+  //     result.sort((a, b) => this.sortData(a, b, this.sortColumn!, col?.type));
+  //   }
+
+  //   this.filteredData = result;
+  //   this.currentPage = 1;
+  //   this.applyPagination();
+  // }
+
   applyFilters(): void {
-    let result = [...this.data];
+  let result = [...this.data];
 
-    if (this.searchable && this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      result = result.filter((row) =>
-        Object.values(row).some((val) =>
-          String(val).toLowerCase().includes(term)
-        )
-      );
-    }
-
-    if (this.sortColumn) {
-      const col = this.columns.find((c) => c.key === this.sortColumn);
-      result.sort((a, b) => this.sortData(a, b, this.sortColumn!, col?.type));
-    }
-
-    this.filteredData = result;
-    this.currentPage = 1;
-    this.applyPagination();
+  // 🔹 1. Apply select filter (if active)
+  if (this.filterColumnKey && this.selectedFilterValue !== null) {
+    result = result.filter(row => {
+      const cellValue = row[this.filterColumnKey!];
+      return cellValue == this.selectedFilterValue; // '==' to match string/number
+    });
   }
+
+  // 🔹 2. Apply search term (existing)
+  if (this.searchable && this.searchTerm) {
+    const term = this.searchTerm.toLowerCase();
+    result = result.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(term)
+      )
+    );
+  }
+
+  // 🔹 3. Apply sorting (existing)
+  if (this.sortColumn) {
+    const col = this.columns.find((c) => c.key === this.sortColumn);
+    result.sort((a, b) => this.sortData(a, b, this.sortColumn!, col?.type));
+  }
+
+  this.filteredData = result;
+  this.currentPage = 1;
+  this.applyPagination();
+}
 
   applyPagination(): void {
     if (!this.showPagination) {
@@ -832,4 +874,6 @@ export class DynamicTableComponent implements OnChanges {
     }
     return inputs;
   }
+
+  
 }
