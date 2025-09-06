@@ -187,6 +187,10 @@ td .badge {
   white-space: nowrap !important;
 }
 
+.badge{
+  color: black!important
+}
+
 .badge-success,
 td .badge-success {
   background-color: #d1f7e5;
@@ -199,11 +203,11 @@ td .badge-danger {
   background-color: #ffe8e8;
   color: #c00;
 }
-.badge-warning,
-td .badge-warning {
-  background-color: #fff3cd;
-  color: #856404;
-}
+// .badge-warning,
+// td .badge-warning {
+//   background-color: #fff3cd;
+//   color: #856404;
+// }
 .badge-info,
 td .badge-info {
   background-color: #e8f4fd;
@@ -364,24 +368,24 @@ td .badge-unknown {
   }
 }
 
-.badge {
-  display: inline-block;
-  padding: 0.25em 0.6em;
-  font-size: 0.8em;
-  font-weight: 600;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  border-radius: 12px;
-  background-color: #e0e0e0;
-  color: #333;
-  min-width: 60px;
-}
+// .badge {
+//   display: inline-block;
+//   padding: 0.25em 0.6em;
+//   font-size: 0.8em;
+//   font-weight: 600;
+//   line-height: 1;
+//   text-align: center;
+//   white-space: nowrap;
+//   border-radius: 12px;
+//   background-color: #e0e0e0;
+//   color: #333;
+//   min-width: 60px;
+// }
 
-.badge-success {
-  background-color: #d1f7e3;
-  color: #0a7a3d;
-}
+// .badge-success {
+//   background-color: #d1f7e3;
+//   color: #0a7a3d;
+// }
 .badge-warning {
   background-color: #fff4d6;
   color: #926500;
@@ -442,24 +446,24 @@ td .badge-unknown {
   min-height: 40px;
 }
 
-.badge {
-  display: inline-block;
-  padding: 0.25em 0.6em;
-  font-size: 0.85em;
-  font-weight: 600;
-  border-radius: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+// .badge {
+//   display: inline-block;
+//   padding: 0.25em 0.6em;
+//   font-size: 0.85em;
+//   font-weight: 600;
+//   border-radius: 12px;
+//   text-transform: uppercase;
+//   letter-spacing: 0.5px;
+// }
 
 .badge-success {
   background-color: #d1f7e3;
   color: #0a7a3d;
 }
-.badge-warning {
-  background-color: #fff4d6;
-  color: #926500;
-}
+// .badge-warning {
+//   background-color: #fff4d6;
+//   color: #926500;
+// }
 .badge-danger {
   background-color: #ffe5e5;
   color: #c62828;
@@ -503,4 +507,10 @@ td .badge-unknown {
 ::ng-deep .mat-mdc-menu-content{
   padding: 0 !important;
   background-color: #fff;
+}
+
+::ng-deep .badge{
+  color: #000!important;
+  font-size: 0.875rem!important;
+  font-weight: 400!important;
 }

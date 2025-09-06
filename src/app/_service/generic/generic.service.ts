@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders,HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders,HttpParams } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, Subject } from 'rxjs';
+import { catchError, Observable, Subject, throwError } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
 import { FormGroup, FormArray } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
@@ -146,44 +146,63 @@ getDecryptedUserId(): string | null {
   }
 }
 
-  getByConditions(conditionParams: any, apiObject: string): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = new HttpHeaders();
-    // console.log(token,"token");
-    
-
-    if (token) {
-      headers = headers.set(
-        'Authorization',
-        `Bearer ${this.decryptData(token)}`
-      );
-      console.log(headers, "headers");
-      
-    }
-
-
-
-    return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
-      headers,
-    });
-  }
-
-  // getWithParams(params: any, endpoint: string): Observable<any> {
+  // getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   //   const token = localStorage.getItem('token');
   //   let headers = new HttpHeaders();
+  //   // console.log(token,"token");
+    
+
   //   if (token) {
-  //     headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+  //     headers = headers.set(
+  //       'Authorization',
+  //       `Bearer ${this.decryptData(token)}`
+  //     );
+  //     console.log(headers, "headers");
+      
   //   }
 
-  //   let httpParams = new HttpParams();
-  //   Object.keys(params).forEach(key => {
-  //     if (params[key] !== null && params[key] !== undefined) {
-  //       httpParams = httpParams.set(key, params[key]);
-  //     }
-  //   });
 
-  //   return this.http.post<any>(`${this.baseUrl}/${endpoint}`, { headers, params: httpParams });
+
+  //   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
+  //     headers,
+  //   });
   // }
+
+  getByConditions(conditionParams: any, apiObject: string): Observable<any> {
+  const token = localStorage.getItem('token');
+  let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+  }
+
+  return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, { headers }).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.error && typeof error.error === 'object') {
+        const message = error.error.message;
+
+        if (message === 'Unauthenticated.' || message === 'Unauthorised') {
+          console.warn('Session expired or invalid. Redirecting to login...');
+          this.handleUnauthenticated();
+        }
+      }
+      else if (error.status === 401) {
+        console.warn('401 Unauthorized. Redirecting to login...');
+        this.handleUnauthenticated();
+      }
+
+      return throwError(() => error);
+    })
+  );
+}
+
+private handleUnauthenticated(): void {
+  localStorage.clear();
+  this.setLoginStatus(false);
+
+  window.location.href = '/page/login';
+}
+
 
 
 
