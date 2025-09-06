@@ -1,11 +1,11 @@
 <div>
     <h1 class="page-head ">Departmental Services</h1>
-    <div class="mb-4" >
+    <!-- <div class="mb-4" >
 
       <app-ilogi-select [selectOptions]="allDepartments" placeholder="Select a department"  (change)="onDepartmentSelected($event)" ></app-ilogi-select>
-    </div>
+    </div> -->
 
-@if(selectedDepartmentId){
+<!-- @if(selectedDepartmentId){ -->
 
   <app-dynamic-table 
  [data]="services" 
@@ -15,5 +15,5 @@
  [searchable]="true"
 >
 </app-dynamic-table>
-}
+<!-- } -->
 </div>

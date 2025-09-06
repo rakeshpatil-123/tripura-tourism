@@ -1174,7 +1174,7 @@ private handleUnauthenticated(): void {
   }
   getDepartmentalUserProfile(): Observable<any> {
     return this.http.post<any>(
-      `${this.baseUrl}/api/user/get-profile`,
+      `${this.baseUrl}/api/department/get-department-users`,
       {},
       { headers: this.getHeaders() }
     );

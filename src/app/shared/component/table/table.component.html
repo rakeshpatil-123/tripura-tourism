@@ -1,16 +1,29 @@
 <!-- table.component.html -->
 <div class="dynamic-table-container">
-  <div class="table-controls" *ngIf="searchable">
-    <div class="search-box" id="searchBox">
-      <input
+  <div class="filter" >
+
+    <div class="table-controls" *ngIf="searchable">
+      <div class="search-box" id="searchBox">
+        <input
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
         placeholder="🔍 Search anything..."
         class="search-input"
         aria-label="Search table"
-      />
+        />
+      </div>
     </div>
+    <div class="table-filters mb-3" *ngIf="filterOptions && filterOptions.length > 0">
+    <app-ilogi-select
+      [fieldLabel]="filterLabel"
+      [placeholder]="filterPlaceholder"
+      [selectOptions]="filterOptions"
+      [(ngModel)]="selectedFilterValue"
+      (ngModelChange)="applyFilters()"
+    >
+    </app-ilogi-select>
+  </div>
   </div>
 
   <div class="table-wrapper">

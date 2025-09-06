@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
@@ -40,6 +40,7 @@ interface Ward {
 })
 export class RegistrationComponent implements OnInit {
   @Input() sourcePage: string | null = null;
+  @Output() registrationSuccess = new EventEmitter<void>();
   isSpecialRequired(): boolean {
     return this.sourcePage === 'departmental-users';
   }
@@ -89,11 +90,19 @@ export class RegistrationComponent implements OnInit {
       subdivision_id: ['', []],
       ulb_id: ['', []],
       ward_id: ['', []],
-      hierarchy_level: ['', []],
-      department_id: ['', []],
-      designation: ['', []],
     }, {
       validators: this.passwordMatchValidator
+    });
+    this.registrationForm.get('user_type')?.valueChanges.subscribe((value) => {
+      if (value === 'department') {
+        this.registrationForm.addControl('hierarchy_level', this.fb.control('', []));
+        this.registrationForm.addControl('department_id', this.fb.control('', []));
+        this.registrationForm.addControl('designation', this.fb.control('', []));
+      } else {
+        this.registrationForm.removeControl('hierarchy_level');
+        this.registrationForm.removeControl('department_id');
+        this.registrationForm.removeControl('designation');
+      }
     });
   }
 
@@ -248,7 +257,8 @@ export class RegistrationComponent implements OnInit {
         next: (res : any) => {
           console.log('Registration Success:', res);
           this.genericService.openSnackBar('Registration successful!', 'Success');
-          this.router.navigate(['page/login']);
+          this.registrationSuccess.emit();
+          this.sourcePage === 'departmental-users' ? null : this.router.navigate(['page/login']);
           this.registrationForm.reset();
         },
         error: (err: any) => {

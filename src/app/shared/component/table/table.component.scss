@@ -23,7 +23,7 @@ table{
 
 .table-controls {
   border-radius: 12px;
-  padding: 0 0 16px 0;
+  padding: 10px 16px 0  0;
   background: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
   flex-shrink: 0;
@@ -33,7 +33,7 @@ table{
     // margin: 0 auto;
 
     .search-input {
-      width: 100%;
+      // width: 100%;
       padding: 10px 14px;
       border: 1px solid #ced4da;
       border-radius: 8px;
@@ -513,4 +513,14 @@ td .badge-unknown {
   color: #000!important;
   font-size: 0.875rem!important;
   font-weight: 400!important;
+}
+
+.filter{
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+
+ 
 }
