@@ -45,7 +45,7 @@ export class HeroSectionComponent implements OnInit, OnDestroy {
 
   slideContent: SlideContent[] = [
     {
-      title: "Welcome to SWAGAT Portal",
+      title: "Welcome to SWAAGAT Portal",
       paragraph: "Single Window Agency for Getting Approvals and Time-bound services in Tripura. Experience seamless digital governance with our comprehensive online platform that brings all government services to your fingertips. Apply, track, and receive approvals for various certificates, licenses, and permits through one unified digital gateway designed for the citizens of Tripura.",
       imageUrl: "https://images.unsplash.com/photo-1614326014420-1f0c741ca7e1?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
@@ -61,7 +61,7 @@ export class HeroSectionComponent implements OnInit, OnDestroy {
     },
     {
       title: "Citizen-Centric Services",
-      paragraph: "Designed with citizens at the center, SWAGAT portal offers multilingual support, mobile-responsive design, and user-friendly interfaces. Whether you're applying for a domicile certificate, trade license, or any other government service, our platform ensures a smooth and hassle-free experience. Get your services delivered directly to your doorstep with our integrated courier and digital certificate delivery system.",
+      paragraph: "Designed with citizens at the center, SWAAGAT portal offers multilingual support, mobile-responsive design, and user-friendly interfaces. Whether you're applying for a domicile certificate, trade license, or any other government service, our platform ensures a smooth and hassle-free experience. Get your services delivered directly to your doorstep with our integrated courier and digital certificate delivery system.",
       imageUrl: "https://images.unsplash.com/photo-1600150806193-cf869bcfee05?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     }
   ];
@@ -118,7 +118,7 @@ export class HeroSectionComponent implements OnInit, OnDestroy {
   }
 
   onButtonClick() {
-    console.log('Get Started button clicked - Navigate to SWAGAT services');
+    console.log('Get Started button clicked - Navigate to SWAAGAT services');
     // Add navigation logic to main services page
     // Example: this.router.navigate(['/services']);
   }

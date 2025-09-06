@@ -12,11 +12,12 @@ import { CommonModule } from '@angular/common';
 import { GenericService } from './_service/generic/generic.service';
 import { PageContentComponent } from "./page-content/page-content.component";
 import { MiniFooterComponent } from './page-template/mini-footer/mini-footer.component';
+import { LogoFooterComponent } from './page-template/logo-footer/logo-footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent, FontAwesomeModule, NewNavComponent, PageContentComponent,MiniFooterComponent],
+  imports: [CommonModule, RouterOutlet, HeaderNewComponent, LoaderComponent, FooterComponent, FontAwesomeModule, NewNavComponent, PageContentComponent, MiniFooterComponent, LogoFooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
