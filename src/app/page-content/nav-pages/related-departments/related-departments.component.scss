@@ -17,7 +17,7 @@ body {
 
 h1 {
     text-align: center;
-    background: #60A5FA;
+    background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
     padding: 1.5rem;
     border-radius: 12px;
     color: #fff;
@@ -44,11 +44,10 @@ table {
 th, td {
     padding: 1.2rem 1.5rem;
     text-align: left;
-    border-bottom: 1px solid #e5e7eb;
 }
 
 th {
-    background: #60A5FA;
+    background: #2e8cfe;
     color: #fff;
     font-weight: 600;
     text-transform: uppercase;
@@ -69,7 +68,7 @@ tr:nth-child(even) {
     background-color: rgba(241, 245, 249, 0.8);
 }
 
-tr:hover {
+tr:not(.header):hover {
     background-color: #e0f2fe;
     transform: scale(1.01);
 }
