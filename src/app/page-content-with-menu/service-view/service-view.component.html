@@ -9,6 +9,17 @@
     <p>Application not found.</p>
   </div>
 
+  <!-- Workflow History -->
+  @if (!isLoading && workflowData.length > 0) {
+    <!-- <h3 class="mt-4">Workflow Steps</h3> -->
+    <app-dynamic-table
+      [data]="workflowData"
+      [columns]="workflowColumns"
+      [showPagination]="true"
+      [pageSize]="5"
+      [searchable]="true"
+    ></app-dynamic-table>
+  }
   <!-- Main Application Info -->
   @if (!isLoading && infoData.length > 0) {
     <app-dynamic-table
@@ -19,15 +30,29 @@
     ></app-dynamic-table>
   }
 
-  <!-- Workflow History -->
-  @if (!isLoading && workflowData.length > 0) {
-    <h3 class="mt-4">Workflow Steps</h3>
-    <app-dynamic-table
-      [data]="workflowData"
-      [columns]="workflowColumns"
-      [showPagination]="true"
-      [pageSize]="5"
-      [searchable]="true"
-    ></app-dynamic-table>
-  }
+
+  <!-- Status Action Modal -->
+  <div *ngIf="statusModal.visible" class="modal-overlay">
+    <div class="modal-content">
+      <h3>{{ statusModal.title }}</h3>
+
+      <form [formGroup]="remarkForm" (ngSubmit)="onSubmitStatus()">
+        <app-ilogi-input
+          formControlName="remarks"
+          fieldLabel="Remarks"
+          [mandatory]="true"
+          placeholder="Enter remarks for this action"
+        ></app-ilogi-input>
+
+        <div class="modal-actions">
+          <button type="button" (click)="closeModal()" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="remarkForm.invalid" class="btn btn-primary">
+            Confirm
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

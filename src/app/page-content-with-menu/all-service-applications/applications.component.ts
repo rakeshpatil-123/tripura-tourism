@@ -111,76 +111,51 @@ export class ApplicationsComponent implements OnInit {
   }
 
   generateColumns(data: any[]): TableColumn[] {
-    if (!Array.isArray(data) || data.length === 0) return [];
+  if (!Array.isArray(data) || data.length === 0) return [];
 
-    const firstItem = data[0];
-    const columns: TableColumn[] = [];
+  const firstItem = data[0];
+  const columns: TableColumn[] = [];
 
-    for (const key in firstItem) {
-      if (!firstItem.hasOwnProperty(key)) continue;
+  for (const key in firstItem) {
+    if (!firstItem.hasOwnProperty(key)) continue;
 
-      const type: ColumnType = this.guessColumnType(key, firstItem[key]);
+    const type: ColumnType = this.guessColumnType(key, firstItem[key]);
 
-      if (key === 'status') {
-        columns.push({
-          key,
-          label: 'Status',
-          type: 'status',
-          sortable: true,
-        });
-      } else {
-        columns.push({
-          key,
-          label: this.formatLabel(key),
-          type,
-          sortable: true,
-        });
-      }
+    if (key === 'status') {
+      columns.push({
+        key,
+        label: 'Status',
+        type: 'status',
+        sortable: true,
+      });
+    } else {
+      columns.push({
+        key,
+        label: this.formatLabel(key),
+        type,
+        sortable: true,
+      });
     }
-
-    // ✅ Actions column with modal-based status update
-    columns.push({
-      key: 'actions',
-      label: 'Actions',
-      type: 'action',
-      width: '200px',
-      actions: [
-        {
-          label: 'View',
-          color: 'primary',
-          onClick: (row: any) => {
-            this.router.navigate(['/dashboard/service-view', row.application_id]);
-          },
-        },
-        {
-          label: 'Approve',
-          color: 'success',
-          visible: (row: any) => row.status === 'submitted',
-          onClick: (row: any) => {
-            this.openStatusModal(row.application_id, 'approved', 'Approve Application');
-          },
-        },
-        {
-          label: 'Send Back',
-          color: 'warn',
-          visible: (row: any) => row.status === 'submitted',
-          onClick: (row: any) => {
-            this.openStatusModal(row.application_id, 'send_back', 'Send Back Application');
-          },
-        },
-        {
-          label: 'Reject',
-          color: 'danger',
-          visible: (row: any) => row.status === 'submitted',
-          onClick: (row: any) => {
-            this.openStatusModal(row.application_id, 'rejected', 'Reject Application');
-          },
-        },
-      ],
-    });
-
-    return columns;
   }
+
+  columns.push({
+    key: 'actions',
+    label: 'Actions',
+    type: 'action',
+    width: '150px',
+    actions: [
+      {
+        label: 'View',
+        color: 'primary',
+        onClick: (row: any) => {
+          this.router.navigate(['/dashboard/service-view', row.application_id]);
+        },
+      },
+    ],
+  });
+
+  return columns;
+}
 
  openStatusModal(
   applicationId: number,

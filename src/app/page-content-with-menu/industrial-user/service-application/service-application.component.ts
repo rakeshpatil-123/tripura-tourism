@@ -168,7 +168,7 @@ loadDefaultValues(): void {
     console.log(`Making API call for question ${question.id}:`, payload);
 
     this.apiService
-      .getByConditions(payload, 'api/user/get-default-source')
+      .getByConditions(payload, 'api/get-default-source')
       .subscribe({
         next: (res: any) => {
           console.log(` API Response for question ${question.id}:`, res);
