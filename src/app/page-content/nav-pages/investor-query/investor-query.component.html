@@ -1,0 +1,288 @@
+<div class="container">
+  <header class="header">
+    <h1>Investor Query Form</h1>
+  </header>
+
+  <div class="form-container">
+    <p class="note">* All fields marked with an asterisk are mandatory</p>
+    <form #investorForm="ngForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <!-- Company Details Section -->
+        <div class="section-title">Company Details</div>
+
+        <div class="input-field">
+          <label for="topic">Query Topic *</label>
+          <select
+            id="topic"
+            name="topic"
+            [(ngModel)]="formData.topic"
+            required
+            aria-required="true"
+            #topic="ngModel"
+            [ngClass]="{'error': topic.touched && topic.invalid}"
+          >
+            <option value="">Select a topic</option>
+            <option *ngFor="let topic of queryTopics" [value]="topic">{{ topic }}</option>
+          </select>
+          <div class="error-message" *ngIf="topic.touched && topic.invalid">Please select a query topic</div>
+        </div>
+
+        <div class="input-field">
+          <label for="cname">Company Name *</label>
+          <input
+            type="text"
+            id="cname"
+            name="cname"
+            placeholder="Enter company name"
+            [(ngModel)]="formData.cname"
+            required
+            aria-required="true"
+            #cname="ngModel"
+            [ngClass]="{'error': cname.touched && cname.invalid}"
+          >
+          <div class="error-message" *ngIf="cname.touched && cname.invalid">Please enter a valid company name</div>
+        </div>
+
+        <div class="input-field">
+          <label for="caddress">Company Address *</label>
+          <textarea
+            id="caddress"
+            name="caddress"
+            placeholder="Enter company address"
+            [(ngModel)]="formData.caddress"
+            required
+            aria-required="true"
+            #caddress="ngModel"
+            [ngClass]="{'error': caddress.touched && caddress.invalid}"
+          ></textarea>
+          <div class="error-message" *ngIf="caddress.touched && caddress.invalid">Please enter a valid company address</div>
+        </div>
+
+        <div class="input-field">
+          <label for="city">City *</label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            placeholder="Enter city"
+            [(ngModel)]="formData.city"
+            required
+            aria-required="true"
+            #city="ngModel"
+            [ngClass]="{'error': city.touched && city.invalid}"
+          >
+          <div class="error-message" *ngIf="city.touched && city.invalid">Please enter a valid city</div>
+        </div>
+
+        <div class="input-field">
+          <label for="state">State/Province *</label>
+          <select
+            id="state"
+            name="state"
+            [(ngModel)]="formData.state"
+            required
+            aria-required="true"
+            #state="ngModel"
+            [ngClass]="{'error': state.touched && state.invalid}"
+          >
+            <option value="">Select a state</option>
+            <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+          </select>
+          <div class="error-message" *ngIf="state.touched && state.invalid">Please select a state</div>
+        </div>
+
+        <div class="input-field">
+          <label for="activities">Present Activities</label>
+          <textarea
+            id="activities"
+            name="activities"
+            placeholder="Describe current business activities"
+            [(ngModel)]="formData.activities"
+            aria-describedby="activities-desc"
+          ></textarea>
+          <small id="activities-desc" class="form-text">Optional: Provide details of your company's current operations</small>
+        </div>
+
+        <div class="input-field">
+          <label>Area of Interest</label>
+          <div class="radio-group" role="radiogroup">
+            <label class="radio-label">
+              <input type="radio" name="interest" value="Manufacturing" [(ngModel)]="formData.interest">
+              Manufacturing
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="interest" value="Services" [(ngModel)]="formData.interest">
+              Services
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="interest" value="Trading" [(ngModel)]="formData.interest">
+              Trading
+            </label>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="sector">Specific Sector of Interest</label>
+          <select
+            id="sector"
+            name="sector"
+            [(ngModel)]="formData.sector"
+            aria-describedby="sector-desc"
+          >
+            <option value="">Select a sector</option>
+            <option *ngFor="let sector of sectors" [value]="sector">{{ sector }}</option>
+          </select>
+          <small id="sector-desc" class="form-text">Optional: Select your primary sector of interest</small>
+        </div>
+
+        <!-- Applicant Details Section -->
+        <div class="section-title">Applicant Details</div>
+
+        <div class="input-field">
+          <label for="aname">Full Name *</label>
+          <input
+            type="text"
+            id="aname"
+            name="aname"
+            placeholder="Enter your full name"
+            [(ngModel)]="formData.aname"
+            required
+            aria-required="true"
+            #aname="ngModel"
+            [ngClass]="{'error': aname.touched && aname.invalid}"
+          >
+          <div class="error-message" *ngIf="aname.touched && aname.invalid">Please enter your full name</div>
+        </div>
+
+        <div class="input-field">
+          <label for="email">Email Address *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter email address"
+            [(ngModel)]="formData.email"
+            required
+            aria-required="true"
+            pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+            #email="ngModel"
+            [ngClass]="{'error': email.touched && email.invalid}"
+          >
+          <div class="error-message" *ngIf="email.touched && email.invalid">Please enter a valid email address</div>
+        </div>
+
+        <div class="input-field">
+          <label for="mobile">Mobile Number *</label>
+          <input
+            type="tel"
+            id="mobile"
+            name="mobile"
+            placeholder="Enter mobile number"
+            [(ngModel)]="formData.mobile"
+            required
+            aria-required="true"
+            pattern="[0-9]{10}"
+            #mobile="ngModel"
+            [ngClass]="{'error': mobile.touched && mobile.invalid}"
+          >
+          <div class="error-message" *ngIf="mobile.touched && mobile.invalid">Please enter a valid 10-digit mobile number</div>
+        </div>
+
+        <div class="input-field">
+          <label for="summary">Query Summary *</label>
+          <input
+            type="text"
+            id="summary"
+            name="summary"
+            placeholder="Enter query summary"
+            [(ngModel)]="formData.summary"
+            required
+            aria-required="true"
+            #summary="ngModel"
+            [ngClass]="{'error': summary.touched && summary.invalid}"
+          >
+          <div class="error-message" *ngIf="summary.touched && summary.invalid">Please provide a query summary</div>
+        </div>
+
+        <div class="input-field">
+          <label for="details">Query Details *</label>
+          <textarea
+            id="details"
+            name="details"
+            placeholder="Provide detailed information about your query"
+            [(ngModel)]="formData.details"
+            required
+            aria-required="true"
+            #details="ngModel"
+            [ngClass]="{'error': details.touched && details.invalid}"
+          ></textarea>
+          <div class="error-message" *ngIf="details.touched && details.invalid">Please provide query details</div>
+        </div>
+
+        <div class="input-field">
+          <label for="file">Attachment</label>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            accept=".pdf,.doc,.docx,.jpg,.png"
+            (change)="onFileChange($event)"
+            aria-describedby="file-desc"
+          >
+          <small id="file-desc" class="form-text">Optional: Upload supporting documents (PDF, DOC, JPG, PNG)</small>
+        </div>
+
+        <div class="input-field">
+          <label for="ref">Reference of Previous Query</label>
+          <select
+            id="ref"
+            name="ref"
+            [(ngModel)]="formData.ref"
+            aria-describedby="ref-desc"
+          >
+            <option value="">Select a reference (if applicable)</option>
+            <option value="Q123">Q123 - Previous Query</option>
+            <option value="Q124">Q124 - Previous Query</option>
+          </select>
+          <small id="ref-desc" class="form-text">Optional: Select if this query relates to a previous submission</small>
+        </div>
+
+        <!-- Mock CAPTCHA -->
+        <div class="input-field captcha">
+          <label for="captcha">Verification *</label>
+          <input
+            type="checkbox"
+            id="captcha"
+            name="captcha"
+            [(ngModel)]="formData.captcha"
+            required
+            aria-required="true"
+            #captcha="ngModel"
+            [ngClass]="{'error': captcha.touched && captcha.invalid}"
+          >
+          <div class="error-message" *ngIf="captcha.touched && captcha.invalid">Please complete the CAPTCHA verification</div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-cancel"
+            (click)="onReset()"
+          >
+            <fa-icon icon="undo" class="button-icon"></fa-icon>
+            Reset Form
+          </button>
+          <button
+            type="submit"
+            class="btn btn-submit"
+            [disabled]="investorForm.invalid"
+          >
+            <fa-icon icon="paper-plane" class="button-icon"></fa-icon>
+            Submit Query
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

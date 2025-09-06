@@ -1,0 +1,87 @@
+<div class="container">
+  <header class="header">
+    <h1>Swaagat Certificate Verification</h1>
+  </header>
+
+  <section class="verification-form" role="form" aria-labelledby="form-title">
+    <p class="mandatory-note">All * marked fields are mandatory</p>
+    <div class="message" [ngClass]="messageType" *ngIf="message">
+      {{ message }}
+    </div>
+    <form #verificationForm="ngForm" (ngSubmit)="onSearch()">
+      <div class="input-group">
+        <div class="input-field">
+          <label for="uid">UID Number *</label>
+          <input
+            type="text"
+            id="uid"
+            name="uid"
+            placeholder="Enter UID Number"
+            [(ngModel)]="uid"
+            required
+            aria-required="true"
+            [ngClass]="{'error': uidInput.touched && uidInput.invalid}"
+            #uidInput="ngModel"
+          >
+        </div>
+        <div class="input-field">
+          <label for="certificate">Certificate/License/NOC Number *</label>
+          <input
+            type="text"
+            id="certificate"
+            name="certificate"
+            placeholder="Enter Certificate Number"
+            [(ngModel)]="certificate"
+            required
+            aria-required="true"
+            [ngClass]="{'error': certificateInput.touched && certificateInput.invalid}"
+            #certificateInput="ngModel"
+          >
+        </div>
+        <div class="buttons">
+          <button
+            type="button"
+            class="reset-btn"
+            aria-label="Reset form"
+            (click)="onReset()"
+          >
+            <fa-icon icon="undo" class="button-icon"></fa-icon>
+            Reset
+          </button>
+          <button
+            type="submit"
+            class="search-btn"
+            aria-label="Search certificate"
+            [ngClass]="{'loading': isLoading}"
+            [disabled]="isLoading"
+          >
+            <fa-icon icon="search" class="button-icon"></fa-icon>
+            Search
+          </button>
+        </div>
+      </div>
+    </form>
+    <div
+      class="details-section"
+      [ngClass]="{'hidden': !showDetails}"
+      role="region"
+      aria-labelledby="details-title"
+    >
+      <h2 id="details-title">Details</h2>
+      <div class="details-group">
+        <div class="detail-field">
+          <label for="detail-uid">UID Number</label>
+          <input type="text" id="detail-uid" [value]="details.uid" readonly>
+        </div>
+        <div class="detail-field">
+          <label for="detail-name">Name of the Unit</label>
+          <input type="text" id="detail-name" [value]="details.name" readonly>
+        </div>
+        <div class="detail-field">
+          <label for="detail-address">Address of the Unit</label>
+          <input type="text" id="detail-address" [value]="details.address" readonly>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

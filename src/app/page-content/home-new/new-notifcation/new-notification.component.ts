@@ -96,7 +96,7 @@ export class NewNotificationComponent implements OnInit, OnDestroy {
     this.stopAutoPlay(); // Clear any existing interval
     this.intervalId = setInterval(() => {
       this.next();
-    }, 3000); // Auto-slide every 3 seconds
+    }, 5000); // Auto-slide every 3 seconds
   }
 
   stopAutoPlay(): void {

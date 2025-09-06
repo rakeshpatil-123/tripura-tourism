@@ -46,16 +46,80 @@ export class NewNavComponent implements OnDestroy {
       dropdownOpen: false,
       children: [
         {
-          label: 'Team',
-          path: '/page/services/team',
+          label: 'SWAAGAT Certificate Verification',
+          path: '/page/swaagat-certificate-verification',
           hasDropdown: false,
           isActive: false,
           dropdownOpen: false,
           children: []
         },
         {
-          label: 'History',
-          path: '/page/services/history',
+          label: 'Incentive',
+          path: '/page/incentive',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'Investor Facilitation Cell',
+          path: '/page/investor-facilitation-cell',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'Central Inspection System',
+          path: '/page/central-inspection-system',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'MIS Reports',
+          path: '/page/mis-reports',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'Land Availability',
+          path: '/page/land-availability',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'Land Availability - GIS',
+          path: '/page/land-availability-gis',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'List of Services',
+          path: '/page/list-of-services',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'Query/Feedback',
+          path: '/page/query-feedback',
+          hasDropdown: false,
+          isActive: false,
+          dropdownOpen: false,
+          children: []
+        },
+        {
+          label: 'Investor Query',
+          path: '/page/investor-query',
           hasDropdown: false,
           isActive: false,
           dropdownOpen: false,
@@ -90,14 +154,6 @@ export class NewNavComponent implements OnDestroy {
     {
       label: 'Contact Us',
       path: '/page/contact-us',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'Business Regulations',
-      path: '/page/business-regulations',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,

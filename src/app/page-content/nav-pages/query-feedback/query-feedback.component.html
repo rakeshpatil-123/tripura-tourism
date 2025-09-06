@@ -1,0 +1,129 @@
+<div class="container">
+  <header class="header">
+    <h1>Query / Feedback</h1>
+    <p class="note">All <span class="required">*</span> marked fields are mandatory</p>
+  </header>
+
+  <form [formGroup]="queryFeedbackForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+    <div class="form-grid">
+      <!-- Left Side -->
+      <div class="form-group">
+        <label for="name">Name <span class="required">*</span></label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Enter your full name"
+          [ngClass]="{'invalid': queryFeedbackForm.get('name')?.invalid && (queryFeedbackForm.get('name')?.touched || submitted)}"
+        >
+        <div class="error" *ngIf="queryFeedbackForm.get('name')?.invalid && (queryFeedbackForm.get('name')?.touched || submitted)">
+          Name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="department">Department Name <span class="required">*</span></label>
+        <select
+          id="department"
+          formControlName="department"
+          [ngClass]="{'invalid': queryFeedbackForm.get('department')?.invalid && (queryFeedbackForm.get('department')?.touched || submitted)}"
+        >
+          <option value="">Choose a Department</option>
+          <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+        </select>
+        <div class="error" *ngIf="queryFeedbackForm.get('department')?.invalid && (queryFeedbackForm.get('department')?.touched || submitted)">
+          Department is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-Mail <span class="required">*</span></label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [ngClass]="{'invalid': queryFeedbackForm.get('email')?.invalid && (queryFeedbackForm.get('email')?.touched || submitted)}"
+        >
+        <div class="error" *ngIf="queryFeedbackForm.get('email')?.invalid && (queryFeedbackForm.get('email')?.touched || submitted)">
+          <span *ngIf="queryFeedbackForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="queryFeedbackForm.get('email')?.errors?.['email']">Invalid email format</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="mobile">Mobile Number <span class="required">*</span></label>
+        <input
+          id="mobile"
+          type="tel"
+          formControlName="mobile"
+          placeholder="Enter your mobile number"
+          [ngClass]="{'invalid': queryFeedbackForm.get('mobile')?.invalid && (queryFeedbackForm.get('mobile')?.touched || submitted)}"
+        >
+        <div class="error" *ngIf="queryFeedbackForm.get('mobile')?.invalid && (queryFeedbackForm.get('mobile')?.touched || submitted)">
+          <span *ngIf="queryFeedbackForm.get('mobile')?.errors?.['required']">Mobile number is required</span>
+          <span *ngIf="queryFeedbackForm.get('mobile')?.errors?.['pattern']">Invalid mobile number</span>
+        </div>
+      </div>
+
+      <div class="form-group wide">
+        <label for="description">Description <span class="required">*</span></label>
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="Write your query or feedback here..."
+          rows="5"
+          [ngClass]="{'invalid': queryFeedbackForm.get('description')?.invalid && (queryFeedbackForm.get('description')?.touched || submitted)}"
+        ></textarea>
+        <div class="error" *ngIf="queryFeedbackForm.get('description')?.invalid && (queryFeedbackForm.get('description')?.touched || submitted)">
+          Description is required
+        </div>
+      </div>
+
+      <!-- Right Side -->
+      <div class="form-group">
+        <label for="type">Type <span class="required">*</span></label>
+        <select
+          id="type"
+          formControlName="type"
+          [ngClass]="{'invalid': queryFeedbackForm.get('type')?.invalid && (queryFeedbackForm.get('type')?.touched || submitted)}"
+        >
+          <option value="">Select Type</option>
+          <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+        </select>
+        <div class="error" *ngIf="queryFeedbackForm.get('type')?.invalid && (queryFeedbackForm.get('type')?.touched || submitted)">
+          Type is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="subject">Subject <span class="required">*</span></label>
+        <input
+          id="subject"
+          type="text"
+          formControlName="subject"
+          placeholder="Enter subject"
+          [ngClass]="{'invalid': queryFeedbackForm.get('subject')?.invalid && (queryFeedbackForm.get('subject')?.touched || submitted)}"
+        >
+        <div class="error" *ngIf="queryFeedbackForm.get('subject')?.invalid && (queryFeedbackForm.get('subject')?.touched || submitted)">
+          Subject is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="file">Upload</label>
+        <input
+          id="file"
+          type="file"
+          (change)="onFileChange($event)"
+        >
+      </div>
+
+      <!-- Buttons -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-cancel" (click)="onReset()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </form>
+</div>
