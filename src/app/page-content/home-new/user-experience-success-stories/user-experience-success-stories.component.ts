@@ -36,7 +36,7 @@ export class UserExperienceSuccessStoriesComponent {
     {
       experience: 'Excellent Experience',
       rating: 5,
-      text: 'SWAGAT 2.0 transformed our investment experience. The single window system reduced our approval time from 6 months to just 3 weeks. The transparency and real-time tracking gave us confidence throughout the process.',
+      text: 'SWAAGAT 2.0 transformed our investment experience. The single window system reduced our approval time from 6 months to just 3 weeks. The transparency and real-time tracking gave us confidence throughout the process.',
       author: 'Rajesh Mehta',
       title: 'CEO, Mehta Agro Industries',
       industry: 'Agro-processing',

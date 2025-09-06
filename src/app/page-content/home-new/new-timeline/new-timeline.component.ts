@@ -32,7 +32,7 @@ export class NewTimelineComponent implements OnInit {
       days: 'Day 1',
       duration: '1 Day',
       keyActivities: [
-        'Online registration on SWAGAT 2.0 portal',
+        'Online registration on SWAAGAT 2.0 portal',
         'Submit preliminary project information',
         'Receive acknowledgment and unique ID',
         'Access to dedicated relationship manager'

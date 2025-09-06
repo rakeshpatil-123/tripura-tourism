@@ -1,0 +1,14 @@
+.logo-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+//   padding: 20px;
+  min-height: 15vh; /* Ensure container is visible */
+  background-color: #ffffff; /* Light background for visibility */
+}
+
+.logo {
+  max-height: 10vh;
+  width: auto;
+  object-fit: contain;
+}

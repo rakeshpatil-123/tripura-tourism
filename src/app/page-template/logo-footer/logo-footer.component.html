@@ -1,0 +1,6 @@
+<div class="logo-container">
+  <div *ngIf="!logos || logos.length === 0">No logos available</div>
+  <a *ngFor="let logo of logos; trackBy: trackByFn" [href]="logo.link" target="_blank" rel="noopener noreferrer">
+    <img [src]="logo.src" [alt]="logo.alt" class="logo" loading="lazy" (error)="onImageError($event, logo.src)">
+  </a>
+</div>
