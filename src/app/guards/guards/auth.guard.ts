@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (route, state): boolean | UrlTree => {
   const router = inject(Router);
-  const userName = localStorage.getItem('userName');
+  const userRole = localStorage.getItem('userRole');
+  const allowedRoles: string[] = route.data?.['roles'] || [];
 
-  if (userName === 'admin' || 'Individual') {
+
+  if (userRole && allowedRoles.includes(userRole)) {
     return true;
-  } else {
-    router.navigate(['/unauthorized']);
-    return false;
   }
+  return router.parseUrl('/unauthorized');
 };

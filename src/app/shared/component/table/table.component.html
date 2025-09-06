@@ -83,9 +83,7 @@
               class="custom-cell"
               [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"
             >
-              <!-- This would require dynamic component creation in a more complex implementation -->
               <ng-container *ngIf="col.renderComponent; else defaultCell">
-                <!-- For simplicity, we'll show a placeholder - in a real implementation you'd dynamically create the component -->
                 <div class="custom-component-placeholder">
                   Custom Component: {{ col.key }}
                 </div>
@@ -93,9 +91,7 @@
               <ng-template #defaultCell>
                 <div
                   [innerHTML]="formatValue(row[col.key], col, row)"
-                  [class]="
-                    col.cellClass ? col.cellClass(row[col.key], row) : ''
-                  "
+                  [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"
                 ></div>
               </ng-template>
             </div>
@@ -115,7 +111,7 @@
               <!-- Menu Trigger Button -->
               <button
                 mat-icon-button
-                class=" clkable"
+                class="clkable"
                 [matMenuTriggerFor]="menu"
                 title="More actions"
                 type="button"
@@ -152,8 +148,9 @@
                   </div>
 
                   <!-- Regular Action Button -->
+                  <!-- ✅ Added *ngIf with visible support -->
                   <button
-                    *ngIf="!hasActionComponent(action)"
+                    *ngIf="!hasActionComponent(action) && (action.visible ? action.visible(row) : true)"
                     mat-menu-item
                     (click)="onRowActionAndClose(action, row)"
                     [class]="'btn-' + (action.color || 'primary')"

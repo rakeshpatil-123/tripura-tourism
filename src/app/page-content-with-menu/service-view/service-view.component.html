@@ -1,0 +1,33 @@
+<div class="service-view-container">
+  <h2 class="page-head mb-3">Application Details</h2>    
+
+  <div *ngIf="isLoading" class="text-center">
+    🔍 Loading application details...
+  </div>
+
+  <div *ngIf="!isLoading && !applicationData" class="text-center text-muted">
+    <p>Application not found.</p>
+  </div>
+
+  <!-- Main Application Info -->
+  @if (!isLoading && infoData.length > 0) {
+    <app-dynamic-table
+      [data]="infoData"
+      [columns]="infoColumns"
+      [showPagination]="false"
+      [searchable]="false"
+    ></app-dynamic-table>
+  }
+
+  <!-- Workflow History -->
+  @if (!isLoading && workflowData.length > 0) {
+    <h3 class="mt-4">Workflow Steps</h3>
+    <app-dynamic-table
+      [data]="workflowData"
+      [columns]="workflowColumns"
+      [showPagination]="true"
+      [pageSize]="5"
+      [searchable]="true"
+    ></app-dynamic-table>
+  }
+</div>

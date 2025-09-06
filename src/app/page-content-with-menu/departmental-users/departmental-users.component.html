@@ -1,0 +1,29 @@
+<p-divider align="center">
+  <h2 class="text-xl font-semibold m-0">Add Departmental User</h2>
+</p-divider>
+
+<app-registration [sourcePage]="'departmental-users'"></app-registration>
+
+<p-divider></p-divider>
+
+<!-- <div *ngIf="profile" class="p-4">
+  <h2 class="mb-4">User Profile</h2>
+
+  <p-table [value]="profileTable" class="p-datatable-gridlines p-mb-4" [responsiveLayout]="'scroll'">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>{{ row.field }}</td>
+        <td>{{ row.value }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div> -->
+
+<router-outlet></router-outlet>

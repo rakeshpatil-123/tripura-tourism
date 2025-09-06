@@ -90,7 +90,7 @@ export class AddServiceDialogComponent implements OnInit {
       label_noc_date: [''],
       label_noc_doc: [''],
       label_noc_no: [''],
-      label_valid_till: [new Date(), Validators.required],
+      label_valid_till: [''],
 
       show_valid_till: [true],
       auto_renewal: [false],
@@ -133,7 +133,7 @@ export class AddServiceDialogComponent implements OnInit {
               label_noc_doc: s.label_noc_doc,
               label_noc_no: s.label_noc_no,
               label_valid_till: s.label_valid_till
-                ? new Date(s.label_valid_till)
+                ? (s.label_valid_till)
                 : null,
               show_valid_till: s.show_valid_till === 'yes',
               auto_renewal: s.auto_renewal === 'yes',
@@ -190,7 +190,7 @@ export class AddServiceDialogComponent implements OnInit {
         label_noc_doc: formValue.label_noc_doc,
         label_noc_no: formValue.label_noc_no,
         label_valid_till: formValue.label_valid_till
-          ? moment(formValue.label_valid_till).format('YYYY-MM-DD')
+          ? (formValue.label_valid_till)
           : null,
         show_valid_till: formValue.show_valid_till ? 'yes' : 'no',
         auto_renewal: formValue.auto_renewal ? 'yes' : 'no',

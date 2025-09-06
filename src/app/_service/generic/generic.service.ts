@@ -65,7 +65,16 @@ export class GenericService {
     return this.http.post(`${this.baseUrl}/api/user/login`, credentials);
   }
 
-  
+   getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+    }
+
+    return headers;
+  }
 
   registerUser(userData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/api/user/register`, userData);
@@ -159,21 +168,22 @@ getDecryptedUserId(): string | null {
     });
   }
 
-  // getDataByConditions(queryParams: any, apiObject: string): Observable<any> {
+  // getWithParams(params: any, endpoint: string): Observable<any> {
   //   const token = localStorage.getItem('token');
   //   let headers = new HttpHeaders();
+  //   if (token) {
+  //     headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+  //   }
 
-//   if (token) {
-//     headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
-//   }
-
-  //   let params = new HttpParams();
-  //   Object.keys(queryParams).forEach(key => {
-  //     params = params.set(key, queryParams[key]);
+  //   let httpParams = new HttpParams();
+  //   Object.keys(params).forEach(key => {
+  //     if (params[key] !== null && params[key] !== undefined) {
+  //       httpParams = httpParams.set(key, params[key]);
+  //     }
   //   });
 
-//   return this.http.post(`${this.baseUrl}/${apiObject}`, { headers, params });
-// }
+  //   return this.http.post<any>(`${this.baseUrl}/${endpoint}`, { headers, params: httpParams });
+  // }
 
 
 
@@ -1141,6 +1151,13 @@ getDecryptedUserId(): string | null {
       `${this.baseUrl}/api/admin/service-approval-flow-delete`,
       body,
       { headers }
+    );
+  }
+  getDepartmentalUserProfile(): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/get-profile`,
+      {},
+      { headers: this.getHeaders() }
     );
   }
 }

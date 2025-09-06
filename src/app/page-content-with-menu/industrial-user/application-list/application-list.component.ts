@@ -323,3 +323,96 @@ export class ApplicationSearchPageComponent {
     this.applicationType = '';
   }
 }
+
+
+
+
+
+/* 
+
+
+// application-list.component.ts
+import { Component } from '@angular/core';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  DynamicTableComponent,
+  TableColumn,
+  TableRowAction,
+} from '../../../shared/component/table/table.component';
+
+// --- Import for Dialog ---
+import { MatDialog } from '@angular/material/dialog';
+
+// --- Import for Navigation ---
+import { Router } from '@angular/router';
+import { TransactionHistoryDialogComponent } from './transaction-history';
+import { GenericService } from '../../../_service/generic/generic.service';
+
+interface ApplicationDataItem {
+  nocDetailsId: string;
+  noc_master_id: string;
+  nocMasterId: string;
+  applicationNumber: string;
+  applicationDate: string;
+  applicationFor: string;
+  departmentName: string;
+  applicationType: string;
+  status: string;
+  renewalDate: string;
+  dueDate: string;
+  payment_status: string;
+}
+
+@Component({
+  selector: 'app-application-search-page',
+  templateUrl: './application-list.component.html',
+  styleUrls: ['./application-list.component.scss'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    DynamicTableComponent,
+  ],
+  standalone: true,
+})
+export class ApplicationSearchPageComponent {
+  constructor( private apiService : GenericService) {}
+
+  fromDate: string = '';
+  toDate: string = '';
+  department: string = '';
+  applicationType: string = '';
+
+
+
+ 
+ngOnInit(): void {
+  this.getApplications();
+}
+
+
+
+
+
+
+
+  
+
+ 
+
+
+getApplications(): void{
+this.apiService.getByConditions({},'api/user/service-application-view').subscribe({
+  next: (res:any)=>{
+    if(res && res.status ===1 && Array.isArray(res.data)){
+      // this.ApplicationData = res.data;
+      console.log("Applications",res.data);
+      
+    }
+  }
+
+});
+
+}}
+*/

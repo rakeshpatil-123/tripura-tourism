@@ -35,15 +35,14 @@ export class LoginComponent {
         next: (response) => {
           console.log('Login successful:', response);
           if (response?.token) {
-            localStorage.setItem('userName', response.data.authorized_person_name);
-            localStorage.setItem('userRole', response.data.user_type);
             localStorage.setItem('token', response.token);
           }
           this.genericService.storeSessionData(
             response,
             payload.rememberMe || false
           );
-
+          localStorage.setItem('userName', response.data.authorized_person_name);
+          localStorage.setItem('userRole', response.data.user_type);
           this.genericService.openSnackBar('Login successful!', 'Success');
           this.genericService.setLoginStatus(true);
           this.loginForm.reset();
