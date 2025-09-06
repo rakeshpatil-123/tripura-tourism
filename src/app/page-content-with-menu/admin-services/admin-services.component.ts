@@ -22,7 +22,11 @@ import { AddRenewalFeeRuleComponent } from '../add-renewal-fee-rule/add-renewal-
 import { ViewApprovalFlowDialogComponent } from '../view-approval-flow-dialog/view-approval-flow-dialog.component';
 import { AddApprovalFlowComponent } from '../add-approval-flow/add-approval-flow.component';
 import { MatMenuModule } from "@angular/material/menu";
-
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 export interface Service {
   department_id: string;
   service_title_or_description: string;
@@ -68,8 +72,11 @@ export interface Service {
     MatTooltipModule,
     MatButtonModule,
     MatCheckboxModule,
-    MatMenuModule
+    MatMenuModule,
+    ConfirmDialogModule,
+    ButtonModule,
   ],
+  providers: [ConfirmationService],
 })
 export class AdminServicesComponent implements OnInit, OnDestroy {
   subscription: Subscription;
@@ -84,7 +91,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
 
   constructor(
     private genericService: GenericService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private confirmationService: ConfirmationService
   ) {
     this.subscription = new Subscription();
   }
@@ -161,10 +169,17 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteService(service: Service): void {
-    if (!confirm(`Are you sure you want to delete "${service.service_title_or_description}"?`)) return;
-
-    this.genericService.deleteAdminService((service as any).id).subscribe({
+deleteService(service: Service): void {
+  this.confirmationService.confirm({
+    message: `Are you sure you want to delete "${service.service_title_or_description}"?`,
+    header: 'Confirm Service Deletion',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Yes',
+    rejectLabel: 'No',
+    acceptButtonStyleClass: 'p-button-success p-button-lg p-button-rounded',
+    rejectButtonStyleClass: 'p-button-danger p-button-lg p-button-rounded',
+    accept: () => {
+      this.genericService.deleteAdminService((service as any).id).subscribe({
       next: () => {
         this.genericService.openSnackBar(
           'Service deleted successfully.',
@@ -174,9 +189,14 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.genericService.openSnackBar('Error deleting service.', 'Error');
-      },
-    });
-  }
+        },
+      });
+    },
+    reject: () => {
+      this.genericService.openSnackBar('Deletion cancelled.', 'Info');
+    },
+  });
+}
 
   viewService(service: Service): void {
     this.dialog.open(ViewServiceDialogComponent, {
@@ -186,12 +206,13 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleAction(type: string, action: 'view' | 'add' | 'edit', service: Service) {
+  handleAction(type: string, action: 'view' | 'add' | 'edit' | 'delete', service: Service) {
     switch (type) {
       case 'service':
         if (action === 'view') this.viewService(service);
         if (action === 'add') this.openAddServiceDialog();
         if (action === 'edit') this.editService(service);
+        if (action === 'delete') this.deleteService(service);
         break;
 
       case 'questionnaire':

@@ -161,3 +161,62 @@
     border-radius: 0 !important;
     overflow: hidden !important;
 }
+:host ::ng-deep .custom-confirm-dialog .p-dialog {
+  width: 400px !important;
+  max-width: 90% !important;
+  text-align: center;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .custom-confirm-dialog .p-dialog-header {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 1rem;
+  text-align: center;
+}
+
+:host ::ng-deep .custom-confirm-dialog .p-dialog-content {
+  background: #ffffff !important;
+  color: #374151 !important;
+  font-size: 15px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep .custom-confirm-dialog .p-dialog-footer {
+  background: #f9fafb !important;
+  padding: 1rem;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 1rem;
+}
+
+:host ::ng-deep .custom-confirm-dialog .p-button-success {
+  background: #10b981 !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem !important;
+  transition: all 0.3s ease;
+}
+:host ::ng-deep .custom-confirm-dialog .p-button-success:hover {
+  background: #059669 !important;
+  transform: translateY(-2px);
+}
+
+:host ::ng-deep .custom-confirm-dialog .p-button-danger {
+  background: #ef4444 !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem !important;
+  transition: all 0.3s ease;
+}
+:host ::ng-deep .custom-confirm-dialog .p-button-danger:hover {
+  background: #dc2626 !important;
+  transform: translateY(-2px);
+}

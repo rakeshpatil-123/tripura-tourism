@@ -23,3 +23,12 @@ p-table ::ng-deep .p-datatable-tbody>tr>td {
   color: #1f2937;
   font-weight: 500;
 }
+.status-active {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.status-inactive {
+  color: #ef4444;
+  font-weight: 600;
+}

@@ -95,7 +95,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
             '../page-content-with-menu/departmental-services/departmental-services.component'
           ).then((m) => m.DepartmentalServicesComponent),
         canActivate: [authGuard],
-        data: { roles: ['department', 'individual'] }
+        data: { roles: ['department',] }
       },
       {
         path: 'all-service-application/:departmentId/:serviceId',

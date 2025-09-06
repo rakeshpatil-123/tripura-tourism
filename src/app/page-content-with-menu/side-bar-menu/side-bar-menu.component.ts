@@ -89,7 +89,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Departmental Services',
       icon: 'track_changes',
       route: '/dashboard/departmental-services',
-      roles: ['department', 'individual', 'user', 'moderator', 'guest'],
+      roles: ['department', 'user', 'moderator', 'guest'],
     },
     // {
     //   id: 'external-tracking',
