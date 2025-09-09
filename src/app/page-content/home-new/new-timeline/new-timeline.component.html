@@ -75,7 +75,7 @@
                         <div class="support">
                             <h4>Need Help?</h4>
                             <p>Our dedicated support team is available to assist you through this step.</p>
-                            <button (click)="contactSupport()">Contact Support</button>
+                            <app-button text="Contact Support" type="primary" size="xxlarge" ></app-button>
                         </div>
                     </div>
                 </div>
@@ -126,11 +126,8 @@
                 <h3>Ready to Start Your Investment Journey?</h3>
                 <p>Experience the most efficient and transparent investment process in Northeast India. Our dedicated team will guide you through every step.</p>
                 <div class="cta-buttons">
-                    <button class="primary-btn" (click)="beginApplication()">
-                        <span>Begin Application</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right" [innerHTML]="arrowRightSvgSafe"></svg>
-                    </button>
-                    <button class="secondary-btn" (click)="downloadGuide()">Download Process Guide</button>
+                    <app-button text="Download Process Guide" type="secondary" size="xxlarge" ></app-button>
+                    <app-button text="Begin Application" type="primary" size="xxlarge"></app-button>
                 </div>
             </div>
         </div>

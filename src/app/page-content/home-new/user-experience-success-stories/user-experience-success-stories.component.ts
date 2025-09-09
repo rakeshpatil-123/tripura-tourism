@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
 
 interface Testimonial {
   experience: string;
@@ -25,7 +26,7 @@ interface FeedbackForm {
 @Component({
   selector: 'app-user-experience-success-stories',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ButtonComponent],
   templateUrl: './user-experience-success-stories.component.html',
   styleUrls: ['./user-experience-success-stories.component.scss'],
 })
