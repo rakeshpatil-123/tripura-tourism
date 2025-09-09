@@ -68,7 +68,7 @@
           <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
             [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
         </div>
-        <div>
+        <div *ngIf="registrationForm.get('user_type')?.value === 'department'">
           <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" [mandatory]="true"
             formControlName="hierarchy_level" [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
           </app-ilogi-select>

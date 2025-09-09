@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
   imports: [IlogiSelectComponent, DynamicTableComponent],
   templateUrl: './departmental-services.component.html',
   styleUrl: './departmental-services.component.scss',
-  standalone: true, // ✅ Added if not in module
+  standalone: true,
 })
 export class DepartmentalServicesComponent implements OnInit {
   allDepartments: any[] = [];
@@ -25,58 +25,26 @@ export class DepartmentalServicesComponent implements OnInit {
   constructor(private apiService: GenericService, private router: Router) {}
 
   ngOnInit(): void {
-    this.getAllDepartments();
+    // Get deptId from localStorage when component initializes
+    const deptId = localStorage.getItem('deptId');
+    if (deptId) {
+      this.selectedDepartmentId = Number(deptId);
+    }
+    this.loadServices();
   }
 
-  getAllDepartments(): void {
-    this.isLoading = true;
-    this.apiService
-      .getByConditions({}, 'api/department-get-all-departments')
-      .subscribe({
-        next: (res: any) => {
-          this.isLoading = false;
-          if (res?.status === 1 && Array.isArray(res.data)) {
-            this.allDepartments = res.data;
-            console.log('Departments loaded:', this.allDepartments);
-          } else {
-            this.apiService.openSnackBar(
-              'Failed to load departments.',
-              'Close'
-            );
-          }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          console.error('Error loading departments:', err);
-          this.apiService.openSnackBar(
-            'Network error. Could not load departments.',
-            'Close'
-          );
-        },
-      });
-  }
-
-  onDepartmentSelected(event: any): void {
-    const departmentId = event?.value ?? null;
-
+  loadServices(): void {
+    const departmentId = localStorage.getItem('deptId');
     if (!departmentId) {
-      console.warn('Invalid department selection:', event);
-      this.apiService.openSnackBar(
-        'Please select a valid department.',
-        'Close'
-      );
+      this.apiService.openSnackBar('Department ID not found.', 'Close');
       return;
     }
-
-    this.selectedDepartmentId = departmentId;
-    this.loadServices(departmentId);
-  }
-
-  loadServices(departmentId: number): void {
+    
+    this.selectedDepartmentId = Number(departmentId); // Store it for later use
     this.services = [];
     this.isLoading = true;
 
-    const payload = { department_id: +departmentId };
+    const payload = { department_id: departmentId };
 
     this.apiService
       .getByConditions(payload, 'api/department/services')
@@ -134,21 +102,21 @@ export class DepartmentalServicesComponent implements OnInit {
       actions: [
         {
           label: 'View applications',
-          // icon: '🚀',
           color: 'success',
           onClick: (row: any) => {
-            if (!this.selectedDepartmentId || !row.service_id) {
+            // Use the stored selectedDepartmentId or get fresh from localStorage
+            const deptId = this.selectedDepartmentId || Number(localStorage.getItem('deptId'));
+            if (!deptId || !row.service_id) {
               this.apiService.openSnackBar('Missing required IDs.', 'Close');
               return;
             }
-            console.log(this.selectedDepartmentId, "dept", row.service_id, "service");
+            console.log(deptId, "dept", row.service_id, "service");
 
             this.router.navigate([
               'dashboard/all-service-application',
-              this.selectedDepartmentId,
+              deptId,
               row.service_id,
             ]);
-
           },
         },
       ],
@@ -200,9 +168,9 @@ export class DepartmentalServicesComponent implements OnInit {
 
   formatLabel(key: string): string {
     return key
-      .replace(/_([a-z])/g, ' $1') // snake_case → " snake case"
-      .replace(/([a-z])([A-Z])/g, '$1 $2') // camelCase → "camel Case"
-      .replace(/^\w/, (c) => c.toUpperCase()) // Capitalize first letter
+      .replace(/_([a-z])/g, ' $1')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/^\w/, (c) => c.toUpperCase())
       .trim();
   }
 }

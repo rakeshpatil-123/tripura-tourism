@@ -15,8 +15,7 @@ import { GenericService } from '../../_service/generic/generic.service';
   styleUrls: ['./departmental-users.component.scss']
 })
 export class DepartmentalUsersComponent implements OnInit {
-  profile: any = null;
-  profileTable: { field: string; value: any }[] = [];
+  users: any[] = [];
   loading: boolean = false;
 
   constructor(private genericService: GenericService) { }
@@ -28,10 +27,24 @@ export class DepartmentalUsersComponent implements OnInit {
   fetchProfile() {
     this.loading = true;
     this.genericService.getDepartmentalUserProfile().subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.profile = res.data;
-          this.prepareProfileTable();
+      next: (res: any) => {
+        if (res.status === 1 && res.data) {
+          this.users = res.data.map((user: any) => ({
+            id: user.id,
+            name_of_enterprise: user.name_of_enterprise,
+            authorized_person_name: user.authorized_person_name,
+            email_id: user.email_id,
+            mobile_no: user.mobile_no,
+            user_name: user.user_name,
+            district_name: user.district_name,
+            subdivision_name: user.subdivision_name,
+            ulb_name: user.ulb_name,
+            ward_name: user.ward_name,
+            bin: user.bin,
+            registered_enterprise_address: user.registered_enterprise_address,
+            registered_enterprise_city: user.registered_enterprise_city,
+            status: user.status
+          }));
         } else {
           console.warn('Failed to fetch profile');
         }
@@ -42,17 +55,5 @@ export class DepartmentalUsersComponent implements OnInit {
         this.loading = false;
       }
     });
-  }
-
-  prepareProfileTable() {
-    this.profileTable = [
-      { field: 'Name', value: this.profile.name },
-      { field: 'Email', value: this.profile.email },
-      { field: 'Mobile', value: this.profile.mobile },
-      { field: 'Address', value: this.profile.address },
-      { field: 'District ID', value: this.profile.district_id },
-      { field: 'Subdivision ID', value: this.profile.subdivision_id },
-      { field: 'Block ID', value: this.profile.block_id || 'N/A' }
-    ];
   }
 }
