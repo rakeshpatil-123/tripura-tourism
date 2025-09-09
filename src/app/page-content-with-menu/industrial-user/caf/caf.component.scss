@@ -3,12 +3,13 @@
   padding: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  background-color: #fff;
+  color: white !important;
+  background-color: #003c5b !important;
   overflow: hidden;
 }
 ::ng-deep {
   .mdc-tab.mdc-tab--active {
-    background-color: #2c82aa !important;
+    background-color: #fba40f !important;
     color: white !important;
 
     .mdc-tab__text-label {
@@ -22,7 +23,7 @@
 
   // Optional: Style inactive tab text
   .mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label {
-    color: rgba(0, 0, 0, 0.87);
+    color: rgba(255, 255, 255, 0.87);
   }
 }
 .tab-content-wrapper {
