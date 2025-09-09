@@ -2,21 +2,33 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 
-export type ButtonType = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-export type ButtonSize = 'small' | 'medium' | 'large';
+export type ButtonType = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success' | 'designer';
+export type ButtonSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge';
 
 @Component({
+  standalone: true,
   imports: [CommonModule],
   selector: 'app-button',
   template: `
     <button 
       [class]="getButtonClasses()" 
-      [disabled]="disabled"
-      (click)="handleClick()"
-      [type]="htmlType">
-      <i *ngIf="icon" [class]="'feather-' + icon"></i>
-      <span *ngIf="text" [class.ml-2]="icon">{{ text }}</span>
-      <ng-content></ng-content>
+      [disabled]="disabled || loading"
+      (click)="handleClick($event)"
+      [type]="htmlType"
+      [attr.aria-label]="ariaLabel || text || 'Button'"
+      [title]="tooltip">
+      
+      <!-- Loading spinner -->
+      <span *ngIf="loading" class="spinner" aria-hidden="true"></span>
+      
+      <!-- Icon (only show if not loading) -->
+      <i *ngIf="icon && !loading" [class]="'feather-' + icon" aria-hidden="true"></i>
+      
+      <!-- Button text (only show if not loading and text exists) -->
+      <span *ngIf="text && !loading" [class.ml-2]="icon">{{ text }}</span>
+      
+      <!-- Custom content (only show if not loading and no text) -->
+      <ng-content *ngIf="!loading && !text"></ng-content>
     </button>
   `,
   styleUrls: ['./button.component.scss']
@@ -27,22 +39,39 @@ export class ButtonComponent {
   @Input() text: string = '';
   @Input() icon: string = '';
   @Input() route: string = '';
+  @Input() queryParams?: { [key: string]: any };
   @Input() disabled: boolean = false;
   @Input() fullWidth: boolean = false;
   @Input() htmlType: 'button' | 'submit' | 'reset' = 'button';
+  @Input() loading: boolean = false;
+  @Input() tooltip: string = '';
+  @Input() ariaLabel: string = '';
 
-  @Output() clicked = new EventEmitter<void>();
+  @Output() clicked = new EventEmitter<MouseEvent>();
 
   constructor(private router: Router) {}
 
-  handleClick(): void {
-    if (this.disabled) return;
-
-    if (this.route) {
-      this.router.navigate([this.route]);
+  handleClick(event: MouseEvent): void {
+    if (this.disabled || this.loading) {
+      event.preventDefault();
+      return;
     }
 
-    this.clicked.emit();
+    // Handle navigation if route is provided
+    if (this.route) {
+      try {
+        if (this.queryParams) {
+          this.router.navigate([this.route], { queryParams: this.queryParams });
+        } else {
+          this.router.navigate([this.route]);
+        }
+      } catch (error) {
+        console.warn('Navigation failed:', error);
+      }
+    }
+
+    // Always emit the clicked event
+    this.clicked.emit(event);
   }
 
   getButtonClasses(): string {
@@ -56,8 +85,12 @@ export class ButtonComponent {
       classes.push('btn--full-width');
     }
 
-    if (this.disabled) {
+    if (this.disabled || this.loading) {
       classes.push('btn--disabled');
+    }
+
+    if (this.loading) {
+      classes.push('btn--loading');
     }
 
     return classes.join(' ');
