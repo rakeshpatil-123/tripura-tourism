@@ -2,6 +2,7 @@ import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { gsap } from 'gsap';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
 
 interface Feature {
   gradientFrom: string;
@@ -30,7 +31,7 @@ interface SmallFeature {
 @Component({
   selector: 'app-key-feature-for-success',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './key-feature-for-success.component.html',
   styleUrls: ['./key-feature-for-success.component.scss']
 })

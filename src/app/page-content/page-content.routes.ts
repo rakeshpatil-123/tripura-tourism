@@ -106,7 +106,12 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                 path: 'investor-query',
                 loadComponent: () =>
                     import('./nav-pages/investor-query/investor-query.component').then(m => m.InvestorQueryComponent)
-            }
+            },
+            {
+                path: 'try-buttons',
+                loadComponent: () =>
+                    import('./nav-pages/try-use/try-use.component').then(m => m.TryUseComponent)
+            },
         ]
     }
 ];

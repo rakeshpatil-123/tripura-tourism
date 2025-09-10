@@ -10,9 +10,11 @@ p-table {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
-
+p-table > p-paginator {
+  background: #003c5b !important;
+}
 p-table ::ng-deep .p-datatable-thead>tr>th {
-  background-color: #1e3a8a;
+  background-color: #003c5b;
   color: #fff;
   font-weight: 600;
   text-align: left;
@@ -31,4 +33,7 @@ p-table ::ng-deep .p-datatable-tbody>tr>td {
 .status-inactive {
   color: #ef4444;
   font-weight: 600;
+}
+.header-bg-color {
+  background-color: #003c5b;
 }

@@ -1,4 +1,4 @@
-<p-divider align="center">
+<p-divider class="header-bg-color" align="center">
   <h2 class="text-xl font-semibold m-0">Add Departmental User</h2>
 </p-divider>
 
@@ -18,7 +18,7 @@
     [responsiveLayout]="'scroll'">
     
     <ng-template pTemplate="header">
-      <tr>
+      <tr class="header-bg-color">
         <th>ID</th>
         <th>Enterprise Name</th>
         <th>Authorized Person</th>
@@ -58,6 +58,11 @@
         </td>
       </tr>
     </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="14" class="text-center">No data found</td>
+        </tr>
+      </ng-template>
   </p-table>
 </div>
 

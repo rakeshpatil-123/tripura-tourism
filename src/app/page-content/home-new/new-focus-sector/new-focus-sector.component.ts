@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
 
 interface Sector {
   icon: string;
@@ -31,7 +32,7 @@ interface SectorDetail {
 @Component({
   selector: 'app-new-focus-sector',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './new-focus-sector.component.html',
   styleUrls: ['./new-focus-sector.component.scss']
 })

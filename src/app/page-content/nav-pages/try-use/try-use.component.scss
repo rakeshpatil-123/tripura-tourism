@@ -1,0 +1,218 @@
+.button-demo-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    
+    @media (max-width: 768px) {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+  }
+
+  .demo-section {
+    margin-bottom: 40px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+
+    h2 {
+      color: #343a40;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 8px;
+      
+      @media (max-width: 768px) {
+        font-size: 1.25rem;
+        margin-bottom: 15px;
+      }
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      
+      @media (max-width: 768px) {
+        gap: 8px;
+      }
+
+      &.full-width-demo {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+      }
+    }
+  }
+
+  // Code snippet styles
+  .code-snippet {
+    margin-top: 20px;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    pre {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 10px;
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+
+    code {
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+    }
+  }
+
+  // Form styles
+  .demo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 400px;
+
+    .demo-input {
+      padding: 10px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      &::placeholder {
+        color: #6c757d;
+      }
+    }
+
+    .button-group {
+      justify-content: flex-start;
+    }
+  }
+
+  // Action log styles
+  .action-log {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+
+    .log-entry {
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: 'Courier New', monospace;
+      border-bottom: 1px solid #f1f3f4;
+      color: #495057;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:nth-child(even) {
+        background-color: #f8f9fa;
+      }
+
+      &:hover {
+        background-color: #e9ecef;
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 15px;
+
+    .demo-section {
+      padding: 15px;
+      margin-bottom: 25px;
+
+      .button-group {
+        justify-content: center;
+        
+        &:not(.full-width-demo) {
+          app-button {
+            min-width: 120px;
+          }
+        }
+      }
+    }
+
+    .demo-form {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .demo-section {
+      .button-group {
+        flex-direction: column;
+        align-items: stretch;
+
+        app-button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+// Animation for smooth transitions
+.button-demo-container * {
+  box-sizing: border-box;
+}
+
+// Custom scrollbar for action log
+.action-log::-webkit-scrollbar {
+  width: 6px;
+}
+
+.action-log::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.action-log::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+
+  &:hover {
+    background: #a1a1a1;
+  }
+}
+
+// Focus styles for better accessibility
+.button-demo-container {
+  *:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+}

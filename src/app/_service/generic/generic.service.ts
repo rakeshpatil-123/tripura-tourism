@@ -17,7 +17,7 @@ export class GenericService {
   static QA_BACKEND_URL = 'https://swaagat-backend-qa.oitsystems.com';
   static UAT_BACKEND_URL = 'https://swaagat-backend-uat.oitsystems.com';
   static CERTIN_BACKEND_URL = 'https://swagat-backend-certin.oitsystems.com';
-  static PRODUCTION_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in';
+  static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
 
   public static BACKEND_URL(): string {
     console.log(window.location.origin);
@@ -27,7 +27,7 @@ export class GenericService {
       return GenericService.UAT_BACKEND_URL;
     } else if (window.location.origin.includes('swaagat-certin')) {
       return GenericService.CERTIN_BACKEND_URL;
-    } else if (window.location.origin.includes('swaagat.tripura')) {
+    } else if (window.location.origin.includes('swaagatstaging.tripura')) {
       return GenericService.PRODUCTION_BACKEND_URL;
     }
     return GenericService.DEV_BACKEND_URL;

@@ -435,6 +435,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IlogiSelectComponent } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
+import { MatIcon } from '@angular/material/icon';
 
 export type ColumnType =
   | 'text'
@@ -447,7 +448,8 @@ export type ColumnType =
   | 'link'
   | 'file'
   | 'action'
-  | 'custom';
+  | 'custom'
+  | 'icon';
 
 // ✅ Extended: Added optional `visible` to action
 export interface TableColumn {
@@ -459,26 +461,26 @@ export interface TableColumn {
   format?: (value: any, row: any) => string;
   linkHref?: (row: any) => string;
   linkText?: (row: any) => string;
+
+  icon?: string;             // mat-icon name, e.g., 'visibility'
+  onClick?: (row: any) => void; // handler for icon click
+
   actions?: Array<{
     label: string;
     action?: string;
     icon?: string;
     color?: 'primary' | 'warn' | 'accent' | 'success' | 'danger';
     handler?: (row: any) => void;
-
     component?: Type<any>;
     componentInputs?: { [key: string]: any };
     onClick?: (row: any) => void;
-
-    // ✅ NEW: Optional visibility function (backward compatible)
     visible?: (row: any) => boolean;
   }>;
+
   class?: string;
   cellClass?: (value: any, row: any) => string;
-
   renderComponent?: Type<any>;
   renderComponentInputs?: { [key: string]: any };
-  
 }
 
 export interface TableRowAction {
@@ -491,7 +493,7 @@ export interface TableRowAction {
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatMenuModule, MatButtonModule, IlogiSelectComponent],
+  imports: [CommonModule, FormsModule, MatMenuModule, MatButtonModule, IlogiSelectComponent, MatIcon],
 })
 export class DynamicTableComponent implements OnChanges {
   @Input() data: any[] = [];
@@ -746,7 +748,7 @@ export class DynamicTableComponent implements OnChanges {
           ? column.linkText(row)
           : String(value || href);
         return this.sanitizer.bypassSecurityTrustHtml(
-          `<a href="${href}" target="_blank" class="table-link">${text}</a>`
+          `<a href="${href}" class="table-link">${text}</a>`
         );
 
       case 'file':
