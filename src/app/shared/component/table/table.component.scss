@@ -144,7 +144,7 @@ table{
   opacity: 0.5;
   transition: opacity 0.2s ease;
 }
-
+  
 .sortable:hover .sort-icon {
   opacity: 1;
 }
@@ -519,8 +519,28 @@ td .badge-unknown {
   display: flex;
   // justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: 0 0 12px 0;
   border-bottom: 1px solid #eee;
 
  
+}
+
+.icon-cell {
+  button {
+    margin: 0;
+    padding: 0;
+    min-width: auto;
+    width: 36px;
+    height: 36px;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+::ng-deep  .text-center{
+  text-align: start!important;
 }

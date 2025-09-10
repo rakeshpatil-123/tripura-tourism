@@ -1,51 +1,35 @@
 <div class="form-group">
 
-
-
   <p-floatlabel variant="on">
-    <input
-      *ngIf="type !== 'textarea'"
-      pInputText
-      appBlockCopyPaste
-      [blockCopyPaste]="appBlockCopyPaste"
-      [type]="type"
-      [id]="fieldId"
-      [value]="value == null ? '' : value"
-      [placeholder]="placeholder"
-      (input)="onInputChange($event)"
-      [attr.maxlength]="maxlength"
-      [readonly]="readonly"  
-      [disabled]="isDisabled"
-      [attr.aria-invalid]="submitted && hasErrors"
-      [attr.aria-describedby]="errorFieldId"
-      (mouseenter)="showErrorOnFieldHover()"
-      (mouseleave)="hideErrorOnFieldHoverOut()"
-      (blur)="changeBlur($event)"
-      class="form-control"
-      [ngClass]="{ 'is-invalid': submitted && hasErrors, 'readonly-like': readonly }"
-      autocomplete="off"
-    />
+    <div class="input-wrapper" *ngIf="type !== 'textarea'" class="eye">
+      <input pInputText appBlockCopyPaste [blockCopyPaste]="appBlockCopyPaste" [type]="inputType" [id]="fieldId"
+        [value]="value == null ? '' : value" [placeholder]="placeholder" (input)="onInputChange($event)"
+        [attr.maxlength]="maxlength" [readonly]="readonly" [disabled]="isDisabled"
+        [attr.aria-invalid]="submitted && hasErrors" [attr.aria-describedby]="errorFieldId"
+        (mouseenter)="showErrorOnFieldHover()" (mouseleave)="hideErrorOnFieldHoverOut()" (blur)="changeBlur($event)"
+        class="form-control" [ngClass]="{ 
+          'is-invalid': submitted && hasErrors, 
+          'readonly-like': readonly,
+          'password-input': type === 'password'
+        }" autocomplete="off" />
+      <div class="pos">
 
-    <textarea
-      *ngIf="type === 'textarea'"
-      pInputTextarea
-      [value]="value == null ? '' : value"
-      (input)="onInputChange($event)"
-      [attr.maxlength]="maxlength"
-      [placeholder]="placeholder"
-      [id]="fieldId"
-      [rows]="rows"
-      [readonly]="readonly" 
-      [disabled]="isDisabled"
-      [attr.aria-invalid]="submitted && hasErrors"
-      [attr.aria-describedby]="errorFieldId"
-      (mouseenter)="showErrorOnFieldHover()"
-      (mouseleave)="hideErrorOnFieldHoverOut()"
-      (blur)="changeBlur($event)"
-      class="form-control"
-      [ngClass]="{ 'is-invalid': submitted && hasErrors, 'readonly-like': readonly }"
-      autocomplete="off"
-    ></textarea>
+        <button *ngIf="type === 'password'" type="button" class="password-toggle-btn"
+        (click)="togglePasswordVisibility()" [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+        tabindex="-1">
+  <mat-icon style="font-size: 18px;">
+    {{ passwordVisible ? 'visibility_off' : 'visibility' }}
+  </mat-icon>
+</button>
+      </div>
+    </div>
+
+    <textarea *ngIf="type === 'textarea'" pInputTextarea [value]="value == null ? '' : value"
+      (input)="onInputChange($event)" [attr.maxlength]="maxlength" [placeholder]="placeholder" [id]="fieldId"
+      [rows]="rows" [readonly]="readonly" [disabled]="isDisabled" [attr.aria-invalid]="submitted && hasErrors"
+      [attr.aria-describedby]="errorFieldId" (mouseenter)="showErrorOnFieldHover()"
+      (mouseleave)="hideErrorOnFieldHoverOut()" (blur)="changeBlur($event)" class="form-control"
+      [ngClass]="{ 'is-invalid': submitted && hasErrors, 'readonly-like': readonly }" autocomplete="off"></textarea>
 
     <label [for]="fieldId">
       {{ fieldLabel }}
@@ -53,12 +37,7 @@
     </label>
   </p-floatlabel>
 
-  <div
-    *ngIf="submitted && hasErrors"
-    class="invalid-input"
-    [id]="errorFieldId"
-    [ngClass]="{ 'show-error': isHovered }"
-  >
+  <div *ngIf="submitted && hasErrors" class="invalid-input" [id]="errorFieldId" [ngClass]="{ 'show-error': isHovered }">
     <ng-container *ngFor="let item of errors | keyvalue; let i = index">
       <div *ngIf="i === 0" class="x-error-msg-text">
         {{ errorMessages[item.key] || item.value?.message }}
@@ -69,96 +48,3 @@
     </div>
   </div>
 </div>
-
-
-
-
-<!-- 
-
-<div class="form-group">
-  <label *ngIf="!hideLabel && readonly" [for]="fieldId" [class.bold-label]="readonly">
-    {{ fieldLabel }}
-    <span *ngIf="mandatory" class="required-indicator">*</span>
-  </label>
-
-  <div *ngIf="readonly" class="readonly-display" [attr.id]="fieldId" [attr.aria-label]="fieldLabel">
-    <ng-container *ngIf="pipe === 'currency'; else defaultReadonly">
-      {{
-        fieldExactVal ??
-        (checkIsNaN(value) ? value : (value | currency : "INR"))
-      }}
-    </ng-container>
-    <ng-template #defaultReadonly>
-      {{ fieldExactVal ?? value }}
-    </ng-template>
-  </div>
-
-  <ng-container *ngIf="!readonly">
-    <p-floatlabel variant="on">
-      <input
-        *ngIf="type !== 'textarea'"
-        pInputText
-        appBlockCopyPaste
-        [blockCopyPaste]="appBlockCopyPaste"
-        [type]="type"
-        [id]="fieldId"
-        [value]="value == null ? '' : value"
-        [placeholder]="placeholder"
-        (input)="onInputChange($event)"
-        [attr.maxlength]="maxlength"
-        [readonly]="readonly"
-        [disabled]="isDisabled"
-        [attr.aria-invalid]="submitted && hasErrors"
-        [attr.aria-describedby]="errorFieldId"
-        (mouseenter)="showErrorOnFieldHover()"
-        (mouseleave)="hideErrorOnFieldHoverOut()"
-        (blur)="changeBlur($event)"
-        class="form-control"
-        [ngClass]="{ 'is-invalid': submitted && hasErrors, 'readonly-like': readonly }"
-        autocomplete="off"
-      />
-
-      <textarea
-        *ngIf="type === 'textarea'"
-        pInputTextarea
-        [value]="value == null ? '' : value"
-        (input)="onInputChange($event)"
-        [attr.maxlength]="maxlength"
-        [placeholder]="placeholder"
-        [id]="fieldId"
-        [rows]="rows"
-        [readonly]="readonly"
-        [disabled]="isDisabled"
-        [attr.aria-invalid]="submitted && hasErrors"
-        [attr.aria-describedby]="errorFieldId"
-        (mouseenter)="showErrorOnFieldHover()"
-        (mouseleave)="hideErrorOnFieldHoverOut()"
-        (blur)="changeBlur($event)"
-        class="form-control"
-        [ngClass]="{ 'is-invalid': submitted && hasErrors, 'readonly-like': readonly }"
-        autocomplete="off"
-      ></textarea>
-
-      <label [for]="fieldId">
-        {{ fieldLabel }}
-        <span *ngIf="mandatory" class="required-indicator">*</span>
-      </label>
-    </p-floatlabel>
-  </ng-container>
-
-  <div
-    *ngIf="submitted && hasErrors"
-    class="invalid-input"
-    [id]="errorFieldId"
-    [ngClass]="{ 'show-error': isHovered }"
-  >
-    <ng-container *ngFor="let item of errors | keyvalue; let i = index">
-      <div *ngIf="i === 0" class="x-error-msg-text">
-        {{ errorMessages[item.key] || item.value?.message }}
-      </div>
-    </ng-container>
-    <div *ngIf="errors?.['custom']?.status" class="x-error-msg-text">
-      {{ errors?.['custom']?.message }}
-    </div>
-  </div>
-</div> -->

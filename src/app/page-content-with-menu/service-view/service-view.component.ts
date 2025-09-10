@@ -29,13 +29,17 @@ export class ServiceViewComponent implements OnInit {
   applicationData: any = null;
   isLoading: boolean = false;
 
-  // Dynamic table data and columns
+  // Application Info Table
   infoData: any[] = [];
   infoColumns: TableColumn[] = [];
 
-  // Workflow table (separate, since it's a list)
+  // Workflow Table
   workflowColumns: TableColumn[] = [];
   workflowData: any[] = [];
+
+  // Application Q&A Table
+  applicationQATableData: any[] = [];
+  applicationQAColumns: TableColumn[] = [];
 
   // Modal state
   statusModal: StatusActionModal = {
@@ -90,6 +94,10 @@ export class ServiceViewComponent implements OnInit {
 
           if (res?.status === 1 && res.data) {
             this.applicationData = res.data;
+
+            // ❌ Remove JSON.parse — it's already an object/array
+            console.log('Application Data:', this.applicationData.application_data);
+
             this.processDataForDisplay();
           } else {
             this.apiService.openSnackBar(
@@ -111,29 +119,52 @@ export class ServiceViewComponent implements OnInit {
   processDataForDisplay(): void {
     const data = this.applicationData;
 
+    // Define field mapping for readable labels
+    const fieldMap: Record<string, string> = {
+      'application_id': 'Application ID',
+      'service_id': 'Service ID',
+      'service_name': 'Service Name',
+      'status': 'Status',
+      'applied_fee': 'Applied Fee',
+      'approved_fee': 'Approved Fee',
+      'payment_status': 'Payment Status',
+      'user.id': 'User ID',
+      'user.name': 'User Name',
+      'user.phone': 'User Phone',
+      'user.email': 'User Email',
+      'step_number': 'Step Number',
+      'step_type': 'Step Type',
+      'department': 'Department',
+      'action_taken_by': 'Action Taken By',
+      'action_taken_at': 'Action Taken At',
+      'remarks': 'Remarks'
+    };
+
     const flatEntries: { key: string; value: string }[] = [];
 
     const flatten = (obj: any, prefix = '') => {
       for (const key in obj) {
         if (!obj.hasOwnProperty(key)) continue;
 
-        if (key === 'workflow') continue;
+        // Skip workflow and application_data — handle separately
+        if (key === 'workflow' || key === 'application_data') continue;
 
         const value = obj[key];
         const formattedKey = prefix ? `${prefix}.${key}` : key;
+        const displayKey = fieldMap[formattedKey] || formattedKey;
 
         if (value === null || value === undefined) {
-          flatEntries.push({ key: formattedKey, value: '—' });
+          flatEntries.push({ key: displayKey, value: '—' });
         } else if (typeof value === 'object' && !Array.isArray(value)) {
           flatten(value, formattedKey);
         } else if (Array.isArray(value)) {
           flatEntries.push({
-            key: formattedKey,
+            key: displayKey,
             value: `[Array: ${value.length} item(s)]`,
           });
         } else {
           flatEntries.push({
-            key: formattedKey,
+            key: displayKey,
             value: String(value),
           });
         }
@@ -142,12 +173,30 @@ export class ServiceViewComponent implements OnInit {
 
     flatten(data);
 
+    // Populate Info Table (excluding workflow & application_data)
     this.infoData = flatEntries;
     this.infoColumns = [
       { key: 'key', label: 'Field', type: 'text', sortable: true },
       { key: 'value', label: 'Value', type: 'text', sortable: true },
     ];
 
+    // ➤ Process Application Q&A
+    if (Array.isArray(data.application_data) && data.application_data.length > 0) {
+      this.applicationQATableData = data.application_data.map((item: any) => ({
+        question: item.question || '—',
+        answer: item.answer || '—',
+      }));
+
+      this.applicationQAColumns = [
+        { key: 'question', label: 'Question', type: 'text' },
+        { key: 'answer', label: 'Answer', type: 'text' },
+      ];
+    } else {
+      this.applicationQATableData = [];
+      this.applicationQAColumns = [];
+    }
+
+    // ➤ Process Workflow
     if (Array.isArray(data.workflow)) {
       this.workflowData = data.workflow.map((step: any, index: number) => ({
         ...step,
@@ -158,8 +207,7 @@ export class ServiceViewComponent implements OnInit {
         action_taken_by: step.action_taken_by || '—',
         action_taken_at: step.action_taken_at || '—',
         remarks: step.remarks || '—',
-        // Add index for action handling
-        workflowIndex: index
+        workflowIndex: index,
       }));
 
       this.workflowColumns = [
@@ -168,14 +216,11 @@ export class ServiceViewComponent implements OnInit {
         { key: 'department', label: 'Department', type: 'text' },
         { key: 'status', label: 'Status', type: 'status' },
         { key: 'action_taken_by', label: 'Action By', type: 'text' },
-        { key: 'action_taken_at', label: 'Action At', type: 'date' },
+        { key: 'action_taken_at', label: 'Action At', type: 'text' },
         { key: 'remarks', label: 'Remarks', type: 'text' },
       ];
 
-      // Check if there are any pending steps
       const hasPendingSteps = data.workflow.some((step: any) => step.status === 'pending');
-      
-      // Only add actions column if there are pending steps
       if (hasPendingSteps) {
         this.workflowColumns.push({
           key: 'actions',
@@ -265,7 +310,7 @@ export class ServiceViewComponent implements OnInit {
               `Application step ${status.replace('_', ' ').toUpperCase()} successfully.`,
               'Close'
             );
-            this.fetchApplicationDetails();
+            this.fetchApplicationDetails(); // Refresh data
           } else {
             this.apiService.openSnackBar(
               res?.message || 'Failed to update status.',
@@ -276,7 +321,7 @@ export class ServiceViewComponent implements OnInit {
         error: (err) => {
           console.error('Status update failed:', err);
           this.apiService.openSnackBar(
-            'Could not update status. Please try again.',
+            err.error?.message || 'Update failed.',
             'Close'
           );
         },

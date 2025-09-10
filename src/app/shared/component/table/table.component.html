@@ -1,70 +1,36 @@
 <!-- table.component.html -->
 <div class="dynamic-table-container">
-  <div class="filter" >
+  <div class="filter">
 
     <div class="table-controls" *ngIf="searchable">
       <div class="search-box" id="searchBox">
-        <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        (input)="onSearch()"
-        placeholder="🔍 Search anything..."
-        class="search-input"
-        aria-label="Search table"
-        />
+        <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="🔍 Search anything..."
+          class="search-input" aria-label="Search table" />
       </div>
     </div>
     <div class="table-filters mb-3" *ngIf="filterOptions && filterOptions.length > 0">
-    <app-ilogi-select
-      [fieldLabel]="filterLabel"
-      [placeholder]="filterPlaceholder"
-      [selectOptions]="filterOptions"
-      [(ngModel)]="selectedFilterValue"
-      (ngModelChange)="applyFilters()"
-    >
-    </app-ilogi-select>
-  </div>
+      <app-ilogi-select [fieldLabel]="filterLabel" [placeholder]="filterPlaceholder" [selectOptions]="filterOptions"
+        [(ngModel)]="selectedFilterValue" (ngModelChange)="applyFilters()">
+      </app-ilogi-select>
+    </div>
   </div>
 
   <div class="table-wrapper">
     <table class="dynamic-table table-red-headers">
       <thead class="">
         <tr>
-          <th
-            *ngFor="let col of columns"
-            [style.width]="col.width"
-            [class.sortable]="col.sortable"
-            (click)="col.sortable ? onSort(col.key) : null"
-            [class]="col.class"
-          >
+          <th *ngFor="let col of columns" [style.width]="col.width" [class.sortable]="col.sortable"
+            (click)="col.sortable ? onSort(col.key) : null" [class]="col.class">
             <div class="th-content">
               {{ col.label }}
               <span class="sort-icon" *ngIf="col.sortable">
-                <svg
-                  *ngIf="sortColumn !== col.key || sortDirection === 'asc'"
-                  viewBox="0 0 24 24"
-                  width="14"
-                  height="14"
-                >
-                  <path
-                    d="M7 14l5-5 5 5"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    fill="none"
-                  />
+                <svg *ngIf="sortColumn !== col.key || sortDirection === 'asc'" viewBox="0 0 24 24" width="14"
+                  height="14">
+                  <path d="M7 14l5-5 5 5" stroke="currentColor" stroke-width="2" fill="none" />
                 </svg>
-                <svg
-                  *ngIf="sortColumn === col.key && sortDirection === 'desc'"
-                  viewBox="0 0 24 24"
-                  width="14"
-                  height="14"
-                >
-                  <path
-                    d="M7 10l5 5 5-5"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    fill="none"
-                  />
+                <svg *ngIf="sortColumn === col.key && sortDirection === 'desc'" viewBox="0 0 24 24" width="14"
+                  height="14">
+                  <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" />
                 </svg>
               </span>
             </div>
@@ -73,104 +39,83 @@
       </thead>
 
       <tbody>
-        <tr
-          *ngFor="
+        <tr *ngFor="
             let row of paginatedData;
             let i = index;
             trackBy: trackByRowIndex
-          "
-          [class.even]="i % 2 === 0"
-        >
-          <td
-            *ngFor="
+          " [class.even]="i % 2 === 0">
+          <td *ngFor="
               let col of columns;
               let colIndex = index;
               trackBy: trackByColumnKey
-            "
-            [style.width]="col.width"
-            [class]="col.class"
-          >
+            " [style.width]="col.width" [class]="col.class">
+
+
+
+            <!-- 👇 Icon Button Cell -->
+            <div *ngIf="col.type === 'icon'" class="icon-cell text-center"
+              [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''">
+              <button mat-icon-button (click)="col.onClick ? col.onClick(row) : null" [title]="col.label || 'Action'"
+                type="button" [attr.aria-label]="col.label || 'Icon action'">
+                <mat-icon>{{ col.icon || 'help' }}</mat-icon>
+              </button>
+            </div>
             <!-- Custom Component Cells -->
-            <div
-              *ngIf="isCustomComponentColumn(col)"
-              class="custom-cell"
-              [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"
-            >
+            <div *ngIf="isCustomComponentColumn(col)" class="custom-cell"
+              [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''">
               <ng-container *ngIf="col.renderComponent; else defaultCell">
                 <div class="custom-component-placeholder">
                   Custom Component: {{ col.key }}
                 </div>
               </ng-container>
               <ng-template #defaultCell>
-                <div
-                  [innerHTML]="formatValue(row[col.key], col, row)"
-                  [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"
-                ></div>
+                <div [innerHTML]="formatValue(row[col.key], col, row)"
+                  [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"></div>
               </ng-template>
             </div>
 
             <!-- Regular Cells -->
-            <div
-              *ngIf="!isCustomComponentColumn(col) && col.type !== 'action'"
+            <!-- <div *ngIf="!isCustomComponentColumn(col) && col.type !== 'action'"
               [innerHTML]="formatValue(row[col.key], col, row)"
-              [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"
-            ></div>
+              [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"></div> -->
+            <!-- Regular Cells -->
+            <div *ngIf="!isCustomComponentColumn(col) && col.type !== 'action' && col.type !== 'icon'"
+              [innerHTML]="formatValue(row[col.key], col, row)"
+              [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"></div>
 
             <!-- Action Dropdown using mat-menu -->
-            <div
-              *ngIf="col.type === 'action'"
-              class="action-dropdown text-center"
-            >
+            <div *ngIf="col.type === 'action'" class="action-dropdown text-center">
               <!-- Menu Trigger Button -->
-              <button
-                mat-icon-button
-                class="clkable"
-                [matMenuTriggerFor]="menu"
-                title="More actions"
-                type="button"
-                aria-label="Action menu"
-              >
+              <button mat-icon-button class="clkable" [matMenuTriggerFor]="menu" title="More actions" type="button"
+                aria-label="Action menu">
                 <span class="icon">⋮</span>
               </button>
 
               <!-- The mat-menu element -->
               <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
-                <ng-container
-                  *ngFor="
+                <ng-container *ngFor="
                     let action of col.actions;
                     trackBy: trackByActionLabel
-                  "
-                >
+                  ">
                   <!-- Action with Custom Component -->
-                  <div
-                    *ngIf="hasActionComponent(action)"
-                    class="custom-action-item"
-                  >
-                    <button
-                      mat-menu-item
-                      (click)="onRowActionAndClose(action, row)"
-                      [class]="'btn-' + (action.color || 'primary')"
-                    >
-                      <ng-container
-                        *ngComponentOutlet="
+                  <div *ngIf="hasActionComponent(action)" class="custom-action-item">
+                    <button mat-menu-item (click)="onRowActionAndClose(action, row)"
+                      [class]="'btn-' + (action.color || 'primary')">
+                      <ng-container *ngComponentOutlet="
                           action.component ?? null;
                           injector: injector
-                        "
-                      ></ng-container>
+                        "></ng-container>
                     </button>
                   </div>
 
                   <!-- Regular Action Button -->
                   <!-- ✅ Added *ngIf with visible support -->
-                  <button
-                    *ngIf="!hasActionComponent(action) && (action.visible ? action.visible(row) : true)"
-                    mat-menu-item
-                    (click)="onRowActionAndClose(action, row)"
-                    [class]="'btn-' + (action.color || 'primary')"
-                  >
+                  <button *ngIf="!hasActionComponent(action) && (action.visible ? action.visible(row) : true)"
+                    mat-menu-item (click)="onRowActionAndClose(action, row)"
+                    [class]="'btn-' + (action.color || 'primary')">
                     <span *ngIf="action.icon" class="icon mr-1">{{
                       action.icon
-                    }}</span>
+                      }}</span>
                     <span>{{ action.label }}</span>
                   </button>
                 </ng-container>
@@ -182,22 +127,11 @@
         <tr *ngIf="paginatedData.length === 0">
           <td [attr.colspan]="columns.length" class="no-data">
             <div class="empty-state">
-              <svg
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path
                   d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                  stroke-width="2"
-                />
-                <path
-                  d="M12 8V12M12 16H12.01"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
+                  stroke-width="2" />
+                <path d="M12 8V12M12 16H12.01" stroke-width="2" stroke-linecap="round" />
               </svg>
               <p>No records found</p>
             </div>
@@ -212,36 +146,24 @@
       Showing <strong>{{ (currentPage - 1) * pageSize + 1 }}</strong> to
       <strong>{{
         minValue(currentPage * pageSize, filteredData.length)
-      }}</strong>
+        }}</strong>
       of <strong>{{ filteredData.length }}</strong> entries
     </div>
 
     <div class="pagination-controls">
-      <button
-        class="btn btn-pagination prev"
-        [disabled]="currentPage === 1"
-        (click)="onPageChange(currentPage - 1)"
-        aria-label="Previous page"
-      >
+      <button class="btn btn-pagination prev" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)"
+        aria-label="Previous page">
         <span class="icon">◀</span>
         <span class="label">Previous</span>
       </button>
 
-      <button
-        *ngFor="let page of pageNumbers"
-        class="btn btn-pagination page"
-        [class.active]="page === currentPage"
-        (click)="onPageChange(page)"
-      >
+      <button *ngFor="let page of pageNumbers" class="btn btn-pagination page" [class.active]="page === currentPage"
+        (click)="onPageChange(page)">
         {{ page }}
       </button>
 
-      <button
-        class="btn btn-pagination next"
-        [disabled]="currentPage === totalPages"
-        (click)="onPageChange(currentPage + 1)"
-        aria-label="Next page"
-      >
+      <button class="btn btn-pagination next" [disabled]="currentPage === totalPages"
+        (click)="onPageChange(currentPage + 1)" aria-label="Next page">
         <span class="label">Next</span>
         <span class="icon">▶</span>
       </button>

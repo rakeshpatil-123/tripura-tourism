@@ -1,35 +1,63 @@
 <div class="service-view-container">
-  <h2 class="page-head mb-3">Application Details</h2>    
+  <!-- <h2 class="page-head mb-3">Application Details</h2> -->
 
-  <div *ngIf="isLoading" class="text-center">
-    🔍 Loading application details...
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading application details...</p>
   </div>
 
-  <div *ngIf="!isLoading && !applicationData" class="text-center text-muted">
-    <p>Application not found.</p>
+  <div *ngIf="!isLoading && !applicationData" class="text-center text-muted py-5">
+    <p> Application not found.</p>
+    <!-- <button class="btn btn-outline-primary" (click)="router.navigate(['/departmental-services'])">
+      Go Back
+    </button> -->
   </div>
 
-  <!-- Workflow History -->
-  @if (!isLoading && workflowData.length > 0) {
-    <!-- <h3 class="mt-4">Workflow Steps</h3> -->
-    <app-dynamic-table
-      [data]="workflowData"
-      [columns]="workflowColumns"
-      [showPagination]="true"
-      [pageSize]="5"
-      [searchable]="true"
-    ></app-dynamic-table>
-  }
-  <!-- Main Application Info -->
-  @if (!isLoading && infoData.length > 0) {
-    <app-dynamic-table
-      [data]="infoData"
-      [columns]="infoColumns"
-      [showPagination]="false"
-      [searchable]="false"
-    ></app-dynamic-table>
-  }
+  <!-- Only show content if data is loaded -->
+  <div *ngIf="!isLoading && applicationData">
 
+    <!-- Workflow History -->
+    @if (workflowData.length > 0) {
+      <h3 class="mt-4 page-head">Workflow Steps</h3>
+      <app-dynamic-table
+        [data]="workflowData"
+        [columns]="workflowColumns"
+        [showPagination]="true"
+        [pageSize]="5"
+        [searchable]="true"
+      ></app-dynamic-table>
+    }
+
+    <!-- Application Questions & Answers -->
+    @if (applicationQAColumns.length > 0) {
+      <h3 class="mt-4 page-head">Application Questions & Answers</h3>
+      <app-dynamic-table
+        [data]="applicationQATableData"
+        [columns]="applicationQAColumns"
+        [showPagination]="false"
+        [searchable]="false"
+      ></app-dynamic-table>
+    }
+    @else {
+      <div class="alert alert-info mt-4">
+        No application questions provided.
+      </div>
+    }
+
+    <!-- Main Application Summary -->
+    @if (infoData.length > 0) {
+      <h3 class="mt-4 page-head">Application Summary</h3>
+      <app-dynamic-table
+        [data]="infoData"
+        [columns]="infoColumns"
+        [showPagination]="false"
+        [searchable]="false"
+      ></app-dynamic-table>
+    }
+
+  </div>
 
   <!-- Status Action Modal -->
   <div *ngIf="statusModal.visible" class="modal-overlay">
@@ -41,11 +69,17 @@
           formControlName="remarks"
           fieldLabel="Remarks"
           [mandatory]="true"
-          placeholder="Enter remarks for this action"
+          placeholder="Enter remarks for this action (min 5 characters)"
         ></app-ilogi-input>
 
-        <div class="modal-actions">
-          <button type="button" (click)="closeModal()" class="btn btn-secondary">
+        @if (remarkForm.get('remarks')?.invalid && remarkForm.get('remarks')?.touched) {
+          <small class="text-danger">
+            Remarks are required and must be at least 5 characters.
+          </small>
+        }
+
+        <div class="modal-actions mt-3">
+          <button type="button" (click)="closeModal()" class="btn btn-secondary me-2">
             Cancel
           </button>
           <button type="submit" [disabled]="remarkForm.invalid" class="btn btn-primary">
