@@ -95,7 +95,16 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
             '../page-content-with-menu/departmental-services/departmental-services.component'
           ).then((m) => m.DepartmentalServicesComponent),
         canActivate: [authGuard],
-        data: { roles: ['department', 'individual'] }
+        data: { roles: ['department', ] }
+      },
+      {
+        path: 'all-departmental-applications',
+        loadComponent: () =>
+          import(
+            '../page-content-with-menu/all-department-applications/all-department-applications.component'
+          ).then((m) => m.AllDepartmentApplicationsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department', ] }
       },
       {
         path: 'all-service-application/:departmentId/:serviceId',
@@ -112,8 +121,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           import('./service-view/service-view.component').then(
             (m) => m.ServiceViewComponent
           ),
-        canActivate: [authGuard],
-        data: { roles: ['individual'] }
+        data: { roles: [ 'department'] }
       },
 
       {

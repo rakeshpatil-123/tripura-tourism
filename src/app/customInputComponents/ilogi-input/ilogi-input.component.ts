@@ -1,243 +1,3 @@
-// // import {
-// //   Component,
-// //   Input,
-// //   Output,
-// //   EventEmitter,
-// //   OnInit,
-// //   forwardRef,
-// // } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import {
-// //   ReactiveFormsModule,
-// //   ControlValueAccessor,
-// //   NG_VALUE_ACCESSOR,
-// // } from '@angular/forms';
-// // import { MatInputModule } from '@angular/material/input';
-// // import { BlockCopyPasteDirective } from '../../directives/block-copy-paste.directive';
-
-// // @Component({
-// //   selector: 'app-ilogi-input',
-// //   standalone: true,
-// //   imports: [
-// //     CommonModule,
-// //     ReactiveFormsModule,
-// //     MatInputModule,
-// //     BlockCopyPasteDirective,
-// //   ],
-// //   templateUrl: './ilogi-input.component.html',
-// //   styleUrls: ['./ilogi-input.component.scss'],
-// //   providers: [
-// //     {
-// //       provide: NG_VALUE_ACCESSOR,
-// //       useExisting: forwardRef(() => IlogiInputComponent),
-// //       multi: true,
-// //     },
-// //   ],
-// // })
-// // export class IlogiInputComponent implements OnInit, ControlValueAccessor {
-// //   @Input() submitted = false;
-// //   @Input() fieldLabel: string = '';
-// //   @Input() hideLabel = false;
-// //   @Input() fieldId: string = '';
-// //   @Input() pipe: string = '';
-// //   @Input() fieldExactVal: string | number | undefined;
-// //   @Input() errorMessages: { [key: string]: string } = {};
-// //   @Input() type = 'text';
-// //   @Input() placeholder = '';
-// //   @Input() mandatory = false;
-// //   @Input() appBlockCopyPaste = false;
-// //   @Input() readonly = false;
-// //   @Input() maxlength?: string | null | number = '255';
-// //   @Input() rows?: string | null | number = '2';
-// //   @Input() errors: { [key: string]: any } | null = null;
-
-// //   @Output() blur = new EventEmitter<Event>();
-
-// //   errorFieldId = '';
-// //   isHovered = false;
-// //   value: any;
-// //   isDisabled = false;
-
-// //   private onChange: (value: any) => void = () => {};
-// //   private onTouched: () => void = () => {};
-
-// //   ngOnInit() {
-// //     if (this.fieldId) {
-// //       this.errorFieldId = `invalid-input-${this.fieldId}`;
-// //     }
-// //   }
-
-// //   get hasErrors(): boolean {
-// //     return !!this.errors && Object.keys(this.errors).length > 0;
-// //   }
-
-// //   writeValue(value: any): void {
-// //     this.value = value ?? '';
-// //   }
-
-// //   registerOnChange(fn: (value: any) => void): void {
-// //     this.onChange = fn;
-// //   }
-
-// //   registerOnTouched(fn: () => void): void {
-// //     this.onTouched = fn;
-// //   }
-
-// //   setDisabledState(isDisabled: boolean): void {
-// //     this.isDisabled = isDisabled;
-// //   }
-
-// //   onInputChange(event: Event): void {
-// //     const input = event.target as HTMLInputElement | HTMLTextAreaElement;
-// //     this.value = input.value;
-// //     this.onChange(this.value);
-// //     this.onTouched();
-// //   }
-
-// //   showErrorOnFieldHover() {
-// //     this.isHovered = true;
-// //   }
-
-// //   hideErrorOnFieldHoverOut() {
-// //     this.isHovered = false;
-// //   }
-
-// //   changeBlur(event: Event) {
-// //     if (!this.readonly) {
-// //       this.blur.emit(event);
-// //       this.onTouched();
-// //     }
-// //   }
-
-// //   checkIsNaN(value: any): boolean {
-// //     return isNaN(Number(value));
-// //   }
-// // }
-
-// import {
-//   Component,
-//   Input,
-//   Output,
-//   EventEmitter,
-//   OnInit,
-//   forwardRef,
-// } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import {
-//   ReactiveFormsModule,
-//   ControlValueAccessor,
-//   NG_VALUE_ACCESSOR,
-// } from '@angular/forms';
-
-// // ✅ PrimeNG imports
-// import { InputTextModule } from 'primeng/inputtext';
-// import { TextareaModule } from 'primeng/textarea';
-// import { FloatLabelModule } from 'primeng/floatlabel';
-
-// import { BlockCopyPasteDirective } from '../../directives/block-copy-paste.directive';
-
-// @Component({
-//   selector: 'app-ilogi-input',
-//   standalone: true,
-//   imports: [
-//     CommonModule,
-//     ReactiveFormsModule,
-//     InputTextModule,       
-//     TextareaModule,   
-//     FloatLabelModule,      
-//     BlockCopyPasteDirective,
-//   ],
-//   templateUrl: './ilogi-input.component.html',
-//   styleUrls: ['./ilogi-input.component.scss'],
-//   providers: [
-//     {
-//       provide: NG_VALUE_ACCESSOR,
-//       useExisting: forwardRef(() => IlogiInputComponent),
-//       multi: true,
-//     },
-//   ],
-// })
-// export class IlogiInputComponent implements OnInit, ControlValueAccessor {
-//   @Input() submitted = false;
-//   @Input() fieldLabel: string = '';
-//   @Input() hideLabel = false;
-//   @Input() fieldId: string = '';
-//   @Input() pipe: string = '';
-//   @Input() fieldExactVal: string | number | undefined;
-//   @Input() errorMessages: { [key: string]: string } = {};
-//   @Input() type = 'text';
-//   @Input() placeholder = '';
-//   @Input() mandatory = false;
-//   @Input() appBlockCopyPaste = false;
-//   @Input() readonly = false;
-//   @Input() maxlength?: string | null | number = '255';
-//   @Input() rows?: string | null | number = '2';
-//   @Input() errors: { [key: string]: any } | null = null;
-
-//   @Output() blur = new EventEmitter<Event>();
-
-//   errorFieldId = '';
-//   isHovered = false;
-//   value: any;
-//   isDisabled = false;
-
-//   private onChange: (value: any) => void = () => {};
-//   private onTouched: () => void = () => {};
-
-//   ngOnInit() {
-//     if (this.fieldId) {
-//       this.errorFieldId = `invalid-input-${this.fieldId}`;
-//     }
-//   }
-
-//   get hasErrors(): boolean {
-//     return !!this.errors && Object.keys(this.errors).length > 0;
-//   }
-
-//   writeValue(value: any): void {
-//     this.value = value ?? '';
-//   }
-
-//   registerOnChange(fn: (value: any) => void): void {
-//     this.onChange = fn;
-//   }
-
-//   registerOnTouched(fn: () => void): void {
-//     this.onTouched = fn;
-//   }
-
-//   setDisabledState(isDisabled: boolean): void {
-//     this.isDisabled = isDisabled;
-//   }
-
-//   onInputChange(event: Event): void {
-//     const input = event.target as HTMLInputElement | HTMLTextAreaElement;
-//     this.value = input.value;
-//     this.onChange(this.value);
-//     this.onTouched();
-//   }
-
-//   showErrorOnFieldHover() {
-//     this.isHovered = true;
-//   }
-
-//   hideErrorOnFieldHoverOut() {
-//     this.isHovered = false;
-//   }
-
-//   changeBlur(event: Event) {
-//     if (!this.readonly) {
-//       this.blur.emit(event);
-//       this.onTouched();
-//     }
-//   }
-
-//   checkIsNaN(value: any): boolean {
-//     return isNaN(Number(value));
-//   }
-// }
-
-
 import {
   Component,
   Input,
@@ -256,11 +16,22 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { BlockCopyPasteDirective } from '../../directives/block-copy-paste.directive';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-ilogi-input',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, InputTextModule, TextareaModule, FloatLabelModule, BlockCopyPasteDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    InputTextModule,
+    TextareaModule,
+    FloatLabelModule,
+    BlockCopyPasteDirective,
+    FontAwesomeModule,
+    MatIcon
+  ],
   templateUrl: './ilogi-input.component.html',
   styleUrls: ['./ilogi-input.component.scss'],
   providers: [
@@ -279,7 +50,7 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
   @Input() pipe: string = '';
   @Input() fieldExactVal: string | number | undefined;
   @Input() errorMessages: { [key: string]: string } = {};
-  @Input() type: 'text' | 'number' | 'email' | 'textarea' = 'text'; 
+  @Input() type: 'text' | 'number' | 'email' | 'textarea' | 'password' = 'text'; 
   @Input() placeholder = '';
   @Input() mandatory = false;
   @Input() appBlockCopyPaste = false;
@@ -294,6 +65,7 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
   isHovered = false;
   value: any;
   isDisabled = false;
+  passwordVisible = false;
 
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
@@ -309,9 +81,9 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
     return !!this.errors && Object.keys(this.errors).length > 0;
   }
 
- writeValue(value: any): void {
-  this.value = value ?? '';
-}
+  writeValue(value: any): void {
+    this.value = value ?? '';
+  }
 
   registerOnChange(fn: (value: any) => void): void {
     this.onChange = fn;
@@ -325,18 +97,18 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
     this.isDisabled = isDisabled;
   }
 
-onInputChange(event: Event): void {
-  const input = event.target as HTMLInputElement | HTMLTextAreaElement;
-  let value: string | number | null = input.value;
+  onInputChange(event: Event): void {
+    const input = event.target as HTMLInputElement | HTMLTextAreaElement;
+    let value: string | number | null = input.value;
 
-  if (this.type === 'number') {
-    value = value === '' ? null : parseFloat(value);
+    if (this.type === 'number') {
+      value = value === '' ? null : parseFloat(value);
+    }
+
+    this.value = value; 
+    this.onChange(this.value); 
+    this.onTouched();
   }
-
-  this.value = value; 
-  this.onChange(this.value); 
-  this.onTouched();
-}
 
   showErrorOnFieldHover() {
     this.isHovered = true;
@@ -356,4 +128,20 @@ onInputChange(event: Event): void {
   checkIsNaN(value: any): boolean {
     return isNaN(Number(value));
   }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  get inputType(): string {
+    if (this.type === 'password') {
+      return this.passwordVisible ? 'text' : 'password';
+    }
+    return this.type;
+  }
+
+  // Add this getter for debugging
+get debugInfo(): string {
+  return `Type: ${this.type}, Password Visible: ${this.passwordVisible}, Input Type: ${this.inputType}`;
+}
 }
