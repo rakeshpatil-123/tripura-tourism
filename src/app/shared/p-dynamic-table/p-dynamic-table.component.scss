@@ -9,10 +9,20 @@
   overflow: hidden !important;
   color: #374151 !important;
 }
+::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: transparent !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-right: 1px solid #e5e7eb !important;
+  padding: 1rem 0.75rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
 
-/* Table header styling */
 ::ng-deep .p-datatable .p-datatable-header {
-  background: #f9fafb !important;
+  background: #003c5b !important;
   border-bottom: 1px solid #e5e7eb !important;
   color: #000000 !important;
   padding: 1rem !important;
@@ -113,7 +123,7 @@
 }
 
 ::ng-deep .p-datatable .p-badge.p-badge-info {
-  background-color: #3b82f6 !important;
+  background-color: #003c5b !important;
   color: #ffffff !important;
 }
 
@@ -151,7 +161,7 @@
 }
 
 ::ng-deep .p-datatable .p-tag.p-tag-info {
-  background-color: #3b82f6 !important;
+  background-color: #003c5b !important;
   color: #ffffff !important;
 }
 
@@ -338,7 +348,7 @@
 
 /* Active paginator page */
 ::ng-deep .p-paginator .p-paginator-page.p-highlight {
-  background: #3b82f6 !important;
+  background: #003c5b !important;
   border-color: #3b82f6 !important;
   color: #ffffff !important;
 }
@@ -441,7 +451,7 @@
 }
 
 ::ng-deep .p-datatable .p-badge.p-badge-info {
-  background-color: #3b82f6 !important;
+  background-color: #003c5b !important;
   color: #ffffff !important;
 }
 
@@ -475,6 +485,6 @@
 }
 
 ::ng-deep .p-datatable .p-tag.p-tag-info {
-  background-color: #3b82f6 !important;
+  background-color: #003c5b !important;
   color: #ffffff !important;
 }

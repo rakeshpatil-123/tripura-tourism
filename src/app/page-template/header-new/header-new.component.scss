@@ -86,27 +86,27 @@ $success-green-dark: #047857;
   }
 
   &.primary {
-    background: linear-gradient(to right, $primary-blue, $secondary-blue);
+    background: linear-gradient(135deg, #003c5b, #002a40);
     color: $white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     
     &:hover {
-      background: linear-gradient(to right, #003d91, #0099c7);
+      background: linear-gradient(to right, #003d91, #003d84, #003d92);
       box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
     }
   }
 
   // New registration button styling
   &.register-btn {
-    background: linear-gradient(90deg, #0051b4, #01b1d4);
+    background: linear-gradient(to right, #003c5b, #004aad, #0066cc, #00b4d8);
     color: $white;
     box-shadow: 0 4px 6px rgba(0, 81, 180, 0.3);
     position: relative;
     overflow: hidden;
     
     &:hover {
-      background: linear-gradient(90deg, #00429a, #0096b9);
+      background: linear-gradient(to right, #003d91, #003d84, #003d92);
       box-shadow: 0 6px 12px rgba(0, 81, 180, 0.4);
       transform: translateY(-1px);
     }

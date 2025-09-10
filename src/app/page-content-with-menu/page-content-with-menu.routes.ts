@@ -88,7 +88,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department', 'individual'] }
       },
-      {
+     {
         path: 'departmental-services',
         loadComponent: () =>
           import(
@@ -97,7 +97,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department', ] }
       },
-      {
+    {
         path: 'all-departmental-applications',
         loadComponent: () =>
           import(

@@ -84,14 +84,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/services',
       roles: ['individual', 'department','user', 'moderator', 'guest'],
     },
-    {
+     {
       id: 'Departmental services',
       title: 'Departmental Services',
       icon: 'important_devices',
       route: '/dashboard/departmental-services',
       roles: ['department', ],
     },
-    {
+  {
       id: 'all-departmental-applications',
       title: 'All departmental applications',
       icon: 'assignment',

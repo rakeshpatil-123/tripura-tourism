@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
 
 interface Slide {
   src: string;
@@ -14,7 +15,7 @@ interface Stat {
 @Component({
   selector: 'app-new-slider',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './new-slider.component.html',
   styleUrls: ['./new-slider.component.scss']
 })

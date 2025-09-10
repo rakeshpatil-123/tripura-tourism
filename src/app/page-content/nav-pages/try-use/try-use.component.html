@@ -1,0 +1,232 @@
+<div class="button-demo-container">
+  <h1>Button Component Demo</h1>
+  <h6 style="color: red;">*import "<span style="color: black;">ButtonComponent</span>" class in your TS file! *</h6>
+
+  <!-- Section: Button Types -->
+  <section class="demo-section">
+    <h2>Button Types</h2>
+    <div class="button-group">
+      <app-button text="Primary" type="primary" (clicked)="onButtonClick('Primary clicked')"></app-button>
+      <app-button text="Secondary" type="secondary" (clicked)="onButtonClick('Secondary clicked')"></app-button>
+      <app-button text="Outline" type="outline" (clicked)="onButtonClick('Outline clicked')"></app-button>
+      <app-button text="Ghost" type="ghost" (clicked)="onButtonClick('Ghost clicked')"></app-button>
+      <app-button text="Danger" type="danger" (clicked)="onButtonClick('Danger clicked')"></app-button>
+      <app-button text="Success" type="success" (clicked)="onButtonClick('Success clicked')"></app-button>
+      <app-button text="Designer" type="designer" (clicked)="onButtonClick('Designer clicked')"></app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{buttonTypesHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(buttonTypesHtml)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Button Sizes -->
+  <section class="demo-section">
+    <h2>Button Sizes</h2>
+    <div class="button-group">
+      <app-button text="Small" type="designer" size="small" (clicked)="bngPrint()"></app-button>
+      <app-button text="Medium" type="designer" size="medium" (clicked)="bngPrint2()"></app-button>
+      <app-button text="Large" type="designer" size="large" (clicked)="tryNewFunction()"></app-button>
+      <app-button text="XLarge" type="designer" size="xlarge" (clicked)="tryXLargeFunction()"></app-button>
+      <app-button text="XXLarge" type="designer" size="xxlarge" (clicked)="tryXXLargeFunction()"></app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{buttonSizesHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(buttonSizesHtml)"></app-button>
+      <h3>TS Code (Optional Handlers)</h3>
+      <pre><code>{{buttonSizesTs}}</code></pre>
+      <app-button text="Copy TS" type="ghost" size="small" (clicked)="copyToClipboard(buttonSizesTs)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Buttons with Icons -->
+  <section class="demo-section">
+    <h2>Buttons with Icons</h2>
+    <div class="button-group">
+      <app-button text="Search" icon="search" type="primary" (clicked)="onButtonClick('Search clicked')"></app-button>
+      <app-button text="Edit" icon="edit" type="secondary" (clicked)="onButtonClick('Edit clicked')"></app-button>
+      <app-button icon="trash" type="danger" ariaLabel="Delete item" (clicked)="onButtonClick('Delete clicked')"></app-button>
+      <app-button text="Download" icon="download" type="success" (clicked)="onButtonClick('Download clicked')"></app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{buttonsWithIconsHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(buttonsWithIconsHtml)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Full Width and Disabled -->
+  <section class="demo-section">
+    <h2>Full Width and Disabled</h2>
+    <div class="button-group full-width-demo">
+      <app-button text="Full Width Button" type="primary" [fullWidth]="true" (clicked)="onButtonClick('Full width clicked')"></app-button>
+      <app-button text="Disabled Button" type="secondary" [disabled]="true"></app-button>
+      <app-button text="Disabled Primary" type="primary" [disabled]="true"></app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{fullWidthDisabledHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(fullWidthDisabledHtml)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Loading State -->
+  <section class="demo-section">
+    <h2>Loading State</h2>
+    <div class="button-group">
+      <app-button 
+        text="Save Changes" 
+        type="success" 
+        [loading]="isLoading" 
+        (clicked)="toggleLoading()">
+      </app-button>
+      <app-button 
+        text="Submit Form" 
+        type="primary" 
+        htmlType="submit" 
+        [loading]="isLoading2"
+        (clicked)="toggleLoading2()">
+      </app-button>
+      <app-button 
+        icon="refresh-cw" 
+        type="outline" 
+        [loading]="isLoading3"
+        (clicked)="toggleLoading3()"
+        ariaLabel="Refresh data">
+      </app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{loadingStateHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(loadingStateHtml)"></app-button>
+      <h3>TS Code</h3>
+      <pre><code>{{loadingStateTs}}</code></pre>
+      <app-button text="Copy TS" type="ghost" size="small" (clicked)="copyToClipboard(loadingStateTs)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Navigation -->
+  <section class="demo-section">
+    <h2>Navigation (Note: Routes may not exist in demo)</h2>
+    <div class="button-group">
+      <app-button text="Go to Home" type="ghost" route="/" (clicked)="onButtonClick('Home navigation clicked')"></app-button>
+      <app-button 
+        text="About Us" 
+        type="outline" 
+        route="page/about-us" 
+        [queryParams]="{ id: 123, tab: 'settings' }"
+        (clicked)="onButtonClick('Profile navigation clicked')">
+      </app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{navigationHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(navigationHtml)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Tooltips -->
+  <section class="demo-section">
+    <h2>Tooltips (Hover to see)</h2>
+    <div class="button-group">
+      <app-button 
+        text="Hover Me" 
+        type="primary" 
+        tooltip="This is a primary button with tooltip"
+        (clicked)="onButtonClick('Tooltip button clicked')">
+      </app-button>
+      <app-button 
+        text="Danger Action" 
+        type="danger" 
+        tooltip="Be careful with this destructive action"
+        (clicked)="onButtonClick('Danger tooltip clicked')">
+      </app-button>
+      <app-button 
+        icon="info" 
+        type="ghost" 
+        tooltip="Information button"
+        ariaLabel="Show information"
+        (clicked)="onButtonClick('Info button clicked')">
+      </app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{tooltipsHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(tooltipsHtml)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Custom Content -->
+  <section class="demo-section">
+    <h2>Custom Content</h2>
+    <div class="button-group">
+      <app-button type="primary" (clicked)="onButtonClick('Custom star clicked')">
+        <span>Custom</span>
+        <i class="feather-star"></i>
+      </app-button>
+      <app-button type="success" (clicked)="onButtonClick('Custom done clicked')">
+        <i class="feather-check"></i>
+        <span style="margin-left: 8px;">Done</span>
+      </app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{customContentHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(customContentHtml)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Form Integration -->
+  <section class="demo-section">
+    <h2>Form Integration</h2>
+    <form (ngSubmit)="onFormSubmit()" class="demo-form">
+      <input 
+        type="text" 
+        placeholder="Enter some text..." 
+        class="demo-input"
+        [(ngModel)]="formText"
+        name="formText">
+      <div class="button-group">
+        <app-button text="Submit" type="primary" htmlType="submit"></app-button>
+        <app-button text="Reset" type="secondary" htmlType="reset" (clicked)="onFormReset()"></app-button>
+        <app-button text="Cancel" type="ghost" htmlType="button" (clicked)="onCancel()"></app-button>
+      </div>
+    </form>
+    <div class="code-snippet">
+      <h3>HTML Usage</h3>
+      <pre><code>{{formIntegrationHtml}}</code></pre>
+      <app-button text="Copy HTML" type="ghost" size="small" (clicked)="copyToClipboard(formIntegrationHtml)"></app-button>
+      <h3>TS Code</h3>
+      <pre><code>{{formIntegrationTs}}</code></pre>
+      <app-button text="Copy TS" type="ghost" size="small" (clicked)="copyToClipboard(formIntegrationTs)"></app-button>
+    </div>
+  </section>
+
+  <!-- Section: Button Component Source Code -->
+  <section class="demo-section">
+    <h2>Button Component Source Code</h2>
+    <div class="code-snippet">
+      <h3>button.component.ts</h3>
+      <pre><code>{{buttonComponentTs}}</code></pre>
+      <app-button text="Copy TS" type="ghost" size="small" (clicked)="copyToClipboard(buttonComponentTs)"></app-button>
+    </div>
+    <div class="code-snippet">
+      <h3>button.component.scss</h3>
+      <pre><code>{{buttonComponentScss}}</code></pre>
+      <app-button text="Copy SCSS" type="ghost" size="small" (clicked)="copyToClipboard(buttonComponentScss)"></app-button>
+    </div>
+  </section>
+
+  <!-- Action Log -->
+  <section class="demo-section" *ngIf="actionLog.length > 0">
+    <h2>Action Log</h2>
+    <div class="action-log">
+      <div *ngFor="let action of actionLog; trackBy: trackByIndex" class="log-entry">
+        {{ action }}
+      </div>
+    </div>
+    <app-button text="Clear Log" type="ghost" size="small" (clicked)="clearLog()"></app-button>
+  </section>
+</div>

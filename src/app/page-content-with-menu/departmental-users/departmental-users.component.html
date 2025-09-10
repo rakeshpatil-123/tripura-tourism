@@ -1,29 +1,69 @@
-<p-divider align="center">
+<p-divider class="header-bg-color" align="center">
   <h2 class="text-xl font-semibold m-0">Add Departmental User</h2>
 </p-divider>
 
-<app-registration [sourcePage]="'departmental-users'"></app-registration>
+<app-registration [sourcePage]="'departmental-users'"(registrationSuccess)="fetchProfile()"></app-registration>
 
 <p-divider></p-divider>
 
-<!-- <div *ngIf="profile" class="p-4">
-  <h2 class="mb-4">User Profile</h2>
+<div class="p-4">
+  <h2 class="mb-4">Departmental Users</h2>
 
-  <p-table [value]="profileTable" class="p-datatable-gridlines p-mb-4" [responsiveLayout]="'scroll'">
+  <p-table 
+    [value]="users" 
+    [paginator]="true" 
+    [rows]="5" 
+    [loading]="loading"
+    class="p-datatable-gridlines p-mb-4" 
+    [responsiveLayout]="'scroll'">
+    
     <ng-template pTemplate="header">
-      <tr>
-        <th>Field</th>
-        <th>Value</th>
+      <tr class="header-bg-color">
+        <th>ID</th>
+        <th>Enterprise Name</th>
+        <th>Authorized Person</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>User Name</th>
+        <th>District</th>
+        <th>Subdivision</th>
+        <th>Ulb</th>
+        <th>Ward</th>    
+        <th>Business Identification Number</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>Status</th>
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-row>
+    <ng-template pTemplate="body" let-user>
       <tr>
-        <td>{{ row.field }}</td>
-        <td>{{ row.value }}</td>
+        <td>{{ user.id }}</td>
+        <td>{{ user.name_of_enterprise }}</td>
+        <td>{{ user.authorized_person_name }}</td>
+        <td>{{ user.email_id }}</td>
+        <td>{{ user.mobile_no }}</td>
+        <td>{{ user.user_name }}</td>
+        <td>{{ user.district_name }}</td>
+        <td>{{ user.subdivision_name }}</td>
+        <td>{{ user.ulb_name }}</td>
+        <td>{{ user.ward_name }}</td>
+        <td>{{ user.bin }}</td>
+        <td>{{ user.registered_enterprise_address }}</td>
+        <td>{{ user.registered_enterprise_city }}</td>
+        <td>
+          <span [ngClass]="{'status-active': user.status === 'active', 'status-inactive': user.status !== 'active'}">
+            {{ user.status | titlecase }}
+          </span>
+        </td>
       </tr>
     </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="14" class="text-center">No data found</td>
+        </tr>
+      </ng-template>
   </p-table>
-</div> -->
+</div>
 
 <router-outlet></router-outlet>

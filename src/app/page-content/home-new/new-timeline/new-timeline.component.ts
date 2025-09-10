@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
 
 interface Step {
   icon: string;
@@ -18,7 +19,7 @@ interface Step {
 @Component({
   selector: 'app-new-timeline',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './new-timeline.component.html',
   styleUrls: ['./new-timeline.component.scss']
 })
