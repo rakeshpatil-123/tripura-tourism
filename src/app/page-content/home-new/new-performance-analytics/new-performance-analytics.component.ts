@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
 
 interface Metric {
   value: string;
@@ -21,7 +22,7 @@ interface Insight {
 @Component({
   selector: 'app-new-performance-analytics',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,ButtonComponent],
   templateUrl: './new-performance-analytics.component.html',
   styleUrls: ['./new-performance-analytics.component.scss']
 })

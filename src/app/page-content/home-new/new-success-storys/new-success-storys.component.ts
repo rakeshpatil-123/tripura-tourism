@@ -2,6 +2,7 @@ import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@
 import { CommonModule } from '@angular/common';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { gsap } from 'gsap';
+import { ButtonComponent } from '../../../shared/component/button-component/button.component';
 
 interface Metric {
   icon: string;
@@ -15,7 +16,7 @@ interface Metric {
 @Component({
   selector: 'app-new-success-storys',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './new-success-storys.component.html',
   styleUrls: ['./new-success-storys.component.scss'],
   animations: [
