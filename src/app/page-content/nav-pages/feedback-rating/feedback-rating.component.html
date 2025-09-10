@@ -78,8 +78,11 @@
               [(ngModel)]="feedbackForm.satisfaction"
               (change)="onRatingChange()"
               required>
-            <label [for]="'rating' + rating.value">
-              <span class="star" [class.star-selected]="getStarRating(parseNumber(rating.value))">★</span>
+            <label 
+              [for]="'rating' + rating.value"
+              (mouseenter)="onStarHover(rating.value)"
+              (mouseleave)="onStarLeave()">
+              <span class="star" [class.star-selected]="getStarRating(parseNumber(rating.value))" [class.star-hovered]="isStarHovered(parseNumber(rating.value))">★</span>
               <span class="rating-text">{{ rating.label }}</span>
             </label>
           </div>
@@ -127,7 +130,7 @@
       </div>
 
       <div class="submit-section">
-        <button type="submit" class="submit-btn">Submit Feedback</button>
+        <button type="submit" class="submit-btn" [class.loading]="isSubmitting" [disabled]="isSubmitting">Submit Feedback</button>
       </div>
     </form>
 
@@ -136,7 +139,7 @@
     </div>
 
     <div class="form-footer">
-      <p>For technical issues, contact: <strong>support@swaagat.gov.in</strong></p>
+      <p>For technical issues, contact: <strong><a href="mailto:support@swaagat.gov.in">support@swaagat.gov.in</a></strong></p>
     </div>
   </div>
 </div>

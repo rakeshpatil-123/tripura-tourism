@@ -1,5 +1,8 @@
 import { Component, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faFileAlt, faBook, faClock, faPen } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface Document {
   id: string;
@@ -15,16 +18,20 @@ interface Document {
   templateUrl: './acts-rules.component.html',
   styleUrls: ['./acts-rules.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FontAwesomeModule],
   encapsulation: ViewEncapsulation.None
 })
 export class ActsRulesComponent implements OnDestroy {
-  
+  faFileAlt = faFileAlt;
+  faBook = faBook;
+  faClock = faClock;
+  faPen = faPen;
+
   swaagatDocuments: Document[] = [
     {
       id: 'tripura-act-2018',
       title: 'The Tripura Industries (Facilitation) Act, 2018',
-      icon: 'fas fa-file-alt',
+      icon: 'file-alt',
       badge: 'Act',
       badgeClass: 'blue',
       url: 'https://swaagat.tripura.gov.in/assets/documents/The_Tripura_Industries_Facilitation_Act.pdf'
@@ -32,7 +39,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'tripura-rules-2020',
       title: 'Tripura Industries (Facilitation) Rules, 2020',
-      icon: 'fas fa-file-alt',
+      icon: 'file-alt',
       badge: 'Rules',
       badgeClass: 'green',
       url: 'https://swaagat.tripura.gov.in/assets/documents/SWAAGAT_Rule_e_Gazette_notification.pdf'
@@ -40,7 +47,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'tripura-amendment-2020',
       title: 'The Tripura Industries (Facilitation) (Amendment) Act, 2020',
-      icon: 'fas fa-file-alt',
+      icon: 'file-alt',
       badge: 'Amendment',
       badgeClass: 'red',
       url: 'https://swaagat.tripura.gov.in/assets/documents/Tripura%20Industries%20Faciltation%20(Amendment)%20Act.pdf'
@@ -48,7 +55,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'tripura-amendment-rules-2020',
       title: 'The Tripura Industries (Facilitation) (Amendment) Rules, 2020',
-      icon: 'fas fa-file-alt',
+      icon: 'file-alt',
       badge: 'Amendment Rules',
       badgeClass: 'orange',
       url: 'https://swaagat.tripura.gov.in/assets/documents/The%20Tripura%20Industries%20(Facilitation)%20(Amendment)%20Rules,%202020.pdf'
@@ -56,7 +63,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'timelines-services',
       title: 'Timelines of Services',
-      icon: 'fas fa-clock',
+      icon: 'clock',
       badge: 'Guidelines',
       badgeClass: 'pink',
       url: 'https://swaagat.tripura.gov.in/assets/documents/Timelines%20of%20services.pdf'
@@ -67,7 +74,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'industrial-policy',
       title: 'Industrial Policy and Schemes',
-      icon: 'fas fa-book',
+      icon: 'book',
       badge: 'Policy',
       badgeClass: 'orange',
       url: 'https://industries.tripura.gov.in/tripura-industrial-policy/'
@@ -75,7 +82,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'tiips-amendment',
       title: 'TIIPS 2017 Amendment',
-      icon: 'fas fa-book',
+      icon: 'book',
       badge: 'Amendment',
       badgeClass: 'red',
       url: 'https://swaagat.tripura.gov.in/assets/documents/TIIPS-2017-Amendment.pdf'
@@ -83,7 +90,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'tiipis-2022',
       title: 'Tripura Industrial Investment Promotion Incentive Scheme (TIIPIS), 2022',
-      icon: 'fas fa-book',
+      icon: 'book',
       badge: 'New Scheme',
       badgeClass: 'blue',
       url: 'https://swaagat.tripura.gov.in/assets/documents/TIIPS%20-2022.pdf'
@@ -91,7 +98,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'neids-2017',
       title: 'North East Industrial Development Scheme NEIDS 2017',
-      icon: 'fas fa-book',
+      icon: 'book',
       badge: 'Scheme',
       badgeClass: 'green',
       url: 'https://swaagat.tripura.gov.in/assets/documents/North-East-Industrial-Development-Scheme-NEIDS-2017.pdf'
@@ -99,7 +106,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'udyam-registration',
       title: 'Udyam Registration',
-      icon: 'fas fa-pen',
+      icon: 'pen',
       badge: 'Registration',
       badgeClass: 'pink',
       url: 'https://swaagat.tripura.gov.in/assets/documents/Udyam_Registration_Booklet.pdf'
@@ -107,7 +114,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'allotment-policy',
       title: 'Allotment Policy',
-      icon: 'fas fa-book',
+      icon: 'book',
       badge: 'Policy',
       badgeClass: 'orange',
       url: 'https://swaagat.tripura.gov.in/assets/documents/Allotment_Policy.pdf'
@@ -118,7 +125,7 @@ export class ActsRulesComponent implements OnDestroy {
     {
       id: 'rti-act',
       title: 'Right to Information Act',
-      icon: 'fas fa-file-alt',
+      icon: 'file-alt',
       badge: 'Act',
       badgeClass: 'blue',
       url: 'https://swaagat.tripura.gov.in/assets/documents/Tripura_RTI_Rules_2008.pdf'
@@ -127,6 +134,24 @@ export class ActsRulesComponent implements OnDestroy {
 
   showNoResults = false;
   private debounceTimer: any;
+
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faFileAlt, faBook, faClock, faPen);
+  }
+
+  /**
+   * Maps icon string to Font Awesome icon
+   * @param iconName - The name of the icon
+   */
+  getIcon(iconName: string): IconDefinition {
+    const iconMap: { [key: string]: IconDefinition } = {
+      'file-alt': this.faFileAlt,
+      'book': this.faBook,
+      'clock': this.faClock,
+      'pen': this.faPen
+    };
+    return iconMap[iconName] || this.faFileAlt; // Default to faFileAlt if not found
+  }
 
   /**
    * Opens a document in a new tab
