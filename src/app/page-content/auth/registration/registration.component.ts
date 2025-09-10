@@ -83,16 +83,25 @@ export class RegistrationComponent implements OnInit {
       user_name: ['', []],
       registered_enterprise_address: ['', []],
       registered_enterprise_city: ['', []],
-      user_type: ['Individual', []], 
+      user_type: ['individual', []], 
       password: ['', []],
       confirmPassword: ['', []],
       district_id: ['', []],
       subdivision_id: ['', []],
       ulb_id: ['', []],
       ward_id: ['', []],
+      hierarchy_level: [''],
+      department_id: [''],
+      designation: [''],
     }, {
       validators: this.passwordMatchValidator
     });
+  }
+
+  ngOnInit(): void {
+    this.loadDistricts();
+    this.setupCascadingDropdowns();
+    this.getAllDepartmentList();
     this.registrationForm.get('user_type')?.valueChanges.subscribe((value) => {
       if (value === 'department') {
         this.registrationForm.addControl('hierarchy_level', this.fb.control('', []));
@@ -104,12 +113,6 @@ export class RegistrationComponent implements OnInit {
         this.registrationForm.removeControl('designation');
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.loadDistricts();
-    this.setupCascadingDropdowns();
-    this.getAllDepartmentList();
   }
 
   setupCascadingDropdowns(): void {
