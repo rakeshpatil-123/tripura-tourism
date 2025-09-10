@@ -74,13 +74,10 @@
     padding: 2rem;
     box-shadow: 0 0.0625rem 0.1875rem 0 rgba(0, 0, 0, 0.1), 0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.06);
     border: 0.0625rem solid #E5E7EB;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
 .contact-card:hover {
-    transform: translateY(-0.25rem);
-    box-shadow: 0 0.625rem 0.9375rem -0.1875rem rgba(0, 0, 0, 0.1), 0 0.25rem 0.375rem -0.125rem rgba(0, 0, 0, 0.05);
     border-color: #60A5FA;
 }
 
@@ -105,7 +102,6 @@
     align-items: center;
     justify-content: center;
     margin-right: 1rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
 }
 
@@ -118,10 +114,6 @@
     width: 2.5rem;
     height: 2.5rem;
     object-fit: contain;
-}
-
-.card-icon:hover {
-    transform: scale(1.05);
 }
 
 .card-title {
@@ -150,7 +142,6 @@
     align-items: flex-start;
     padding: 1rem;
     border-radius: 0.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     background: #F3F4F6;
     border: 0.0625rem solid transparent;
@@ -159,8 +150,6 @@
 .info-item:hover {
     background: #FFFFFF;
     border-color: #E5E7EB;
-    transform: translateX(0.25rem);
-    box-shadow: 0 0.0625rem 0.1875rem 0 rgba(0, 0, 0, 0.1), 0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.06);
 }
 
 .info-icon {
@@ -170,7 +159,6 @@
     margin-top: 0.125rem;
     flex-shrink: 0;
     filter: invert(46%) sepia(99%) saturate(1350%) hue-rotate(208deg) brightness(100%) contrast(101%); /* Blue tint */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .info-item.secondary .info-icon {
@@ -198,7 +186,6 @@
     color: #3B82F6;
     text-decoration: none;
     font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .info-value a:hover {
@@ -220,13 +207,7 @@
     overflow: hidden;
     box-shadow: 0 0.0625rem 0.1875rem 0 rgba(0, 0, 0, 0.1), 0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.06);
     border: 0.0625rem solid #E5E7EB;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-top: 2rem;
-}
-
-.map-card:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.25rem 0.375rem -0.0625rem rgba(0, 0, 0, 0.1), 0 0.125rem 0.25rem -0.0625rem rgba(0, 0, 0, 0.06);
 }
 
 .map-card-header {
@@ -258,17 +239,9 @@
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     box-shadow: 0 0.625rem 0.9375rem -0.1875rem rgba(0, 0, 0, 0.1), 0 0.25rem 0.375rem -0.125rem rgba(0, 0, 0, 0.05);
-    transform: translateY(6.25rem);
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
     font-weight: 500;
     font-size: 0.875rem;
-}
-
-.copy-notification {
-    transform: translateY(0);
-    opacity: 1;
 }
 
 /* Responsive Design */
@@ -299,32 +272,4 @@
     .hero-title {
         font-size: clamp(1.5rem, 3vw, 2rem);
     }
-}
-
-/* Subtle animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(1.25rem);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.contact-card {
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.contact-card:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.map-card {
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.map-card:nth-child(2) {
-    animation-delay: 0.1s;
 }

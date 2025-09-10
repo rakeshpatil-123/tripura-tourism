@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-feedback-rating',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './feedback-rating.component.html',
-  styleUrl: './feedback-rating.component.scss'
+  styleUrls: ['./feedback-rating.component.scss']
 })
 export class FeedbackRatingComponent {
   // Form data model
@@ -28,6 +31,8 @@ export class FeedbackRatingComponent {
   showSuccessMessage = false;
   formErrors: { [key: string]: boolean } = {};
   ratingBorderError = false;
+  isSubmitting = false;
+  hoveredRating: number | null = null; // Track the currently hovered star
 
   // Department options
   departments = [
@@ -63,7 +68,13 @@ export class FeedbackRatingComponent {
     { value: '5', label: 'Excellent' }
   ];
 
-  constructor() {}
+  // Font Awesome icons
+  faUser = faUser;
+  faEnvelope = faEnvelope;
+
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faUser, faEnvelope);
+  }
 
   // Update character count for textareas
   onFeedbackInput(event: Event): void {
@@ -87,6 +98,24 @@ export class FeedbackRatingComponent {
   // Clear rating error when user selects a rating
   onRatingChange(): void {
     this.ratingBorderError = false;
+  }
+
+  // Handle star hover
+  onStarHover(value: string): void {
+    this.hoveredRating = Number(value);
+  }
+
+  // Handle mouse leaving star
+  onStarLeave(): void {
+    this.hoveredRating = null;
+  }
+
+  // Determine if a star should be highlighted (selected or hovered)
+  isStarHovered(starIndex: number): boolean {
+    if (this.hoveredRating !== null) {
+      return starIndex <= this.hoveredRating;
+    }
+    return false;
   }
 
   // Validate form
@@ -124,21 +153,20 @@ export class FeedbackRatingComponent {
   // Handle form submission
   onSubmit(): void {
     if (this.validateForm()) {
+      this.isSubmitting = true;
       this.showSuccessMessage = true;
       
-      // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Reset form after 3 seconds
       setTimeout(() => {
         this.resetForm();
+        this.isSubmitting = false;
       }, 3000);
 
       console.log('Form submitted successfully', this.feedbackForm);
     } else {
-      // Scroll to first error
       setTimeout(() => {
-        const firstError = document.querySelector('.error');
+        const firstError = document.querySelector('.error, .rating-section.rating-error');
         if (firstError) {
           firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -161,9 +189,10 @@ export class FeedbackRatingComponent {
     this.showSuccessMessage = false;
     this.formErrors = {};
     this.ratingBorderError = false;
+    this.hoveredRating = null;
   }
 
-  // Get star rating for display
+  // Get star rating for display (selected state)
   getStarRating(starIndex: number): boolean {
     const selectedRating = Number(this.feedbackForm.satisfaction || '0');
     return starIndex <= selectedRating;
