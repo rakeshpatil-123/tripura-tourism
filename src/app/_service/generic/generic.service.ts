@@ -14,9 +14,9 @@ import Swal from 'sweetalert2';
 export class GenericService {
   // API URLs (same as provided)
   static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static QA_BACKEND_URL = 'https://swaagat-backend-qa.oitsystems.com';
-  static UAT_BACKEND_URL = 'https://swaagat-backend-uat.oitsystems.com';
-  static CERTIN_BACKEND_URL = 'https://swagat-backend-certin.oitsystems.com';
+  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
 
   public static BACKEND_URL(): string {
