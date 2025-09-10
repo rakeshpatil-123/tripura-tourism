@@ -877,5 +877,22 @@ export class DynamicTableComponent implements OnChanges {
     return inputs;
   }
 
+// shouldShowActionMenu(col: TableColumn, row: any): boolean {
+//   if (!col.actions || col.actions.length === 0) return false;
+
+//   // Show menu if at least one action is visible (or has no visible condition)
+//   return col.actions.some(action => 
+//     !action.visible || action.visible(row)
+//   );
+// }
+
+shouldEnableActionMenu(col: TableColumn, row: any): boolean {
+  if (!col.actions || col.actions.length === 0) return false;
+
+  return col.actions.some(action => 
+    !action.visible || action.visible(row)
+  );
+}
+
   
 }

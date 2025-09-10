@@ -99,6 +99,7 @@ export class ServicesComponent {
         {
           label: 'Apply',
           color: 'primary',
+          visible: (row: any) => row.application_status === null || row.application_status === 'send_back',
           onClick: (row: any) => {
             this.onApply(row);
           },
@@ -127,8 +128,13 @@ export class ServicesComponent {
   }
 
   onApply(row: any): void {
-    console.log('Applying for service:', row);
-    this.router.navigate(['dashboard/service-application', row.id]);
+    console.log('Applying for service:', row.application_status);
+    this.router.navigate(['dashboard/service-application', row.id],{
+    queryParams: {
+      application_status: row.application_status, 
+    },
+    
+  });
   }
 
   handleRowAction(event: any): void {

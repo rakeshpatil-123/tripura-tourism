@@ -86,8 +86,19 @@
             <!-- Action Dropdown using mat-menu -->
             <div *ngIf="col.type === 'action'" class="action-dropdown text-center">
               <!-- Menu Trigger Button -->
-              <button mat-icon-button class="clkable" [matMenuTriggerFor]="menu" title="More actions" type="button"
+              <!-- <button mat-icon-button class="clkable" [matMenuTriggerFor]="menu" title="More actions" type="button"
                 aria-label="Action menu">
+                <span class="icon">⋮</span>
+              </button> -->
+
+              <!-- <button *ngIf="shouldShowActionMenu(col, row)" mat-icon-button class="clkable" [matMenuTriggerFor]="menu"
+                title="More actions" type="button" aria-label="Action menu">
+                <span class="icon">⋮</span>
+              </button> -->
+
+              <button mat-icon-button class="clkable" [matMenuTriggerFor]="menu"
+                [disabled]="!shouldEnableActionMenu(col, row)" [class.disabled-menu]="!shouldEnableActionMenu(col, row)"
+                title="More actions" type="button" aria-label="Action menu">
                 <span class="icon">⋮</span>
               </button>
 

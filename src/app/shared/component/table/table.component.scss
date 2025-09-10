@@ -544,3 +544,14 @@ td .badge-unknown {
 ::ng-deep  .text-center{
   text-align: start!important;
 }
+
+.disabled-menu {
+  opacity: 0.8;
+  cursor: not-allowed;
+  pointer-events: auto; /* Keep tooltip and focus */
+}
+
+/* Optional: Prevent hover effect when disabled */
+.disabled-menu:hover {
+  background-color: transparent !important;
+}
