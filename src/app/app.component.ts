@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
 import { HeaderNewComponent } from './page-template/header-new/header-new.component';
 import { NewNavComponent } from './page-template/new-nav/new-nav.component';
 import { LoaderComponent } from './page-template/loader/loader.component';
@@ -23,16 +23,24 @@ import { LogoFooterComponent } from './page-template/logo-footer/logo-footer.com
 })
 export class AppComponent implements OnInit, OnDestroy {
   protected title = 'swaagat_2';
-  showLoader: boolean = true;
+  showLoginLayout = false;
+  showLoader: boolean = false;
   isLoggedIn: boolean = false; 
   private loaderSubscription!: Subscription;
 
   constructor(
     private loaderService: LoaderService,
     private cdRef: ChangeDetectorRef,
-    private genericService: GenericService
+    private genericService: GenericService,
+    private router: Router
 
-  ) { }
+  ) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.showLoginLayout = event.url === '/page/login';
+      });
+  }
   ngOnInit() {
     this.loaderSubscription = this.loaderService.getLoaderStatus().subscribe((status) => {
       //  console.log('Loader status:', status); // Debug log
