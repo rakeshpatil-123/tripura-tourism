@@ -1,14 +1,9 @@
-<ng-container *ngIf="showLoginLayout; else defaultLayout">
-  <router-outlet></router-outlet>
-</ng-container>
-<ng-template #defaultLayout>
 <app-header-new></app-header-new>
 <app-new-nav *ngIf="!isLoggedIn"></app-new-nav>
 <div style="padding-top: 16vh;">
     <router-outlet></router-outlet>
 </div>
-<app-logo-footer *ngIf="!isLoggedIn"></app-logo-footer>
+<app-logo-footer *ngIf="!isLoggedIn"/>
 <app-footer *ngIf="!isLoggedIn"></app-footer>
 <app-mini-footer></app-mini-footer>
 <app-loader *ngIf="showLoader"></app-loader>
-</ng-template>
