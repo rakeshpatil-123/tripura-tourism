@@ -17,7 +17,7 @@
   </div>
 
   <!-- Upload Mode -->
-  <ng-template #uploadMode>
+  <!-- <ng-template #uploadMode>
     <div class="upload-area">
       <input
         type="file"
@@ -29,7 +29,10 @@
       />
 
       <div class="file-input-wrapper">
-        <span class="placeholder-text">{{ label || 'Select file' }}</span>
+        <div class="label-wrapper">
+  <span class="placeholder-text">{{ label || 'Select file' }}</span>
+  <span *ngIf="mandatory" class="mandatory-star">*</span>
+</div>
         <button
           type="button"
           class="browse-btn"
@@ -44,6 +47,39 @@
         {{ error }}
       </div>
     </div>
-  </ng-template>
+  </ng-template> -->
+
+  <!-- Upload Mode -->
+<ng-template #uploadMode>
+  <div class="upload-area">
+    <input
+      type="file"
+      #fileInput
+      [accept]="accept"
+      (change)="onFileSelected($event)"
+      class="hidden-input"
+      [disabled]="disabled"
+    />
+
+    <div class="file-input-wrapper">
+      <div class="label-wrapper">
+        <span class="placeholder-text">{{ label || 'Select file' }}</span>
+        <span *ngIf="mandatory" class="mandatory-star">*</span>
+      </div>
+      <button
+        type="button"
+        class="browse-btn"
+        (click)="onButtonClick()"
+        [disabled]="disabled"
+      >
+        Browse
+      </button>
+    </div>
+
+    <div *ngIf="error" class="error-msg">
+      {{ error }}
+    </div>
+  </div>
+</ng-template>
 
 </div>

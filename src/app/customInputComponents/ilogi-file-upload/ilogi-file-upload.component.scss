@@ -100,3 +100,14 @@
     pointer-events: none;
   }
 }
+
+.mandatory-star {
+  color: #d32f2f; /* Material red */
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.label-wrapper {
+  display: flex;
+  align-items: center;
+}

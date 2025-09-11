@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders,HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+  HttpParams,
+} from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, Observable, Subject, throwError } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
@@ -65,12 +70,15 @@ export class GenericService {
     return this.http.post(`${this.baseUrl}/api/user/login`, credentials);
   }
 
-   getHeaders(): HttpHeaders {
+  getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
 
     if (token) {
-      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
     }
 
     return headers;
@@ -125,32 +133,31 @@ export class GenericService {
   //   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams);
   // }
 
-/**
- * Get decrypted user ID from localStorage
- * @returns string - decrypted user ID or null if not found
- */
-getDecryptedUserId(): string | null {
-  try {
-    const encryptedId = localStorage.getItem('id');
-    if (!encryptedId) {
-      console.warn('User ID not found in localStorage');
+  /**
+   * Get decrypted user ID from localStorage
+   * @returns string - decrypted user ID or null if not found
+   */
+  getDecryptedUserId(): string | null {
+    try {
+      const encryptedId = localStorage.getItem('id');
+      if (!encryptedId) {
+        console.warn('User ID not found in localStorage');
+        return null;
+      }
+
+      // Decrypt the ID using existing decryptData method
+      const decryptedId = this.decryptData(encryptedId);
+      return decryptedId;
+    } catch (error) {
+      console.error('Failed to decrypt user ID:', error);
       return null;
     }
-    
-    // Decrypt the ID using existing decryptData method
-    const decryptedId = this.decryptData(encryptedId);
-    return decryptedId;
-  } catch (error) {
-    console.error('Failed to decrypt user ID:', error);
-    return null;
   }
-}
 
   // getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   //   const token = localStorage.getItem('token');
   //   let headers = new HttpHeaders();
   //   // console.log(token,"token");
-    
 
   //   if (token) {
   //     headers = headers.set(
@@ -158,53 +165,94 @@ getDecryptedUserId(): string | null {
   //       `Bearer ${this.decryptData(token)}`
   //     );
   //     console.log(headers, "headers");
-      
+
   //   }
-
-
 
   //   return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
   //     headers,
   //   });
   // }
 
-  getByConditions(conditionParams: any, apiObject: string): Observable<any> {
+  // getByConditions(conditionParams: any, apiObject: string): Observable<any> {
+  //   const token = localStorage.getItem('token');
+  //   let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+  //   if (token) {
+  //     headers = headers.set(
+  //       'Authorization',
+  //       `Bearer ${this.decryptData(token)}`
+  //     );
+  //   }
+
+  //   return this.http
+  //     .post(`${this.baseUrl}/${apiObject}`, conditionParams, { headers })
+  //     .pipe(
+  //       catchError((error: HttpErrorResponse) => {
+  //         if (error.error && typeof error.error === 'object') {
+  //           const message = error.error.message;
+
+  //           if (message === 'Unauthenticated.' || message === 'Unauthorised') {
+  //             console.warn(
+  //               'Session expired or invalid. Redirecting to login...'
+  //             );
+  //             this.handleUnauthenticated();
+  //           }
+  //         } else if (error.status === 401) {
+  //           console.warn('401 Unauthorized. Redirecting to login...');
+  //           this.handleUnauthenticated();
+  //         }
+
+  //         return throwError(() => error);
+  //       })
+  //     );
+  // }
+
+
+
+getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   const token = localStorage.getItem('token');
-  let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  let headers = new HttpHeaders();
 
   if (token) {
-    headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+    headers = headers.set(
+      'Authorization',
+      `Bearer ${this.decryptData(token)}`
+    );
   }
 
-  return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, { headers }).pipe(
-    catchError((error: HttpErrorResponse) => {
-      if (error.error && typeof error.error === 'object') {
-        const message = error.error.message;
+  if (!(conditionParams instanceof FormData)) {
+    headers = headers.set('Content-Type', 'application/json');
+  }
 
-        if (message === 'Unauthenticated.' || message === 'Unauthorised') {
-          console.warn('Session expired or invalid. Redirecting to login...');
-          this.handleUnauthenticated();
-        }
-      }
-      else if (error.status === 401) {
-        console.warn('401 Unauthorized. Redirecting to login...');
-        this.handleUnauthenticated();
-      }
+  return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
+    headers,
+  }).pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.error && typeof error.error === 'object') {
+            const message = error.error.message;
 
-      return throwError(() => error);
-    })
-  );
+            if (message === 'Unauthenticated.' || message === 'Unauthorised') {
+              console.warn(
+                'Session expired or invalid. Redirecting to login...'
+              );
+              this.handleUnauthenticated();
+            }
+          } else if (error.status === 401) {
+            console.warn('401 Unauthorized. Redirecting to login...');
+            this.handleUnauthenticated();
+          }
+
+          return throwError(() => error);
+        }));
 }
 
-private handleUnauthenticated(): void {
-  localStorage.clear();
-  this.setLoginStatus(false);
 
-  window.location.href = '/page/login';
-}
+  private handleUnauthenticated(): void {
+    localStorage.clear();
+    this.setLoginStatus(false);
 
-
-
+    window.location.href = '/page/login';
+  }
 
   getByConditionsExternal(
     conditionParams: any,
@@ -658,9 +706,13 @@ private handleUnauthenticated(): void {
       );
     }
 
-    return this.http.post(this.baseUrl + '/api/admin/service-master-store', body, {
-      headers,
-    });
+    return this.http.post(
+      this.baseUrl + '/api/admin/service-master-store',
+      body,
+      {
+        headers,
+      }
+    );
   }
   getUpdationDataServiceAdmin(body: any): Observable<any> {
     const token = localStorage.getItem('token');
@@ -695,9 +747,13 @@ private handleUnauthenticated(): void {
       );
     }
 
-    return this.http.post(`${this.baseUrl}/api/admin/service-master-update`, body, {
-      headers,
-    });
+    return this.http.post(
+      `${this.baseUrl}/api/admin/service-master-update`,
+      body,
+      {
+        headers,
+      }
+    );
   }
 
   deleteAdminService(serviceId: number): Observable<any> {
@@ -811,7 +867,10 @@ private handleUnauthenticated(): void {
     let headers = new HttpHeaders();
 
     if (token) {
-      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
     }
     return this.http.post<any>(
       `${this.baseUrl}/api/department-get-all-departments`,
@@ -833,9 +892,13 @@ private handleUnauthenticated(): void {
       );
     }
 
-    return this.http.post(this.baseUrl + '/api/department-store-department', body, {
-      headers,
-    });
+    return this.http.post(
+      this.baseUrl + '/api/department-store-department',
+      body,
+      {
+        headers,
+      }
+    );
   }
 
   updateDepartment(body: any): Observable<any> {
@@ -873,13 +936,15 @@ private handleUnauthenticated(): void {
     );
   }
 
-
   deleteDepartment(departmentId: number): Observable<any> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
 
     if (token) {
-      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
     }
 
     return this.http.post(
@@ -888,9 +953,6 @@ private handleUnauthenticated(): void {
       { headers }
     );
   }
-
-
-
 
   addServiceFeeRule(body: any): Observable<any> {
     const token = localStorage.getItem('token');
@@ -903,7 +965,10 @@ private handleUnauthenticated(): void {
       );
     }
 
-    return this.http.post(`${this.baseUrl}/api/admin/service-fee-rule-store`, body, {
+    return this.http.post(
+      `${this.baseUrl}/api/admin/service-fee-rule-store`,
+      body,
+      {
         headers,
       }
     );
@@ -975,9 +1040,13 @@ private handleUnauthenticated(): void {
       );
     }
 
-    return this.http.post(`${this.baseUrl}/api/admin/renewal-cycle-store`, body, {
-      headers,
-    });
+    return this.http.post(
+      `${this.baseUrl}/api/admin/renewal-cycle-store`,
+      body,
+      {
+        headers,
+      }
+    );
   }
 
   getRenewalCycle(serviceId: number): Observable<any> {
@@ -1046,9 +1115,13 @@ private handleUnauthenticated(): void {
       );
     }
 
-    return this.http.post(`${this.baseUrl}/api/admin/renewal-fee-rule-store`, body, {
-      headers,
-    });
+    return this.http.post(
+      `${this.baseUrl}/api/admin/renewal-fee-rule-store`,
+      body,
+      {
+        headers,
+      }
+    );
   }
 
   getRenewalFeeRule(serviceId: number): Observable<any> {
@@ -1123,16 +1196,22 @@ private handleUnauthenticated(): void {
     );
   }
 
-
   addApprovalFlow(body: any): Observable<any> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders().set('Accept', 'application/json');
 
     if (token) {
-      headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
     }
 
-    return this.http.post(`${this.baseUrl}/api/admin/service-approval-flow-store`, body, { headers });
+    return this.http.post(
+      `${this.baseUrl}/api/admin/service-approval-flow-store`,
+      body,
+      { headers }
+    );
   }
 
   updateApprovalFlow(body: any): Observable<any> {

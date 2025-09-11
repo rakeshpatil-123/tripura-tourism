@@ -258,9 +258,9 @@ loadingSubdivisions = false;
 
     this.form.get('landType')?.valueChanges.subscribe((value) => {
       if (value === 'Municipality') {
-        this.form.get('areaType')?.setValue('urban', { emitEvent: true });
+        this.form.get('areaType')?.setValue('Urban', { emitEvent: true });
       } else if (value === 'Panchayat') {
-        this.form.get('areaType')?.setValue('rural', { emitEvent: true });
+        this.form.get('areaType')?.setValue('Rural', { emitEvent: true });
       }
       this.updateFieldVisibility();
     });
@@ -340,11 +340,11 @@ onDistrictChange(district: string): void {
       this.visibility.showEstateFields = true;
     }
 
-    if (areaType === 'urban' || landType === 'Municipality') {
+    if (areaType === 'Urban' || landType === 'Municipality') {
       this.visibility.showUrbanFields = true;
     }
 
-    if (areaType === 'rural' || landType === 'Panchayat') {
+    if (areaType === 'Rural' || landType === 'Panchayat') {
       this.visibility.showRuralFields = true;
     }
 
@@ -605,30 +605,30 @@ onDistrictChange(district: string): void {
       });
   }
 
-getErrorMessage(fieldName: string): string {
-  const control = this.form.get(fieldName);
-  if (control?.errors && (control.touched || this.submitted)) {
-    if (control.errors['required']) {
-      return `${this.getFieldLabel(fieldName)} is required`;
-    }
-    if (control.errors['pattern']) {
-      switch (fieldName) {
-        case 'pinNo':  
-          return 'Pin must be 6 digits';
-        case 'contactNo':  
-          return 'Mobile must be 10 digits';
-        case 'email':  
-          return 'Please enter valid email';
-        default:
-          return 'Invalid format';
-      }
-    }
-    if (control.errors['email']) {
-      return 'Please enter a valid email';
-    }
-  }
-  return '';
-}
+// getErrorMessage(fieldName: string): string {
+//   const control = this.form.get(fieldName);
+//   if (control?.errors && (control.touched || this.submitted)) {
+//     if (control.errors['required']) {
+//       return `${this.getFieldLabel(fieldName)} is required`;
+//     }
+//     if (control.errors['pattern']) {
+//       switch (fieldName) {
+//         case 'pinNo':  
+//           return 'Pin must be 6 digits';
+//         case 'contactNo':  
+//           return 'Mobile must be 10 digits';
+//         case 'email':  
+//           return 'Please enter valid email';
+//         default:
+//           return 'Invalid format';
+//       }
+//     }
+//     if (control.errors['email']) {
+//       return 'Please enter a valid email';
+//     }
+//   }
+//   return '';
+// }
 
 getFieldLabel(fieldName: string): string {
   const labels: { [key: string]: string } = {

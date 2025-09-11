@@ -173,13 +173,13 @@ export class EnterpriseDetailsComponent implements OnInit {
       control?.markAsTouched();
     });
 
-    if (this.enterpriseForm.invalid) {
-      this.apiService.openSnackBar(
-        'Please correct the errors in the form.',
-        'error'
-      );
-      return;
-    }
+    // if (this.enterpriseForm.invalid) {
+    //   this.apiService.openSnackBar(
+    //     'Please correct the errors in the form.',
+    //     'error'
+    //   );
+    //   return;
+    // }
     // if (this.enterpriseForm.valid) {
     const formValue = this.enterpriseForm.value;
 
@@ -264,30 +264,30 @@ export class EnterpriseDetailsComponent implements OnInit {
   }
 
   // Add this helper method
-  getErrorMessage(fieldName: string): string {
-    const control = this.enterpriseForm.get(fieldName);
-    if (control?.errors && (control.touched || this.submitted)) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        switch (fieldName) {
-          case 'pin':
-            return 'Pin must be 6 digits';
-          case 'aadhar':
-            return 'Aadhar must be 12 digits';
-          case 'mobile':
-            return 'Mobile must be 10 digits';
-          default:
-            return 'Invalid format';
-        }
-      }
-      if (control.errors['email']) {
-        return 'Please enter a valid email';
-      }
-    }
-    return '';
-  }
+  // getErrorMessage(fieldName: string): string {
+  //   const control = this.enterpriseForm.get(fieldName);
+  //   if (control?.errors && (control.touched || this.submitted)) {
+  //     if (control.errors['required']) {
+  //       return `${this.getFieldLabel(fieldName)} is required`;
+  //     }
+  //     if (control.errors['pattern']) {
+  //       switch (fieldName) {
+  //         case 'pin':
+  //           return 'Pin must be 6 digits';
+  //         case 'aadhar':
+  //           return 'Aadhar must be 12 digits';
+  //         case 'mobile':
+  //           return 'Mobile must be 10 digits';
+  //         default:
+  //           return 'Invalid format';
+  //       }
+  //     }
+  //     if (control.errors['email']) {
+  //       return 'Please enter a valid email';
+  //     }
+  //   }
+  //   return '';
+  // }
 
   getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
