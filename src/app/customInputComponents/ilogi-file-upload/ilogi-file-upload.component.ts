@@ -1,6 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef } from '@angular/core';
-import { ReactiveFormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  forwardRef,
+} from '@angular/core';
+import {
+  ReactiveFormsModule,
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-ilogi-file-upload',
@@ -12,9 +24,9 @@ import { ReactiveFormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@a
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => IlogiFileUploadComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class IlogiFileUploadComponent implements ControlValueAccessor {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -24,7 +36,7 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
   @Input() accept: string = '';
   @Input() maxFileSize: number = 5 * 1024 * 1024; // 5MB
   @Input() disabled: boolean = false;
-
+  @Input() mandatory: boolean = false;
   @Output() fileSelected = new EventEmitter<File>();
   @Output() fileCleared = new EventEmitter<void>();
   @Output() onRemove = new EventEmitter<string>(); // 👈 New: Tell parent "file removed"

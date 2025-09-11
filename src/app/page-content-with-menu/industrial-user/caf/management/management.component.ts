@@ -419,11 +419,15 @@ export class ManagementComponent implements OnInit, OnDestroy {
  this.submitted = true;
   
   this.markFormGroupTouched(this.form);
+    // debugger;
+
     const payload = this.buildFormData(false);
     this.submitForm(payload, false);
   }
 
-  private submitForm(payload: FormData, isDraft: boolean): void {
+   submitForm(payload: FormData, isDraft: boolean): void {
+    debugger
+     console.log('Submitting form with payload:', payload);
     this.apiService
       .getByConditions(payload, 'api/caf/management-details-store')
       .subscribe({
@@ -599,72 +603,72 @@ export class ManagementComponent implements OnInit, OnDestroy {
   }
 
   // Fix your error message method
-  getErrorMessage(fieldName: string): string {
-    const control = this.form.get(fieldName);
-    if (control?.errors && (control.touched || this.submitted)) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        switch (fieldName) {
-          case 'ownerDetailsPin':
-          case 'managerDetailsPin':
-            return 'Pin must be 6 digits';
-          case 'ownerDetailsMobile':
-          case 'ownerDetailsAlternateMobile':
-          case 'managerDetailsMobile':
-            return 'Mobile must be 10 digits';
-          case 'ownerDetailsAadharNo':
-          case 'managerDetailsAadharNo':
-            return 'Aadhar must be 12 digits';
-          default:
-            return 'Invalid format';
-        }
-      }
-      if (control.errors['email']) {
-        return 'Please enter a valid email';
-      }
-    }
-    return '';
-  }
+  // getErrorMessage(fieldName: string): string {
+  //   const control = this.form.get(fieldName);
+  //   if (control?.errors && (control.touched || this.submitted)) {
+  //     if (control.errors['required']) {
+  //       return `${this.getFieldLabel(fieldName)} is required`;
+  //     }
+  //     if (control.errors['pattern']) {
+  //       switch (fieldName) {
+  //         case 'ownerDetailsPin':
+  //         case 'managerDetailsPin':
+  //           return 'Pin must be 6 digits';
+  //         case 'ownerDetailsMobile':
+  //         case 'ownerDetailsAlternateMobile':
+  //         case 'managerDetailsMobile':
+  //           return 'Mobile must be 10 digits';
+  //         case 'ownerDetailsAadharNo':
+  //         case 'managerDetailsAadharNo':
+  //           return 'Aadhar must be 12 digits';
+  //         default:
+  //           return 'Invalid format';
+  //       }
+  //     }
+  //     if (control.errors['email']) {
+  //       return 'Please enter a valid email';
+  //     }
+  //   }
+  //   return '';
+  // }
 
-  getFieldLabel(fieldName: string): string {
-    const labels: { [key: string]: string } = {
-      // Owner Details
-      ownerDetailsName: 'Owner Name',
-      ownerDetailsFathersName: "Owner Father's Name",
-      ownerDetailsResidentialAddress: 'Owner Address',
-      ownerDetailsPoliceStation: 'Owner Police Station',
-      ownerDetailsPin: 'Owner Pin',
-      ownerDetailsMobile: 'Owner Mobile',
-      ownerDetailsAlternateMobile: 'Owner Alternate Mobile',
-      ownerDetailsAadharNo: 'Owner Aadhar',
-      ownerDetailsStatus: 'Owner Status',
-      ownerDetailsEmail: 'Owner Email',
-      ownerDetailsDob: 'Owner Date of Birth',
-      ownerDetailsSocialStatus: 'Owner Social Status',
-      ownerDetailsIsDifferentlyAbled: 'Differently Abled Status',
-      ownerDetailsIsWomenEntrepreneur: 'Women Entrepreneur Status',
-      ownerDetailsIsMinority: 'Minority Status',
-      ownerDetailsPhoto: 'Owner Photo',
+  // getFieldLabel(fieldName: string): string {
+  //   const labels: { [key: string]: string } = {
+  //     // Owner Details
+  //     ownerDetailsName: 'Owner Name',
+  //     ownerDetailsFathersName: "Owner Father's Name",
+  //     ownerDetailsResidentialAddress: 'Owner Address',
+  //     ownerDetailsPoliceStation: 'Owner Police Station',
+  //     ownerDetailsPin: 'Owner Pin',
+  //     ownerDetailsMobile: 'Owner Mobile',
+  //     ownerDetailsAlternateMobile: 'Owner Alternate Mobile',
+  //     ownerDetailsAadharNo: 'Owner Aadhar',
+  //     ownerDetailsStatus: 'Owner Status',
+  //     ownerDetailsEmail: 'Owner Email',
+  //     ownerDetailsDob: 'Owner Date of Birth',
+  //     ownerDetailsSocialStatus: 'Owner Social Status',
+  //     ownerDetailsIsDifferentlyAbled: 'Differently Abled Status',
+  //     ownerDetailsIsWomenEntrepreneur: 'Women Entrepreneur Status',
+  //     ownerDetailsIsMinority: 'Minority Status',
+  //     ownerDetailsPhoto: 'Owner Photo',
 
-      // Manager Details
-      managerDetailsName: 'Manager Name',
-      managerDetailsFathersName: "Manager Father's Name",
-      managerDetailsResidentialAddress: 'Manager Address',
-      managerDetailsPoliceStation: 'Manager Police Station',
-      managerDetailsPin: 'Manager Pin',
-      managerDetailsMobile: 'Manager Mobile',
-      managerDetailsAadharNo: 'Manager Aadhar',
-      managerDetailsDob: 'Manager Date of Birth',
-      managerDetailsPhoto: 'Manager Photo',
+  //     // Manager Details
+  //     managerDetailsName: 'Manager Name',
+  //     managerDetailsFathersName: "Manager Father's Name",
+  //     managerDetailsResidentialAddress: 'Manager Address',
+  //     managerDetailsPoliceStation: 'Manager Police Station',
+  //     managerDetailsPin: 'Manager Pin',
+  //     managerDetailsMobile: 'Manager Mobile',
+  //     managerDetailsAadharNo: 'Manager Aadhar',
+  //     managerDetailsDob: 'Manager Date of Birth',
+  //     managerDetailsPhoto: 'Manager Photo',
 
-      // Signatures
-      signatureAuthorizationOfOwner: 'Owner Authorization Signature',
-      factoryOccupiersSignature: 'Factory Occupier Signature',
-      factoryManagersSignature: 'Factory Manager Signature',
-    };
+  //     // Signatures
+  //     signatureAuthorizationOfOwner: 'Owner Authorization Signature',
+  //     factoryOccupiersSignature: 'Factory Occupier Signature',
+  //     factoryManagersSignature: 'Factory Manager Signature',
+  //   };
 
-    return labels[fieldName] || fieldName;
-  }
+  //   return labels[fieldName] || fieldName;
+  // }
 }

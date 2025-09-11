@@ -33,9 +33,9 @@
         <app-ilogi-input fieldId="mobile" fieldLabel="Mobile" [mandatory]="true"
           [formControlName]="'ownerDetailsMobile'" placeholder="Enter mobile number" maxlength="10"></app-ilogi-input>
 
-        <div *ngIf="getErrorMessage('ownerDetailsMobile')" class="text-danger small mt-1">
+        <!-- <div *ngIf="getErrorMessage('ownerDetailsMobile')" class="text-danger small mt-1">
           {{ getErrorMessage('ownerDetailsMobile') }}
-        </div>
+        </div> -->
       </div>
 
       <app-ilogi-input fieldId="alternateMobileNo" fieldLabel="Alternate Mobile No"
@@ -80,16 +80,16 @@
 
         <app-ilogi-select fieldId="statusOfPerson" fieldLabel="Status of Person"
           [formControlName]="'ownerDetailsStatus'" [selectOptions]="statusOfPersonOptions"
-          placeholder="Select"></app-ilogi-select>
+          placeholder="Select" [mandatory]="true" ></app-ilogi-select>
       </div>
       <div class="mt-4">
 
         <app-ilogi-input fieldId="ownerEmail" fieldLabel="Owner Email" [formControlName]="'ownerDetailsEmail'"
-          placeholder="Enter Email" maxlength="100"></app-ilogi-input>
+          placeholder="Enter Email" maxlength="100" [mandatory]="true"></app-ilogi-input>
       </div>
       <div class="mt-4">
 
-        <app-ilogi-select fieldId="womenEntrepreneur" fieldLabel="Women Entrepreneur"
+        <app-ilogi-select fieldId="womenEntrepreneur" fieldLabel="Women Entrepreneur" [mandatory]="true"
           [formControlName]="'ownerDetailsIsWomenEntrepreneur'" [selectOptions]="womenEntrepreneurOptions"
           placeholder="Select"></app-ilogi-select>
       </div>
@@ -103,11 +103,11 @@
           placeholder="Select"></app-ilogi-select>
       </div>
       <div class="mt-4">
-        <app-ilogi-select fieldId="minority" fieldLabel="Minority" [formControlName]="'ownerDetailsIsMinority'"
+        <app-ilogi-select fieldId="minority" [mandatory]="true" fieldLabel="Minority" [formControlName]="'ownerDetailsIsMinority'"
           [selectOptions]="yesNoOptions" placeholder="Select"></app-ilogi-select>
       </div>
       <div class="mt-4">
-        <app-ilogi-select fieldId="differentlyAbled" fieldLabel="Differently Abled"
+        <app-ilogi-select fieldId="differentlyAbled" [mandatory]="true" fieldLabel="Differently Abled"
           [formControlName]="'ownerDetailsIsDifferentlyAbled'" [selectOptions]="yesNoOptions"
           placeholder="Select"></app-ilogi-select>
       </div>
@@ -189,7 +189,7 @@
 
   <div class="row top-space no-padding-first-last">
     <div class="col-md-4">
-      <app-ilogi-file-upload [formControlName]="'signatureAuthorizationOfOwner'"
+      <app-ilogi-file-upload [formControlName]="'signatureAuthorizationOfOwner'" [mandatory]="true"
         label="Signature Authorization of Owner"
         accept="image/png,image/jpg,image/jpeg,application/pdf"></app-ilogi-file-upload>
     </div>
@@ -215,15 +215,15 @@
           <thead>
             <tr>
               <th style="width: 70px;">SL No</th>
-              <th>Name <span class="red-font">*</span></th>
-              <th>Father's Name <span class="red-font">*</span></th>
+              <th>Name <span class="text-danger">*</span></th>
+              <th>Father's Name <span class="text-danger">*</span></th>
               <th>Age</th>
               <th>Sex</th>
               <th>Social Status</th>
               <th>Profession</th>
               <th>Permanent Address</th>
-              <th>Mobile No <span class="red-font">*</span></th>
-              <th>Date of Birth <span class="red-font">*</span></th>
+              <th>Mobile No <span class="text-danger">*</span></th>
+              <th>Date of Birth <span class="text-danger">*</span></th>
               <th>Date of Joining</th>
               <th>Upload ID Proof</th>
               <th>Upload Signature</th>
@@ -300,9 +300,9 @@
           <thead>
             <tr>
               <th style="width: 50px;">SL No</th>
-              <th>Name <span class="red-font">*</span></th>
+              <th>Name <span class="text-danger">*</span></th>
               <th>Permanent Address</th>
-              <th>Mobile No <span class="red-font">*</span></th>
+              <th>Mobile No <span class="text-danger">*</span></th>
               <th>Action</th>
             </tr>
           </thead>
@@ -351,9 +351,9 @@
           <thead>
             <tr>
               <th style="width: 50px;">SL No</th>
-              <th>Name <span class="red-font">*</span></th>
+              <th>Name <span class="text-danger">*</span></th>
               <th>Permanent Address</th>
-              <th>Mobile No <span class="red-font">*</span></th>
+              <th>Mobile No <span class="text-danger">*</span></th>
               <th>Action</th>
             </tr>
           </thead>

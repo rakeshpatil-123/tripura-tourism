@@ -13,6 +13,11 @@
   <app-ilogi-input fieldId="businessPan" formControlName="businessPan" fieldLabel="Business PAN No"
     [placeholder]="'Enter Business PAN No'" [submitted]="submitted" [mandatory]="true">
   </app-ilogi-input>
+
+  <div></div>
+  <h1 class="page-head" >Enterprise Address
+</h1>
+<div></div>
   <app-ilogi-input fieldId="registeredAddress" formControlName="registeredAddress"
     fieldLabel="Enterprise's Registered Address" [placeholder]="'Enter Registered Address'" type="textarea">
   </app-ilogi-input>
@@ -22,12 +27,12 @@
   <div>
 
     <app-ilogi-input fieldId="pin" formControlName="pin" fieldLabel="Pin" [submitted]="submitted"
-      [placeholder]="'Enter Pin'" [mandatory]="true">
+      [placeholder]="'Enter Pin'" >
 
     </app-ilogi-input>
-    <div *ngIf="getErrorMessage('pin') as errorMsg" class=" error-msg mt-1">
+    <!-- <div *ngIf="getErrorMessage('pin') as errorMsg" class=" error-msg mt-1">
       {{ errorMsg }}
-    </div>
+    </div> -->
   </div>
   <app-ilogi-input fieldId="postOffice" formControlName="postOffice" fieldLabel="Post Office" [submitted]="submitted"
     [placeholder]="'Enter Post Office'" [mandatory]="true">
@@ -35,6 +40,9 @@
   <app-ilogi-input fieldId="policeStation" formControlName="policeStation" fieldLabel="Police Station"
     [submitted]="submitted" [placeholder]="'Enter Police Station'" [mandatory]="true">
   </app-ilogi-input>
+<div></div>
+<h1 class="page-head" >Authorized Representative (Online User Details)</h1>
+<div></div>
   <app-ilogi-input fieldId="repName" formControlName="repName" fieldLabel="Name" [submitted]="submitted"
     [placeholder]="'Enter repName'" [mandatory]="true">
   </app-ilogi-input>
@@ -43,33 +51,33 @@
   </app-ilogi-input>
   <div>
 
-    <app-ilogi-input fieldId="aadhar" formControlName="aadhar" fieldLabel="Aadhar No" [submitted]="submitted"
-      [placeholder]="'Enter Aadhar No'" [mandatory]="true">
+    <app-ilogi-input fieldId="aadhar" formControlName="aadhar" [mandatory]="true" fieldLabel="Aadhar No" [submitted]="submitted"
+      [placeholder]="'Enter Aadhar No'">
     </app-ilogi-input>
 
-    <div *ngIf="getErrorMessage('aadhar') as errorMsg" class=" error-msg mt-1">
+    <!-- <div *ngIf="getErrorMessage('aadhar') as errorMsg" class=" error-msg mt-1">
       {{ errorMsg }}
-    </div>
+    </div> -->
   </div>
   <div>
 
     <app-ilogi-input fieldId="mobile" formControlName="mobile" fieldLabel="Mobile No" [submitted]="submitted"
     [placeholder]="'Enter Mobile No'" [mandatory]="true">
   </app-ilogi-input>
-   <div *ngIf="getErrorMessage('mobile') as errorMsg" class=" error-msg mt-1">
+   <!-- <div *ngIf="getErrorMessage('mobile') as errorMsg" class=" error-msg mt-1">
       {{ errorMsg }}
-    </div>
+    </div> -->
 </div>
   <app-ilogi-input fieldId="phone" formControlName="phone" fieldLabel="Phone No" [placeholder]="'Enter Phone No'">
   </app-ilogi-input>
   <div>
 
     <app-ilogi-input fieldId="email" formControlName="email" fieldLabel="Email Id" [submitted]="submitted"
-    [placeholder]="'Enter Email Id'" [mandatory]="true">
+    [placeholder]="'Enter Email Id'" >
   </app-ilogi-input>
-     <div *ngIf="getErrorMessage('email') as errorMsg" class=" error-msg mt-1">
+     <!-- <div *ngIf="getErrorMessage('email') as errorMsg" class=" error-msg mt-1">
       {{ errorMsg }}
-    </div>
+    </div> -->
 </div>
   <div class="mt-4">
 
@@ -78,7 +86,7 @@
     </app-ilogi-input>
   </div>
   <app-ilogi-select fieldId="proposalFor" formControlName="proposalFor" fieldLabel="Proposal For"
-    [placeholder]="'Proposal For'" [selectOptions]="proposalOptions" [submitted]="submitted" [mandatory]="true">
+    [placeholder]="'Proposal For'" [selectOptions]="proposalOptions" [submitted]="submitted" >
   </app-ilogi-select>
   <app-ilogi-input-date fieldId="commissioningDate" formControlName="commissioningDate"
     fieldLabel="Proposed Date of Commissioning" [submitted]="submitted"
