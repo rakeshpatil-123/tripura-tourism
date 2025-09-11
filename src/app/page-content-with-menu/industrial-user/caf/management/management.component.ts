@@ -419,14 +419,11 @@ export class ManagementComponent implements OnInit, OnDestroy {
  this.submitted = true;
   
   this.markFormGroupTouched(this.form);
-    // debugger;
-
     const payload = this.buildFormData(false);
     this.submitForm(payload, false);
   }
 
    submitForm(payload: FormData, isDraft: boolean): void {
-    debugger
      console.log('Submitting form with payload:', payload);
     this.apiService
       .getByConditions(payload, 'api/caf/management-details-store')
