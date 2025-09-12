@@ -50,12 +50,20 @@ body {
   gap: 30px;
   margin-bottom: 30px;
 }
+/* Enhanced Row Styling with More Gap */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px; /* Increased gap between form fields */
+  margin: 0 -15px;
+}
 .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 25px;
   flex: 1;
   min-width: 220px;
+  padding: 0 15px; /* Added padding to create space between fields */
 }
 label {
   font-size: 1rem;
@@ -86,7 +94,7 @@ input[type="number"]:focus {
 .button-section {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 30px; /* Increased top margin */
   padding-top: 20px;
   border-top: 1px solid #eaeaea;
 }
@@ -418,6 +426,11 @@ td select:focus {
     font-size: 1.2rem;
     padding: 14px 24px;
   }
+  
+  /* Adjust gap for medium screens */
+  .row {
+    gap: 25px;
+  }
 }
 
 @media (max-width: 992px) {
@@ -428,6 +441,7 @@ td select:focus {
   
   .form-group {
     min-width: 100%;
+    padding: 0; /* Remove padding on mobile */
   }
   
   .container-for-table {
@@ -477,6 +491,11 @@ td select:focus {
   button {
     min-width: 220px;
     padding: 0 25px;
+  }
+  
+  /* Adjust gap for tablet screens */
+  .row {
+    gap: 20px;
   }
 }
 
@@ -540,6 +559,12 @@ td select:focus {
   
   table {
     min-width: 700px;
+  }
+  
+  /* Adjust gap for mobile screens */
+  .row {
+    gap: 15px;
+    margin: 0; /* Remove negative margin on mobile */
   }
 }
 
@@ -633,6 +658,11 @@ td select:focus {
   
   .subsidy-amount-box .small-text {
     font-size: 0.75rem;
+  }
+  
+  /* Adjust gap for small mobile screens */
+  .row {
+    gap: 10px;
   }
 }
 
