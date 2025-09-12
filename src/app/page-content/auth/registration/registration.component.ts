@@ -63,8 +63,6 @@ export class RegistrationComponent implements OnInit {
     { id: 'state3', name: 'State 3' },
   ];
   userTypeOptions = [
-    { value: 'individual', name: 'Individual', id: 'individual' },
-    { value: 'admin', name: 'Admin', id: 'admin' },
     { value: 'department', name: 'Department', id: 'department' },
   ];
 
@@ -73,8 +71,6 @@ export class RegistrationComponent implements OnInit {
     private genericService: GenericService,  
     private router: Router
   ) {
-    const isRequired = this.sourcePage === 'departmental-users';
-    if (isRequired) {this.userTypeOptions.push({value: 'department',name: 'Department', id: 'department'}); }
     this.registrationForm = this.fb.group({
       name_of_enterprise: ['', []],
       authorized_person_name: ['', []], 
@@ -102,17 +98,19 @@ export class RegistrationComponent implements OnInit {
     this.loadDistricts();
     this.setupCascadingDropdowns();
     this.getAllDepartmentList();
-    this.registrationForm.get('user_type')?.valueChanges.subscribe((value) => {
-      if (value === 'department') {
-        this.registrationForm.addControl('hierarchy_level', this.fb.control('', []));
-        this.registrationForm.addControl('department_id', this.fb.control('', []));
-        this.registrationForm.addControl('designation', this.fb.control('', []));
-      } else {
-        this.registrationForm.removeControl('hierarchy_level');
-        this.registrationForm.removeControl('department_id');
-        this.registrationForm.removeControl('designation');
-      }
-    });
+    if (this.sourcePage === 'departmental-users') {
+      this.registrationForm.patchValue({ user_type: 'department' });
+      this.registrationForm.addControl('hierarchy_level', this.fb.control('', []));
+      this.registrationForm.addControl('department_id', this.fb.control('', []));
+      this.registrationForm.addControl('designation', this.fb.control('', []));
+    } else {
+      this.registrationForm.patchValue({ user_type: 'individual' });
+      ['hierarchy_level', 'department_id', 'designation'].forEach(ctrl => {
+        if (this.registrationForm.contains(ctrl)) {
+          this.registrationForm.removeControl(ctrl);
+        }
+      });
+    }
   }
 
   setupCascadingDropdowns(): void {
@@ -255,14 +253,40 @@ export class RegistrationComponent implements OnInit {
   onSubmit(): void {
     if (this.registrationForm.valid) {
       const { confirmPassword, ...payload } = this.registrationForm.value;
+      const hierarchyFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
+      hierarchyFields.forEach((field) => {
+        const base = field.replace('_id', '');
+        if (!this.shouldShow(base)) {
+          delete payload[field];
+        }
+      });
+
+      if (payload.user_type === 'individual') {
+        delete payload.department_id;
+        delete payload.designation;
+        delete payload.hierarchy_level;
+      }
 
       this.genericService.registerUser(payload).subscribe({
         next: (res : any) => {
           console.log('Registration Success:', res);
           this.genericService.openSnackBar('Registration successful!', 'Success');
+          this.registrationForm.reset();
+
+          if (this.sourcePage === 'departmental-users') {
+            this.registrationForm.patchValue({
+              user_type: 'department'
+            });
+            this.registrationForm.get('hierarchy_level')?.setValue('');
+            this.registrationForm.get('department_id')?.setValue('');
+            this.registrationForm.get('designation')?.setValue('');
+          } else {
+            this.registrationForm.patchValue({
+              user_type: 'individual'
+            });
+          }
           this.registrationSuccess.emit();
           this.sourcePage === 'departmental-users' ? null : this.router.navigate(['page/login']);
-          this.registrationForm.reset();
         },
         error: (err: any) => {
           console.error('Registration Failed:', err);
@@ -298,5 +322,24 @@ export class RegistrationComponent implements OnInit {
         this.departments = [];
       }
     });
+  }
+  shouldShow(field: string): boolean {
+    const h = this.registrationForm.get('hierarchy_level')?.value;
+    const u = this.registrationForm.get('user_type')?.value;
+
+    if (u === 'individual') return true;
+    if (['state1', 'state2', 'state3'].includes(h)) {
+      return false;
+    }
+    if (h === 'district') {
+      return field === 'district';
+    }
+    if (h === 'subdivision') {
+      return ['district', 'subdivision'].includes(field);
+    }
+    if (h === 'block') {
+      return ['district', 'subdivision', 'block'].includes(field);
+    }
+    return false;
   }
 }
