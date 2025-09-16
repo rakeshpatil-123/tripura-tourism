@@ -9,11 +9,12 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
+import Swal from 'sweetalert2';
 
 interface StatusActionModal {
   visible: boolean;
   applicationId: number;
-  action: 'approved' | 'send_back' | 'rejected';
+  action: 'approved' | 'send_back' | 'rejected' | 'raise_extra_payment';
   title: string;
 }
 
@@ -60,6 +61,7 @@ export class ServiceViewComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.remarkForm = this.fb.group({
+      extraAmount: [null],
       remarks: ['', [Validators.required, Validators.minLength(5)]],
     });
   }
@@ -122,20 +124,19 @@ export class ServiceViewComponent implements OnInit {
     // Define field mapping for readable labels
     const fieldMap: Record<string, string> = {
       'application_id': 'Application ID',
-      'service_id': 'Service ID',
       'service_name': 'Service Name',
       'status': 'Status',
-      'applied_fee': 'Applied Fee',
-      'approved_fee': 'Approved Fee',
+      'application_fee': 'Application Fee',
+      'extra_payment': 'Extra payment raised by departmental user',
+      'total_fee': 'Total Fee',
       'payment_status': 'Payment Status',
-      'user.id': 'User ID',
-      'user.name': 'User Name',
-      'user.phone': 'User Phone',
-      'user.email': 'User Email',
+      'user.name': 'Name',
+      'user.phone': 'Phone No.',
+      'user.email': 'Email ID',
       'step_number': 'Step Number',
       'step_type': 'Step Type',
       'department': 'Department',
-      'action_taken_by': 'Action Taken By',
+      'action_taken_by': 'Action Taken By ',
       'action_taken_at': 'Action Taken At',
       'remarks': 'Remarks'
     };
@@ -143,11 +144,13 @@ export class ServiceViewComponent implements OnInit {
     const flatEntries: { key: string; value: string }[] = [];
 
     const flatten = (obj: any, prefix = '') => {
-      for (const key in obj) {
-        if (!obj.hasOwnProperty(key)) continue;
+  for (const key in obj) {
+    if (!obj.hasOwnProperty(key)) continue;
 
-        // Skip workflow and application_data — handle separately
-        if (key === 'workflow' || key === 'application_data') continue;
+    // Skip workflow, application_data, applied_fee, approved_fee
+    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id'].includes(key)) {
+      continue;
+    }
 
         const value = obj[key];
         const formattedKey = prefix ? `${prefix}.${key}` : key;
@@ -252,6 +255,14 @@ export class ServiceViewComponent implements OnInit {
                 this.openStatusModal('rejected', 'Reject Step');
               },
             },
+            {
+              label: 'Raise Extra Payment',
+              color: 'danger',
+              visible: (row: any) => row.status === 'pending',
+              onClick: (row: any) => {
+                this.openStatusModal('raise_extra_payment', 'Raise Extra Payment');
+              },
+            },
           ],
         });
       }
@@ -262,7 +273,7 @@ export class ServiceViewComponent implements OnInit {
   }
 
   openStatusModal(
-    action: 'approved' | 'send_back' | 'rejected',
+    action: 'approved' | 'send_back' | 'rejected' | 'raise_extra_payment',
     title: string
   ): void {
     this.statusModal.visible = true;
@@ -270,6 +281,12 @@ export class ServiceViewComponent implements OnInit {
     this.statusModal.action = action;
     this.statusModal.title = title;
     this.remarkForm.reset();
+    if (action === 'raise_extra_payment') {
+      this.remarkForm.get('extraAmount')?.setValidators([Validators.required, Validators.min(1)]);
+    } else {
+      this.remarkForm.get('extraAmount')?.clearValidators();
+    }
+    this.remarkForm.get('extraAmount')?.updateValueAndValidity();
     this.cdr.detectChanges();
   }
 
@@ -279,52 +296,51 @@ export class ServiceViewComponent implements OnInit {
   }
 
   onSubmitStatus(): void {
-    if (this.remarkForm.invalid) {
-      this.remarkForm.markAllAsTouched();
-      return;
-    }
-
-    const remarks = this.remarkForm.get('remarks')?.value;
-    const { applicationId, action } = this.statusModal;
-
-    this.updateApplicationStatus(applicationId, action, remarks);
-    this.closeModal();
+  if (this.remarkForm.invalid) {
+    this.remarkForm.markAllAsTouched();
+    return;
   }
 
-  updateApplicationStatus(
-    applicationId: number,
-    status: string,
-    remarks: string
-  ): void {
-    const payload = { status, remarks };
+  const { remarks, extraAmount } = this.remarkForm.value;
+  const { applicationId, action } = this.statusModal;
 
-    this.apiService
-      .getByConditions(
-        payload,
-        `api/department/applications/${applicationId}/status`
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1) {
-            this.apiService.openSnackBar(
-              `Application step ${status.replace('_', ' ').toUpperCase()} successfully.`,
-              'Close'
-            );
-            this.fetchApplicationDetails(); // Refresh data
-          } else {
-            this.apiService.openSnackBar(
-              res?.message || 'Failed to update status.',
-              'Close'
-            );
-          }
-        },
-        error: (err) => {
-          console.error('Status update failed:', err);
-          this.apiService.openSnackBar(
-            err.error?.message || 'Update failed.',
-            'Close'
-          );
-        },
-      });
+    const payload: any = {
+      status: action === 'raise_extra_payment' ? 'extra_payment' : action,
+      remarks,
+    };
+
+    if (action === 'raise_extra_payment') {
+      payload.extra_payment = extraAmount;
+    }
+
+  this.updateApplicationStatus(applicationId, payload);
+  this.closeModal();
+}
+
+ updateApplicationStatus(applicationId: number, payload: any): void {
+  this.apiService
+    .getByConditions(payload, `api/department/applications/${applicationId}/status`)
+    .subscribe({
+      next: (res: any) => {
+        if (res?.status === 1) {
+          Swal.fire({
+            title: 'Success!',
+            text: `Application step ${payload.status.replace('_', ' ').toUpperCase()} successfully.`,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+            customClass: {
+              popup: 'swal2-popup'
+            }
+          });
+          this.fetchApplicationDetails();
+        } else {
+          Swal.fire('Error', res?.message || 'Failed to update status.', 'error');
+        }
+      },
+      error: (err) => {
+        Swal.fire('Error', err.error?.message || 'Update failed.', 'error');
+      }
+    });
   }
 }

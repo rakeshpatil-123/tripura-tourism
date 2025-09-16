@@ -14,12 +14,22 @@ import {
   Validators,
 } from '@angular/forms';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
+import { SelectOption, IlogiSelectComponent } from '../../customInputComponents/ilogi-select/ilogi-select.component';
 
 interface StatusActionModal {
   visible: boolean;
   applicationId: number;
-  action: 'approved' | 'send_back' | 'rejected';
+  action: 'approved' | 'send_back' | 'rejected' | 'raise_extra_payment';
   title: string;
+}
+
+interface Subdivision {
+  sub_division: string;
+  sub_lgd_code: string;
+}
+interface District {
+  district_code: string;
+  district_name: string;
 }
 
 @Component({
@@ -29,18 +39,46 @@ interface StatusActionModal {
     DynamicTableComponent,
     IlogiInputComponent,
     ReactiveFormsModule,
+    IlogiSelectComponent,
   ],
   templateUrl: './applications.component.html',
-  styleUrl: './applications.component.scss',
+  styleUrls: ['./applications.component.scss'],
   standalone: true,
 })
 export class ApplicationsComponent implements OnInit {
   departmentId: number | null = null;
   serviceId: number | null = null;
 
+  hierarchyLevels = [
+    { id: '', name: 'None' }, 
+    { id: 'block', name: 'Block' },
+    { id: 'subdivision', name: 'Subdivision' },
+    { id: 'district', name: 'District' },
+    { id: 'state1', name: 'State 1' },
+    { id: 'state2', name: 'State 2' },
+    { id: 'state3', name: 'State 3' },
+  ];
+
+  statusOptions = [
+    { id: '', name: 'None' }, 
+    { id: 'saved', name: 'Saved' },
+    { id: 'submitted', name: 'Submitted' },
+    { id: 'under_review', name: 'Under Review' },
+    { id: 'approved', name: 'Approved' },
+    { id: 'rejected', name: 'Rejected' },
+    { id: 'send_back', name: 'Send Back' },
+    { id: 're_submitted', name: 'Re-Submitted' },
+    { id: 'extra_payment', name: 'Extra Payment' },
+  ];
+
+  districts: SelectOption[] = [];
+  subdivisions: SelectOption[] = [];
   applications: any[] = [];
+  filteredApplications: any[] = [];
   columns: TableColumn[] = [];
   isLoading: boolean = false;
+  loadingDistricts = false;
+  loadingSubdivisions = false;
 
   // Modal state
   statusModal: StatusActionModal = {
@@ -62,11 +100,27 @@ export class ApplicationsComponent implements OnInit {
   ) {
     this.remarkForm = this.fb.group({
       remarks: ['', [Validators.required, Validators.minLength(5)]],
+      district_id: [''],
+      subdivision_id: [''],
+      hierarchy_level: [''],
+      current_status: [''],
+      search: ['']            
     });
   }
 
   ngOnInit(): void {
     this.loadParamsAndData();
+    this.loadDistricts();
+
+    this.remarkForm.get('district_id')?.valueChanges.subscribe(district => {
+      this.loadSubdivisions(district);
+      this.applyFilters();
+    });
+
+    this.remarkForm.get('subdivision_id')?.valueChanges.subscribe(() => this.applyFilters());
+    this.remarkForm.get('hierarchy_level')?.valueChanges.subscribe(() => this.applyFilters());
+    this.remarkForm.get('current_status')?.valueChanges.subscribe(() => this.applyFilters());
+    this.remarkForm.get('search')?.valueChanges.subscribe(() => this.applyFilters());
   }
 
   loadParamsAndData(): void {
@@ -95,17 +149,12 @@ export class ApplicationsComponent implements OnInit {
     };
 
     const uid = this.apiService.getDecryptedUserId();
-    console.log(uid, 'User id');
-
-    // Define both APIs
-    const api1 = `api/department/user/${uid}/assigned-applications`; // default
-    const api2 = `api/department/applications`; // for "all"
-
-    // 👇 Conditionally pick API based on query param
+    const api1 = `api/department/user/${uid}/assigned-applications`;
+    const api2 = `api/department/applications`;
     const viewMode = this.route.snapshot.queryParamMap.get('view');
     const selectedApi = viewMode === 'all-applications' ? api2 : api1;
 
-    this.isLoading = true; // ⚠️ Set loading BEFORE request
+    this.isLoading = true;
 
     this.apiService.getByConditions(payload, selectedApi).subscribe({
       next: (res: any) => {
@@ -120,7 +169,7 @@ export class ApplicationsComponent implements OnInit {
             submission_date: this.formatDateTime(app.submission_date),
             max_processing_date: this.formatDateTime(app.max_processing_date),
           }));
-
+          this.filteredApplications = [...this.applications];
           this.columns = this.generateColumns(this.applications);
         } else {
           this.applications = [];
@@ -139,72 +188,24 @@ export class ApplicationsComponent implements OnInit {
     });
   }
 
-  // generateColumns(data: any[]): TableColumn[] {
-  //   if (!Array.isArray(data) || data.length === 0) return [];
-
-  //   const firstItem = data[0];
-  //   const columns: TableColumn[] = [];
-
-  //   const columnConfig: Record<string, { type?: ColumnType; label?: string; width?: string }> = {
-  //     application_id: { label: 'Application ID', width: '120px' },
-  //     service_name: { label: 'Service', width: '180px' },
-  //     applicant_name: { label: 'Applicant Name', width: '180px' },
-  //     applicant_email: { label: 'Email', width: '200px' },
-  //     applicant_mobile: { label: 'Mobile', width: '140px' },
-  //     department: { label: 'Department', width: '160px' },
-  //     status: { type: 'status', label: 'Status', width: '140px' },
-  //     current_step: { label: 'Current Step', width: '120px' },
-  //   };
-
-  //   for (const key in firstItem) {
-  //     if (!firstItem.hasOwnProperty(key)) continue;
-
-  //     const config = columnConfig[key] || {};
-  //     const type: ColumnType = config.type || this.guessColumnType(key, firstItem[key]);
-  //     const label = config.label || this.formatLabel(key);
-  //     const width = config.width;
-
-  //     columns.push({
-  //       key,
-  //       label,
-  //       type,
-  //       sortable: true,
-  //       ...(width && { width }), // conditionally add width
-  //     });
-  //   }
-
-  //   columns.push({
-  //     key: 'actions',
-  //     label: 'Actions',
-  //     type: 'action',
-  //     width: '150px',
-  //     actions: [
-  //       {
-  //         label: 'View',
-  //         color: 'primary',
-  //         onClick: (row: any) => {
-  //           this.router.navigate(['/dashboard/service-view', row.application_id]);
-  //         },
-  //       },
-  //     ],
-  //   });
-
-  //   return columns;
-  // }
-
   generateColumns(data: any[]): TableColumn[] {
     if (!Array.isArray(data) || data.length === 0) return [];
 
     const firstItem = data[0];
     const columns: TableColumn[] = [];
 
+  const skipKeys = ['final_fee', 'extra_payment', 'total_fee', 'current_step_number', 'ulb_code', 'ulb_name', 'ward_code', 'ward_name', 'district_code', 'subdivision_code'];
 
-
-    const columnConfig: Record<
-      string,
-      { type?: ColumnType; label?: string; width?: string,  linkHref?: (row: any) => string; }
-    > = {
-       application_id: {
+  const columnConfig: Record<
+    string,
+    {
+      type?: ColumnType;
+      label?: string;
+      width?: string;
+      linkHref?: (row: any) => string;
+    }
+  > = {
+    application_id: {
     label: 'Application ID',
     width: '120px',
     type: 'link', 
@@ -216,64 +217,54 @@ export class ApplicationsComponent implements OnInit {
       applicant_mobile: { label: 'Mobile', width: '140px' },
       department: { label: 'Department', width: '160px' },
       status: { type: 'status', label: 'Status', width: '140px' },
-      current_step: { label: 'Current Step', width: '120px' },
-      submission_date: {
-        type: 'text',
-        label: 'Submission Date',
-        width: '180px',
-      },
-      max_processing_date: {
-        type: 'text',
-        label: 'Max Processing Date',
-        width: '180px',
-      },
-    };
+    district: { label: 'District', width: '160px' },
+    sub_division: { label: 'Subdivision', width: '160px' },
+    hierarchy: { label: 'Hierarchy', width: '140px' },
+    payment_status: { type: 'status', label: 'Payment Status', width: '140px' },
+    submission_date: { type: 'text', label: 'Submission Date', width: '180px' },
+    max_processing_date: { type: 'text', label: 'Max Processing Date', width: '180px' },
+  };
 
-  
+  for (const key in firstItem) {
+    if (!firstItem.hasOwnProperty(key)) continue;
+    if (key === 'view' || skipKeys.includes(key)) continue;
 
-    // 👇 Generate other columns
-    for (const key in firstItem) {
-      if (!firstItem.hasOwnProperty(key)) continue;
+    const config = columnConfig[key] || {};
+    const type: ColumnType =
+      config.type || this.guessColumnType(key, firstItem[key]);
+    const label = config.label || this.formatLabel(key);
+    const width = config.width;
 
-      // Skip if already handled (like 'view')
-      if (key === 'view') continue;
-
-      const config = columnConfig[key] || {};
-      const type: ColumnType =
-        config.type || this.guessColumnType(key, firstItem[key]);
-      const label = config.label || this.formatLabel(key);
-      const width = config.width;
-
-      columns.push({
-        key,
-        label,
-        type,
-        sortable: true,
-        ...(width && { width }),
-        ...(config.linkHref && { linkHref: config.linkHref }),
-      });
-    }
-
-          columns.push({
-      key: 'view',
-      label: 'View',
-      type: 'icon',
-      icon: 'visibility',
-      width: '60px',
-      onClick: (row: any) => {
-        this.router.navigate(['/dashboard/service-view', row.application_id]);
-      },
-      sortable: false,
+    columns.push({
+      key,
+      label,
+      type,
+      sortable: true,
+      ...(width && { width }),
+      ...(config.linkHref && { linkHref: config.linkHref }),
     });
-
-    return columns;
   }
+
+  columns.push({
+    key: 'view',
+    label: 'View',
+    type: 'icon',
+    icon: 'visibility',
+    width: '60px',
+    onClick: (row: any) => {
+      this.router.navigate(['/dashboard/service-view', row.application_id]);
+    },
+    sortable: false,
+  });
+
+  return columns;
+}
 
   formatDateTime(dateTimeString: string): string {
     if (!dateTimeString) return '-';
 
     const date = new Date(dateTimeString);
-    if (isNaN(date.getTime())) return dateTimeString; // fallback
+    if (isNaN(date.getTime())) return dateTimeString;
 
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -287,14 +278,14 @@ export class ApplicationsComponent implements OnInit {
 
   openStatusModal(
     applicationId: number,
-    action: 'approved' | 'send_back' | 'rejected',
+    action: 'approved' | 'send_back' | 'rejected' | 'raise_extra_payment',
     title: string
   ): void {
     this.statusModal.visible = true;
     this.statusModal.applicationId = applicationId;
     this.statusModal.action = action;
     this.statusModal.title = title;
-    this.remarkForm.reset();
+    this.remarkForm.get('remarks')?.reset();
     this.cdr.detectChanges();
   }
 
@@ -332,23 +323,15 @@ export class ApplicationsComponent implements OnInit {
         next: (res: any) => {
           if (res?.status === 1) {
             this.apiService.openSnackBar(
-              `Application ${status
-                .replace('_', ' ')
-                .toUpperCase()} successfully.`,
+              `Application ${status.replace('_', ' ').toUpperCase()} successfully.`,
               'Close'
             );
-            // Update status in UI
             const app = this.applications.find(
               (a) => a.application_id === applicationId
             );
-            if (app) {
-              app.status = status;
-            }
+            if (app) app.status = status;
           } else {
-            this.apiService.openSnackBar(
-              res?.message || 'Failed to update status.',
-              'Close'
-            );
+            this.apiService.openSnackBar(res?.message || 'Failed to update status.', 'Close');
           }
         },
         error: (err) => {
@@ -363,30 +346,13 @@ export class ApplicationsComponent implements OnInit {
 
   guessColumnType(key: string, value: any): ColumnType {
     const keyLower = key.toLowerCase();
-
-    if (
-      keyLower.includes('date') ||
-      (keyLower.includes('at') && typeof value === 'string')
-    ) {
+    if (keyLower.includes('date') || (keyLower.includes('at') && typeof value === 'string'))
       return 'date';
-    }
-    if (
-      keyLower.includes('name') ||
-      keyLower.includes('phone') ||
-      keyLower.includes('email')
-    ) {
+    if (keyLower.includes('name') || keyLower.includes('phone') || keyLower.includes('email'))
       return 'text';
-    }
-    if (keyLower.includes('amount') || keyLower.includes('fee')) {
-      return 'currency';
-    }
-    if (typeof value === 'number') {
-      return 'number';
-    }
-    if (typeof value === 'boolean') {
-      return 'boolean';
-    }
-
+    if (keyLower.includes('amount') || keyLower.includes('fee')) return 'currency';
+    if (typeof value === 'number') return 'number';
+    if (typeof value === 'boolean') return 'boolean';
     return 'text';
   }
 
@@ -396,5 +362,86 @@ export class ApplicationsComponent implements OnInit {
       .replace(/([a-z])([A-Z])/g, '$1 $2')
       .replace(/^\w/, (c) => c.toUpperCase())
       .trim();
+  }
+  loadDistricts(): void {
+    this.loadingDistricts = true;
+    this.apiService.getByConditions({}, 'api/tripura/get-all-districts').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.districts)) {
+          this.districts = [
+            { id: '', name: 'None' },
+            ...res.districts.map((d: District) => ({
+              id: d.district_code,
+              name: d.district_name
+            }))
+          ];
+        }
+        this.loadingDistricts = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to load districts:', err);
+        this.apiService.openSnackBar('Failed to load districts', 'Error');
+        this.loadingDistricts = false;
+      }
+    });
+  }
+  loadSubdivisions(districtCode: string): void {
+    this.loadingSubdivisions = true;
+    const selectedDistrict = this.districts.find(d => d.id === districtCode);
+    if (!selectedDistrict) {
+      this.loadingSubdivisions = false;
+      return;
+    }
+
+    const payload = { district: selectedDistrict.name };
+    this.apiService.getByConditions(payload, 'api/tripura/get-sub-subdivisions').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.subdivision)) {
+          this.subdivisions = [
+            { id: '', name: 'None' },
+            ...res.subdivision.map((s: Subdivision) => ({
+              id: s.sub_lgd_code,
+              name: s.sub_division
+            }))
+          ];
+        }
+        this.loadingSubdivisions = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to load subdivisions:', err);
+        this.apiService.openSnackBar('Failed to load subdivisions', 'Error');
+        this.loadingSubdivisions = false;
+      }
+    });
+  }
+
+
+  private applyFilters(): void {
+    const districtId = this.remarkForm.get('district_id')?.value;
+    const subdivisionId = this.remarkForm.get('subdivision_id')?.value;
+    const hierarchyLevel = this.remarkForm.get('hierarchy_level')?.value;
+    const currentStatus = this.remarkForm.get('current_status')?.value;
+    const searchText = (this.remarkForm.get('search')?.value || '').toLowerCase();
+
+    this.filteredApplications = this.applications.filter((app) => {
+      const matchDistrict = !districtId || app.district_code === districtId;
+      const matchSubdivision = !subdivisionId || app.subdivision_code === subdivisionId;
+      const matchHierarchy = !hierarchyLevel || app.hierarchy === hierarchyLevel;
+      const matchStatus = !currentStatus || app.status === currentStatus;
+
+      const matchSearch =
+        !searchText ||
+        app.service_name.toLowerCase().includes(searchText) ||
+        app.applicant_name.toLowerCase().includes(searchText) ||
+        app.applicant_phone.toLowerCase().includes(searchText);
+
+      return (
+        matchDistrict &&
+        matchSubdivision &&
+        matchHierarchy &&
+        matchStatus &&
+        matchSearch
+      );
+    });
   }
 }

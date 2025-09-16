@@ -1,0 +1,80 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="title">
+      <mat-icon>
+        {{ mode === 'view' ? 'visibility' : mode === 'edit' ? 'edit_calendar' : 'event_available' }}
+      </mat-icon>
+      <h3>
+        {{ mode === 'add' ? 'Add Holiday' : mode === 'edit' ? 'Update Holiday' : 'Holiday Details' }}
+      </h3>
+    </div>
+
+    <button mat-icon-button class="close-btn" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div *ngIf="mode === 'view'" class="view-container fade-in">
+    <div *ngIf="isLoadingDetails" class="loading">
+      <mat-icon class="spin">autorenew</mat-icon> Loading details...
+    </div>
+    <mat-card *ngIf="!isLoadingDetails && holidayDetails" class="details-card">
+      <div class="dept-header">
+        <mat-icon class="dept-icon">event</mat-icon>
+        <h2>Holiday Details</h2>
+      </div>
+
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Holiday ID:</span>
+          <span class="value">{{ holidayDetails.id }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Date:</span>
+          <span class="value">{{ holidayDetails.holiday_date | date }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Description:</span>
+          <span class="value desc">{{ holidayDetails.description }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <form *ngIf="mode !== 'view'" [formGroup]="holidayForm" (ngSubmit)="onSubmit()" class="dialog-form fade-in">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Holiday Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="holiday_date" (click)="picker.open()" />
+
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+
+      <mat-error *ngIf="holidayForm.get('holiday_date')?.hasError('required')">
+        Date is required
+      </mat-error>
+    </mat-form-field>
+
+
+
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput placeholder="Enter holiday description" formControlName="description" rows="3"></textarea>
+      <mat-icon matSuffix color="primary">description</mat-icon>
+      <mat-error *ngIf="holidayForm.get('description')?.hasError('required')">
+        Description is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="dialog-actions">
+      <button mat-raised-button type="button" class="cancel-btn" (click)="close()">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary" type="submit" class="submit-btn" [disabled]="isSubmitting">
+        {{ mode === 'add' ? 'Create' : 'Update' }}
+      </button>
+    </div>
+  </form>
+</div>

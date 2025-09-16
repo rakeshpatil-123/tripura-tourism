@@ -138,7 +138,24 @@ $mobile-breakpoint: 1024px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+.user-profile .dept-name {
+  font-size: 11px;
+  color: var(--color-text-medium, #3e3f3f);
+  letter-spacing: 0.5px;
+}
 
+.user-profile .hierarchy-level {
+  font-size: 11px;
+  font-style: oblique;
+  color: var(--color-text-medium, #12171c);
+  letter-spacing: 0.5px;
+}
+
+.user-profile .user-email {
+  font-size: 12px;
+  color: var(--color-text-medium, #5c5c5c);
+  letter-spacing: 0.5px;
+}
 .user-profile .user-status .status-indicator {
   width: 8px;
   height: 8px;

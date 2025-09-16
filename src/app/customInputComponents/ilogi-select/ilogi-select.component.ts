@@ -217,12 +217,13 @@ export class IlogiSelectComponent
   //   this.cdr.detectChanges();
   // }
   writeValue(value: any): void {
+  if (value !== undefined && value !== null) {
   this.value = value;
-  // Delay to ensure options are rendered
   setTimeout(() => {
     this.value = value;
     this.cdr.detectChanges();
-  }, 100);
+  });
+  }
 }
 
   registerOnChange(fn: (value: any) => void): void {

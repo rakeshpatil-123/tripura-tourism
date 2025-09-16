@@ -1,56 +1,125 @@
-// .profile-fields{
-//     display: grid;
-
-// }
-
-.avatar{
-    width: 2.2rem;
-    height: 2.2rem;
-    // border: 1px solid #ccc;
-    border-radius: 50%;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #9cfaff 0%, #2C82AA 100%);
-    color: #fff;
-    font-weight: bold;
-}
-
-.form-con{
-width: 500px;
-margin: 24px 0;
-}
-:host ::ng-deep  .p-tabs .p-tablist-tab-list, :host ::ng-deep .p-tabs .p-tabpanels {
-background-color: #fff!important;
-}
-:host ::ng-deep  .p-tab-active {
-background-color: #fff!important;
-color: #2C82AA!important;
-border-color   :  #2C82AA!important;
-}
-
-::ng-deep .p-tablist-tab-list {
+.profile-page {
+  min-height: 100vh;
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f3f9fd 0%, #dceeff 100%);
+}
+
+.profile-card {
   width: 100%;
+  max-width: 650px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-::ng-deep .p-tablist-tab-list .p-tab {
-  flex: 1; // Makes both tabs equally wide
-  justify-content: center; // Center text & icon
-  border-bottom: 2px solid transparent; // Default border
-  transition: all 0.3s ease;
+.profile-form,
+.change-password {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-::ng-deep .p-tablist-tab-list .p-tab:hover {
-  color: #000!important; // Hover text/icon color
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-::ng-deep .p-tablist-tab-list .p-tab.p-tab-active {
-  border-bottom: 2px solid #2C82AA; // Active border bottom
-  color: #2C82AA; // Active text/icon color
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+
+  .btn {
+    padding: 10px 25px;
+    border-radius: 6px;
+    font-weight: 500;
+    background-color: #2c82aa;
+    border: none;
+    color: #fff;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background-color: #226482;
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
 }
 
-::ng-deep .p-tablist-active-bar {
-  display: none !important; // Hide default ink bar
+:host ::ng-deep .p-tabs {
+  .p-tablist-tab-list {
+    display: flex;
+    border-bottom: 2px solid #eaeaea;
+    background-color: #fafafa;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+  }
+
+  .p-tab {
+    flex: 1;
+    text-align: center;
+    font-weight: 500;
+    padding: 12px 0;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #2c82aa;
+      background-color: #f4fbff;
+    }
+  }
+
+  .p-tab.p-tab-active {
+    color: #2c82aa !important;
+    border-bottom: 2px solid #2c82aa !important;
+    background: #fff;
+  }
+
+  .p-tablist-active-bar {
+    display: none !important;
+  }
+
+  .p-tabpanels {
+    background-color: #fff;
+    padding: 20px 0 0;
+  }
+}
+
+.warn {
+  font-size: 0.85rem;
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-card {
+    padding: 20px;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
 }

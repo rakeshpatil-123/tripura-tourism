@@ -40,6 +40,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
   currentUserType: string = '';
   routerSubscription: Subscription | undefined;
   userName: string = 'User';
+  deptName: string = '';
+  emailId: string = '';
+  hierarchyLevel: string = '';
+  designation: string = '';
+  blockUser: string = '';
+  subDivisionUser: string = '';
+  districtUser: string = '';
   filteredMenuItems: MenuItem[] = [];
   menuItems: MenuItem[] = [
     {
@@ -69,6 +76,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
       icon: 'groups',
       route: '/dashboard/departmental-user',
       roles: ['admin', 'department'],
+    },
+    {
+      id: 'BusinessUser',
+      title: 'Business User',
+      icon: 'supervisor_account',
+      route: '/dashboard/business-user',
+      roles: ['admin'],
+    },
+    {
+      id: 'Holidays',
+      title: 'Holidays',
+      icon: 'celebration',
+      route: '/dashboard/holidays',
+      roles: ['admin'],
     },
     {
       id: 'common-application-form',
@@ -183,6 +204,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
   constructor(private router: Router, private genericService: GenericService) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
     this.userName = localStorage.getItem('userName') || 'User';
+    this.deptName = localStorage.getItem('deptName') || '';
+    this.emailId = localStorage.getItem('email_id') || '';
+    this.hierarchyLevel = localStorage.getItem('hierarchy') || 'India';
+    this.designation = localStorage.getItem('designation') || '';
+    this.blockUser = localStorage.getItem('block') || '';
+    this.subDivisionUser = localStorage.getItem('subdivision') || '';
+    this.districtUser = localStorage.getItem('district') || '';
   }
 
   ngOnInit(): void {
