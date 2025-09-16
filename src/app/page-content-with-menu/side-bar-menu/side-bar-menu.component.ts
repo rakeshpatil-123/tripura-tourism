@@ -23,7 +23,7 @@ export interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule,],
   templateUrl: './side-bar-menu.component.html',
   styleUrls: ['./side-bar-menu.component.scss'],
 })
@@ -41,6 +41,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
   routerSubscription: Subscription | undefined;
   userName: string = 'User';
   filteredMenuItems: MenuItem[] = [];
+
+  deptName: string = '';
+  emailId: string = '';
+  hierarchyLevel: string = '';
+  designation: string = '';
+  auth_person: string = '';
+  bin: string = '';
+      
   menuItems: MenuItem[] = [
     {
       id: 'dashboard',
@@ -183,7 +191,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
   constructor(private router: Router, private genericService: GenericService) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
     this.userName = localStorage.getItem('userName') || 'User';
+    this.deptName = localStorage.getItem('deptName') || '';
+    this.emailId = localStorage.getItem('email_id') || '';
+    this.hierarchyLevel = localStorage.getItem('hierarchy') || 'India';
+    this.designation = localStorage.getItem('designation') || '';
+    this.bin = this.genericService.decryptLocalStorageItem('bin') || '';
+    this.auth_person = this.genericService.decryptLocalStorageItem('authorized_person_name')?.toUpperCase() || '';
+
   }
+
+  
 
   ngOnInit(): void {
     this.currentUrl = this.router.url;

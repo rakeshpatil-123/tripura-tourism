@@ -200,7 +200,7 @@ import { TableColumn } from '../../../shared/p-dynamic-table/p-table.model';
       }
 
       .btn-primary {
-        background: #007bff;
+        background: #003c5b;
         color: white;
       }
 

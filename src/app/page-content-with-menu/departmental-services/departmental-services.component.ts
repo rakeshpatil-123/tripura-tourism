@@ -81,17 +81,40 @@ export class DepartmentalServicesComponent implements OnInit {
     const firstItem = data[0];
     const columns: TableColumn[] = [];
 
-    for (const key in firstItem) {
-      if (firstItem.hasOwnProperty(key)) {
-        const type: ColumnType = this.guessColumnType(key, firstItem[key]);
-        columns.push({
-          key,
-          label: this.formatLabel(key),
-          type,
-          sortable: true,
-        });
-      }
-    }
+   for (const key in firstItem) {
+  if (!firstItem.hasOwnProperty(key)) continue;
+
+  let column: TableColumn;
+
+  if (key === 'service_name') {
+    // ✅ Make service_name a clickable link (full page reload is fine)
+    column = {
+      key: 'service_name',
+      label: 'Service Name',
+      type: 'link',
+      sortable: true,
+      linkHref: (row: any) => {
+        const deptId = this.selectedDepartmentId || Number(localStorage.getItem('deptId'));
+        if (!deptId || !row.service_id) {
+          this.apiService.openSnackBar('Missing required IDs.', 'Close');
+          return '#';
+        }
+        // ✅ Return full URL path — will cause reload, but that's fine for now
+        return `/dashboard/all-service-application/${deptId}/${row.service_id}`;
+      },
+    };
+  } else {
+    const type: ColumnType = this.guessColumnType(key, firstItem[key]);
+    column = {
+      key,
+      label: this.formatLabel(key),
+      type,
+      sortable: true,
+    };
+  }
+
+  columns.push(column);
+}
 
     // Add Actions column
     columns.push({

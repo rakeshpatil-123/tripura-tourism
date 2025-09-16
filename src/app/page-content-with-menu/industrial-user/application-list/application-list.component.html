@@ -58,7 +58,7 @@
   </div>
 
   <!-- Dynamic Table -->
-  <app-dynamic-table [data]="ApplicationData" [columns]="ApplicationColumns" [searchable]="true" [pageSize]="5"
+  <app-dynamic-table [data]="filteredData" [columns]="ApplicationColumns" [searchable]="true" [pageSize]="5"
     [showPagination]="true" (rowAction)="onRowAction($event)"></app-dynamic-table>
 
   <!-- Dialog Template for Transaction History -->

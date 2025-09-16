@@ -13,12 +13,13 @@ import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-ilogi-file-upload',
   templateUrl: './ilogi-file-upload.component.html',
   styleUrls: ['./ilogi-file-upload.component.scss'],
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, MatIcon],
   standalone: true,
   providers: [
     {
@@ -37,9 +38,11 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
   @Input() maxFileSize: number = 5 * 1024 * 1024; // 5MB
   @Input() disabled: boolean = false;
   @Input() mandatory: boolean = false;
+  @Input() fileUrl: string | null = null;
+
   @Output() fileSelected = new EventEmitter<File>();
   @Output() fileCleared = new EventEmitter<void>();
-  @Output() onRemove = new EventEmitter<string>(); // 👈 New: Tell parent "file removed"
+  @Output() onRemove = new EventEmitter<string>();
 
   selectedFile: File | null = null;
   error: string | null = null;
@@ -90,7 +93,6 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
     }
   }
 
-  // ✅ Fixed: Safe clear + emit onRemove
   clearFile(): void {
     if (this.fileInput?.nativeElement) {
       this.fileInput.nativeElement.value = ''; // Only if exists
@@ -102,5 +104,10 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
     this.fileCleared.emit();
 
     this.onRemove.emit(this.name); // or use a better identifier if needed
+  }
+  previewFile(): void {
+    if (this.fileUrl) {
+      window.open(this.fileUrl, '_blank');
+    }
   }
 }

@@ -44,7 +44,7 @@ table{
       color: #000;
 
       &:focus {
-        border-color: #007bff;
+        border-color: #003c5b;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
       }
     }
@@ -240,7 +240,7 @@ td .badge-unknown {
 }
 
 .table-link {
-  color: #007bff;
+  color: #003c5b;
   text-decoration: none;
   font-weight: 500;
   white-space: nowrap;
@@ -331,9 +331,9 @@ td .badge-unknown {
 
   &.active,
   &:hover:not(:disabled) {
-    background: #007bff;
+    background: #003c5b;
     color: white;
-    border-color: #007bff;
+    border-color: #003c5b;
   }
 
   &:disabled {

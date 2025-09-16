@@ -7,6 +7,7 @@ import { IlogiRadioComponent } from '../../../../customInputComponents/ilogi-rad
 import { IlogiFileUploadComponent } from '../../../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
 import { IlogiInputDateComponent } from '../../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { GenericService } from '../../../../_service/generic/generic.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-attachment',
@@ -18,11 +19,26 @@ import { GenericService } from '../../../../_service/generic/generic.service';
     IlogiRadioComponent,
     IlogiFileUploadComponent,
     IlogiInputDateComponent,
+    MatIcon
   ],
   templateUrl: './attachment.component.html',
   styleUrls: ['./attachment.component.scss'],
 })
 export class AttachmentComponent implements OnInit {
+  selfCertificationUrl: string | null = null;
+  selfCertificateFormat3AUrl: string | null = null;
+  treeRegistrationCertificateUrl: string | null = null;
+  ownerPanPdfUrl: string | null = null;
+  ownerAadharPdfUrl: string | null = null;
+  udyogAadharUrl: string | null = null;
+  gstCertificatePdfUrl: string | null = null;
+  combinedBuildingUrl: string | null = null;
+  landRegistrationDeedUrl: string | null = null;
+  partnershipDetailsUrl: string | null = null;
+  processFlowChartUrl: string | null = null;
+  detailProjectReportUrl: string | null = null;
+  propertyTaxClearanceCertificateUrl: string | null = null;
+  additionalDocUrl: string | null = null;
   @Input() submitted = false;
 
   form: FormGroup;
@@ -105,24 +121,83 @@ export class AttachmentComponent implements OnInit {
                   : null,
             });
 
-            // Only set file URLs (filename will be shown if we create placeholder)
-            const fields: [string, string | null][] = [
-              ['selfCertification', data.general_self_certification_form],
-              ['self_certificate_format_3A', data.self_certificate_format_3A],
-              [
-                'tree_registration_certificate',
-                data.tree_registration_certificate,
-              ],
-              ['owner_pan_pdf', data.owner_pan_pdf],
-              ['owner_aadhar_pdf', data.owner_aadhar_pdf],
-              ['udyog_aadhar', data.udyog_aadhar],
-              ['gst_certificate_pdf', data.gst_certificate_pdf],
-              ['combinedBuilding', data.combined_plan_document],
-              ['detailProjectReport', data.detailed_project_report_pdf],
+            const fieldMappings: {
+              controlName: string;
+              urlKey: keyof typeof data;
+              urlProp: keyof AttachmentComponent;
+            }[] = [
+              {
+                controlName: 'selfCertification',
+                urlKey: 'general_self_certification_form',
+                urlProp: 'selfCertificationUrl',
+              },
+              {
+                controlName: 'self_certificate_format_3A',
+                urlKey: 'self_certificate_format_3A',
+                urlProp: 'selfCertificateFormat3AUrl',
+              },
+              {
+                controlName: 'tree_registration_certificate',
+                urlKey: 'tree_registration_certificate',
+                urlProp: 'treeRegistrationCertificateUrl',
+              },
+              {
+                controlName: 'owner_pan_pdf',
+                urlKey: 'owner_pan_pdf',
+                urlProp: 'ownerPanPdfUrl',
+              },
+              {
+                controlName: 'owner_aadhar_pdf',
+                urlKey: 'owner_aadhar_pdf',
+                urlProp: 'ownerAadharPdfUrl',
+              },
+              {
+                controlName: 'udyog_aadhar',
+                urlKey: 'udyog_aadhar',
+                urlProp: 'udyogAadharUrl',
+              },
+              {
+                controlName: 'gst_certificate_pdf',
+                urlKey: 'gst_certificate_pdf',
+                urlProp: 'gstCertificatePdfUrl',
+              },
+              {
+                controlName: 'combinedBuilding',
+                urlKey: 'combined_plan_document',
+                urlProp: 'combinedBuildingUrl',
+              },
+              {
+                controlName: 'landRegistrationDeed',
+                urlKey: 'unit_land_details_pdf',
+                urlProp: 'landRegistrationDeedUrl',
+              },
+              {
+                controlName: 'partnershipDetails',
+                urlKey: 'unit_registaration_details_pdf',
+                urlProp: 'partnershipDetailsUrl',
+              },
+              {
+                controlName: 'processFlowChart',
+                urlKey: 'unit_process_flow_chart_diagram_or_write_up_pdf',
+                urlProp: 'processFlowChartUrl',
+              },
+              {
+                controlName: 'detailProjectReport',
+                urlKey: 'detailed_project_report_pdf',
+                urlProp: 'detailProjectReportUrl',
+              },
+              {
+                controlName: 'propertyTaxClearanceCertificate',
+                urlKey: 'unit_property_tax_clearance_certificate_pdf',
+                urlProp: 'propertyTaxClearanceCertificateUrl',
+              },
             ];
 
-            fields.forEach(([controlName, url]) => {
+            fieldMappings.forEach(({ controlName, urlKey, urlProp }) => {
+              const url = data[urlKey];
               if (url) {
+                (this[urlProp] as string) = url;
+
                 const fileName = decodeURIComponent(
                   url.split('/').pop() || 'file.pdf'
                 );
@@ -136,6 +211,8 @@ export class AttachmentComponent implements OnInit {
             // Additional docs (just basic)
             if (data.other_supporting_docuement1_pdf) {
               const url = data.other_supporting_docuement1_pdf;
+              this.additionalDocUrl = url; // ✅ Store for preview
+
               const fileName = decodeURIComponent(
                 url.split('/').pop() || 'additional-document.pdf'
               );
@@ -254,10 +331,12 @@ export class AttachmentComponent implements OnInit {
         raw.propertyTaxClearanceCertificate
       );
 
-   
-if (this.additionalDoc.file instanceof File) {
-  formData.append('other_supporting_docuement1_pdf', this.additionalDoc.file);
-}
+    if (this.additionalDoc.file instanceof File) {
+      formData.append(
+        'other_supporting_docuement1_pdf',
+        this.additionalDoc.file
+      );
+    }
 
     this.filesToDelete.forEach((flag) => {
       formData.append(flag, 'delete');
@@ -310,10 +389,10 @@ if (this.additionalDoc.file instanceof File) {
           const message = isDraft ? 'Draft saved!' : 'Submitted!';
           this.apiService.openSnackBar(message, 'success');
         },
-         error: (err: any) => {
+        error: (err: any) => {
           console.error('API Error:', err);
 
-          const errorResponse = err?.error; 
+          const errorResponse = err?.error;
           if (errorResponse?.errors) {
             const allErrors: string[] = [];
 
@@ -327,7 +406,7 @@ if (this.additionalDoc.file instanceof File) {
             allErrors.forEach((msg, index) => {
               setTimeout(() => {
                 this.apiService.openSnackBar(msg, 'error');
-              }, index * 1200); 
+              }, index * 1200);
             });
           } else {
             this.apiService.openSnackBar(
@@ -340,15 +419,15 @@ if (this.additionalDoc.file instanceof File) {
   }
 
   onAdditionalDocSelected(file: File): void {
-  this.additionalDoc.file = file;
-  this.cdr.markForCheck();
-}
+    this.additionalDoc.file = file;
+    this.cdr.markForCheck();
+  }
 
-removeAdditionalDoc(): void {
-  this.additionalDoc.file = null;
-  this.form.get('otherSupportingDoc')?.reset();
-  this.cdr.markForCheck();
-}
+  removeAdditionalDoc(): void {
+    this.additionalDoc.file = null;
+    this.form.get('otherSupportingDoc')?.reset();
+    this.cdr.markForCheck();
+  }
 
   addAdditionalDocument(): void {
     const name = this.form.get('additionalDocumentName')?.value?.trim();
@@ -369,4 +448,10 @@ removeAdditionalDoc(): void {
     this.additionalDocuments.splice(index, 1);
     this.cdr.markForCheck();
   }
+
+  previewFile(url: string): void {
+  if (url) {
+    window.open(url, '_blank');
+  }
+}
 }

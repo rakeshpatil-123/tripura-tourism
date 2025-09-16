@@ -126,9 +126,9 @@ $mobile-breakpoint: 1024px;
 }
 
 .user-profile .user-name {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--color-text-dark, #212529);
+  color:  #003c5b;
   margin-bottom: 2px;
 }
 
@@ -326,4 +326,10 @@ $mobile-breakpoint: 1024px;
 .sidebar.collapsed .nav-link {
   justify-content: center;
   padding: 12px;
+}
+
+.val{
+  color: #003c5b;
+  font-weight: 500;
+  font-size: 0.75rem;
 }

@@ -60,8 +60,8 @@
 
       .browse-btn {
         background: transparent;
-        color: #007bff;
-        border: 1px solid #007bff;
+        color: #003c5b;
+        border: 1px solid #003c5b;
         padding: 4px 8px;
         border-radius: 4px;
         font-size: 0.85rem;
@@ -110,4 +110,25 @@
 .label-wrapper {
   display: flex;
   align-items: center;
+}
+
+.preview-btn {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #003c5b;
+  padding: 2px 4px;
+  margin-top: 3px;
+  border-radius: 4px;
+
+  // &:hover {
+  //   background-color: rgba(0, 123, 255, 0.1);
+  // }
+
+  &:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
 }

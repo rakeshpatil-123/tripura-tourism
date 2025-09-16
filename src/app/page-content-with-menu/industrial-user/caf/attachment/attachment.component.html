@@ -9,7 +9,7 @@
     <div class="col-md-4 mt-2">
       <div class="form-group form-group-margin">
         <label for="selfCertification">Self Certification Form  <span class="text-danger">*</span></label>
-        <app-ilogi-file-upload [formControlName]="'selfCertification'" accept=".png,.jpg,.jpeg,.pdf"
+        <app-ilogi-file-upload [formControlName]="'selfCertification'" [fileUrl]="selfCertificationUrl" accept=".png,.jpg,.jpeg,.pdf"
           label="Choose File"></app-ilogi-file-upload>
       </div>
     </div>
@@ -49,7 +49,7 @@
     <div class="col-md-4" *ngIf="form.get('typeOfTree')?.value === 'EXEMPTED'">
       <div class="form-group form-group-margin">
         <label>Self Certificate Format 3A <span class="text-danger">*</span></label>
-        <app-ilogi-file-upload [formControlName]="'self_certificate_format_3A'" accept=".png,.jpg,.jpeg,.pdf"
+        <app-ilogi-file-upload [formControlName]="'self_certificate_format_3A'"  [fileUrl]="selfCertificateFormat3AUrl" accept=".png,.jpg,.jpeg,.pdf"
           label="Upload File" (onRemove)="removeFile('self_certificate_format_3A')">
         </app-ilogi-file-upload>
       </div>
@@ -58,7 +58,7 @@
     <div class="col-md-4" *ngIf="form.get('typeOfTree')?.value === 'NON_EXEMPTED'">
       <div class="form-group form-group-margin">
         <label>Tree Registration Certificate <span class="text-danger">*</span></label>
-        <app-ilogi-file-upload [formControlName]="'tree_registration_certificate'" accept=".png,.jpg,.jpeg,.pdf"
+        <app-ilogi-file-upload [fileUrl]="treeRegistrationCertificateUrl" [formControlName]="'tree_registration_certificate'" accept=".png,.jpg,.jpeg,.pdf"
           label="Upload File" (onRemove)="removeFile('tree_registration_certificate')">
         </app-ilogi-file-upload>
       </div>
@@ -76,7 +76,7 @@
     <div class="col-md-4">
       <div class="form-group form-group-margin">
         <label>Owner PAN <span class="text-danger">*</span></label>
-        <app-ilogi-file-upload [formControlName]="'owner_pan_pdf'" accept=".png,.jpg,.jpeg,.pdf"
+        <app-ilogi-file-upload [fileUrl]="ownerPanPdfUrl" [formControlName]="'owner_pan_pdf'" accept=".png,.jpg,.jpeg,.pdf"
           label="Choose File"></app-ilogi-file-upload>
       </div>
     </div>
@@ -85,7 +85,7 @@
     <div class="col-md-4">
       <div class="form-group form-group-margin">
         <label>Owner Aadhar</label>
-        <app-ilogi-file-upload [formControlName]="'owner_aadhar_pdf'" accept=".png,.jpg,.jpeg,.pdf" label="Choose File"
+        <app-ilogi-file-upload [fileUrl]="ownerAadharPdfUrl" [formControlName]="'owner_aadhar_pdf'" accept=".png,.jpg,.jpeg,.pdf" label="Choose File"
           (onRemove)="removeFile('owner_aadhar_pdf')">
         </app-ilogi-file-upload>
       </div>
@@ -95,7 +95,7 @@
     <div class="col-md-4">
       <div class="form-group form-group-margin">
         <label>Udyog Aadhar</label>
-        <app-ilogi-file-upload [formControlName]="'udyog_aadhar'" accept=".png,.jpg,.jpeg,.pdf" label="Choose File"
+        <app-ilogi-file-upload  [fileUrl]="udyogAadharUrl" [formControlName]="'udyog_aadhar'" accept=".png,.jpg,.jpeg,.pdf" label="Choose File"
           (onRemove)="removeFile('udyog_aadhar')">
         </app-ilogi-file-upload>
       </div>
@@ -120,7 +120,7 @@
 
   <div class="row top-space no-padding-first-last mt-4">
     <div class="col-md-4">
-      <app-ilogi-file-upload [formControlName]="'gst_certificate_pdf'" label="GST Certificate"
+      <app-ilogi-file-upload [formControlName]="'gst_certificate_pdf'" [fileUrl]="gstCertificatePdfUrl" label="GST Certificate"
         accept=".png,.jpg,.jpeg,.pdf" (onRemove)="removeFile('gst_certificate_pdf')">
       </app-ilogi-file-upload>
     </div>
@@ -146,7 +146,7 @@
     <!-- Combined Building Plan -->
     <div class="row top-space no-padding-first-last mt-2 ">
       <div class="">
-        <app-ilogi-file-upload [formControlName]="'combinedBuilding'" label="Combined Building Plan"
+        <app-ilogi-file-upload [formControlName]="'combinedBuilding'" [fileUrl]="combinedBuildingUrl" label="Combined Building Plan"
           accept=".png,.jpg,.jpeg,.pdf" (onRemove)="removeFile('combinedBuilding')">
         </app-ilogi-file-upload>
       </div>
@@ -155,7 +155,7 @@
     <!-- Land Details -->
     <div class="row top-space no-padding-first-last mt-2">
       <div class="">
-        <app-ilogi-file-upload [formControlName]="'landRegistrationDeed'" label="Land Details"
+        <app-ilogi-file-upload [formControlName]="'landRegistrationDeed'" [fileUrl]="landRegistrationDeedUrl" label="Land Details"
           accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
       </div>
     </div>
@@ -163,7 +163,7 @@
     <!-- Registration Details -->
     <div class="row top-space no-padding-first-last mt-2">
       <div class="">
-        <app-ilogi-file-upload [formControlName]="'partnershipDetails'" label="Registration Details"
+        <app-ilogi-file-upload [formControlName]="'partnershipDetails'" [fileUrl]="partnershipDetailsUrl" label="Registration Details"
           accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
       </div>
     </div>
@@ -171,7 +171,7 @@
     <!-- Process Flow Chart -->
     <div class="row top-space no-padding-first-last mt-2">
       <div class="">
-        <app-ilogi-file-upload [formControlName]="'processFlowChart'" label="Process Flow Chart (Diagram / write up)"
+        <app-ilogi-file-upload [formControlName]="'processFlowChart'" [fileUrl]="processFlowChartUrl" label="Process Flow Chart (Diagram / write up)"
           accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
       </div>
     </div>
@@ -179,7 +179,7 @@
     <!-- Detail Project Report -->
     <div class="row top-space no-padding-first-last mt-2">
       <div class="">
-        <app-ilogi-file-upload [formControlName]="'detailProjectReport'" label="Detail Project Report (DPR)"
+        <app-ilogi-file-upload [formControlName]="'detailProjectReport'" [fileUrl]="detailProjectReportUrl" label="Detail Project Report (DPR)"
           accept=".png,.jpg,.jpeg,.pdf" (onRemove)="removeFile('detailProjectReport')">
         </app-ilogi-file-upload>
       </div>
@@ -188,7 +188,7 @@
     <!-- Property Tax Clearance Certificate -->
     <div class="row top-space no-padding-first-last mt-2">
       <div class="">
-        <app-ilogi-file-upload [formControlName]="'propertyTaxClearanceCertificate'"
+        <app-ilogi-file-upload [formControlName]="'propertyTaxClearanceCertificate'"  [fileUrl]="propertyTaxClearanceCertificateUrl"
           label="Property Tax Clearance Certificate" accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
       </div>
     </div>
@@ -201,7 +201,8 @@
       [formControlName]="'otherSupportingDoc'"
       label="Upload Additional Document"
       accept=".png,.jpg,.jpeg,.pdf,.doc,.docx"
-      (fileSelected)="onAdditionalDocSelected($event)">
+      (fileSelected)="onAdditionalDocSelected($event)" [fileUrl]="additionalDocUrl">
+      
     </app-ilogi-file-upload>
   </div>
 </div>
@@ -222,7 +223,15 @@
           <td>{{ additionalDoc.name }}</td>
           <td>{{ additionalDoc.file.name }}</td>
           <td>
-            <a class="c-link" (click)="removeAdditionalDoc()">Remove</a>
+            <button
+              *ngIf="additionalDocUrl"
+              type="button"
+              class="btn btn-sm mt-2"
+              (click)="previewFile(additionalDocUrl)"
+              title="Preview">
+            <mat-icon>visibility</mat-icon>
+            </button>
+            <button class="remove-btn" (click)="removeAdditionalDoc()">✕</button>
           </td>
         </tr>
       </tbody>

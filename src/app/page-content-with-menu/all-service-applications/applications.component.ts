@@ -139,58 +139,7 @@ export class ApplicationsComponent implements OnInit {
     });
   }
 
-  // generateColumns(data: any[]): TableColumn[] {
-  //   if (!Array.isArray(data) || data.length === 0) return [];
 
-  //   const firstItem = data[0];
-  //   const columns: TableColumn[] = [];
-
-  //   const columnConfig: Record<string, { type?: ColumnType; label?: string; width?: string }> = {
-  //     application_id: { label: 'Application ID', width: '120px' },
-  //     service_name: { label: 'Service', width: '180px' },
-  //     applicant_name: { label: 'Applicant Name', width: '180px' },
-  //     applicant_email: { label: 'Email', width: '200px' },
-  //     applicant_mobile: { label: 'Mobile', width: '140px' },
-  //     department: { label: 'Department', width: '160px' },
-  //     status: { type: 'status', label: 'Status', width: '140px' },
-  //     current_step: { label: 'Current Step', width: '120px' },
-  //   };
-
-  //   for (const key in firstItem) {
-  //     if (!firstItem.hasOwnProperty(key)) continue;
-
-  //     const config = columnConfig[key] || {};
-  //     const type: ColumnType = config.type || this.guessColumnType(key, firstItem[key]);
-  //     const label = config.label || this.formatLabel(key);
-  //     const width = config.width;
-
-  //     columns.push({
-  //       key,
-  //       label,
-  //       type,
-  //       sortable: true,
-  //       ...(width && { width }), // conditionally add width
-  //     });
-  //   }
-
-  //   columns.push({
-  //     key: 'actions',
-  //     label: 'Actions',
-  //     type: 'action',
-  //     width: '150px',
-  //     actions: [
-  //       {
-  //         label: 'View',
-  //         color: 'primary',
-  //         onClick: (row: any) => {
-  //           this.router.navigate(['/dashboard/service-view', row.application_id]);
-  //         },
-  //       },
-  //     ],
-  //   });
-
-  //   return columns;
-  // }
 
   generateColumns(data: any[]): TableColumn[] {
     if (!Array.isArray(data) || data.length === 0) return [];
@@ -198,18 +147,21 @@ export class ApplicationsComponent implements OnInit {
     const firstItem = data[0];
     const columns: TableColumn[] = [];
 
-
-
     const columnConfig: Record<
       string,
-      { type?: ColumnType; label?: string; width?: string,  linkHref?: (row: any) => string; }
+      {
+        type?: ColumnType;
+        label?: string;
+        width?: string;
+        linkHref?: (row: any) => string;
+      }
     > = {
-       application_id: {
-    label: 'Application ID',
-    width: '120px',
-    type: 'link', 
-    linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
-  },
+      application_id: {
+        label: 'Application ID',
+        width: '120px',
+        type: 'link',
+        linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
+      },
       service_name: { label: 'Service', width: '180px' },
       applicant_name: { label: 'Applicant Name', width: '180px' },
       applicant_email: { label: 'Email', width: '200px' },
@@ -228,8 +180,6 @@ export class ApplicationsComponent implements OnInit {
         width: '180px',
       },
     };
-
-  
 
     // 👇 Generate other columns
     for (const key in firstItem) {
@@ -254,7 +204,7 @@ export class ApplicationsComponent implements OnInit {
       });
     }
 
-          columns.push({
+    columns.push({
       key: 'view',
       label: 'View',
       type: 'icon',

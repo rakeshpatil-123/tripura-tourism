@@ -94,16 +94,37 @@ export class AllDepartmentApplicationsComponent implements OnInit {
     const columns: TableColumn[] = [];
 
     for (const key in firstItem) {
-      if (firstItem.hasOwnProperty(key)) {
-        const type: ColumnType = this.guessColumnType(key, firstItem[key]);
-        columns.push({
-          key,
-          label: this.formatLabel(key),
-          type,
-          sortable: true,
-        });
-      }
-    }
+  if (!firstItem.hasOwnProperty(key)) continue;
+
+  let column: TableColumn;
+
+  if (key === 'service_name') {
+    column = {
+      key: 'service_name',
+      label: 'Service Name',
+      type: 'link',
+      sortable: true,
+      linkHref: (row: any) => {
+        const deptId = this.selectedDepartmentId || Number(localStorage.getItem('deptId'));
+        if (!deptId || !row.service_id) {
+          this.apiService.openSnackBar('Missing required IDs.', 'Close');
+          return '#';
+        }
+        return `/dashboard/all-service-application/${deptId}/${row.service_id}?view=all-applications`;
+      },
+    };
+  } else {
+    const type: ColumnType = this.guessColumnType(key, firstItem[key]);
+    column = {
+      key,
+      label: this.formatLabel(key),
+      type,
+      sortable: true,
+    };
+  }
+
+  columns.push(column);
+}
 
     // Add Actions column
     columns.push({

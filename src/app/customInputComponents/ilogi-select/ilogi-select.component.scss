@@ -121,7 +121,7 @@
 
 /* Dropdown focus state */
 :host ::ng-deep .p-select.p-focus {
-  border-color: #2C82AA;
+  border-color: #003c5b;
   box-shadow: none;
   
 }
@@ -157,12 +157,12 @@
 }
 
 :host ::ng-deep .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus{
-  background-color: #2C82AA!important;
+  background-color: #003c5b!important;
 }
 
 :host ::ng-deep .ng-star-inserted li:hover,
 :host ::ng-deep .ng-star-inserted li span:hover {
- background-color: #2C82AA!important;
+ background-color: #003c5b!important;
  color: #fff!important;
 }
 
@@ -196,7 +196,7 @@
 
 label{
     font-size: 0.75rem;
-  color: #2C82AA;
+  color: #003c5b;
 
 }
 .required-indicator {
