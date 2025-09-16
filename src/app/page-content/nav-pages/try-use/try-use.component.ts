@@ -356,7 +356,7 @@ export class ButtonComponent {
 
   // Button types
   &--primary {
-    background-color: #007bff;
+    background-color: #003c5b;
     color: white;
     
     &:hover:not(.btn--disabled):not(.btn--loading) { 
@@ -383,11 +383,11 @@ export class ButtonComponent {
 
   &--outline {
     background: transparent;
-    border: 1px solid #007bff;
-    color: #007bff;
+    border: 1px solid #003c5b;
+    color: #003c5b;
     
     &:hover:not(.btn--disabled):not(.btn--loading) { 
-      background-color: #007bff;
+      background-color: #003c5b;
       color: white;
     }
     
@@ -399,7 +399,7 @@ export class ButtonComponent {
 
   &--ghost {
     background: transparent;
-    color: #007bff;
+    color: #003c5b;
     
     &:hover:not(.btn--disabled):not(.btn--loading) { 
       background-color: rgba(0, 123, 255, 0.1); 

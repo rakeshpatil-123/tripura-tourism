@@ -107,6 +107,22 @@ export class ServicesComponent {
       ],
     });
 
+  columns.push({
+  key: 'view',
+  label: 'View',
+  type: 'icon',
+  icon: 'visibility',
+  width: '60px',
+  onClick: (row: any) => {
+    this.router.navigate(['/dashboard/user-app-view', row.id, row.application_id]);
+  },
+  cellClass: (value: any, row: any) => {
+    // 👇 Show ONLY if status is NOT null AND NOT 'send_back'
+   const shouldShow = row.application_status !== null && row.application_status !== 'send_back';
+    return shouldShow ? '' : 'd-none'; // Hide if condition not met
+  },
+});
+
     this.ApplicationColumns = columns;
   }
 

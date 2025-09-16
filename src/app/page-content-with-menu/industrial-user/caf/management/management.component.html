@@ -56,12 +56,13 @@
         </div>
 
         <app-ilogi-file-upload [formControlName]="'ownerDetailsPhoto'" accept="image/png,image/jpg,image/jpeg"
-          label="Upload Photo" (change)="onOwnerPhotoSelected($event)"></app-ilogi-file-upload>
+          label="Upload Photo" (change)="onOwnerPhotoSelected($event)" [fileUrl]="ownerPhotoPreview" (onRemove)="removeFile('ownerDetailsPhoto')">
+        </app-ilogi-file-upload>
 
-        <button *ngIf="form.get('ownerDetailsPhoto')?.value" type="button"
+        <!-- <button *ngIf="form.get('ownerDetailsPhoto')?.value" type="button"
           class="btn-remove-attach browse-btn ml-2 pl-3 pr-3 add-new-btn" (click)="removeFile('ownerDetailsPhoto')">
           Remove
-        </button>
+        </button> -->
 
         <div class="sub-field-text">
           [Photograph should be in colour, against a light-coloured, preferably white, background. 35mm X 45mm or 100 x
@@ -79,8 +80,8 @@
       <div class="mt-4">
 
         <app-ilogi-select fieldId="statusOfPerson" fieldLabel="Status of Person"
-          [formControlName]="'ownerDetailsStatus'" [selectOptions]="statusOfPersonOptions"
-          placeholder="Select" [mandatory]="true" ></app-ilogi-select>
+          [formControlName]="'ownerDetailsStatus'" [selectOptions]="statusOfPersonOptions" placeholder="Select"
+          [mandatory]="true"></app-ilogi-select>
       </div>
       <div class="mt-4">
 
@@ -103,8 +104,9 @@
           placeholder="Select"></app-ilogi-select>
       </div>
       <div class="mt-4">
-        <app-ilogi-select fieldId="minority" [mandatory]="true" fieldLabel="Minority" [formControlName]="'ownerDetailsIsMinority'"
-          [selectOptions]="yesNoOptions" placeholder="Select"></app-ilogi-select>
+        <app-ilogi-select fieldId="minority" [mandatory]="true" fieldLabel="Minority"
+          [formControlName]="'ownerDetailsIsMinority'" [selectOptions]="yesNoOptions"
+          placeholder="Select"></app-ilogi-select>
       </div>
       <div class="mt-4">
         <app-ilogi-select fieldId="differentlyAbled" [mandatory]="true" fieldLabel="Differently Abled"
@@ -160,13 +162,14 @@
             class="rounded employer-photo" style="width: 100px; height: 128px; object-fit: cover;" /> -->
         </div>
 
-        <app-ilogi-file-upload [formControlName]="'managerDetailsPhoto'" accept="image/png,image/jpg,image/jpeg"
-          label="Upload Photo" (change)="onManagerPhotoSelected($event)"></app-ilogi-file-upload>
+        <app-ilogi-file-upload [formControlName]="'managerDetailsPhoto'" [fileUrl]="managerPhotoPreview" accept="image/png,image/jpg,image/jpeg"
+          label="Upload Photo" (change)="onManagerPhotoSelected($event)" (onRemove)="removeFile('managerDetailsPhoto')">
+        </app-ilogi-file-upload>
 
-        <button *ngIf="form.get('managerDetailsPhoto')?.value" type="button"
+        <!-- <button *ngIf="form.get('managerDetailsPhoto')?.value" type="button"
           class="browse-btn ml-2 pl-3 pr-3 add-new-btn" (click)="removeFile('managerDetailsPhoto')">
           Remove
-        </button>
+        </button> -->
 
         <div class="sub-field-text">
           [Photograph should be in colour, against a light-coloured, preferably white, background. 35mm X 45mm or 100 x
@@ -189,17 +192,20 @@
 
   <div class="row top-space no-padding-first-last">
     <div class="col-md-4">
-      <app-ilogi-file-upload [formControlName]="'signatureAuthorizationOfOwner'" [mandatory]="true"
-        label="Signature Authorization of Owner"
-        accept="image/png,image/jpg,image/jpeg,application/pdf"></app-ilogi-file-upload>
+      <app-ilogi-file-upload [formControlName]="'signatureAuthorizationOfOwner'" [mandatory]="true" [fileUrl]="signatureOwnerPreview"
+        label="Signature Authorization of Owner" accept="image/png,image/jpg,image/jpeg,application/pdf"
+        (onRemove)="removeFile('signatureAuthorizationOfOwner')">
+      </app-ilogi-file-upload>
     </div>
     <div class="col-md-4">
-      <app-ilogi-file-upload [formControlName]="'factoryOccupiersSignature'" label="Factory Occupier's Signature"
-        accept="image/png,image/jpg,image/jpeg,application/pdf"></app-ilogi-file-upload>
+      <app-ilogi-file-upload [formControlName]="'factoryOccupiersSignature'" [fileUrl]="signatureOccupierPreview" label="Factory Occupier's Signature"
+        accept="image/png,image/jpg,image/jpeg,application/pdf" (onRemove)="removeFile('factoryOccupiersSignature')">
+      </app-ilogi-file-upload>
     </div>
     <div class="col-md-4">
-      <app-ilogi-file-upload [formControlName]="'factoryManagersSignature'" label="Factory Manager's Signature"
-        accept="image/png,image/jpg,image/jpeg,application/pdf"></app-ilogi-file-upload>
+      <app-ilogi-file-upload [formControlName]="'factoryManagersSignature'" [fileUrl]="signatureManagerPreview" label="Factory Manager's Signature"
+        accept="image/png,image/jpg,image/jpeg,application/pdf" (onRemove)="removeFile('factoryManagersSignature')">
+      </app-ilogi-file-upload>
     </div>
   </div>
 
@@ -264,10 +270,14 @@
                 <app-ilogi-input-date [formControlName]="'dateOfJoining'"></app-ilogi-input-date>
               </td>
               <td>
-                <app-ilogi-file-upload [formControlName]="'idProof'" label="Upload"></app-ilogi-file-upload>
+                <app-ilogi-file-upload [formControlName]="'idProof'" label="Upload" 
+                  (onRemove)="onPartnerFileRemoved(i, 'idProof')">
+                </app-ilogi-file-upload>
               </td>
               <td>
-                <app-ilogi-file-upload [formControlName]="'signature'" label="Upload"></app-ilogi-file-upload>
+                <app-ilogi-file-upload [formControlName]="'signature'" label="Upload"
+                  (onRemove)="onPartnerFileRemoved(i, 'signature')">
+                </app-ilogi-file-upload>
               </td>
               <td>
                 <button type="button" class="btn btn-danger btn-sm" (click)="removePartner(i)">Remove</button>

@@ -8,11 +8,14 @@
     <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-application-form">
 
       <!-- Render each group -->
-      <h1 class="page-head mb-2">Service Application</h1>
-      <hr>
-      <div *ngFor="let group of Object.keys(groupedQuestions)" class="mb-5">
+      <div class="h-style">
+
+        <h1 class="">Service Application</h1>
+      </div>
+      <div *ngFor="let group of Object.keys(groupedQuestions)" class="mb-5 p-4">
 
         <h5 class="mb-2 info-head">{{ group }}</h5>
+        <hr>
         <div class="row">
           <div *ngFor="let q of groupedQuestions[group]" class="mb-3" [style.width]="q.display_width">
             <!-- Text / Number / Email / Textarea -->
@@ -21,7 +24,7 @@
                 q.question_type === 'number' ||
                 q.question_type === 'email' ||
                 q.question_type === 'textarea'
-              " [formControlName]="q.id" [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+              " [formControlName]="q.id" [fieldLabel]="q.question_label" [placeholder]="q.question_label" [mandatory]="q.is_required === 'yes'"
               [type]="q.question_type" [errorMessages]="{
                 pattern: q.validation_rule?.errorMessage || 'Invalid input.'
               }" [readonly]="isFieldReadonly(q.id)"></app-ilogi-input>
@@ -56,7 +59,7 @@
         </div>
       </div>
 
-      <div class="mt-4">
+      <div class="m-4">
         <button type="submit" class="btn btn-success">Submit</button>
       </div>
     </form>

@@ -9,13 +9,13 @@
   }
   
   .red-font {
-    color: var(--color-poppy-red, #2C82AA)!important;
+    color: var(--color-poppy-red, #003c5b)!important;
   }
   
   .invalid-input {
     visibility: hidden;
     opacity: 0;
-    color: var(--color-poppy-red, #2C82AA)!important;
+    color: var(--color-poppy-red, #003c5b)!important;
     font-size: 0.875rem;
     height: 0;
     overflow: hidden;
@@ -29,7 +29,7 @@
   }
   
   .x-error-msg-text {
-    color: var(--color-poppy-red, #2C82AA)!important;
+    color: var(--color-poppy-red, #003c5b)!important;
   }
   
   .show-data {
@@ -49,13 +49,13 @@
   }
   
   mat-radio-group.is-invalid {
-    border: 1px solid var(--color-poppy-red, #2C82AA)!important;
+    border: 1px solid var(--color-poppy-red, #003c5b)!important;
     border-radius: 4px;
     transition: none;
   }
   
   // :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-outer-circle {
-  //   border-color: var(--color-tertiary, #2C82AA)!important;
+  //   border-color: var(--color-tertiary, #003c5b)!important;
   // }
   
   //   :host ::ng-deep .mdc-radio .mdc-radio__background .mat-radio-outer-circle {
@@ -63,12 +63,12 @@
   //   }
 
   // :host ::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
-  //   background-color: var(--color-tertiary, #2C82AA)!important;
+  //   background-color: var(--color-tertiary, #003c5b)!important;
   // }
 
   ::ng-deep .mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__background .mdc-radio__inner-circle {
-  background-color: #2C82AA !important;   /* inner circle */
-  border-color: #2C82AA !important;
+  background-color: #003c5b !important;   /* inner circle */
+  border-color: #003c5b !important;
 }
 
 ::ng-deep .mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__background .mdc-radio__outer-circle {
@@ -100,7 +100,7 @@
 /* Label style */
 .area-type .area-label {
   font-size: 0.85rem;
-  color: #2C82AA;
+  color: #003c5b;
   margin: 0; /* remove default margin */
   white-space: nowrap; /* keep label in one line */
 }

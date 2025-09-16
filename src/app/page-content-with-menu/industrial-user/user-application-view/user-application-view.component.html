@@ -1,0 +1,129 @@
+<!-- user-application-view.component.html -->
+<div class="application-view-container">
+  <!-- <div class="header">
+    <h1>Application Details</h1>
+    <p class="subtitle">View and track your submitted application</p>
+  </div> -->
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading application details...</p>
+  </div>
+
+  <div class="error-card" *ngIf="error && !isLoading">
+    <div class="icon">⚠️</div>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="fetchApplicationDetails()">Retry</button>
+  </div>
+
+  <div class="application-card" *ngIf="application && !isLoading">
+    <!-- Application Info -->
+    <section class="section">
+      <h2> Application Information</h2>
+      <div class="grid">
+        <div class="field">
+          <label>Application Date</label>
+          <span>{{ formatDate(application?.application_date) || '—' }}</span>
+        </div>
+        <div class="field">
+          <label>Due Date</label>
+          <span>{{ formatDate(application?.max_processing_date) || '—' }}</span>
+        </div>
+        <div class="field">
+          <label>Current Step</label>
+          <span>Step {{ application?.current_step_number || '—' }}</span>
+        </div>
+        <div class="field">
+          <label>Final Fee</label>
+          <span>₹{{ application?.final_fee || '0' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Status -->
+    <section class="section">
+      <h2> Status</h2>
+      <div class="status-display">
+        <span [ngClass]="getStatusBadgeClass(application?.status || '')">
+          {{ (application?.status || '—') | titlecase }}
+        </span>
+        <div class="remarks" *ngIf="application?.remarks">
+          <strong>Remarks:</strong> {{ application?.remarks || '—' }}
+        </div>
+      </div>
+    </section>
+
+    <!-- Applicant Data -->
+    <section
+      class="section"
+      *ngIf="application?.application_data "
+    >
+      <h2> Applicant Information</h2>
+      <div class="grid">
+        <div class="field" *ngFor="let entry of application.application_data | keyvalue">
+          <label>{{ getLabel(entry.key) }}</label>
+          <span>{{ entry.value || '—' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payment Info -->
+    <section class="section">
+      <h2> Payment Information</h2>
+      <div class="grid">
+        <div class="field">
+          <label>Payment Status</label>
+          <span
+            [ngClass]="{
+              'payment-pending': application?.payment_status === 'pending',
+              'payment-success': application?.payment_status === 'success',
+              'payment-failed': application?.payment_status === 'failed'
+            }"
+          >
+            {{ application?.payment_status ? (application.payment_status | titlecase) : '—' }}
+          </span>
+        </div>
+        <div class="field" *ngIf="application?.payment_status !== 'pending'">
+          <label>Transaction ID</label>
+          <span>{{ application?.payment_transId || '—' }}</span>
+        </div>
+        <div class="field" *ngIf="application?.payment_status !== 'pending'">
+          <label>Payment Time</label>
+          <span>{{ formatDate(application?.payment_time) || '—' }}</span>
+        </div>
+        <div class="field" *ngIf="application?.GRN_number">
+          <label>GRN Number</label>
+          <span>{{ application?.GRN_number || '—' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOC Details (if issued) -->
+    <section class="section" *ngIf="application?.NOC_letter_number">
+      <h2>📄 NOC Details</h2>
+      <div class="grid">
+        <div class="field">
+          <label>NOC Letter Number</label>
+          <span>{{ application?.NOC_letter_number || '—' }}</span>
+        </div>
+        <div class="field">
+          <label>NOC Letter Date</label>
+          <span>{{ formatDate(application?.NOC_letter_date) || '—' }}</span>
+        </div>
+        <div class="field">
+          <label>NOC Expiry Date</label>
+          <span>{{ formatDate(application?.NOC_expiry_date) || '—' }}</span>
+        </div>
+        <div class="field">
+          <label>Penalty Amount</label>
+          <span *ngIf="application?.NOC_penalty_amount !== null && application?.NOC_penalty_amount !== undefined">
+            ₹{{ application?.NOC_penalty_amount }}
+          </span>
+          <span *ngIf="application?.NOC_penalty_amount === null || application?.NOC_penalty_amount === undefined">
+            —
+          </span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

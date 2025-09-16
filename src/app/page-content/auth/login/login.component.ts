@@ -41,10 +41,19 @@ export class LoginComponent {
             response,
             payload.rememberMe || false
           );
-          localStorage.setItem('userName', response.data.authorized_person_name);
+          localStorage.setItem('userName', response.data.user_name);
           localStorage.setItem('userRole', response.data.user_type);
           localStorage.setItem('deptId', response.data.department_id || '');
           localStorage.setItem('deptName', response.data.department_name || '');
+          localStorage.setItem('email_id', response.data.email_id);
+          localStorage.setItem('hierarchy', response.data.hierarchy || '');
+          localStorage.setItem('designation', response.data.designation || '');
+          localStorage.setItem('district', response.data.district || '');
+          localStorage.setItem('subdivision', response.data.subdivision || '');
+          localStorage.setItem('ulb', response.data.ulb || '');
+          localStorage.setItem('ward', response.data.ward || '');
+          localStorage.setItem('userId', response.data.id || '');
+          localStorage.setItem('bin', response.data.bin || '');
           this.genericService.openSnackBar('Login successful!', 'Success');
           this.genericService.setLoginStatus(true);
           this.loginForm.reset();

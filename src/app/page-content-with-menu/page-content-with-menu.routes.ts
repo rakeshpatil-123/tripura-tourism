@@ -80,6 +80,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department', 'individual'] }
       },
       {
+        path: 'user-app-view/:serviceId/:appId',
+        loadComponent: () =>
+          import('./industrial-user/user-application-view/user-application-view.component').then(
+            (m) => m.UserApplicationViewComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
+      },
+      {
         path: 'service-application/:id',
         loadComponent: () =>
           import(
