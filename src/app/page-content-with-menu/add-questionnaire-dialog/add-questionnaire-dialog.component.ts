@@ -85,8 +85,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
           1000,
           [Validators.required, Validators.min(1), Validators.max(1000)],
         ],
-        pattern: ['^[A-Za-z ]+$'],
-        errorMessage: ['Only alphabets allowed'],
+        pattern: [''],
+        errorMessage: [''],
       }),
     });
   }
@@ -133,13 +133,13 @@ export class AddQuestionnaireDialogComponent implements OnInit {
               question_type: 'text',
               is_required: 'yes',
               display_order: this.apiQuestions.length + 1,
-              group_label: 'Basic Information',
+              group_label: '',
               display_width: '50%',
               status: 1,
               validation_required: 'yes',
               validation_rule: {
                 type: 'text',
-                minLength: 3,
+                minLength: 1,
                 maxLength: 100,
                 pattern: '^[A-Za-z ]+$',
                 errorMessage: 'Only alphabets allowed',

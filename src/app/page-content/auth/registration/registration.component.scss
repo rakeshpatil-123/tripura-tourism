@@ -37,7 +37,10 @@
 .form {
   display: flex;
   flex-direction: column;
-  // gap: 1rem;
+  gap: 1rem;
+}
+.height-20 {
+  height: 27px;
 }
 .single-field{
 display: flex;
@@ -45,7 +48,9 @@ flex-direction: column;
 // gap: 2px;
 margin: 8px 0;
 }
-
+.mb-10 {
+  margin-bottom: 10px !important;
+}
 .btn-submit {
   width: 100%;
   margin-top: 0.5rem;

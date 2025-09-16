@@ -34,51 +34,48 @@
 
         <div class="single-field">
           <!-- Address -->
-          <app-ilogi-input fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
+          <app-ilogi-input class="height-20" fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
             [mandatory]="true" formControlName="registered_enterprise_address"
             placeholder="Enter full address"></app-ilogi-input>
-          
-          <!-- District -->
-          <app-ilogi-select fieldId="district_id" fieldLabel="District" [mandatory]="true" 
-            formControlName="district_id" [selectOptions]="districts" 
-           placeholder="Select district">
-          </app-ilogi-select>
-
-          <!-- Subdivision -->
-          <app-ilogi-select fieldId="subdivision_id" fieldLabel="Subdivision" [mandatory]="true" 
-            formControlName="subdivision_id" [selectOptions]="subdivisions" 
-             placeholder="Select subdivision" 
-            [disabled]="!districts.length || loadingDistricts">
-          </app-ilogi-select>
-
-          <!-- ULB -->
-          <app-ilogi-select fieldId="ulb_id" fieldLabel="ULB" [mandatory]="true" 
-            formControlName="ulb_id" [selectOptions]="ulbs" 
-             placeholder="Select ULB" 
-            [disabled]="!subdivisions.length || loadingSubdivisions">
-          </app-ilogi-select>
-
-          <!-- Ward -->
-          <app-ilogi-select fieldId="ward_id" fieldLabel="Ward" [mandatory]="true" 
-            formControlName="ward_id" [selectOptions]="wards" 
-             placeholder="Select ward" 
-            [disabled]="!ulbs.length || loadingUlbs">
-          </app-ilogi-select>
-
-          <app-ilogi-select fieldId="user_type" fieldLabel="User Type" [mandatory]="true" formControlName="user_type"
-            [selectOptions]="userTypeOptions" inputType="select" placeholder="Select user type"></app-ilogi-select>
         </div>
-        <div *ngIf="registrationForm.get('user_type')?.value === 'department'">
+        <div *ngIf="(sourcePage === 'departmental-users')">
           <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" [mandatory]="true"
             formControlName="hierarchy_level" [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
           </app-ilogi-select>
-          <app-ilogi-select fieldId="department_id" fieldLabel="Department" [mandatory]="true" formControlName="department_id"
+          <app-ilogi-select class="mb-10" fieldId="department_id" fieldLabel="Department" [mandatory]="true" formControlName="department_id"
             [selectOptions]="departments" placeholder="Select department">
           </app-ilogi-select>
           <app-ilogi-input fieldId="designation" fieldLabel="Designation" [mandatory]="true" formControlName="designation"
             placeholder="Enter designation">
           </app-ilogi-input>
         </div>
+          <!-- District -->
+          <app-ilogi-select *ngIf="shouldShow('district')" fieldId="district_id" fieldLabel="District" [mandatory]="true" 
+            formControlName="district_id" [selectOptions]="districts" 
+           placeholder="Select district">
+          </app-ilogi-select>
+
+          <!-- Subdivision -->
+          <app-ilogi-select *ngIf="shouldShow('subdivision')" fieldId="subdivision_id" fieldLabel="Subdivision" [mandatory]="true" 
+            formControlName="subdivision_id" [selectOptions]="subdivisions" 
+             placeholder="Select subdivision" 
+            [disabled]="!districts.length || loadingDistricts">
+          </app-ilogi-select>
+
+          <!-- ULB -->
+          <app-ilogi-select *ngIf="shouldShow('block')" fieldId="ulb_id" fieldLabel="ULB" [mandatory]="true" 
+            formControlName="ulb_id" [selectOptions]="ulbs" 
+             placeholder="Select ULB" 
+            [disabled]="!subdivisions.length || loadingSubdivisions">
+          </app-ilogi-select>
+
+          <!-- Ward -->
+          <app-ilogi-select *ngIf="shouldShow('ward')" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true" 
+            formControlName="ward_id" [selectOptions]="wards" 
+             placeholder="Select ward" 
+            [disabled]="!ulbs.length || loadingUlbs">
+          </app-ilogi-select>
+
         <div class="enterprise-form">
           <!-- Password -->
           <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
@@ -98,7 +95,7 @@
         </div>
       </form>
 
-      <span class="text-center small mt-2">Already Registered? <a href="/page/login">Login</a></span>
+      <span *ngIf="!(sourcePage === 'departmental-users')" class="text-center small mt-2">Already Registered? <a href="/page/login">Login</a></span>
     </div>
   </div>
 </div>

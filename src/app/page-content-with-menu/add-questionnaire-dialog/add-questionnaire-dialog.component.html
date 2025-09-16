@@ -92,7 +92,7 @@
 
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>Group Label</mat-label>
-        <input matInput formControlName="group_label" />
+        <input matInput placeholder="Basic Information" formControlName="group_label" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
@@ -118,7 +118,7 @@
             Min Length must be at least 1
           </mat-error>
           <mat-error *ngIf="questionnaireForm.get('validation_rule.minLength')?.hasError('max')">
-            Min Length cannot be more than 100
+            Min Length cannot be more than 1000
           </mat-error>
         </mat-form-field>
 

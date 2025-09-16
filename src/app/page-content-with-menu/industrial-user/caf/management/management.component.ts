@@ -496,6 +496,7 @@ export class ManagementComponent implements OnInit, OnDestroy {
     //   this.apiService.openSnackBar('Please fix all errors in the form.', 'error');
     //   return;
     // }
+
     this.submitted = true;
 
     this.markFormGroupTouched(this.form);
@@ -504,8 +505,11 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.submitForm(payload, false);
   }
 
-  submitForm(payload: FormData, isDraft: boolean): void {
-    console.log('Submitting form with payload:', payload);
+
+ 
+   submitForm(payload: FormData, isDraft: boolean): void {
+     console.log('Submitting form with payload:', payload);
+
     this.apiService
       .getByConditions(payload, 'api/caf/management-details-store')
       .subscribe({
