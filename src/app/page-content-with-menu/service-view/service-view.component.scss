@@ -55,26 +55,20 @@
   margin-top: 20px;
 }
 
-.btn {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+.btn{
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-  &.btn-secondary {
-    background-color: #e0e0e0;
-    color: #333;
-  }
-
-  &.btn-primary {
-    background-color: #007bff;
-    color: white;
-
-    &:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-    }
-  }
-}   
+.btn-right{
+  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}

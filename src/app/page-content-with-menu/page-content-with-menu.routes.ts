@@ -80,6 +80,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department', 'individual'] }
       },
       {
+        path: 'user-app-view/:serviceId/:appId',
+        loadComponent: () =>
+          import('./industrial-user/user-application-view/user-application-view.component').then(
+            (m) => m.UserApplicationViewComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
+      },
+      {
         path: 'service-application/:id',
         loadComponent: () =>
           import(
@@ -120,6 +129,14 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         loadComponent: () =>
           import('./service-view/service-view.component').then(
             (m) => m.ServiceViewComponent
+          ),
+        data: { roles: [ 'department'] }
+      },
+      {
+        path: 'user-caf-view/:uid',
+        loadComponent: () =>
+          import('./user-caf-view-dept/user-caf-view-dept.component').then(
+            (m) => m.UserCafViewDeptComponent
           ),
         data: { roles: [ 'department'] }
       },

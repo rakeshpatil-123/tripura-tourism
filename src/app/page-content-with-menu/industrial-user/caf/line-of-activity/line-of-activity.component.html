@@ -19,7 +19,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let rm of rawMaterials.controls; let i = index" [formGroupName]="i">
+            <tr *ngFor="let rm of rawMaterials.controls; let i = index trackBy: trackByIndex" [formGroupName]="i">
               <td>{{ i + 1 }}</td>
 
               <td>
@@ -29,12 +29,12 @@
                 </div>
               </td>
               <td>
-              <div class="mt-3"  >
+                <div class="mt-3">
 
                   <app-ilogi-input fieldLabel="Quantity/Month" formControlName="raw_material_quantity_per_month"
                     placeholder="Enter"></app-ilogi-input>
-                  </div>
-                </td>
+                </div>
+              </td>
 
 
               <td>
@@ -43,9 +43,11 @@
               </td>
 
               <td>
-              <div class="mt-3"  >
+                <div class="mt-3">
 
-                <button type="button" class="btn btn-danger btn-sm" (click)="removeRawMaterial(i)">Remove</button>
+                  <button type="button" class="btn btn-danger btn-sm" (click)="removeRawMaterial(i)"
+                    [disabled]="isDeleting">
+                    {{ deletingRowIndex === i ? 'Deleting...' : 'Remove' }}</button>
                 </div>
               </td>
             </tr>
@@ -59,7 +61,7 @@
 
       <div class="pull-right mt-2 color-666666 clkable" (click)="addRawMaterial()">
         <i class="fa fa-plus"></i>
-        <span class="font-weight-bold ml-2">ADD NEW</span>
+        <span class="add ml-2">ADD NEW</span>
       </div>
     </div>
 
@@ -96,31 +98,31 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of products.controls; let i = index" [formGroupName]="i">
+            <tr *ngFor="let p of products.controls; let i = index trackBy: trackByIndex" [formGroupName]="i">
               <td>{{ i + 1 }}</td>
 
               <td>
-              <div class="mt-3"  >
-                
-                <app-ilogi-input fieldLabel="Product" formControlName="product_name" placeholder="Enter"
-                  maxlength="255"></app-ilogi-input>
-              </div>
+                <div class="mt-3">
+
+                  <app-ilogi-input fieldLabel="Product" formControlName="product_name" placeholder="Enter"
+                    maxlength="255"></app-ilogi-input>
+                </div>
               </td>
 
               <td>
-              <div class="mt-3"  >
-                
-                <app-ilogi-input fieldLabel="Capacity/Month" formControlName="product_production_capacity_per_month"
-                  placeholder="Enter"></app-ilogi-input>
-                  </div>
+                <div class="mt-3">
+
+                  <app-ilogi-input fieldLabel="Capacity/Month" formControlName="product_production_capacity_per_month"
+                    placeholder="Enter"></app-ilogi-input>
+                </div>
               </td>
 
               <td>
-              <div class="mt-3"  >
+                <div class="mt-3">
 
-                <app-ilogi-input fieldLabel="Production/Month" formControlName="product_average_production_per_month"
-                  placeholder="Enter"></app-ilogi-input>
-                  </div>
+                  <app-ilogi-input fieldLabel="Production/Month" formControlName="product_average_production_per_month"
+                    placeholder="Enter"></app-ilogi-input>
+                </div>
               </td>
 
               <td>
@@ -129,9 +131,11 @@
               </td>
 
               <td>
-              <div class="mt-3"  >
-                
-                <button type="button" class="btn btn-danger btn-sm" (click)="removeProduct(i)">Remove</button>
+                <div class="mt-3">
+
+                  <button type="button" class="btn btn-danger btn-sm" (click)="removeProduct(i)"
+                    [disabled]="isDeleting">
+                   {{ deletingRowIndex === i ? 'Deleting...' : 'Remove' }}</button>
                 </div>
               </td>
             </tr>
@@ -144,7 +148,7 @@
 
         <div class="pull-right mt-2 color-666666 clkable" (click)="addProduct()">
           <i class="fa fa-plus"></i>
-          <span class="font-weight-bold ml-2">ADD NEW</span>
+          <span class="add ml-2">ADD NEW</span>
         </div>
       </div>
     </div>

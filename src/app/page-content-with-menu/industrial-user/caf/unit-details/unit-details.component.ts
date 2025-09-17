@@ -275,7 +275,7 @@ loadingSubdivisions = false;
 
   private loadDistricts(): void {
   this.loadingDistricts = true;
-  this.apiService.getByConditions({}, 'api/public/tripura/get-all-districts').subscribe({
+  this.apiService.getByConditions({}, 'api/tripura/get-all-districts').subscribe({
     next: (res: DistrictResponse) => {
       this.loadingDistricts = false;
       if (res?.status === 1 && Array.isArray(res.districts)) {
@@ -305,7 +305,7 @@ onDistrictChange(district: string): void {
 
   const payload = { district };
 
-  this.apiService.getByConditions(payload, 'api/public/tripura/get-sub-subdivisions').subscribe({
+  this.apiService.getByConditions(payload, 'api/tripura/get-sub-subdivisions').subscribe({
     next: (res: SubDivisionResponse) => {
       this.loadingSubdivisions = false;
       if (res?.status === 1 && Array.isArray(res.subdivision)) {

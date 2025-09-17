@@ -302,21 +302,27 @@ private buildPayload(isDraft: boolean): any {
     return null;
   }
 
-  const lastActivity = this.activities[this.activities.length - 1];
-  const fourDigit = lastActivity.nic_4_digit_codes[0];
-  const fiveDigit = fourDigit.nic_5_digit_codes[0];
-
   const activityOfEnterprise = this.activityForm.get('companyActivity')?.value || 'Manufacturing';
 
-  const payload = {
-    activity_of_enterprise: activityOfEnterprise,
-    nic_2_digit_code: `${lastActivity.nic_2_digit_code} - ${lastActivity.nic_2_digit_code_description}`,
-    nic_4_digit_code: `${fourDigit.nic_4_digit_code} - ${fourDigit.nic_4_digit_code_description}`,
-    nic_5_digit_code: `${fiveDigit.nic_5_digit_code} - ${fiveDigit.nic_5_digit_code_description}`
+  const activities = this.activities.map(activity => {
+    const fourDigit = activity.nic_4_digit_codes[0];
+    const fiveDigit = fourDigit.nic_5_digit_codes[0];
+
+    return {
+      activity_of_enterprise: activityOfEnterprise,
+      nic_2_digit_code: `${activity.nic_2_digit_code} - ${activity.nic_2_digit_code_description}`,
+      nic_4_digit_code: `${fourDigit.nic_4_digit_code} - ${fourDigit.nic_4_digit_code_description}`,
+      nic_5_digit_code: `${fiveDigit.nic_5_digit_code} - ${fiveDigit.nic_5_digit_code_description}`
+    };
+  });
+
+  // Build final payload
+  const payload: any = {
+    activities
   };
 
   if (isDraft) {
-    (payload as any).save_data = '1';
+    payload.save_data = 1; // send as number, not string
   }
 
   return payload;

@@ -95,7 +95,7 @@
 }
 
 :host ::ng-deep .p-floatlabel label {
-  color: #2C82AA; 
+  color: #003c5b; 
   font-size: 0.75rem; 
   background-color: #fff!important;
 }
@@ -108,12 +108,12 @@
 
 :host ::ng-deep .p-floatlabel input:focus,
 :host ::ng-deep .p-floatlabel textarea:focus{
-  border: 1px solid #2C82AA
+  border: 1px solid #003c5b
 }
 :host ::ng-deep .p-floatlabel input:focus ~ label,
 :host ::ng-deep .p-floatlabel input.p-filled ~ label,:host ::ng-deep .p-floatlabel textarea:focus ~ label {
   background-color: white;
-  color: #2C82AA;
+  color: #003c5b;
   padding: 0 4px; 
 }
 .required-indicator {
@@ -149,7 +149,7 @@
 }
 
 :host ::ng-deep .p-floatlabel label {
-  color: #2C82AA; 
+  color: #003c5b; 
   font-size: 0.75rem; 
   background-color: #fff !important;
 }
@@ -162,14 +162,14 @@
 
 :host ::ng-deep .p-floatlabel input:focus,
 :host ::ng-deep .p-floatlabel textarea:focus {
-  border: 1px solid #2C82AA;
+  border: 1px solid #003c5b;
 }
 
 :host ::ng-deep .p-floatlabel input:focus ~ label,
 :host ::ng-deep .p-floatlabel input.p-filled ~ label,
 :host ::ng-deep .p-floatlabel textarea:focus ~ label {
   background-color: white;
-  color: #2C82AA;
+  color: #003c5b;
   padding: 0 4px; 
 }
 

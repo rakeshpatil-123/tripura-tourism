@@ -153,6 +153,44 @@ export class GenericService {
       return null;
     }
   }
+  // getDecryptedUserType(): string | null {
+  //   try {
+  //     const encryptedType = localStorage.getItem('user_type');
+  //     if (!encryptedType) {
+  //       console.warn('User ID not found in localStorage');
+  //       return null;
+  //     }
+
+  //     // Decrypt the ID using existing decryptData method
+  //     const decryptedType = this.decryptData(encryptedType);
+  //     return decryptedType;
+  //   } catch (error) {
+  //     console.error('Failed to decrypt user ID:', error);
+  //     return null;
+  //   }
+  // }
+
+   decryptLocalStorageItem(key: string): string {
+    try {
+      const encryptedValue = localStorage.getItem(key);
+      
+      // If key doesn't exist, return empty string (not null)
+      if (!encryptedValue) {
+        console.warn(`Encrypted value not found in localStorage for key: "${key}"`);
+        return '';
+      }
+
+      // Decrypt using your existing method
+      const decryptedValue = this.decryptData(encryptedValue);
+
+      return typeof decryptedValue === 'string' ? decryptedValue : '';
+    } catch (error) {
+      console.error(`Failed to decrypt value for key "${key}":`, error);
+      return ''; // Always return string — never null
+    }
+  }
+
+
 
   // getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   //   const token = localStorage.getItem('token');

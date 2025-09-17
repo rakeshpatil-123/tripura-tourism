@@ -20,42 +20,34 @@
 
     <!-- Workflow History -->
     @if (workflowData.length > 0) {
-      <h3 class="mt-4 page-head">Workflow Steps</h3>
-      <app-dynamic-table
-        [data]="workflowData"
-        [columns]="workflowColumns"
-        [showPagination]="true"
-        [pageSize]="5"
-        [searchable]="true"
-      ></app-dynamic-table>
+    <div class="btn-right">
+      <h3 class=" page-head">Workflow Steps</h3>
+
+      <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
+    </div>
+    <app-dynamic-table [data]="workflowData" [columns]="workflowColumns" [showPagination]="true" [pageSize]="5"
+      [searchable]="true"></app-dynamic-table>
     }
 
     <!-- Application Questions & Answers -->
     @if (applicationQAColumns.length > 0) {
-      <h3 class="mt-4 page-head">Application Questions & Answers</h3>
-      <app-dynamic-table
-        [data]="applicationQATableData"
-        [columns]="applicationQAColumns"
-        [showPagination]="false"
-        [searchable]="false"
-      ></app-dynamic-table>
+    <h3 class="mt-4 page-head">Application Questions & Answers</h3>
+    <app-dynamic-table [data]="applicationQATableData" [columns]="applicationQAColumns" [showPagination]="false"
+      [searchable]="false"></app-dynamic-table>
     }
     @else {
-      <div class="alert alert-info mt-4">
-        No application questions provided.
-      </div>
+    <div class="alert alert-info mt-4">
+      No application questions provided.
+    </div>
     }
 
     <!-- Main Application Summary -->
     @if (infoData.length > 0) {
-      <h3 class="mt-4 page-head">Application Summary</h3>
-      <app-dynamic-table
-        [data]="infoData"
-        [columns]="infoColumns"
-        [showPagination]="false"
-        [searchable]="false"
-      ></app-dynamic-table>
+    <h3 class="mt-4 page-head">Application Summary</h3>
+    <app-dynamic-table [data]="infoData" [columns]="infoColumns" [showPagination]="false"
+      [searchable]="false"></app-dynamic-table>
     }
+
 
   </div>
 
@@ -65,17 +57,13 @@
       <h3>{{ statusModal.title }}</h3>
 
       <form [formGroup]="remarkForm" (ngSubmit)="onSubmitStatus()">
-        <app-ilogi-input
-          formControlName="remarks"
-          fieldLabel="Remarks"
-          [mandatory]="true"
-          placeholder="Enter remarks for this action (min 5 characters)"
-        ></app-ilogi-input>
+        <app-ilogi-input formControlName="remarks" fieldLabel="Remarks" [mandatory]="true"
+          placeholder="Enter remarks for this action (min 5 characters)"></app-ilogi-input>
 
         @if (remarkForm.get('remarks')?.invalid && remarkForm.get('remarks')?.touched) {
-          <small class="text-danger">
-            Remarks are required and must be at least 5 characters.
-          </small>
+        <small class="text-danger">
+          Remarks are required and must be at least 5 characters.
+        </small>
         }
 
         <div class="modal-actions mt-3">

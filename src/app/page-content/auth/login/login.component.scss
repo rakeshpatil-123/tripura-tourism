@@ -157,6 +157,19 @@
   }
 }
 
+
+.btn-submit {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: #003c5b;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
 .side-image {
   flex: 1;
   position: relative;
@@ -308,4 +321,4 @@
       }
     }
   }
-}
+}}

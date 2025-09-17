@@ -80,10 +80,19 @@ export class ManagementComponent implements OnInit, OnDestroy {
       ownerDetailsFathersName: ['', Validators.required],
       ownerDetailsResidentialAddress: ['', Validators.required],
       ownerDetailsPoliceStation: ['', Validators.required],
-     ownerDetailsPin: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]], 
-    ownerDetailsMobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]], 
-    ownerDetailsAlternateMobile: ['', Validators.pattern(/^[0-9]{10}$/)],
-    ownerDetailsAadharNo: ['', [Validators.required, Validators.pattern(/^[0-9]{12}$/)]], 
+      ownerDetailsPin: [
+        '',
+        [Validators.required, Validators.pattern(/^[0-9]{6}$/)],
+      ],
+      ownerDetailsMobile: [
+        '',
+        [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
+      ],
+      ownerDetailsAlternateMobile: ['', Validators.pattern(/^[0-9]{10}$/)],
+      ownerDetailsAadharNo: [
+        '',
+        [Validators.required, Validators.pattern(/^[0-9]{12}$/)],
+      ],
       ownerDetailsStatus: ['', Validators.required],
       ownerDetailsEmail: ['', [Validators.required, Validators.email]],
       ownerDetailsDob: ['', Validators.required],
@@ -97,9 +106,18 @@ export class ManagementComponent implements OnInit, OnDestroy {
       managerDetailsFathersName: ['', Validators.required],
       managerDetailsResidentialAddress: ['', Validators.required],
       managerDetailsPoliceStation: ['', Validators.required],
-      managerDetailsPin: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]], 
-    managerDetailsMobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]], 
-    managerDetailsAadharNo: ['', [Validators.required, Validators.pattern(/^[0-9]{12}$/)]], 
+      managerDetailsPin: [
+        '',
+        [Validators.required, Validators.pattern(/^[0-9]{6}$/)],
+      ],
+      managerDetailsMobile: [
+        '',
+        [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
+      ],
+      managerDetailsAadharNo: [
+        '',
+        [Validators.required, Validators.pattern(/^[0-9]{12}$/)],
+      ],
       managerDetailsDob: [''],
       managerDetailsPhoto: [null, Validators.required],
 
@@ -113,6 +131,11 @@ export class ManagementComponent implements OnInit, OnDestroy {
       boardOfDirectors: this.fb.array([]),
       chiefAdministrativeHead: this.fb.array([]),
     });
+  }
+
+  private createDummyFileFromUrl(url: string, fallbackName: string): File {
+    const fileName = decodeURIComponent(url.split('/').pop() || fallbackName);
+    return new File([], fileName, { type: 'application/octet-stream' });
   }
 
   ngOnInit(): void {
@@ -152,6 +175,63 @@ export class ManagementComponent implements OnInit, OnDestroy {
       management.factory_occupiers_signature || null;
     this.signatureManagerPreview =
       management.factory_managers_signature || null;
+
+    if (management.owner_details_photo) {
+      this.form
+        .get('ownerDetailsPhoto')
+        ?.setValue(
+          this.createDummyFileFromUrl(
+            management.owner_details_photo,
+            'owner_photo.jpg'
+          )
+        );
+    }
+
+    if (management.manager_details_photo) {
+      this.form
+        .get('managerDetailsPhoto')
+        ?.setValue(
+          this.createDummyFileFromUrl(
+            management.manager_details_photo,
+            'manager_photo.jpg'
+          )
+        );
+    }
+
+    if (management.signature_authorization_of_owner) {
+      this.form
+        .get('signatureAuthorizationOfOwner')
+        ?.setValue(
+          this.createDummyFileFromUrl(
+            management.signature_authorization_of_owner,
+            'owner_signature.jpg'
+          )
+        );
+    }
+
+    if (management.factory_occupiers_signature) {
+      this.form
+        .get('factoryOccupiersSignature')
+        ?.setValue(
+          this.createDummyFileFromUrl(
+            management.factory_occupiers_signature,
+            'occupier_signature.jpg'
+          )
+        );
+    }
+
+    if (management.factory_managers_signature) {
+      this.form
+        .get('factoryManagersSignature')
+        ?.setValue(
+          this.createDummyFileFromUrl(
+            management.factory_managers_signature,
+            'manager_signature.jpg'
+          )
+        );
+    }
+
+    this.cdr.detectChanges();
 
     this.form.patchValue({
       ownerDetailsName: management.owner_details_name || '',
@@ -364,9 +444,9 @@ export class ManagementComponent implements OnInit, OnDestroy {
         this.formatDate(p.dateOfJoining)
       );
       if (p.idProof)
-        formData.append(`partner_details[${i}][id_proof]`, p.idProof);
+        formData.append(`partner_details[${i}][id_proof_doc]`, p.idProof);
       if (p.signature)
-        formData.append(`partner_details[${i}][signature]`, p.signature);
+        formData.append(`partner_details[${i}][signature_image]`, p.signature);
     });
 
     // Board of Directors
@@ -405,7 +485,7 @@ export class ManagementComponent implements OnInit, OnDestroy {
   }
 
   saveAsDraft(): void {
-     this.submitted = true;
+    this.submitted = true;
     const payload = this.buildFormData(true);
     this.submitForm(payload, true);
   }
@@ -416,15 +496,20 @@ export class ManagementComponent implements OnInit, OnDestroy {
     //   this.apiService.openSnackBar('Please fix all errors in the form.', 'error');
     //   return;
     // }
- this.submitted = true;
-  
-  this.markFormGroupTouched(this.form);
+
+    this.submitted = true;
+
+    this.markFormGroupTouched(this.form);
+
     const payload = this.buildFormData(false);
     this.submitForm(payload, false);
   }
 
+
+ 
    submitForm(payload: FormData, isDraft: boolean): void {
      console.log('Submitting form with payload:', payload);
+
     this.apiService
       .getByConditions(payload, 'api/caf/management-details-store')
       .subscribe({
@@ -493,13 +578,13 @@ export class ManagementComponent implements OnInit, OnDestroy {
         data?.date_of_joining ? new Date(data.date_of_joining) : '',
       ],
       idProof: [
-        data?.id_proof
-          ? this.createFileFromUrl(data.id_proof, 'id_proof.png')
+        data?.id_proof_doc
+          ? this.createDummyFileFromUrl(data.id_proof_doc, 'id_proof.png')
           : null,
       ],
       signature: [
-        data?.signature
-          ? this.createFileFromUrl(data.signature, 'signature.png')
+        data?.signature_image
+          ? this.createDummyFileFromUrl(data.signature_image, 'signature.png')
           : null,
       ],
     });
@@ -507,6 +592,13 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  onPartnerFileRemoved(index: number, fieldName: string): void {
+  const partnerGroup = this.partnerDetails.at(index) as FormGroup;
+  if (partnerGroup) {
+    // Clear the form control
+    partnerGroup.get(fieldName)?.reset();
+  }
+}
   addDirector(data?: any): void {
     this.boardOfDirectors.push(
       this.fb.group({
@@ -544,10 +636,57 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  removeFile(fieldName: string): void {
-    this.form.get(fieldName)?.reset();
-    this.cdr.markForCheck();
+removeFile(fieldName: string): void {
+  const control = this.form.get(fieldName);
+  if (!control) return;
+
+  // ✅ Clear preview
+  if (fieldName === 'ownerDetailsPhoto') {
+    this.ownerPhotoPreview = null;
+  } else if (fieldName === 'managerDetailsPhoto') {
+    this.managerPhotoPreview = null;
+  } else if (fieldName === 'signatureAuthorizationOfOwner') {
+    this.signatureOwnerPreview = null;
+  } else if (fieldName === 'factoryOccupiersSignature') {
+    this.signatureOccupierPreview = null;
+  } else if (fieldName === 'factoryManagersSignature') {
+    this.signatureManagerPreview = null;
   }
+
+  // ✅ Reset form control
+  control.reset();
+
+  // ✅ ONLY for owner or manager photo → send full form + deletion flag
+  if (fieldName === 'ownerDetailsPhoto' || fieldName === 'managerDetailsPhoto') {
+    // ✅ Build full form data (like saveAsDraft)
+    const formData = this.buildFormData(true); // ← isDraft = true → adds save_data=1
+
+    // ✅ Override photo field to null (since we're removing it)
+    if (fieldName === 'ownerDetailsPhoto') {
+      formData.set('owner_details_photo', ''); // or null — test what backend accepts
+      formData.append('remove_owner_details_photo', 'delete');
+    } else if (fieldName === 'managerDetailsPhoto') {
+      formData.set('manager_details_photo', '');
+      formData.append('remove_manager_details_photo', 'delete');
+    }
+
+    // ✅ Call API
+    this.apiService
+      .getByConditions(formData, 'api/caf/management-details-store')
+      .subscribe({
+        next: (res) => {
+          console.log(`${fieldName} removed successfully`, res);
+          this.apiService.openSnackBar('File removed successfully', 'success');
+        },
+        error: (err) => {
+          console.error(`Error removing ${fieldName}:`, err);
+          this.apiService.openSnackBar('Failed to remove file', 'error');
+        },
+      });
+  }
+
+  this.cdr.markForCheck();
+}
 
   getImageUrl(photo: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(photo);
@@ -598,74 +737,4 @@ export class ManagementComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  // Fix your error message method
-  // getErrorMessage(fieldName: string): string {
-  //   const control = this.form.get(fieldName);
-  //   if (control?.errors && (control.touched || this.submitted)) {
-  //     if (control.errors['required']) {
-  //       return `${this.getFieldLabel(fieldName)} is required`;
-  //     }
-  //     if (control.errors['pattern']) {
-  //       switch (fieldName) {
-  //         case 'ownerDetailsPin':
-  //         case 'managerDetailsPin':
-  //           return 'Pin must be 6 digits';
-  //         case 'ownerDetailsMobile':
-  //         case 'ownerDetailsAlternateMobile':
-  //         case 'managerDetailsMobile':
-  //           return 'Mobile must be 10 digits';
-  //         case 'ownerDetailsAadharNo':
-  //         case 'managerDetailsAadharNo':
-  //           return 'Aadhar must be 12 digits';
-  //         default:
-  //           return 'Invalid format';
-  //       }
-  //     }
-  //     if (control.errors['email']) {
-  //       return 'Please enter a valid email';
-  //     }
-  //   }
-  //   return '';
-  // }
-
-  // getFieldLabel(fieldName: string): string {
-  //   const labels: { [key: string]: string } = {
-  //     // Owner Details
-  //     ownerDetailsName: 'Owner Name',
-  //     ownerDetailsFathersName: "Owner Father's Name",
-  //     ownerDetailsResidentialAddress: 'Owner Address',
-  //     ownerDetailsPoliceStation: 'Owner Police Station',
-  //     ownerDetailsPin: 'Owner Pin',
-  //     ownerDetailsMobile: 'Owner Mobile',
-  //     ownerDetailsAlternateMobile: 'Owner Alternate Mobile',
-  //     ownerDetailsAadharNo: 'Owner Aadhar',
-  //     ownerDetailsStatus: 'Owner Status',
-  //     ownerDetailsEmail: 'Owner Email',
-  //     ownerDetailsDob: 'Owner Date of Birth',
-  //     ownerDetailsSocialStatus: 'Owner Social Status',
-  //     ownerDetailsIsDifferentlyAbled: 'Differently Abled Status',
-  //     ownerDetailsIsWomenEntrepreneur: 'Women Entrepreneur Status',
-  //     ownerDetailsIsMinority: 'Minority Status',
-  //     ownerDetailsPhoto: 'Owner Photo',
-
-  //     // Manager Details
-  //     managerDetailsName: 'Manager Name',
-  //     managerDetailsFathersName: "Manager Father's Name",
-  //     managerDetailsResidentialAddress: 'Manager Address',
-  //     managerDetailsPoliceStation: 'Manager Police Station',
-  //     managerDetailsPin: 'Manager Pin',
-  //     managerDetailsMobile: 'Manager Mobile',
-  //     managerDetailsAadharNo: 'Manager Aadhar',
-  //     managerDetailsDob: 'Manager Date of Birth',
-  //     managerDetailsPhoto: 'Manager Photo',
-
-  //     // Signatures
-  //     signatureAuthorizationOfOwner: 'Owner Authorization Signature',
-  //     factoryOccupiersSignature: 'Factory Occupier Signature',
-  //     factoryManagersSignature: 'Factory Manager Signature',
-  //   };
-
-  //   return labels[fieldName] || fieldName;
-  // }
 }

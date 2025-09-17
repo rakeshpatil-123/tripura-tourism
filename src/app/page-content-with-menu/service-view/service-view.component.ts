@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
+import { MatIcon } from '@angular/material/icon';
 
 interface StatusActionModal {
   visible: boolean;
@@ -19,7 +20,7 @@ interface StatusActionModal {
 
 @Component({
   selector: 'app-service-view',
-  imports: [CommonModule, DynamicTableComponent, IlogiInputComponent, ReactiveFormsModule],
+  imports: [CommonModule, DynamicTableComponent, IlogiInputComponent, ReactiveFormsModule, MatIcon],
   templateUrl: './service-view.component.html',
   styleUrl: './service-view.component.scss',
   standalone: true,
@@ -326,5 +327,14 @@ export class ServiceViewComponent implements OnInit {
           );
         },
       });
+  }
+
+  navigateToCAF(): void {
+    if ( this.applicationData.user.id) {
+      const userId = this.applicationData.user.id;
+      this.router.navigate([`dashboard/user-caf-view/${userId}`]);
+    } else {
+      this.apiService.openSnackBar('User ID not found.', 'Close');
+    }
   }
 }
