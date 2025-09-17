@@ -104,7 +104,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'All departmental applications',
       icon: 'assignment',
       route: '/dashboard/all-departmental-applications',
-      roles: ['department', ],
+      roles: ['department',  ],
     },
   
     // {
@@ -190,7 +190,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router, private genericService: GenericService) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
-    this.userName = localStorage.getItem('userName') || 'User';
+    this.userName = this.genericService.decryptLocalStorageItem('user_name') || 'User';
     this.deptName = localStorage.getItem('deptName') || '';
     this.emailId = localStorage.getItem('email_id') || '';
     this.hierarchyLevel = localStorage.getItem('hierarchy') || 'India';

@@ -235,31 +235,31 @@ removeProduct(index: number): void {
 }
 
   buildPayload(isDraft: boolean = false): any {
-    const raw = this.form.getRawValue();
+  const raw = this.form.getRawValue();
 
-    const payload: any = {
-      thrust_sector: raw.thrustSector,
-      raw_materials: raw.rawMaterials.map((rm: any) => ({
-        raw_material_name: rm.raw_material_name,
-        raw_material_quantity_per_month: rm.raw_material_quantity_per_month,
-        raw_material_unit: rm.raw_material_unit,
-      })),
-      products: raw.products.map((p: any) => ({
-        product_name: p.product_name,
-        product_production_capacity_per_month:
-          p.product_production_capacity_per_month,
-        product_average_production_per_month:
-          p.product_average_production_per_month,
-        unit: p.unit,
-      })),
-    };
+  const payload: any = {
+    thrust_sector: raw.thrustSector,
+    raw_materials: raw.rawMaterials.map((rm: any) => ({
+      id: rm.id || null, 
+      raw_material_name: rm.raw_material_name,
+      raw_material_quantity_per_month: rm.raw_material_quantity_per_month,
+      raw_material_unit: rm.raw_material_unit,
+    })),
+    products: raw.products.map((p: any) => ({
+      id: p.id || null, 
+      product_name: p.product_name,
+      product_production_capacity_per_month: p.product_production_capacity_per_month,
+      product_average_production_per_month: p.product_average_production_per_month,
+      unit: p.unit,
+    })),
+  };
 
-    if (isDraft) {
-      payload.save_data = '1'; // string "1" as per your example
-    }
-
-    return payload;
+  if (isDraft) {
+    payload.save_data = '1';
   }
+
+  return payload;
+}
 
   saveAsDraft(): void {
     const payload = this.buildPayload(true);

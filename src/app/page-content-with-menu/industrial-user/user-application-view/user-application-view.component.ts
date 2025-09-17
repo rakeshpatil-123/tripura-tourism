@@ -8,8 +8,15 @@ interface ApplicationDetail {
   application_date: string;
   status: string;
   application_data: Record<string, string>;
+  application_data_structured?: {
+    id: number;
+    question: string;
+    answer: string;
+  }[];
   payment_status: string | null;
   final_fee: string;
+  extra_payment?: string; // <-- Add this
+  total_fee?: string; // <-- Add this (optional, can compute too)
   current_step_number: string;
   max_processing_date: string;
   NOC_application_date?: string | null;
@@ -80,12 +87,32 @@ export class UserApplicationViewComponent implements OnInit {
     };
 
     this.apiService
-      .getByConditions(payload, 'api/user/get-details-user-service-applications')
+      .getByConditions(
+        payload,
+        'api/user/get-details-user-service-applications'
+      )
       .subscribe({
         next: (res: any) => {
           this.isLoading = false;
-          if (res?.status === 1 && Array.isArray(res.data) && res.data.length > 0) {
-            this.application = res.data[0];
+          if (
+            res?.status === 1 &&
+            Array.isArray(res.data) &&
+            res.data.length > 0
+          ) {
+            const appData = res.data[0];
+
+            this.application = {
+              ...appData,
+              application_data_structured: Array.isArray(res.application_data)
+                ? res.application_data.map((item: any) => ({
+                    id: item.id,
+                    question: item.question,
+                    answer: item.answer || '—',
+                  }))
+                : [],
+              extra_payment: appData.extra_payment || '0',
+              total_fee: appData.total_fee || '0',
+            };
           } else {
             this.error = res?.message || 'No application details found.';
           }
@@ -102,7 +129,6 @@ export class UserApplicationViewComponent implements OnInit {
     return this.fieldLabelMap[key] || `Field ${key}`;
   }
 
-  // ✅ Accept undefined as well
   formatDate(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
     const d = new Date(dateStr);
@@ -116,7 +142,6 @@ export class UserApplicationViewComponent implements OnInit {
     });
   }
 
-  // ✅ Already correct — accepts undefined
   getStatusBadgeClass(status: string | null | undefined): string {
     const s = status?.toLowerCase() || '';
     if (s === 'approved') return 'status-badge status-approved';
@@ -125,4 +150,10 @@ export class UserApplicationViewComponent implements OnInit {
     if (s === 'send_back') return 'status-badge status-send-back';
     return 'status-badge status-default';
   }
+
+  get hasExtraPayment(): boolean {
+  if (!this.application?.extra_payment) return false;
+  const amount = parseFloat(this.application.extra_payment);
+  return !isNaN(amount) && amount > 0;
+}
 }

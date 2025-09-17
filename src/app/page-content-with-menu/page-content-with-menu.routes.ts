@@ -132,6 +132,14 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           ),
         data: { roles: [ 'department'] }
       },
+      {
+        path: 'user-caf-view/:uid',
+        loadComponent: () =>
+          import('./user-caf-view-dept/user-caf-view-dept.component').then(
+            (m) => m.UserCafViewDeptComponent
+          ),
+        data: { roles: [ 'department'] }
+      },
 
       {
         path: 'upload-existing-licence',

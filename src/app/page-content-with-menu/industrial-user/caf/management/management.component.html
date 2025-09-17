@@ -246,7 +246,7 @@
                 <app-ilogi-input [formControlName]="'fatherName'" placeholder="Enter"></app-ilogi-input>
               </td>
               <td>
-                <app-ilogi-input [formControlName]="'age'" placeholder="Enter"></app-ilogi-input>
+                <app-ilogi-input [formControlName]="'age'" [type]="'number'" placeholder="Enter"></app-ilogi-input>
               </td>
               <td>
                 <app-ilogi-input [formControlName]="'sex'" placeholder="Enter"></app-ilogi-input>
@@ -261,7 +261,7 @@
                 <app-ilogi-input [formControlName]="'permanentAddress'" placeholder="Enter"></app-ilogi-input>
               </td>
               <td>
-                <app-ilogi-input [formControlName]="'mobile'" placeholder="Enter"></app-ilogi-input>
+                <app-ilogi-input [formControlName]="'mobile'" maxlength="10" [type]="'number'" placeholder="Enter"></app-ilogi-input>
               </td>
               <td>
                 <app-ilogi-input-date [formControlName]="'dob'"></app-ilogi-input-date>
@@ -294,7 +294,7 @@
     </div>
     <div class="pull-right mt-2 color-666666 clkable" (click)="addPartner()">
       <i aria-hidden="true" class="fa fa-plus"></i>
-      <span class="font-weight-bold ml-2">ADD NEW</span>
+      <span class="add ml-2">+ADD NEW</span>
     </div>
   </div>
 
@@ -327,7 +327,7 @@
                   maxlength="255"></app-ilogi-input>
               </td>
               <td>
-                <app-ilogi-input [formControlName]="'mobile'" placeholder="Enter" maxlength="10"></app-ilogi-input>
+                <app-ilogi-input [type]="'number'"  [formControlName]="'mobile'" placeholder="Enter" maxlength="10"></app-ilogi-input>
               </td>
               <td>
                 <button type="button" class="btn btn-danger btn-sm" (click)="removeDirector(i)">Remove</button>
@@ -344,7 +344,7 @@
     </div>
     <div class="pull-right mt-2 color-666666 clkable" (click)="addDirector()">
       <i aria-hidden="true" class="fa fa-plus"></i>
-      <span class="font-weight-bold ml-2">ADD NEW</span>
+      <span class="add ml-2">+ADD NEW</span>
     </div>
   </div>
 
@@ -378,7 +378,7 @@
                   maxlength="255"></app-ilogi-input>
               </td>
               <td>
-                <app-ilogi-input [formControlName]="'mobile'" placeholder="Enter" maxlength="10"></app-ilogi-input>
+                <app-ilogi-input [formControlName]="'mobile'" [type]="'number'" placeholder="Enter" maxlength="10"></app-ilogi-input>
               </td>
               <td>
                 <button type="button" class="btn btn-danger btn-sm"
@@ -391,7 +391,7 @@
     </div>
     <div class="pull-right mt-2 color-666666 clkable" (click)="addChiefAdministrativeHead()">
       <i aria-hidden="true" class="fa fa-plus"></i>
-      <span class="font-weight-bold ml-2">ADD NEW</span>
+      <span class="add ml-2">+ADD NEW</span>
     </div>
   </div>
 
