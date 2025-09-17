@@ -81,6 +81,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           localStorage.setItem('userName', response.data.authorized_person_name);
 
           localStorage.setItem('userRole', response.data.user_type);
+          localStorage.setItem('email_id', response.data.email_id);
           localStorage.setItem('deptId', response.data.department_id || '');
           localStorage.setItem('deptName', response.data.department_name || '');
           localStorage.setItem('email_id', response.data.email_id);

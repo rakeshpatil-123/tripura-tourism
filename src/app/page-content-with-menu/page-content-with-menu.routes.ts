@@ -194,6 +194,24 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['admin', 'department'] }
       },
       {
+        path: 'business-user',
+        loadComponent: () =>
+          import('./business-users/business-users.component').then(
+            (m) => m.BusinessUsersComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
+      {
+        path: 'holidays',
+        loadComponent: () =>
+          import('./holidays/holidays.component').then(
+            (m) => m.HolidaysComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
+      {
         path: 'departments',
         loadComponent: () =>
           import('./departments/departments.component').then(

@@ -391,7 +391,6 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
         'id',
         'name_of_enterprise',
         'authorized_person_name',
-        'email_id',
         'mobile_no',
         'user_name',
         'bin',
@@ -1293,6 +1292,67 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
     return this.http.post<any>(
       `${this.baseUrl}/api/department/get-department-users`,
       {},
+      { headers: this.getHeaders() }
+    );
+  }
+  getAdminDepartmentalUserProfile(): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/fetch-all-department-users`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  updateProfile(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/profile-update`, payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  changePassword(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/change-password`, payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  getProfile(): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/get-profile`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  getBusinessUsersDetails() {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/fetch-all-business-users`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  addHoliday(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holidays-store`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+  updateHoliday(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holidays-update`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+  viewHolidays(id: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holidays-view`,
+      id,
+      { headers: this.getHeaders() }
+    );
+  }
+  deleteHoliday(id: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holiday-delete`,
+      id,
       { headers: this.getHeaders() }
     );
   }

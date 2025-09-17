@@ -1,0 +1,68 @@
+<div class="business-users-wrapper">
+  <h2 class="title">
+    <i class="pi pi-briefcase title-icon"></i>
+    Business Users
+  </h2>
+  <div class="action-bar">
+    <div class="search-box">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search Business Users</mat-label>
+        <input matInput type="text" (input)="applyFilter($event, dt)" placeholder="Type to search..." />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="p-4 fade-in">
+    <p-table #dt [value]="users" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 20]" [loading]="loading"
+      [responsiveLayout]="'scroll'" [globalFilterFields]="globalFilterFields"
+      class="p-datatable-gridlines p-mb-4 animated-table">
+      <ng-template pTemplate="header">
+        <tr class="header-bg-color">
+          <th *ngFor="let col of columns" [ngClass]="{
+              'col-ward': col.field === 'ward',
+              'col-ulb': col.field === 'ulb',
+              'col-address': col.field === 'address',
+              'col-normal': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'address'
+            }" pSortableColumn="{{ col.field }}">
+            <div class="header-wrapper">
+              {{ col.header }}
+              <p-sortIcon [field]="col.field"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user>
+        <tr class="table-row-animate">
+          <td *ngFor="let col of columns" [ngClass]="{
+              'col-ward nowrap': col.field === 'ward',
+              'col-ulb nowrap': col.field === 'ulb',
+              'col-address wrap': col.field === 'address',
+              'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'address'
+            }" pTooltip="{{ user[col.field] }}" tooltipPosition="top">
+            <span *ngIf="col.field !== 'status'">
+              {{ user[col.field] || '----' }}
+            </span>
+            <span *ngIf="col.field === 'status'" class="status-badge" [ngClass]="{
+                'active-status': user.status === 'active',
+                'inactive-status': user.status !== 'active'
+              }">
+              {{ user.status ? (user.status | titlecase) : '----' }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="columns.length" class="no-data-cell">
+            <div class="no-data-wrapper">
+              <i class="pi pi-inbox no-data-icon"></i>
+              <h3>No Business Users Found</h3>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
