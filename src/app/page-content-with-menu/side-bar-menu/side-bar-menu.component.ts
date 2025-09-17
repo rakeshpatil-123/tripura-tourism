@@ -49,10 +49,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   districtUser: string = '';
   filteredMenuItems: MenuItem[] = [];
 
-  deptName: string = '';
-  emailId: string = '';
-  hierarchyLevel: string = '';
-  designation: string = '';
+  
   auth_person: string = '';
   bin: string = '';
       
