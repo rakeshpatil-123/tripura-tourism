@@ -57,15 +57,10 @@
 
 .cancel-btn {
   background: #ef4444 !important;
-  /* Red 500 */
   color: #fff !important;
-  border-radius: 6px;
   border-radius: 10px;
   padding: 0.45rem 1.2rem;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
 
   &:hover {
     background: #dc2626 !important;
@@ -98,7 +93,7 @@
       margin-bottom: 1.2rem;
 
       .dept-icon {
-        font-size: 32px;
+        font-size: 27px;
         color: #2563eb;
       }
 
@@ -137,23 +132,6 @@
     .info-row:last-child {
       border-bottom: none;
     }
-
-    .meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.4rem;
-      margin-top: 1rem;
-      font-size: 14px;
-      color: #555;
-
-      mat-icon {
-        font-size: 18px;
-        vertical-align: middle;
-        margin-right: 0.3rem;
-        color: #2563eb;
-      }
-    }
   }
 
   .loading {
@@ -165,7 +143,6 @@
     .spin {
       animation: spin 1s linear infinite;
       font-size: 22px;
-      vertical-align: middle;
       margin-right: 8px;
     }
   }
@@ -179,7 +156,6 @@
   .cancel-btn {
     background-color: #e0e0e0;
     color: #333;
-    transition: background-color 0.3s ease;
 
     &:hover {
       background-color: #d6d6d6;
@@ -190,7 +166,6 @@
     background-color: #1976d2;
     color: #fff;
     border-radius: 10px;
-    transition: background-color 0.3s ease;
 
     &:hover {
       background-color: #1565c0;
@@ -213,9 +188,6 @@
   }
 
   .dialog-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
     margin-top: 1rem;
   }
 }
@@ -268,6 +240,7 @@
     padding: 1rem;
   }
 }
+
 .swal2-confirm-btn {
   background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
   color: #fff !important;

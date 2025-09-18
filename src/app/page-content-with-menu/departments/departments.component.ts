@@ -11,12 +11,14 @@ import { MatButton, MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { AddDepartmentDialogComponent } from '../add-department-dialog/add-department-dialog.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-departments',
   templateUrl: './departments.component.html',
   styleUrls: ['./departments.component.scss'],
-  imports: [MatInputModule, MatTableModule, MatTableModule, MatPaginatorModule, MatSortModule, MatButton, MatIconModule, MatFormFieldModule, ReactiveFormsModule, MatButtonModule]
+  imports: [MatInputModule, MatTableModule, MatTableModule, MatPaginatorModule, MatSortModule, MatButton, MatIconModule, MatFormFieldModule, ReactiveFormsModule, MatButtonModule, MatTooltipModule]
 })
 export class DepartmentsComponent implements OnInit {
   departments: any[] = [];
@@ -86,22 +88,43 @@ export class DepartmentsComponent implements OnInit {
   }
 
   deleteDepartment(dept: any): void {
-    if (confirm(`Are you sure you want to delete the department "${dept.name}"?`)) {
-      this.genericService.deleteDepartment(dept.id).subscribe({
-        next: () => {
-          this.genericService.openSnackBar(
-            `Department "${dept.name}" deleted successfully`,
-            'Success'
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you want to delete the department "${dept.name}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel',
+      reverseButtons: true,
+      focusCancel: true,
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      },
+      customClass: {
+        confirmButton: 'swal2-confirm-btn',
+        cancelButton: 'swal2-cancel-btn'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.genericService.deleteDepartment(dept.id).subscribe({
+          next: () => {
+            Swal.fire(
+              'Deleted!',
+            `Department "${dept.name}" has been deleted.`,
+            'success'
           );
           this.getAllDepartmentList();
         },
         error: (error) => {
-          const errorMsg =
-            error?.error?.message || `Failed to delete department "${dept.name}"`;
-          this.genericService.openSnackBar(errorMsg, 'Error');
+          const errorMsg = error?.error?.message || 'Failed to delete department';
+            Swal.fire('Error', errorMsg, 'error');
         }
       });
     }
+  });
   }
 
 
