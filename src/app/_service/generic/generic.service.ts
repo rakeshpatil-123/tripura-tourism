@@ -1356,4 +1356,55 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
       { headers: this.getHeaders() }
     );
   }
+
+  generateServiceCertificateGenerate(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-template-store`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getServiceCertificateView(serviceId: number): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-template-show`,
+      { service_id: serviceId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  downloadServiceCertificate(applicationId: any): any {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/download-application-pdf`,
+      { application_id: applicationId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  downloadUserServiceCertificate(applicationId: any): any {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/download-user-application-pdf`,
+      { application_id: applicationId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getDashboardData(department_id: any): any {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department/get-total-applications-by-department`,
+      { department_id: department_id },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getNocIssuedList(deptId: string, page: number = 1) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department/get-list-of-NOC-issued-by-department`,
+      {
+        department_id: deptId,
+        page: page,
+      }
+    );
+  }
+
 }

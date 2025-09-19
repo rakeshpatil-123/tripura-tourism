@@ -93,6 +93,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           localStorage.setItem('ward', response.data.ward || '');
           localStorage.setItem('userId', response.data.id || '');
           localStorage.setItem('bin', response.data.bin || '');
+          localStorage.setItem('deptId', response.data.department_id || '');
           this.genericService.openSnackBar('Login successful!', 'Success');
           this.genericService.setLoginStatus(true);
           this.loginForm.reset();
