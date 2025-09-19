@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 
 import { GenericService } from '../../../_service/generic/generic.service';
 import { TransactionHistoryDialogComponent } from './transaction-history';
+import Swal from 'sweetalert2';
 
 interface ApplicationDataItem {
   id: number;
@@ -78,6 +79,7 @@ export class ApplicationSearchPageComponent implements OnInit {
 
   loading = false;
   loadingDepartments = false;
+  appId: number | null = null;
   noDataMessage = 'No applications found';
 
   constructor(
@@ -251,6 +253,25 @@ export class ApplicationSearchPageComponent implements OnInit {
         format: (value: string) => this.toTitleCase(value),
         cellClass: () => 'input-large-custom wid-cus',
       },
+      {
+        key: 'actions',
+        label: 'Action',
+        type: 'action',
+        actions: [
+          {
+            label: 'Download Certificate',
+            action: 'download',
+            color: 'warn',
+            visible: (row: ApplicationDataItem) =>
+              (row.status || '').toLowerCase() === 'approved',
+            handler: (row: ApplicationDataItem) => {
+              this.downloadCertificate(row.id);
+            },
+          },
+        ],
+        class: 'text-center',
+      }
+
       // {
       //   key: 'dueDate',
       //   label: 'Due Date',
@@ -333,6 +354,9 @@ export class ApplicationSearchPageComponent implements OnInit {
 
   onRowAction(event: TableRowAction): void {
     console.log('Row action:', event);
+    if (event.action === 'download') {
+      this.downloadCertificate(event.row.id);
+    }
   }
 
   onSearch(): void {
@@ -379,5 +403,32 @@ export class ApplicationSearchPageComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  downloadCertificate(appId: number): void {
+    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+    this.apiService.downloadUserServiceCertificate(appId).subscribe({
+      next: (res: any) => {
+        if (res?.download_url) {
+          const openPdf = baseUrl + res.download_url;
+          window.open(openPdf, '_blank');
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'PDF URL not found. Please try again.',
+            confirmButtonText: 'OK',
+          });
+        }
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Download Failed',
+          text: 'Something went wrong while fetching the certificate.',
+          confirmButtonText: 'Retry',
+        });
+      },
+    });
   }
 }
