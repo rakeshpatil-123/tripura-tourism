@@ -30,6 +30,7 @@ export class ServiceViewComponent implements OnInit {
   applicationId: number | null = null;
   applicationData: any = null;
   isLoading: boolean = false;
+  isFinalApproval: string = '';
 
   // Application Info Table
   infoData: any[] = [];
@@ -97,7 +98,7 @@ export class ServiceViewComponent implements OnInit {
 
           if (res?.status === 1 && res.data) {
             this.applicationData = res.data;
-
+            this.isFinalApproval = res.data.status;
             // ❌ Remove JSON.parse — it's already an object/array
             console.log('Application Data:', this.applicationData.application_data);
 
@@ -351,5 +352,31 @@ export class ServiceViewComponent implements OnInit {
     } else {
       this.apiService.openSnackBar('User ID not found.', 'Close');
     }
+  }
+  downloadCertificate(): void {
+    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+    this.apiService.downloadServiceCertificate(this.applicationId).subscribe({
+      next: (res: any) => {
+        if (res?.download_url) {
+          const openPdf = baseUrl + res.download_url;
+          window.open(openPdf, '_blank');
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'PDF URL not found. Please try again.',
+            confirmButtonText: 'OK'
+          });
+        }
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Download Failed',
+          text: 'Something went wrong while fetching the certificate.',
+          confirmButtonText: 'Retry'
+        });
+      }
+    });
   }
 }

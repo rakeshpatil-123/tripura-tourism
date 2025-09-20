@@ -22,9 +22,12 @@
     @if (workflowData.length > 0) {
     <div class="btn-right">
       <h3 class=" page-head">Workflow Steps</h3>
-
-      <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
-    </div>
+    <div class="btn-group-right">
+  <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
+  <button (click)="downloadCertificate()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate <mat-icon>picture_as_pdf</mat-icon>
+  </button>
+  </div>
+  </div>
     <app-dynamic-table [data]="workflowData" [columns]="workflowColumns" [showPagination]="true" [pageSize]="5"
       [searchable]="true"></app-dynamic-table>
     }
