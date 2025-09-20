@@ -3,12 +3,15 @@
 </p-confirmDialog>
 <div class="admin-services-container">
   <div class="header">
-    <h1>Admin Services</h1>
+    <h1 class="page-title">Services</h1>
+    <div class="actions">
+      <app-ilogi-input matInput class="search-box" placeholder="🔍 Search by Service Name" (keyup)="applyFilter($event)">
+      </app-ilogi-input>
     <button color="accent" class="submit-btn" mat-raised-button (click)="openAddServiceDialog()">
       <mat-icon>add</mat-icon> <span>Add New Service</span>
     </button>
   </div>
-
+</div>
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 custom-table">
     <ng-container matColumnDef="sno">
       <th mat-header-cell *matHeaderCellDef>No.</th>
@@ -53,17 +56,20 @@
           <button mat-menu-item [matMenuTriggerFor]="questionnaireMenu">
             <mat-icon>assignment</mat-icon> Service Questionnaires
           </button>
-          <button mat-menu-item [matMenuTriggerFor]="feeRuleMenu">
-            <mat-icon>payments</mat-icon> Service Fee Rule
-          </button>
           <button mat-menu-item [matMenuTriggerFor]="renewalCycleMenu">
             <mat-icon>autorenew</mat-icon> Renewal Cycle
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="feeRuleMenu">
+            <mat-icon>payments</mat-icon> Service Fee Rule
           </button>
           <button mat-menu-item [matMenuTriggerFor]="renewalFeeMenu">
             <mat-icon>receipt_long</mat-icon> Renewal Fee Rule
           </button>
           <button mat-menu-item [matMenuTriggerFor]="approvalMenu">
             <mat-icon>rule</mat-icon> Approval Flow
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="certificateMenu">
+            <mat-icon>rule</mat-icon> Certificate Template
           </button>
         </mat-menu>
         <mat-menu #serviceMenu="matMenu">
@@ -128,9 +134,21 @@
             <mat-icon>edit</mat-icon> Edit
           </button> -->
         </mat-menu>
+        <mat-menu #certificateMenu="matMenu">
+          <button mat-menu-item (click)="handleAction('serviceCertificate','view',element)">
+            <mat-icon>visibility</mat-icon> View
+          </button>
+          <button mat-menu-item (click)="handleAction('serviceCertificate','add',element)">
+            <mat-icon>add_circle</mat-icon> Add
+          </button>
+          <button mat-menu-item (click)="handleAction('serviceCertificate','edit',element)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+        </mat-menu>
       </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="row-hover"></tr>
   </table>
+<mat-paginator [pageSize]="10" [pageSizeOptions]="[5,10,25]" showFirstLastButtons></mat-paginator>
 </div>

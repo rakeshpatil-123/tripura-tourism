@@ -391,7 +391,6 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
         'id',
         'name_of_enterprise',
         'authorized_person_name',
-        'email_id',
         'mobile_no',
         'user_name',
         'bin',
@@ -1296,4 +1295,116 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
       { headers: this.getHeaders() }
     );
   }
+  getAdminDepartmentalUserProfile(): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/fetch-all-department-users`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  updateProfile(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/profile-update`, payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  changePassword(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/change-password`, payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  getProfile(): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/get-profile`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  getBusinessUsersDetails() {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/fetch-all-business-users`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+  addHoliday(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holidays-store`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+  updateHoliday(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holidays-update`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+  viewHolidays(id: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holidays-view`,
+      id,
+      { headers: this.getHeaders() }
+    );
+  }
+  deleteHoliday(id: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/holiday-delete`,
+      id,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  generateServiceCertificateGenerate(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-template-store`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getServiceCertificateView(serviceId: number): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-template-show`,
+      { service_id: serviceId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  downloadServiceCertificate(applicationId: any): any {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/download-application-pdf`,
+      { application_id: applicationId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  downloadUserServiceCertificate(applicationId: any): any {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/download-user-application-pdf`,
+      { application_id: applicationId },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getDashboardData(department_id: any): any {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department/get-total-applications-by-department`,
+      { department_id: department_id },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getNocIssuedList(deptId: string, page: number = 1) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department/get-list-of-NOC-issued-by-department`,
+      {
+        department_id: deptId,
+        page: page,
+      }
+    );
+  }
+
 }

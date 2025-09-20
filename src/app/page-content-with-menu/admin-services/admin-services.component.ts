@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { GenericService } from '../../_service/generic/generic.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddServiceDialogComponent } from '../add-service-dialog/add-service-dialog.component';
@@ -27,6 +27,11 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatPaginatorModule } from "@angular/material/paginator";
+import { MatPaginator } from '@angular/material/paginator';
+import { IlogiSelectComponent } from "../../customInputComponents/ilogi-select/ilogi-select.component";
+import { IlogiInputComponent } from "../../customInputComponents/ilogi-input/ilogi-input.component";
+import { ServiceCertificateComponent } from '../service-certificate/service-certificate.component';
 export interface Service {
   department_id: string;
   service_title_or_description: string;
@@ -75,10 +80,13 @@ export interface Service {
     MatMenuModule,
     ConfirmDialogModule,
     ButtonModule,
-  ],
+    MatPaginatorModule,
+    IlogiSelectComponent,
+    IlogiInputComponent
+],
   providers: [ConfirmationService],
 })
-export class AdminServicesComponent implements OnInit, OnDestroy {
+export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit {
   subscription: Subscription;
   displayedColumns: string[] = [
     'sno',
@@ -88,6 +96,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     'actions'
   ];
   dataSource = new MatTableDataSource<Service>([]);
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private genericService: GenericService,
@@ -99,6 +108,10 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadServices();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator
   }
 
   ngOnDestroy() {
@@ -240,6 +253,11 @@ deleteService(service: Service): void {
         if (action === 'view') this.viewApprovalFlow(service);
         if (action === 'add') this.addOrEditApprovalFlow(service, 'add');
         break;
+      case 'serviceCertificate':
+        if (action === 'view') this.addOrEditServiceCertificate(service, 'add');
+        if (action === 'add') this.addOrEditServiceCertificate(service, 'add');
+        if (action === 'edit') this.addOrEditServiceCertificate(service, 'edit');
+        break;
     }
   }
 
@@ -378,5 +396,27 @@ deleteService(service: Service): void {
       panelClass: 'full-screen-dialog',
       data: { service },
     });
+  }
+  addOrEditServiceCertificate(service: Service, mode: 'add' | 'edit'): void {
+    const dialogRef = this.dialog.open(ServiceCertificateComponent, {
+      width: '100%',
+      height: '100%',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'fullscreen-dialog',
+      data: { service, mode },
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.dataSource.filter = filterValue;
   }
 }

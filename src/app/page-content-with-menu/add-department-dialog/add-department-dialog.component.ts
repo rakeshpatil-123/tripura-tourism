@@ -6,7 +6,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatIconModule } from "@angular/material/icon";
 import { NgIf, NgFor } from '@angular/common';
 import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from "@angular/material/card";
-
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-department-dialog',
@@ -70,29 +70,66 @@ export class AddDepartmentDialogComponent implements OnInit {
     if (this.mode === 'add') {
       this.genericService.addDepartment(payload).subscribe({
         next: (res: any) => {
-          this.genericService.openSnackBar(res.message, 'Success');
-          this.dialogRef.close('updated');
+          Swal.fire({
+            title: 'Created!',
+            text: res.message,
+            icon: 'success',
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+              popup: 'animate__animated animate__fadeOutUp'
+            },
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'swal2-confirm-btn'
+            }
+          }).then(() => {
+            this.dialogRef.close('updated');
+          });
         },
         error: (err: any) => {
           this.isSubmitting = false;
           const backendErrors = err.error?.errors;
-          if (backendErrors?.name) {
-            this.genericService.openSnackBar(backendErrors.name[0], 'Error');
-          } else {
-            this.genericService.openSnackBar(err.error?.message || 'Failed to create department.', 'Error');
-          }
+          const errorMsg = backendErrors?.name ? backendErrors.name[0] : err.error?.message || 'Failed to create department.';
+          Swal.fire({
+            title: 'Error!',
+            text: errorMsg,
+            icon: 'error',
+            showClass: { popup: 'animate__animated animate__fadeInDown' },
+            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+            confirmButtonText: 'OK',
+            customClass: { confirmButton: 'swal2-confirm-btn' }
+          });
         }
       });
     } else if (this.mode === 'edit') {
       payload.id = this.data.data.id;
       this.genericService.updateDepartment(payload).subscribe({
         next: (res: any) => {
-          this.genericService.openSnackBar(res.message, 'Close');
-          this.dialogRef.close('updated');
+          Swal.fire({
+            title: 'Updated!',
+            text: res.message,
+            icon: 'success',
+            showClass: { popup: 'animate__animated animate__fadeInDown' },
+            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+            confirmButtonText: 'OK',
+            customClass: { confirmButton: 'swal2-confirm-btn' }
+          }).then(() => {
+            this.dialogRef.close('updated');
+          });
         },
         error: () => {
           this.isSubmitting = false;
-          this.genericService.openSnackBar('Failed to update department.', 'Close');
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update department.',
+            icon: 'error',
+            showClass: { popup: 'animate__animated animate__fadeInDown' },
+            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+            confirmButtonText: 'OK',
+            customClass: { confirmButton: 'swal2-confirm-btn' }
+          });
         }
       });
     }

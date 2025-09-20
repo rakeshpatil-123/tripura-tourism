@@ -1,0 +1,23 @@
+<div class="certificate-wrapper">
+  <div class="header">
+    <h2 class="service-title">{{ serviceName }}</h2>
+    <button class="close-btn" (click)="closeDialog()">✕</button>
+  </div>
+  <div class="editor-section">
+    <label class="editor-label">Certificate Template</label>
+    <p-editor [(ngModel)]="formTemplate" [modules]="editorModules" [readonly]="false" class="custom-editor">
+    </p-editor>
+  </div>
+
+  <div class="footer">
+    <button pButton type="button" label="Preview" class="p-button-outlined p-button-info"
+      (click)="previewTemplate()">
+    </button>
+
+    <button pButton type="button" label="Download" class="p-button-secondary" (click)="downloadTemplate()">
+    </button>
+
+    <button pButton type="button" label=" Save Template" class="p-button-success" (click)="saveTemplate()">
+    </button>
+  </div>
+</div>
