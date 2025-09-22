@@ -1,0 +1,14 @@
+.wrap-text {
+  max-width: 250px;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal !important;
+  line-height: 1.4;
+}
+
+// Optional: Improve vertical alignment
+::ng-deep .wrap-text {
+  vertical-align: top;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}

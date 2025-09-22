@@ -110,6 +110,29 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/services',
       roles: ['individual', 'department','user', 'moderator', 'guest'],
     },
+
+     {
+      id: 'incentive',
+      title: 'Incentive',
+      icon: 'assessment',
+      roles: ['individual'],
+      children: [
+        {
+          id: 'eligibility',
+          title: 'Eligibility',
+          icon: 'trending_up',
+          route: '/dashboard/eligibility',
+          roles: [ 'individual' ],
+        },
+        {
+          id: 'claim',
+          title: 'Claim',
+          icon: 'people_outline',
+          route: '/dashboard/claim',
+          roles: ['individual'],
+        },
+      ],
+    },
      {
       id: 'Departmental services',
       title: 'Departmental Services',
@@ -175,6 +198,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/application-list',
       roles: ['individual',],
     },
+   
     {
       id: 'reports',
       title: 'Reports',

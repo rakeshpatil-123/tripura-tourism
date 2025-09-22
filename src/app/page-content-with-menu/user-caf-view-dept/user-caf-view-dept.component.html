@@ -13,7 +13,7 @@
   <mat-tab-group *ngIf="!isLoading && !error" mat-stretch-tabs="false" dynamicHeight="true">
     <!-- Unit Details -->
     <mat-tab label="Unit Details">
-      <mat-card *ngIf="unitDetails">
+      <mat-card *ngIf="unitDetails; else noUnitData">
         <mat-card-header>
           <mat-card-title>Unit Information</mat-card-title>
         </mat-card-header>
@@ -49,10 +49,13 @@
               <p><strong>Khatian No:</strong> {{ safeDisplay(unitDetails.land_record_details_khatian_number_new) }}</p>
             </div>
             <div class="col-md-6">
-              <p><strong>CS Plot No:</strong> {{ safeDisplay(unitDetails.land_record_details_plot_number_cs_sabek) }}</p>
+              <p><strong>CS Plot No:</strong> {{ safeDisplay(unitDetails.land_record_details_plot_number_cs_sabek) }}
+              </p>
               <p><strong>RS Plot No:</strong> {{ safeDisplay(unitDetails.land_record_details_plot_number_rs_hal) }}</p>
-              <p><strong>Land Classification:</strong> {{ safeDisplay(unitDetails.land_record_details_classification_of_land) }}</p>
-              <p><strong>Land Area:</strong> {{ safeDisplay(unitDetails.land_record_details_land_area) }} {{ safeDisplay(unitDetails.land_record_details_unit) }}</p>
+              <p><strong>Land Classification:</strong> {{
+                safeDisplay(unitDetails.land_record_details_classification_of_land) }}</p>
+              <p><strong>Land Area:</strong> {{ safeDisplay(unitDetails.land_record_details_land_area) }} {{
+                safeDisplay(unitDetails.land_record_details_unit) }}</p>
             </div>
           </div>
 
@@ -60,14 +63,19 @@
           <h5>Construction Details</h5>
           <div class="row">
             <div class="col-md-4">
-              <p><strong>Load Bearing (sq mtr):</strong> {{ safeDisplay(unitDetails.construction_details_load_bearing_in_sq_mtr) }}</p>
-              <p><strong>RCC Building (sq mtr):</strong> {{ safeDisplay(unitDetails.construction_details_rcc_building_in_sq_mtr) }}</p>
+              <p><strong>Load Bearing (sq mtr):</strong> {{
+                safeDisplay(unitDetails.construction_details_load_bearing_in_sq_mtr) }}</p>
+              <p><strong>RCC Building (sq mtr):</strong> {{
+                safeDisplay(unitDetails.construction_details_rcc_building_in_sq_mtr) }}</p>
               <p><strong>Others:</strong> {{ safeDisplay(unitDetails.construction_details_others_construction) }}</p>
             </div>
             <div class="col-md-4">
-              <p><strong>Sanitary Latrine Count:</strong> {{ safeDisplay(unitDetails.construction_details_sanitary_latrine_count) }}</p>
-              <p><strong>Boundary Wall (mtr):</strong> {{ safeDisplay(unitDetails.construction_details_boundary_wall_in_mtr) }}</p>
-              <p><strong>Power Supply Agency:</strong> {{ safeDisplay(unitDetails.construction_details_power_supply_agency_at_the_factory) }}</p>
+              <p><strong>Sanitary Latrine Count:</strong> {{
+                safeDisplay(unitDetails.construction_details_sanitary_latrine_count) }}</p>
+              <p><strong>Boundary Wall (mtr):</strong> {{
+                safeDisplay(unitDetails.construction_details_boundary_wall_in_mtr) }}</p>
+              <p><strong>Power Supply Agency:</strong> {{
+                safeDisplay(unitDetails.construction_details_power_supply_agency_at_the_factory) }}</p>
             </div>
           </div>
 
@@ -75,17 +83,24 @@
           <h5>Investment & Employment</h5>
           <div class="row">
             <div class="col-md-6">
-              <p><strong>Land Value:</strong> {{ formatCurrency(unitDetails.investment_details_value_of_land_as_per_sale_deed) }}</p>
-              <p><strong>Building Value:</strong> {{ formatCurrency(unitDetails.investment_details_value_of_building) }}</p>
-              <p><strong>Plant/Machinery Value:</strong> {{ formatCurrency(unitDetails.investment_details_value_of_plant_machinery_or_service_equipment) }}</p>
-              <p><strong>Total Project Cost:</strong> {{ formatCurrency(unitDetails.investment_details_total_project_cost) }}</p>
+              <p><strong>Land Value:</strong> {{
+                formatCurrency(unitDetails.investment_details_value_of_land_as_per_sale_deed) }}</p>
+              <p><strong>Building Value:</strong> {{ formatCurrency(unitDetails.investment_details_value_of_building) }}
+              </p>
+              <p><strong>Plant/Machinery Value:</strong> {{
+                formatCurrency(unitDetails.investment_details_value_of_plant_machinery_or_service_equipment) }}</p>
+              <p><strong>Total Project Cost:</strong> {{
+                formatCurrency(unitDetails.investment_details_total_project_cost) }}</p>
             </div>
             <div class="col-md-6">
               <p><strong>Men Workers:</strong> {{ safeDisplay(unitDetails.employment_details_worker_men_count) }}</p>
-              <p><strong>Women Workers:</strong> {{ safeDisplay(unitDetails.employment_details_worker_women_count) }}</p>
-              <p><strong>Management Staff:</strong> {{ safeDisplay(unitDetails.employment_details_management_staff_count) }}</p>
+              <p><strong>Women Workers:</strong> {{ safeDisplay(unitDetails.employment_details_worker_women_count) }}
+              </p>
+              <p><strong>Management Staff:</strong> {{
+                safeDisplay(unitDetails.employment_details_management_staff_count) }}</p>
               <p><strong>Others:</strong> {{ safeDisplay(unitDetails.employment_details_others_count) }}</p>
-              <p><strong>Total Employment:</strong> {{ safeDisplay(unitDetails.employment_details_total_employment) }}</p>
+              <p><strong>Total Employment:</strong> {{ safeDisplay(unitDetails.employment_details_total_employment) }}
+              </p>
             </div>
           </div>
 
@@ -97,11 +112,18 @@
           <p><strong>Manufacturing Process:</strong> {{ safeDisplay(unitDetails.product_manufacturing_process) }}</p>
         </mat-card-content>
       </mat-card>
+      <ng-template #noUnitData>
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <p class="text-muted">No unit details available.</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
     </mat-tab>
 
     <!-- Enterprise Details -->
     <mat-tab label="Enterprise Details">
-      <mat-card *ngIf="enterpriseDetails">
+      <mat-card *ngIf="enterpriseDetails; else noEnterpriseData">
         <mat-card-header>
           <mat-card-title>Enterprise Information</mat-card-title>
         </mat-card-header>
@@ -112,31 +134,44 @@
               <p><strong>Enterprise Name:</strong> {{ safeDisplay(enterpriseDetails.enterprise_name) }}</p>
               <p><strong>PAN No:</strong> {{ safeDisplay(enterpriseDetails.business_pan_no) }}</p>
               <p><strong>Address:</strong> {{ safeDisplay(enterpriseDetails.enterprise_address) }}</p>
-              <p><strong>Registered Address:</strong> {{ safeDisplay(enterpriseDetails.enterprises_registered_address) }}</p>
+              <p><strong>Registered Address:</strong> {{ safeDisplay(enterpriseDetails.enterprises_registered_address)
+                }}</p>
               <p><strong>Habitation Area:</strong> {{ safeDisplay(enterpriseDetails.habitation_area_building) }}</p>
               <p><strong>PIN:</strong> {{ safeDisplay(enterpriseDetails.pin) }}</p>
               <p><strong>Post Office:</strong> {{ safeDisplay(enterpriseDetails.post_office) }}</p>
               <p><strong>Police Station:</strong> {{ safeDisplay(enterpriseDetails.police_station) }}</p>
             </div>
             <div class="col-md-6">
-              <p><strong>Authorized Rep Name:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_name) }}</p>
-              <p><strong>Designation:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_designation) }}</p>
-              <p><strong>Aadhar No:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_aadhar_no) }}</p>
+              <p><strong>Authorized Rep Name:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_name)
+                }}</p>
+              <p><strong>Designation:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_designation)
+                }}</p>
+              <p><strong>Aadhar No:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_aadhar_no) }}
+              </p>
               <p><strong>Mobile:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_mobile_no) }}</p>
               <p><strong>Email:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_email_id) }}</p>
-              <p><strong>Alternate Mobile:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_alternate_mobile_no) }}</p>
+              <p><strong>Alternate Mobile:</strong> {{
+                safeDisplay(enterpriseDetails.authorized_representative_alternate_mobile_no) }}</p>
               <p><strong>Phone:</strong> {{ safeDisplay(enterpriseDetails.authorized_representative_phone_no) }}</p>
               <p><strong>Proposal For:</strong> {{ safeDisplay(enterpriseDetails.proposal_for) }}</p>
-              <p><strong>Proposed Commissioning Date:</strong> {{ formatDate(enterpriseDetails.proposed_date_of_commissioning) }}</p>
+              <p><strong>Proposed Commissioning Date:</strong> {{
+                formatDate(enterpriseDetails.proposed_date_of_commissioning) }}</p>
             </div>
           </div>
         </mat-card-content>
       </mat-card>
+      <ng-template #noEnterpriseData>
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <p class="text-muted">No enterprise details available.</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
     </mat-tab>
 
     <!-- Management Details -->
     <mat-tab label="Management Details">
-      <mat-card *ngIf="managementDetails">
+      <mat-card *ngIf="managementDetails ; else noManagementData">
         <!-- Owner Details -->
         <mat-card class="mb-4">
           <mat-card-header>
@@ -145,30 +180,45 @@
           <mat-card-content>
             <div class="row">
               <div class="col-md-6">
-                <p><strong>Name:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_name) }}</p>
-                <p><strong>Father's Name:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_fathers_name) }}</p>
-                <p><strong>Residential Address:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_residential_address) }}</p>
-                <p><strong>Police Station:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_police_station) }}</p>
+                <p><strong>Name:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_name) }}
+                </p>
+                <p><strong>Father's Name:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_fathers_name) }}</p>
+                <p><strong>Residential Address:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_residential_address) }}</p>
+                <p><strong>Police Station:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_police_station) }}</p>
                 <p><strong>PIN:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_pin) }}</p>
-                <p><strong>Mobile:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_mobile) }}</p>
-                <p><strong>Alternate Mobile:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_alternate_mobile) }}</p>
-                <p><strong>Aadhar No:</strong> {{ safeDisplay(managementDetails.management_details?.owner_aadhar_no) }}</p>
-                <p><strong>Status:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_status) }}</p>
-                <p><strong>Email:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_email) }}</p>
+                <p><strong>Mobile:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_mobile)
+                  }}</p>
+                <p><strong>Alternate Mobile:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_alternate_mobile) }}</p>
+                <p><strong>Aadhar No:</strong> {{ safeDisplay(managementDetails.management_details?.owner_aadhar_no) }}
+                </p>
+                <p><strong>Status:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_status)
+                  }}</p>
+                <p><strong>Email:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_email) }}
+                </p>
                 <p><strong>DOB:</strong> {{ formatDate(managementDetails.management_details?.owner_details_dob) }}</p>
-                <p><strong>Social Status:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_social_status) }}</p>
-                <p><strong>Differently Abled:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_is_differently_abled) }}</p>
-                <p><strong>Women Entrepreneur:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_is_women_entrepreneur) }}</p>
-                <p><strong>Minority:</strong> {{ safeDisplay(managementDetails.management_details?.owner_details_is_minority) }}</p>
+                <p><strong>Social Status:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_social_status) }}</p>
+                <p><strong>Differently Abled:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_is_differently_abled) }}</p>
+                <p><strong>Women Entrepreneur:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_is_women_entrepreneur) }}</p>
+                <p><strong>Minority:</strong> {{
+                  safeDisplay(managementDetails.management_details?.owner_details_is_minority) }}</p>
               </div>
               <div class="col-md-6">
                 <div *ngIf="managementDetails.management_details?.owner_details_photo" class="mb-3">
                   <strong>Owner Photo:</strong><br>
-                  <img [src]="managementDetails.management_details.owner_details_photo" alt="Owner Photo" class="img-fluid mt-2" style="max-height: 200px; object-fit: cover;">
+                  <img [src]="managementDetails.management_details.owner_details_photo" alt="Owner Photo"
+                    class="img-fluid mt-2" style="max-height: 200px; object-fit: cover;">
                 </div>
                 <div *ngIf="managementDetails.management_details?.signature_authorization_of_owner" class="mb-3">
                   <strong>Owner Signature:</strong><br>
-                  <img [src]="managementDetails.management_details.signature_authorization_of_owner" alt="Owner Signature" class="img-fluid mt-2" style="max-height: 100px; object-fit: contain;">
+                  <img [src]="managementDetails.management_details.signature_authorization_of_owner"
+                    alt="Owner Signature" class="img-fluid mt-2" style="max-height: 100px; object-fit: contain;">
                 </div>
               </div>
             </div>
@@ -183,19 +233,27 @@
           <mat-card-content>
             <div class="row">
               <div class="col-md-6">
-                <p><strong>Name:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_name) }}</p>
-                <p><strong>Father's Name:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_fathers_name) }}</p>
-                <p><strong>Residential Address:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_residential_address) }}</p>
-                <p><strong>Police Station:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_police_station) }}</p>
-                <p><strong>PIN:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_pin) }}</p>
-                <p><strong>Mobile:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_mobile) }}</p>
-                <p><strong>Aadhar No:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_aadhar_no) }}</p>
+                <p><strong>Name:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_name) }}
+                </p>
+                <p><strong>Father's Name:</strong> {{
+                  safeDisplay(managementDetails.management_details?.manager_details_fathers_name) }}</p>
+                <p><strong>Residential Address:</strong> {{
+                  safeDisplay(managementDetails.management_details?.manager_details_residential_address) }}</p>
+                <p><strong>Police Station:</strong> {{
+                  safeDisplay(managementDetails.management_details?.manager_details_police_station) }}</p>
+                <p><strong>PIN:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_pin) }}
+                </p>
+                <p><strong>Mobile:</strong> {{ safeDisplay(managementDetails.management_details?.manager_details_mobile)
+                  }}</p>
+                <p><strong>Aadhar No:</strong> {{
+                  safeDisplay(managementDetails.management_details?.manager_details_aadhar_no) }}</p>
                 <p><strong>DOB:</strong> {{ formatDate(managementDetails.management_details?.manager_details_dob) }}</p>
               </div>
               <div class="col-md-6">
                 <div *ngIf="managementDetails.management_details?.manager_details_photo" class="mb-3">
                   <strong>Manager Photo:</strong><br>
-                  <img [src]="managementDetails.management_details.manager_details_photo" alt="Manager Photo" class="img-fluid mt-2" style="max-height: 200px; object-fit: cover;">
+                  <img [src]="managementDetails.management_details.manager_details_photo" alt="Manager Photo"
+                    class="img-fluid mt-2" style="max-height: 200px; object-fit: cover;">
                 </div>
               </div>
             </div>
@@ -211,11 +269,13 @@
             <div class="row">
               <div class="col-md-4" *ngIf="managementDetails.management_details?.factory_occupiers_signature">
                 <strong>Factory Occupier Signature:</strong><br>
-                <img [src]="managementDetails.management_details.factory_occupiers_signature" alt="Occupier Signature" class="img-fluid mt-2" style="max-height: 100px; object-fit: contain;">
+                <img [src]="managementDetails.management_details.factory_occupiers_signature" alt="Occupier Signature"
+                  class="img-fluid mt-2" style="max-height: 100px; object-fit: contain;">
               </div>
               <div class="col-md-4" *ngIf="managementDetails.management_details?.factory_managers_signature">
                 <strong>Factory Manager Signature:</strong><br>
-                <img [src]="managementDetails.management_details.factory_managers_signature" alt="Manager Signature" class="img-fluid mt-2" style="max-height: 100px; object-fit: contain;">
+                <img [src]="managementDetails.management_details.factory_managers_signature" alt="Manager Signature"
+                  class="img-fluid mt-2" style="max-height: 100px; object-fit: contain;">
               </div>
             </div>
           </mat-card-content>
@@ -249,10 +309,12 @@
                   <td>{{ formatDate(partner.date_of_birth) }}</td>
                   <td>{{ formatDate(partner.date_of_joining) }}</td>
                   <td>
-                    <a *ngIf="partner.id_proof_doc" [href]="partner.id_proof_doc" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                    <a *ngIf="partner.id_proof_doc" [href]="partner.id_proof_doc" target="_blank"
+                      class="btn btn-sm btn-outline-primary">View</a>
                   </td>
                   <td>
-                    <a *ngIf="partner.signature_image" [href]="partner.signature_image" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                    <a *ngIf="partner.signature_image" [href]="partner.signature_image" target="_blank"
+                      class="btn btn-sm btn-outline-primary">View</a>
                   </td>
                 </tr>
               </tbody>
@@ -310,21 +372,29 @@
           </mat-card-content>
         </mat-card>
       </mat-card>
+       <ng-template #noManagementData>
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <p class="text-muted">No management details available.</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
     </mat-tab>
 
     <!-- Line of Activity -->
     <mat-tab label="Line of Activity">
-      <mat-card *ngIf="lineOfActivityDetails">
+      <mat-card *ngIf="lineOfActivityDetails; else nolineOfActivityDetails">
         <mat-card-header>
           <mat-card-title>Thrust Sector</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <p><strong>Thrust Sector:</strong> {{ safeDisplay(lineOfActivityDetails.line_of_activity?.thrust_sector) }}</p>
+          <p><strong>Thrust Sector:</strong> {{ safeDisplay(lineOfActivityDetails.line_of_activity?.thrust_sector) }}
+          </p>
         </mat-card-content>
       </mat-card>
 
       <!-- Raw Materials -->
-      <mat-card *ngIf="lineOfActivityDetails.raw_material_to_be_used?.length" class="mt-4">
+      <mat-card *ngIf="lineOfActivityDetails.raw_material_to_be_used?.length; else nolineOfActivityDetails" class="mt-4">
         <mat-card-header>
           <mat-card-title>Raw Materials</mat-card-title>
         </mat-card-header>
@@ -349,7 +419,7 @@
       </mat-card>
 
       <!-- Products -->
-      <mat-card *ngIf="lineOfActivityDetails.list_of_products?.length" class="mt-4">
+      <mat-card *ngIf="lineOfActivityDetails.list_of_products?.length; else nolineOfActivityDetails" class="mt-4">
         <mat-card-header>
           <mat-card-title>Products</mat-card-title>
         </mat-card-header>
@@ -374,11 +444,19 @@
           </table>
         </mat-card-content>
       </mat-card>
+
+        <ng-template #nolineOfActivityDetails>
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <p class="text-muted">No line of activity details available.</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
     </mat-tab>
 
     <!-- General Attachments -->
     <mat-tab label="General Attachments">
-      <mat-card *ngIf="generalAttachmentDetails">
+      <mat-card *ngIf="generalAttachmentDetails; else noGeneralAttachmentDetails">
         <mat-card-content>
           <table class="table table-bordered">
             <thead>
@@ -390,53 +468,70 @@
             <tbody>
               <tr *ngIf="generalAttachmentDetails.general_self_certification_form">
                 <td>Self Certification Form</td>
-                <td><a [href]="generalAttachmentDetails.general_self_certification_form" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.general_self_certification_form" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.self_certificate_format_3A">
                 <td>Self Certificate Format 3A</td>
-                <td><a [href]="generalAttachmentDetails.self_certificate_format_3A" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.self_certificate_format_3A" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.tree_registration_certificate">
                 <td>Tree Registration Certificate</td>
-                <td><a [href]="generalAttachmentDetails.tree_registration_certificate" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.tree_registration_certificate" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.owner_pan_pdf">
                 <td>Owner PAN</td>
-                <td><a [href]="generalAttachmentDetails.owner_pan_pdf" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.owner_pan_pdf" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.owner_aadhar_pdf">
                 <td>Owner Aadhar</td>
-                <td><a [href]="generalAttachmentDetails.owner_aadhar_pdf" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.owner_aadhar_pdf" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.udyog_aadhar">
                 <td>Udyog Aadhar</td>
-                <td><a [href]="generalAttachmentDetails.udyog_aadhar" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.udyog_aadhar" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.gst_certificate_pdf">
                 <td>GST Certificate</td>
-                <td><a [href]="generalAttachmentDetails.gst_certificate_pdf" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.gst_certificate_pdf" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.combined_plan_document">
                 <td>Combined Building Plan</td>
-                <td><a [href]="generalAttachmentDetails.combined_plan_document" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.combined_plan_document" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.detailed_project_report_pdf">
                 <td>Detailed Project Report</td>
-                <td><a [href]="generalAttachmentDetails.detailed_project_report_pdf" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.detailed_project_report_pdf" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
               <tr *ngIf="generalAttachmentDetails.other_supporting_docuement1_pdf">
                 <td>Additional Document</td>
-                <td><a [href]="generalAttachmentDetails.other_supporting_docuement1_pdf" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a [href]="generalAttachmentDetails.other_supporting_docuement1_pdf" target="_blank"
+                    class="btn btn-sm btn-outline-primary">View</a></td>
               </tr>
             </tbody>
           </table>
         </mat-card-content>
       </mat-card>
+      <ng-template #noGeneralAttachmentDetails>
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <p class="text-muted">No general attachments details available.</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
     </mat-tab>
 
     <!-- Bank Details -->
     <mat-tab label="Bank Details">
-      <mat-card *ngIf="bankDetails">
+      <mat-card *ngIf="bankDetails; else noBankDetails">
         <mat-card-content>
           <div class="row">
             <div class="col-md-6">
@@ -450,42 +545,59 @@
           </div>
         </mat-card-content>
       </mat-card>
+
+      <ng-template #noBankDetails>
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <p class="text-muted">No bank details available.</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
     </mat-tab>
 
     <!-- Activity Details (Placeholder) -->
- <!-- Activity Details -->
-<mat-tab label="Activity Details">
-  <mat-card *ngIf="activityDetails && activityDetails.length > 0">
-    <mat-card-header>
-      <mat-card-title>Enterprise Activities (NIC Codes)</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Activity Type</th>
-            <th>NIC 2-Digit</th>
-            <th>NIC 4-Digit</th>
-            <th>NIC 5-Digit</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let activity of activityDetails">
-            <td>{{ safeDisplay(activity.activity_of_enterprise) }}</td>
-            <td>{{ formatNicCode(activity.nic_2_digit_code) }}</td>
-            <td>{{ formatNicCode(activity.nic_4_digit_code) }}</td>
-            <td>{{ formatNicCode(activity.nic_5_digit_code) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </mat-card-content>
-  </mat-card>
+    <!-- Activity Details -->
+    <mat-tab label="Activity Details">
+      <mat-card *ngIf="activityDetails && activityDetails.length > 0; else noActivityDetails" class="mb-4">
+        <mat-card-header>
+          <mat-card-title>Enterprise Activities (NIC Codes)</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Activity Type</th>
+                <th>NIC 2-Digit</th>
+                <th>NIC 4-Digit</th>
+                <th>NIC 5-Digit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let activity of activityDetails">
+                <td>{{ safeDisplay(activity.activity_of_enterprise) }}</td>
+                <td>{{ formatNicCode(activity.nic_2_digit_code) }}</td>
+                <td>{{ formatNicCode(activity.nic_4_digit_code) }}</td>
+                <td>{{ formatNicCode(activity.nic_5_digit_code) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </mat-card-content>
+      </mat-card>
 
-  <mat-card *ngIf="activityDetails && activityDetails.length === 0">
-    <mat-card-content class="text-center py-4">
-      <p class="text-muted">No activity details available.</p>
-    </mat-card-content>
-  </mat-card>
-</mat-tab>
+      <mat-card *ngIf="activityDetails && activityDetails.length === 0; else noActivityDetails">
+        <mat-card-content class="text-center py-4">
+          <p class="text-muted">No activity details available.</p>
+        </mat-card-content>
+      </mat-card>
+
+
+       <ng-template #noActivityDetails>
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <p class="text-muted">No Activity details available.</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
+    </mat-tab>
   </mat-tab-group>
 </div>
