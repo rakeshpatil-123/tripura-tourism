@@ -183,11 +183,11 @@ export class ActivitiesComponent implements OnInit {
       return;
     }
 
-    const exists = this.activities.find(a => a.nic_2_digit_code === nic2.nic_2_digit_code);
-    if (exists) {
-      this.apiService.openSnackBar('This 2-digit NIC code is already added.', 'error');
-      return;
-    }
+    // const exists = this.activities.find(a => a.nic_2_digit_code === nic2.nic_2_digit_code);
+    // if (exists) {
+    //   this.apiService.openSnackBar('This 2-digit NIC code is already added.', 'error');
+    //   return;
+    // }
 
     const newEntry: NicEntry = {
       nic_2_digit_code: nic2.nic_2_digit_code,
