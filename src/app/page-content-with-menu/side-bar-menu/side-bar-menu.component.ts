@@ -40,12 +40,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
   currentUserType: string = '';
   routerSubscription: Subscription | undefined;
   userName: string = 'User';
-  filteredMenuItems: MenuItem[] = [];
-
   deptName: string = '';
   emailId: string = '';
   hierarchyLevel: string = '';
   designation: string = '';
+  blockUser: string = '';
+  subDivisionUser: string = '';
+  districtUser: string = '';
+  filteredMenuItems: MenuItem[] = [];
+
+  
   auth_person: string = '';
   bin: string = '';
       
@@ -79,6 +83,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
       roles: ['admin', 'department'],
     },
     {
+      id: 'BusinessUser',
+      title: 'Business User',
+      icon: 'supervisor_account',
+      route: '/dashboard/business-user',
+      roles: ['admin'],
+    },
+    {
+      id: 'Holidays',
+      title: 'Holidays',
+      icon: 'celebration',
+      route: '/dashboard/holidays',
+      roles: ['admin'],
+    },
+    {
       id: 'common-application-form',
       title: 'Common Application Form',
       icon: 'track_changes',
@@ -91,6 +109,29 @@ export class SidebarComponent implements OnInit, OnDestroy {
       icon: 'work',
       route: '/dashboard/services',
       roles: ['individual', 'department','user', 'moderator', 'guest'],
+    },
+
+     {
+      id: 'incentive',
+      title: 'Incentive',
+      icon: 'assessment',
+      roles: ['individual'],
+      children: [
+        {
+          id: 'eligibility',
+          title: 'Eligibility',
+          icon: 'trending_up',
+          route: '/dashboard/eligibility',
+          roles: [ 'individual' ],
+        },
+        {
+          id: 'claim',
+          title: 'Claim',
+          icon: 'people_outline',
+          route: '/dashboard/claim',
+          roles: ['individual'],
+        },
+      ],
     },
      {
       id: 'Departmental services',
@@ -157,6 +198,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/application-list',
       roles: ['individual',],
     },
+   
     {
       id: 'reports',
       title: 'Reports',
@@ -197,6 +239,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.designation = localStorage.getItem('designation') || '';
     this.bin = this.genericService.decryptLocalStorageItem('bin') || '';
     this.auth_person = this.genericService.decryptLocalStorageItem('authorized_person_name')?.toUpperCase() || '';
+    this.blockUser = localStorage.getItem('block') || '';
+    this.subDivisionUser = localStorage.getItem('subdivision') || '';
+    this.districtUser = localStorage.getItem('district') || '';
 
   }
 

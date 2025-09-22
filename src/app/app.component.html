@@ -1,9 +1,9 @@
 <app-header-new></app-header-new>
 <app-new-nav *ngIf="!isLoggedIn"></app-new-nav>
-<div style="padding-top: 16vh;">
+<div [style.padding-top]="isLoggedIn ? '10vh' : '16vh'">
     <router-outlet></router-outlet>
 </div>
 <app-logo-footer *ngIf="!isLoggedIn"/>
 <app-footer *ngIf="!isLoggedIn"></app-footer>
-<app-mini-footer></app-mini-footer>
+<app-mini-footer *ngIf="!isLoggedIn"></app-mini-footer>
 <app-loader *ngIf="showLoader"></app-loader>

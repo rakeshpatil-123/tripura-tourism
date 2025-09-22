@@ -86,13 +86,13 @@ $success-green-dark: #047857;
   }
 
   &.primary {
-    background: linear-gradient(135deg, #003c5b, #002a40);
+    background: linear-gradient(135deg, #a30000, #ff3e13);
     color: $white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(255, 175, 175, 0.1);
     cursor: pointer;
     
     &:hover {
-      background: linear-gradient(to right, #003d91, #003d84, #003d92);
+      background: linear-gradient(135deg, #fc4c00, #ffa25a);
       box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
     }
   }

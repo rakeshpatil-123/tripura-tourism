@@ -215,3 +215,30 @@
     }
   }
 }
+.swal2-confirm-btn {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 8px !important;
+  padding: 8px 24px;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.swal2-confirm-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+}
+
+.swal2-cancel-btn {
+  background: linear-gradient(135deg, #dc2626, #f87171) !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 8px !important;
+  padding: 8px 24px;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.swal2-cancel-btn:hover {
+  background: linear-gradient(135deg, #f87171, #ef4444) !important;
+}

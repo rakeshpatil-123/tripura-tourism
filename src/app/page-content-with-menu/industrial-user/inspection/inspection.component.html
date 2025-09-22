@@ -9,24 +9,26 @@
     >
       <div class="filter-section">
         <div class="filter-row">
-          <div class="filter-item date-from">
-            <label for="from_dt" class="filter-label">Date From</label>
+          <div class="filter-item date-from mb-2">
+            <!-- <label for="from_dt" class="filter-label">Date From</label> -->
             <app-ilogi-input-date
               formControlName="from_dt"
               fieldId="from_dt"
               placeholder="DD/MM/YYYY"
               [mandatory]="false"
               [readonly]="false"
+              fieldLabel="Date From"
             >
             </app-ilogi-input-date>
           </div>
 
-          <div class="filter-item date-to">
-            <label for="to_dt" class="filter-label">Date To</label>
+          <div class="filter-item date-to mb-2">
+            <!-- <label for="to_dt" class="filter-label">Date To</label> -->
 
             <app-ilogi-input-date
               formControlName="to_dt"
               fieldId="to_dt"
+              fieldLabel="Date To"
               placeholder="DD/MM/YYYY"
               [mandatory]="false"
               [readonly]="false"
@@ -34,14 +36,15 @@
             </app-ilogi-input-date>
           </div>
 
-          <div class="filter-item department">
-            <label for="deptId" class="filter-label">Department</label>
+          <div class=" ">
+            <!-- <label for="deptId" class="filter-label">Department</label> -->
             <app-ilogi-select
               formControlName="deptId"
               fieldId="deptId"
               placeholder="Select Department"
               [mandatory]="false"
               [selectOptions]="departments"
+              fieldLabel="Department"
             >
             </app-ilogi-select>
           </div>

@@ -14,8 +14,10 @@
 
   <!-- <div class="user-profile" *ngIf="!isCollapsed">
     <div class="user-info">
-      <div class="user-name"><b>{{ userName }}</b></div>
-      <div class="user-role">{{ currentUserType.toUpperCase() }}</div>
+      <div class="user-name"><b>{{ userName | titlecase}} <b *ngIf="currentUserType === 'department'" class="user-email">({{emailId}} )</b></b></div>
+      <div *ngIf="currentUserType === 'department'" class="dept-name"> <b>{{designation | titlecase}},</b> <b> {{deptName}}</b></div>
+      <div *ngIf="currentUserType === 'department'" class="hierarchy-level"> <b> Hierarchy </b>- <b>{{hierarchyLevel | titlecase}} ( {{ hierarchyLevel === 'block' ? blockUser : hierarchyLevel === 'subdivision' ? subDivisionUser : hierarchyLevel === 'district' ? districtUser : 'Tripura'}} )</b></div>
+      <div *ngIf="currentUserType !== 'department'" class="user-role">{{ currentUserType.toUpperCase() }} </div>
     </div>
     <div class="user-status">
       <span class="status-indicator online"></span>

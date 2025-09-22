@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import { ClarificationRequiredTableComponent } from './certification-required-table/certification-required-table.component';
@@ -8,6 +8,7 @@ import { StatsCardComponent } from './stats-card/stats-card.component';
 import { ButtonComponent } from '../../shared/component/button-component/button.component';
 import { TimelineCardComponent } from '../../shared/timeline-card/timeline-card.component';
 import { TableColumn } from '../../shared/component/table/table.component';
+import { GenericService } from '../../_service/generic/generic.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,7 +25,12 @@ import { TableColumn } from '../../shared/component/table/table.component';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+  deptId: any;
+  totalApplicationsCount: number = 0;
+  totalPendingApplicationCount: number = 0;
+  totalApprovedApplication: number = 0;
+  totalNOCIssuedDepartment: number = 0;
   barChartData = [
     { label: 'CFO', approved: 3.5, rejected: 1 },
     { label: 'CTO', approved: 5, rejected: 0 },
@@ -50,6 +56,42 @@ export class DashboardComponent {
       pending: 0,
     },
   ];
+
+  constructor(private genericService: GenericService) { }
+
+  ngOnInit(): void {
+    this.deptId = this.genericService.decryptLocalStorageItem('deptId') || '';
+    if (this.deptId) {
+      this.getNocIssuedList();
+      this.getDashboardData();
+    }
+  }
+
+  getDashboardData(): void {
+    this.genericService.getDashboardData(this.deptId).subscribe({
+      next: (res: any) => {
+        this.totalApplicationsCount = res.total_applications_for_this_department || 0;
+        this.totalApprovedApplication = res.total_count_approved_application_in_department || 0;
+        this.totalPendingApplicationCount = res.total_count_pending_application_in_department || 0;
+        this.totalNOCIssuedDepartment = res.number_of_NOC_issued_by_department || 0;
+      },
+    });
+  }
+  getNocIssuedList(): void {
+    this.genericService.getNocIssuedList(this.deptId).subscribe({
+      next: (res: any) => {
+        if (res?.list_of_NOC_issued_by_department?.data) {
+          this.clarificationRequiredData = res.list_of_NOC_issued_by_department.data.map((item: any) => ({
+            applicationId: item.application_id.toString(),
+            department: 'Department of Industries',
+            noc: `Application for NOC of ${item.name_of_unit}`,
+            clarification: '',
+            isDocumentMissing: false
+          }));
+        }
+      },
+    });
+  }
 
   clarificationRequiredData = [
     {
