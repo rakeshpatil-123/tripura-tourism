@@ -67,7 +67,6 @@
             <mat-option value="!=">!=</mat-option>
             <mat-option value="between">Between</mat-option>
           </mat-select>
-          <mat-error *ngIf="feeRuleForm.get('condition_operator')?.hasError('required')">Operator required</mat-error>
         </mat-form-field>
       </div>
       <div class="grid-item">
@@ -82,8 +81,6 @@
         <mat-form-field appearance="outline" class="form-field full">
           <mat-label>End Value</mat-label>
           <input matInput formControlName="condition_value_end" placeholder="e.g. 10" />
-          <mat-error *ngIf="feeRuleForm.get('condition_value_end')?.hasError('required')">End value
-            required</mat-error>
         </mat-form-field>
       </div>
 
@@ -118,7 +115,6 @@
         <mat-form-field appearance="outline" class="form-field full">
           <mat-label>Priority</mat-label>
           <input matInput type="number" formControlName="priority" />
-          <mat-error *ngIf="feeRuleForm.get('priority')?.hasError('required')">Priority required</mat-error>
         </mat-form-field>
       </div>
 

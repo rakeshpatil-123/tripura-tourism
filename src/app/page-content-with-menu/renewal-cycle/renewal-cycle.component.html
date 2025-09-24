@@ -53,7 +53,7 @@
     <div class="grid-2">
       <mat-form-field appearance="outline">
         <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="fixed_renewal_start_date" [min]="today" readonly
+        <input matInput [matDatepicker]="picker1" formControlName="fixed_renewal_start_date"
           (click)="picker1.open()" />
         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
@@ -61,8 +61,7 @@
 
       <mat-form-field appearance="outline">
         <mat-label>End Date</mat-label>
-        <input matInput [matDatepicker]="picker2" formControlName="fixed_renewal_end_date"
-          [min]="renewalForm.get('fixed_renewal_start_date')?.value" readonly (click)="picker2.open()" />
+        <input matInput [matDatepicker]="picker2" formControlName="fixed_renewal_end_date" (click)="picker2.open()" />
         <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
         <mat-datepicker #picker2></mat-datepicker>
       </mat-form-field>
