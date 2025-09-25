@@ -8,7 +8,7 @@
     </div>
     <button class="toggle-btn" (click)="onToggle.emit()" 
       [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
-      <span class="material-icons">{{ isCollapsed ? 'menu' : 'menu_open' }}</span>
+      <span class="material-icons notranslate">{{ isCollapsed ? 'menu' : 'menu_open' }}</span>
     </button>
   </div>
 
@@ -31,10 +31,6 @@
       <ng-container *ngIf="currentUserType === 'admin'">
         <div class="user-name">
           <span class="name">{{ userName | titlecase }}</span>
-        </div>
-        <div class="user-detail">
-          <span class="label">Department:</span>
-          <span class="value">{{ deptName }}</span>
         </div>
         <div class="user-role">
           <span class="badge">{{ currentUserType }}</span>
@@ -71,7 +67,7 @@
           <li class="nav-item" *ngIf="!item.children">
             <a class="nav-link" [class.active]="isActive(item.route)" (click)="navigate(item.route)"
               [attr.title]="isCollapsed ? item.title : null">
-              <span class="nav-icon material-icons">{{ item.icon }}</span>
+              <span class="nav-icon material-icons notranslate">{{ item.icon }}</span>
               <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
             </a>
           </li>
@@ -83,7 +79,7 @@
               [attr.title]="isCollapsed ? item.title : null">
               <span class="nav-icon material-icons">{{ item.icon }}</span>
               <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
-              <span class="expand-icon material-icons" *ngIf="!isCollapsed">
+              <span class="expand-icon material-icons notranslate" *ngIf="!isCollapsed">
                 {{ expandedSubmenu === item.id ? 'expand_less' : 'expand_more' }}
               </span>
             </div>
@@ -91,8 +87,8 @@
               <li class="submenu-item" *ngFor="let child of item.children">
                 <ng-container *ngIf="canAccess(child)">
                   <a class="submenu-link" [class.active]="isActive(child.route)" (click)="navigate(child.route)">
-                    <span class="submenu-icon material-icons">{{ child.icon }}</span>
-                    <span class="submenu-text">{{ child.title }}</span>
+                    <span class="submenu-icon material-icons notranslate">{{ child.icon }}</span>
+                    <span class="submenu-text notranslate">{{ child.title }}</span>
                   </a>
                 </ng-container>
               </li>
@@ -107,11 +103,11 @@
   <div class="sidebar-footer">
     <div class="footer-actions">
       <button class="footer-btn" title="Help & Support">
-        <span class="material-icons">help</span>
+        <span class="material-icons notranslate">help</span>
         <span *ngIf="!isCollapsed">Help</span>
       </button>
       <button class="footer-btn" title="Logout" (click)="logout()">
-        <span class="material-icons">logout</span>
+        <span class="material-icons notranslate">logout</span>
         <span *ngIf="!isCollapsed">Logout</span>
       </button>
     </div>
