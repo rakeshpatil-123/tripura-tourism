@@ -22,6 +22,9 @@
             No more renewal cycles found. Please add a renewal cycle first.
           </mat-option>
         </mat-select>
+        <mat-error *ngIf="feeRuleForm.get('renewal_cycle_id')?.hasError('required')">
+          Renewal Cycle is required
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -43,6 +46,9 @@
             No more questions found. Please add a question first.
           </mat-option>
         </mat-select>
+          <mat-error *ngIf="feeRuleForm.get('question_id')?.hasError('required')">
+            Question is required
+          </mat-error>
       </mat-form-field>
     </div>
 
@@ -50,7 +56,7 @@
       class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Operator</mat-label>
-        <mat-select formControlName="condition_operator" required>
+        <mat-select formControlName="condition_operator">
           <mat-option value="<">&lt;</mat-option>
           <mat-option value="<=">&lt;=</mat-option>
           <mat-option value=">">&gt;</mat-option>
@@ -61,7 +67,7 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Value Start</mat-label>
-        <input matInput formControlName="condition_value_start" required />
+        <input matInput formControlName="condition_value_start" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -104,7 +110,7 @@
       class="form-actions">
       <button mat-raised-button color="warn" type="button" (click)="close()">Cancel</button>
       <button mat-raised-button color="primary" class="submit-btn" type="submit"
-        [disabled]="isSubmitting || feeRuleForm.invalid">
+        [disabled]="isSubmitting">
         {{ isSubmitting ? 'Saving...' : (data.mode === 'add' ? 'Save Renewal Fee Rule' : 'Update Renewal Fee Rule') }}
       </button>
     </div>

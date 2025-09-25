@@ -53,8 +53,8 @@ export class RenewalCycleComponent implements OnInit {
       renewal_period_custom: [null],
       renewal_target_days: [0, [Validators.min(0)]],
       renewal_window_days: [0, [Validators.min(0)]],
-      fixed_renewal_start_date: [this.today],
-      fixed_renewal_end_date: [this.today],
+      fixed_renewal_start_date: [null],
+      fixed_renewal_end_date: [null],
       late_fee_applicable: ['no'],
       late_fee_calculation_dynamic: ['no'],
       late_fee_fixed_amount: ['0'],
@@ -69,10 +69,10 @@ export class RenewalCycleComponent implements OnInit {
         ...cycle,
         fixed_renewal_start_date: cycle.fixed_renewal_start_date
           ? moment(cycle.fixed_renewal_start_date)
-          : this.today,
+          : null,
         fixed_renewal_end_date: cycle.fixed_renewal_end_date
           ? moment(cycle.fixed_renewal_end_date)
-          : this.today,
+          : null,
       });
 
       this.showLateFeeFields = cycle.late_fee_applicable === 'yes';
@@ -88,10 +88,10 @@ export class RenewalCycleComponent implements OnInit {
     const startDate = moment(this.renewalForm.value.fixed_renewal_start_date);
     const endDate = moment(this.renewalForm.value.fixed_renewal_end_date);
 
-    if (startDate.isBefore(this.today, 'day')) {
-      this.genericService.openSnackBar('Start date cannot be earlier than today', 'Error');
-      return;
-    }
+    // if (startDate.isBefore(this.today, 'day')) {
+    //   this.genericService.openSnackBar('Start date cannot be earlier than today', 'Error');
+    //   return;
+    // }
 
     if (endDate.isBefore(startDate, 'day')) {
       this.genericService.openSnackBar('End date cannot be earlier than start date', 'Error');
