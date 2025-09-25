@@ -3,6 +3,13 @@
 <div [style.padding-top]="isLoggedIn ? '10vh' : '16vh'">
     <router-outlet></router-outlet>
 </div>
+<!-- Help Components -->
+<!-- Hide floating button when logged in -->
+<app-help-floating-button 
+    (toggleSidebarEvent)="openHelpSidebar()" 
+    *ngIf="!helpSidebarOpen && !isLoggedIn">
+</app-help-floating-button>
+<app-help-sidebar [isOpen]="helpSidebarOpen" (closeSidebarEvent)="closeHelpSidebar()"></app-help-sidebar>
 <app-logo-footer *ngIf="!isLoggedIn"/>
 <app-footer *ngIf="!isLoggedIn"></app-footer>
 <app-mini-footer *ngIf="!isLoggedIn"></app-mini-footer>
