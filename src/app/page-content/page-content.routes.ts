@@ -1,7 +1,6 @@
 import { Routes } from "@angular/router";
 import { PageContentComponent } from "./page-content.component";
 import { LoginComponent } from "./auth/login/login.component";
-import { HomeComponent } from "./home/home.component";
 
 export const PAGE_CONTENT_ROUTES: Routes = [
     {

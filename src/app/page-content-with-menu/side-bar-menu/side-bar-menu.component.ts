@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { GenericService } from '../../_service/generic/generic.service';
+import { HelpService } from '../../_service/help/help.service'; // Adjust path as needed
 
 export interface MenuItem {
   id: string;
@@ -206,7 +207,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private router: Router, private genericService: GenericService) {
+  constructor(
+    private router: Router, 
+    private genericService: GenericService,
+    private helpService: HelpService  // Add HelpService injection
+  ) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
     this.userName = this.genericService.decryptLocalStorageItem('user_name') || 'User';
     this.deptName = localStorage.getItem('deptName') || '';
@@ -286,6 +291,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.genericService.logoutUser(); 
+  }
+  
+  // Add method to toggle help sidebar
+  toggleHelp(): void {
+    this.helpService.toggleHelpSidebar();
   }
   
   filterMenuItems(): void {

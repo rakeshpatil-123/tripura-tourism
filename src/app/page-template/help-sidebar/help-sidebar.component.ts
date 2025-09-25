@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { FormsModule } from '@angular/forms'; // ✅ Import FormsModule
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-help-sidebar',
-  standalone: true, // ✅ Make it standalone
-  imports: [FormsModule], // ✅ Import FormsModule here
+  standalone: true,
+  imports: [FormsModule],
   templateUrl: './help-sidebar.component.html',
   styleUrls: ['./help-sidebar.component.scss']
 })
@@ -33,5 +33,23 @@ export class HelpSidebarComponent {
 
     console.log('User message:', this.userMessage);
     this.userMessage = '';
+  }
+
+  // New methods for support modules
+  callSupport() {
+    console.log('Calling support...');
+    // In a real app, this would initiate a call
+    // window.open('tel:+1234567890');
+  }
+
+  sendEmail() {
+    console.log('Opening email client...');
+    // In a real app, this would open email client
+    // window.open('mailto:support@example.com');
+  }
+
+  visitOffice() {
+    console.log('Opening appointment booking...');
+    // In a real app, this would open appointment booking page
   }
 }
