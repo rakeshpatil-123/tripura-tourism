@@ -1,0 +1,540 @@
+.proforma-list-container {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.6s ease-out;
+  position: relative;
+  overflow: hidden;
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .proforma-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 2rem;
+
+    .proforma-heading {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0;
+      flex: 1 1 auto;
+      min-width: 180px;
+      animation: fadeInLeft 0.5s ease-out;
+    }
+
+    .add-proforma-btn {
+      background-color: #2563eb;
+      color: #ffffff;
+      font-weight: 600;
+      padding: 0.5rem 1.2rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transition: all 0.3s ease-in-out;
+      white-space: nowrap;
+      animation: fadeInRight 0.5s ease-out;
+
+      &:hover {
+        background-color: #1e40af;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      }
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+
+    th,
+    td {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background-color: #f4f4f4;
+      font-weight: 600;
+    }
+
+    td {
+      color: #374151;
+    }
+
+    tr:hover {
+      background-color: #f9fafb;
+      transition: background 0.2s ease-in-out;
+    }
+  }
+
+  .text-center {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1rem;
+    color: #6b7280;
+  }
+
+  .loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .proforma-header {
+      flex-direction: column;
+      align-items: stretch;
+
+      .add-proforma-btn {
+        width: 100%;
+      }
+    }
+
+    table th,
+    table td {
+      padding: 0.5rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .proforma-heading {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+@keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+::ng-deep .custom-proforma-dialog {
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  color: #111827;
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  animation: dialogFadeIn 0.5s ease-out;
+
+  .p-dialog-header {
+    display: none;
+  }
+
+  .proforma-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .dialog-header {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #111827;
+      text-align: center;
+      margin-bottom: 1rem;
+      animation: fadeDown 0.5s ease-out;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 0.3rem;
+        }
+
+        input,
+        select,
+        textarea {
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #d1d5db;
+          border-radius: 0.5rem;
+          font-size: 0.95rem;
+          transition: all 0.3s ease-in-out;
+
+          &:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+          }
+        }
+
+        textarea {
+          min-height: 80px;
+          resize: vertical;
+        }
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1rem;
+
+      .btn-submit {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+
+        &:hover {
+          transform: translateY(-2px) scale(1.03);
+          box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        &:active {
+          transform: translateY(0) scale(1);
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .proforma-form .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .dialog-header {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@keyframes dialogFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  gap: 1rem;
+
+  .btn-cancel {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    animation: fadeUp 0.5s ease-out;
+
+    &:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    animation: fadeUp 0.5s ease-out;
+
+    &:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::ng-deep .p-inputtext {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 1rem !important;
+  transition: all 0.3s ease-in-out !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+::ng-deep .p-inputtext:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.4) !important;
+  transition: all 0.3s ease-in-out !important;
+}
+
+::ng-deep .custom-proforma-dialog .proforma-form .form-grid .form-group input,
+::ng-deep .custom-proforma-dialog .proforma-form .form-grid .form-group select,
+::ng-deep .custom-proforma-dialog .proforma-form .form-grid .form-group textarea {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.95rem !important;
+  outline: none !important;
+  transition: all 0.3s ease-in-out !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .custom-proforma-dialog .proforma-form .form-grid .form-group input:focus,
+::ng-deep .custom-proforma-dialog .proforma-form .form-grid .form-group select:focus,
+::ng-deep .custom-proforma-dialog .proforma-form .form-grid .form-group textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.4) !important;
+  transition: all 0.3s ease-in-out !important;
+}
+
+::ng-deep .custom-proforma-dialog .proforma-form .form-grid .form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.status-active {
+  background-color: #22c55e;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.status-inactive {
+  background-color: #ef4444;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.proforma-details-dialog {
+  background: #ffffff !important;
+  border-radius: 16px;
+  color: #000 !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+
+  .proforma-details {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    color: black;
+    gap: 16px;
+    padding: 24px;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  :host ::ng-deep .p-dialog {
+    max-height: 90%;
+    transform: scale(1);
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+    background: #ffffff !important;
+    border: 1px solid #ccc;
+    color: #000000 !important;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-header,
+  :host ::ng-deep .p-dialog .p-dialog-content,
+  :host ::ng-deep .p-dialog .p-dialog-footer {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-content {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  :host ::ng-deep .p-dialog {
+    background: #ffffff !important;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: #eef6ff;
+      transform: translateX(3px);
+    }
+
+    label {
+      font-weight: 600;
+      color: #003c5b;
+      flex: 1;
+    }
+
+    span {
+      font-weight: 700;
+      color: #000;
+      flex: 1;
+      text-align: right;
+      word-break: break-word;
+    }
+  }
+
+  .status-active {
+    color: #28a745;
+    background: #e6f9ed;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 80px;
+  }
+
+  .status-inactive {
+    color: #dc3545;
+    background: #fdeaea;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 80px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .proforma-details-dialog {
+    .detail-row {
+      flex-direction: column;
+      align-items: flex-start;
+
+      span {
+        text-align: left;
+        margin-top: 4px;
+        width: 100%;
+      }
+    }
+  }
+}

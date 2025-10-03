@@ -1,0 +1,106 @@
+<div class="proforma-list-container">
+  <div class="proforma-header">
+    <h4 class="proforma-heading">
+      {{ schemeTitle }} - Proformas
+    </h4>
+    <button class="add-proforma-btn" (click)="openProformaDialog()">
+      Add New Proforma
+    </button>
+  </div>
+  <app-dynamic-table [data]="proformas" [columns]="columns" [showPagination]="true" [pageSize]="5" [searchable]="true"
+    (rowAction)="onRowAction($event)">
+  </app-dynamic-table>
+  <p-dialog [(visible)]="showProformaDialog" [modal]="true"
+    [style]="{ width: '720px', maxWidth: '95vw', minHeight: '520px', height: 'auto' }" [draggable]="false"
+    [resizable]="false" [closable]="true" [dismissableMask]="true" styleClass="custom-proforma-dialog">
+    <form [formGroup]="proformaForm" (ngSubmit)="saveProforma()" class="proforma-form">
+
+      <h3 class="dialog-header">{{ isEditMode ? 'Edit Proforma' : 'Add Proforma' }}</h3>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Title</label>
+          <input pInputText formControlName="title" placeholder="Enter title" />
+          <small class="error-message"
+            *ngIf="proformaForm.get('title')?.invalid && (proformaForm.get('title')?.touched || proformaForm.get('title')?.dirty)">
+            Title is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Code</label>
+          <input pInputText formControlName="code" placeholder="Enter code" />
+          <small class="error-message"
+            *ngIf="proformaForm.get('code')?.invalid && (proformaForm.get('code')?.touched || proformaForm.get('code')?.dirty)">
+            Code is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Proforma Type</label>
+          <select formControlName="proforma_type">
+            <option *ngFor="let type of PROFORMA_TYPES" [value]="type.value">{{ type.label }}</option>
+          </select>
+          <small class="error-message"
+            *ngIf="proformaForm.get('proforma_type')?.invalid && (proformaForm.get('proforma_type')?.touched || proformaForm.get('proforma_type')?.dirty)">
+            Proforma Type is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Claim Type</label>
+          <select formControlName="claim_type">
+            <option [value]="null">--Select--</option>
+            <option *ngFor="let type of CLAIM_TYPES" [value]="type.value">{{ type.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea pInputTextarea formControlName="description" placeholder="Enter description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Display Order</label>
+          <input type="number" pInputText formControlName="display_order" placeholder="Enter display order" />
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select formControlName="status">
+            <option [value]="true">Active</option>
+            <option [value]="false">Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="showProformaDialog=false">
+          Cancel
+        </button>
+        <button type="submit" pButton label="Save" class="btn-submit"></button>
+      </div>
+
+    </form>
+  </p-dialog>
+
+
+  <p-dialog header="Proforma Details" [(visible)]="showProformaDetailsDialog" [modal]="true"
+    [style]="{ width: '600px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="true"
+    [dismissableMask]="true" styleClass="proforma-details-dialog animate__animated animate__fadeInDown">
+    <div *ngIf="selectedProforma" class="proforma-details">
+
+      <div class="detail-row" *ngFor="let field of proformaFields">
+        <label>{{ field.label }}:</label>
+        <span [ngClass]="field.class ? field.class : ''">
+          {{ field.value }}
+        </span>
+      </div>
+
+    </div>
+
+    <p-footer>
+      <button pButton label="Close" class="p-button-rounded p-button-secondary"
+        (click)="showProformaDetailsDialog = false">
+      </button>
+    </p-footer>
+  </p-dialog>

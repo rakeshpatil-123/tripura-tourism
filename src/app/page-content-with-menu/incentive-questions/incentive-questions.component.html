@@ -1,0 +1,360 @@
+<div class="questions-container">
+  <div class="header-top">
+    <button class="btn btn-back" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+      Back
+    </button>
+
+    <h2>{{ schemeTitle }} - {{ proformaTitle }} Questions</h2>
+
+    <button class="btn btn-add" (click)="openQuestionDialog()">
+      <span class="material-icons">add</span>
+      New Question
+    </button>
+    <button (click)="allQuestionPreview()" pButton label="Preview Questions"></button>
+  </div>
+
+  <app-dynamic-table [data]="questions" [columns]="columns" [showPagination]="true" [pageSize]="5" [searchable]="true"
+    (rowAction)="onRowAction($event)">
+  </app-dynamic-table>
+
+  <p-dialog [(visible)]="showQuestionDialog" [modal]="true"
+    [style]="{ width: '760px', maxWidth: '95vw', minHeight: '600px', height: 'auto' }" [draggable]="false"
+    [resizable]="false" [closable]="false" [dismissableMask]="true" styleClass="custom-proforma-dialog">
+    <div class="dialog-header">
+      <h2>{{ isEditMode ? 'Edit Question' : 'Add Question' }}</h2>
+      <button class="btn-close" (click)="showQuestionDialog = false">
+        ✖
+      </button>
+    </div>
+
+
+    <form [formGroup]="questionForm" (ngSubmit)="saveQuestion()" class="dialog-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Question Label</label>
+          <input pInputText formControlName="label" placeholder="Enter question label" />
+        </div>
+
+        <div class="form-group mb-3">
+          <label>Question Type</label>
+          <select formControlName="type" class="form-control">
+            <option value="text">Text (Single line)</option>
+            <option value="textarea">Textarea (Multi-line)</option>
+            <option value="number">Number</option>
+            <option value="password">Password</option>
+            <option value="email">Email</option>
+            <option value="tel">Phone</option>
+            <option value="url">URL</option>
+            <option value="select">Dropdown</option>
+            <option value="radio">Radio Buttons (Single Choice)</option>
+            <option value="checkbox">Checkboxes (Multiple Choice)</option>
+            <option value="switch">Toggle / Switch</option>
+            <option value="date">Date</option>
+            <option value="time">Time</option>
+            <option value="datetime-local">Date & Time</option>
+            <option value="month">Month</option>
+            <option value="week">Week</option>
+            <option value="file">File Upload</option>
+            <option value="image">Image Upload</option>
+            <option value="video">Video Upload</option>
+            <option value="audio">Audio Upload</option>
+            <option value="range">Slider / Range</option>
+            <option value="color">Color Picker</option>
+            <option value="rating">Star Rating</option>
+            <option value="signature">Signature Pad</option>
+            <option value="location">Location Picker (Map)</option>
+            <option value="richtext">Rich Text Editor</option>
+            <option value="matrix">Matrix / Grid Question</option>
+            <option value="likert">Likert Scale (Strongly Agree → Strongly Disagree)</option>
+            <option value="captcha">Captcha / Verification</option>
+          </select>
+        </div>
+      </div>
+
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Required</label>
+          <select formControlName="required" class="form-control">
+            <option [value]="true">Yes</option>
+            <option [value]="false">No</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Default Value</label>
+
+          <input *ngIf="['text','email','number','password','url','tel'].includes(questionForm.get('type')?.value)"
+            pInputText formControlName="defaultValue" placeholder="Enter default value" />
+          <textarea *ngIf="questionForm.get('type')?.value === 'textarea'" pInputTextarea formControlName="defaultValue"
+            placeholder="Enter default text"></textarea>
+          <input *ngIf="questionForm.get('type')?.value === 'select'" pInputText formControlName="defaultValue"
+            placeholder="Enter comma separated options, e.g., Option 1, Option 2" />
+          <small *ngIf="questionForm.get('type')?.value === 'select'" class="text-muted">
+            Write comma separated values for dropdown options.
+          </small>
+
+          <input *ngIf="questionForm.get('type')?.value === 'checkbox'" pInputText formControlName="defaultValue"
+            placeholder="Enter comma separated values for multiple options, e.g., Option 1, Option 2" />
+          <small *ngIf="questionForm.get('type')?.value === 'checkbox'" class="text-muted">
+            Write comma separated values for multiple checkboxes.
+          </small>
+
+          <div *ngIf="questionForm.get('type')?.value === 'switch'">
+            <p-inputSwitch formControlName="defaultValue"></p-inputSwitch>
+          </div>
+
+          <input *ngIf="questionForm.get('type')?.value === 'date'" type="date" formControlName="defaultValue"
+            class="form-control" />
+
+          <input *ngIf="questionForm.get('type')?.value === 'time'" type="time" formControlName="defaultValue"
+            class="form-control" />
+        </div>
+
+
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Display Order</label>
+          <input type="number" pInputText formControlName="displayOrder" placeholder="Enter display order" />
+        </div>
+        <div class="form-group">
+          <label>Group Label</label>
+          <input pInputText formControlName="groupLabel" placeholder="Enter group label" />
+        </div>
+        <div class="form-group">
+          <label>Display Width</label>
+          <select formControlName="displayWidth" class="form-control">
+            <option value="col-12">Full Width</option>
+            <option value="col-6">Half Width</option>
+            <option value="col-4">One Third</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-rules" *ngIf="['file','image','video','audio'].includes(questionForm.get('type')?.value)">
+        <h4 class="upload-title">Upload Rules</h4>
+        <div class="form-row upload-rules-row">
+          <div class="form-group half-width">
+            <label>Allowed MIME Types</label>
+            <input pInputText formControlName="mimes" [value]="getDefaultMimes(questionForm.get('type')?.value)"
+              placeholder="e.g. jpg, png, pdf, mp4, mp3" />
+            <small class="text-danger"
+              *ngIf="questionForm.get('mimes')?.hasError('required') && questionForm.get('mimes')?.touched">
+              MIME Types are required.
+            </small>
+          </div>
+
+          <div class="form-group half-width">
+            <label>Max File Size (MB)</label>
+            <input type="number" min="1" pInputText formControlName="max_size_mb"
+              placeholder="Enter maximum file size, e.g., 5"
+              [value]="getDefaultMaxSize(questionForm.get('type')?.value)" /> <small class="text-danger"
+              *ngIf="questionForm.get('max_size_mb')?.hasError('min') && questionForm.get('max_size_mb')?.touched">
+              Max file size cannot be less than 1 MB.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-row upload-rules-row align-center">
+          <div class="form-group toggle-group">
+            <label>Allow Multiple</label>
+            <p-toggleswitch formControlName="multiple" [(ngModel)]="checked" [style]="{width: '60px', height: '28px'}">
+            </p-toggleswitch>
+          </div>
+
+          <div class="form-group small-input">
+            <label>Min Files</label>
+            <input type="number" min="1" pInputText placeholder="Minimum number of files, e.g., 1"
+              formControlName="min_files" /> <small class="text-danger"
+              *ngIf="questionForm.get('min_files')?.hasError('min') && questionForm.get('min_files')?.touched">
+              Min files cannot be less than 1.
+            </small>
+          </div>
+
+          <div class="form-group small-input">
+            <label>Max Files</label>
+            <input type="number" placeholder="Maximum number of files, e.g., 10" min="1" pInputText
+              formControlName="max_files" /><small class="text-danger"
+              *ngIf="questionForm.get('max_files')?.hasError('min') && questionForm.get('max_files')?.touched">
+              Max files cannot be less than 1.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save</button>
+        <button type="button" class="btn-cancel" (click)="showQuestionDialog = false">Cancel</button>
+      </div>
+    </form>
+
+    <hr class="divider" />
+
+    <div class="preview-box">
+      <label>{{ questionForm.get('label')?.value || 'Your question will appear here...' }}</label>
+
+      <input *ngIf="['text','number','email','password','url','tel'].includes(questionForm.get('type')?.value)"
+        type="{{ questionForm.get('type')?.value }}" class="form-control"
+        [value]="questionForm.get('defaultValue')?.value" readonly />
+
+      <textarea *ngIf="questionForm.get('type')?.value === 'textarea'" class="form-control"
+        [value]="questionForm.get('defaultValue')?.value" readonly>
+  </textarea>
+
+      <select *ngIf="questionForm.get('type')?.value === 'select'" class="form-control" readonly>
+        <option *ngFor="let opt of (questionForm.get('defaultValue')?.value?.split(',') || [])" [value]="opt.trim()">
+          {{ opt.trim() }}
+        </option>
+      </select>
+
+      <div *ngIf="questionForm.get('type')?.value === 'radio'">
+        <label *ngFor="let opt of (questionForm.get('defaultValue')?.value?.split(',') || [])">
+          <input type="radio" name="previewRadio" /> {{ opt.trim() }}
+        </label>
+      </div>
+
+      <div *ngIf="questionForm.get('type')?.value === 'checkbox'">
+        <label *ngFor="let opt of (questionForm.get('defaultValue')?.value?.split(',') || [])">
+          <input type="checkbox" [checked]="true" /> {{ opt.trim() }}
+        </label>
+      </div>
+
+      <label *ngIf="questionForm.get('type')?.value === 'switch'" class="switch">
+        <input type="checkbox" [checked]="questionForm.get('defaultValue')?.value" />
+        <span class="slider"></span>
+      </label>
+
+      <input *ngIf="questionForm.get('type')?.value === 'date'" type="date" class="form-control"
+        [value]="questionForm.get('defaultValue')?.value" readonly />
+      <input *ngIf="questionForm.get('type')?.value === 'time'" type="time" class="form-control"
+        [value]="questionForm.get('defaultValue')?.value" readonly />
+      <input *ngIf="questionForm.get('type')?.value === 'datetime-local'" type="datetime-local" class="form-control"
+        [value]="questionForm.get('defaultValue')?.value" readonly />
+      <input *ngIf="questionForm.get('type')?.value === 'month'" type="month" class="form-control"
+        [value]="questionForm.get('defaultValue')?.value" readonly />
+      <input *ngIf="questionForm.get('type')?.value === 'week'" type="week" class="form-control"
+        [value]="questionForm.get('defaultValue')?.value" readonly />
+
+      <input *ngIf="questionForm.get('type')?.value === 'file'" type="file" class="form-control" />
+      <input *ngIf="questionForm.get('type')?.value === 'image'" type="file" accept="image/*" class="form-control" />
+      <input *ngIf="questionForm.get('type')?.value === 'video'" type="file" accept="video/*" class="form-control" />
+      <input *ngIf="questionForm.get('type')?.value === 'audio'" type="file" accept="audio/*" class="form-control" />
+
+      <input *ngIf="questionForm.get('type')?.value === 'range'" type="range" min="0" max="100" class="form-range" />
+      <input *ngIf="questionForm.get('type')?.value === 'color'" type="color" />
+      <div *ngIf="questionForm.get('type')?.value === 'rating'">
+        ⭐⭐⭐⭐⭐
+      </div>
+      <canvas *ngIf="questionForm.get('type')?.value === 'signature'" class="signature-pad"></canvas>
+
+      <div *ngIf="questionForm.get('type')?.value === 'location'">[Map placeholder]</div>
+      <div *ngIf="questionForm.get('type')?.value === 'richtext'">[Rich text editor]</div>
+      <div *ngIf="questionForm.get('type')?.value === 'matrix'">[Matrix Grid Example]</div>
+      <div *ngIf="questionForm.get('type')?.value === 'likert'">[Likert Scale Example]</div>
+      <div *ngIf="questionForm.get('type')?.value === 'captcha'">[Captcha Example]</div>
+    </div>
+  </p-dialog>
+</div>
+<p-dialog [(visible)]="showPreviewDialog" [modal]="true" [draggable]="false" [resizable]="false" [closable]="true"
+  [dismissableMask]="true" header="Questions Preview"
+  [style]="{ width: '760px', maxWidth: '95vw', minHeight: '600px', height: 'auto', backgroundColor: '#ffffff', color: '#000000' }"
+  styleClass="custom-proforma-dialog animate-dialog">
+
+  <div class="questions-preview" *ngIf="questions.length; else noQuestions">
+    <div class="row g-3">
+      <div *ngFor="let q of questions" [ngClass]="q.raw?.display_width || 'col-12'">
+        <div class="question-card">
+          <label class="question-label">
+            {{ q.label }} <span *ngIf="q.required" class="required">*</span>
+          </label>
+
+          <input *ngIf="['text','number','email','password','url','tel'].includes(q.type)" [type]="q.type"
+            class="form-control" [value]="q.raw?.default_value" readonly />
+
+          <textarea *ngIf="q.type === 'textarea'" class="form-control" [value]="q.raw?.default_value"
+            readonly></textarea>
+
+          <select *ngIf="q.type === 'select' || q.type=== 'dropdown'" class="form-control">
+            <option *ngFor="let opt of (q.raw?.default_value?.split(',') || [])"
+              [selected]="opt.trim() === q.selectedOption">
+              {{ opt.trim() }}
+            </option>
+          </select>
+          <div *ngIf="q.type === 'radio'" class="radio-group">
+            <label *ngFor="let opt of q.options">
+              <input type="radio" disabled /> {{ opt.trim() }}
+            </label>
+          </div>
+          <div *ngIf="q.type === 'checkbox'" class="checkbox-group">
+            <label *ngFor="let opt of q.options">
+              <input type="checkbox" disabled /> {{ opt.trim() }}
+            </label>
+          </div>
+          <label *ngIf="q.type === 'switch'" class="switch">
+            <input type="checkbox" [checked]="q.raw?.default_value" disabled />
+            <span class="slider"></span>
+          </label>
+
+          <input *ngIf="['date','time','datetime-local','month','week'].includes(q.type)" [type]="q.type"
+            class="form-control" [value]="q.raw?.default_value" readonly />
+
+          <input *ngIf="['file','image','video','audio'].includes(q.type)" type="file" class="form-control" disabled />
+          <input *ngIf="q.type === 'range'" type="range" min="0" max="100" class="form-range" disabled />
+          <input *ngIf="q.type === 'color'" type="color" [value]="q.raw?.default_value" disabled />
+          <div *ngIf="q.type === 'rating'" class="rating">⭐⭐⭐⭐⭐</div>
+          <canvas *ngIf="q.type === 'signature'" class="signature-pad"></canvas>
+          <div *ngIf="['location','richtext','matrix','likert','captcha'].includes(q.type)" class="placeholder">
+            [{{ q.type | titlecase }} Placeholder]
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noQuestions>
+    <p class="text-center">No questions found for this proforma.</p>
+  </ng-template>
+</p-dialog>
+
+
+
+<p-dialog header="Question Details" [(visible)]="showQuestionDetailsDialog" [modal]="true"
+  [style]="{ width: '700px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="true"
+  [dismissableMask]="true"
+  styleClass="question-details-dialog custom-proforma-dialog animate-dialog animate__animated animate__fadeInDown">
+  <div *ngIf="selectedQuestion" class="question-details">
+    <div class="detail-row" *ngFor="let field of questionFields">
+      <label>{{field.label}}:</label>
+      <span>{{field.value}}</span>
+    </div>
+    <div class="detail-row" *ngIf="selectedQuestion.upload_rule">
+      <label>Upload Rules:</label>
+      <span>
+        MIME Types: {{selectedQuestion.upload_rule.mimes?.join(', ')}} |
+        Multiple: {{selectedQuestion.upload_rule.multiple ? 'Yes' : 'No'}} |
+        Min Files: {{selectedQuestion.upload_rule.min_files}} |
+        Max Files: {{selectedQuestion.upload_rule.max_files}} |
+        Max Size (MB): {{selectedQuestion.upload_rule.max_size_mb}}
+      </span>
+    </div>
+    <div class="preview-section" *ngIf="selectedQuestion.default_value || selectedQuestion.question_type">
+      <h4>Preview:</h4>
+      <ng-container [ngSwitch]="selectedQuestion.question_type">
+
+        <img *ngSwitchCase="'image'" [src]="selectedQuestion.default_value" class="preview-img" />
+        <video *ngSwitchCase="'video'" [src]="selectedQuestion.default_value" controls class="preview-video"></video>
+        <audio *ngSwitchCase="'audio'" [src]="selectedQuestion.default_value" controls class="preview-audio"></audio>
+        <a *ngSwitchCase="'file'" [href]="selectedQuestion.default_value" target="_blank" class="preview-file">
+          Download File
+        </a>
+        <span *ngSwitchDefault>{{selectedQuestion.default_value}}</span>
+      </ng-container>
+    </div>
+
+  </div>
+
+  <p-footer>
+    <button pButton label="Close" class="p-button-rounded p-button-secondary"
+      (click)="showQuestionDetailsDialog = false"></button>
+  </p-footer>
+</p-dialog>

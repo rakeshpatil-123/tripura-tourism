@@ -17,6 +17,12 @@ table{
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 
 }
+td.text-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
 // table th{
 //   font-size: 14px;
 // }
