@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
 export class GenericService {
   // API URLs (same as provided)
   static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud'; 
   static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
@@ -1407,4 +1407,124 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
     );
   }
 
+  getIncentivesScheme() {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/scheme-list`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getProformasByScheme(proformaId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-list`,
+      {
+        scheme_id: proformaId
+      },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  createIncentiveScheme(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/scheme-store`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  updateIncentiveScheme(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/scheme-update`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  deleteIncentiveScheme(schemeId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/scheme-delete`,
+      { id: schemeId },
+      { headers: this.getHeaders() }
+    );
+  }
+  createProforma(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-store`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  updateProforma(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-update`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  deleteProforma(proformaId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-delete`,
+      { id: proformaId },
+      { headers: this.getHeaders() }
+    );
+  }
+  viewSingleProforma(id: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/fetch-proforma-details`,
+      { proforma_id: id },
+      { headers: this.getHeaders() }
+    );
+  }
+  viewSingleScheme(id: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/fetch-scheme-details`,
+      { scheme_id: id },
+      { headers: this.getHeaders() }
+    );
+  }
+  viewSingleIncentiveQuestion(id: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/fetch-proforma-questionnaire-details`,
+      { questionnaire_id: id },
+      { headers: this.getHeaders() }
+    );
+  }
+  getIncentiveQuestions(proformaId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-questionnaire-view`,
+      {
+        proforma_id:
+          proformaId
+      },
+      { headers: this.getHeaders() }
+    );
+  }
+  createIncentiveQuestion(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-questionnaire-store`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  //below method is for single view incentive question right now it now in use
+  viewIncentiveQuestion(questionId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-questionnaire-details`,
+      { id: questionId },
+      { headers: this.getHeaders() }
+    );
+  }
+  updateIncentiveQuestion(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-questionnaire-update`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  deleteIncentiveQuestion(incentiveQuestionId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/incentive/proforma-questionnaire-delete`,
+      { id: incentiveQuestionId },
+      { headers: this.getHeaders() }
+    );
+  }
 }
