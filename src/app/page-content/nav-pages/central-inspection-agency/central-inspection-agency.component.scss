@@ -1,0 +1,285 @@
+/* central-inspection-agency.component.scss */
+@use '@angular/material' as mat;
+
+.container-fluid {
+  padding: 1.5rem;
+  background-color: #ffffff;
+  min-height: 100vh;
+  max-width: 100%;
+}
+
+/* Breadcrumb */
+.link-text {
+  color: #003c5b;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #00283d;
+    text-decoration: underline;
+  }
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.page-link {
+  color: #555;
+  margin-left: 0.5rem;
+  font-size: 1rem;
+}
+
+.breadcrumb-text {
+  color: #003c5b;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Header */
+.heading-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #003c5b;
+  line-height: 1.4;
+
+   .red-text-color {
+    color: #d9534f;
+    font-size: 0.7em;
+    font-weight: bold;
+  }
+}
+
+/* Form & Filters */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+/* Custom Select Styling */
+::ng-deep .ilogi-select {
+  width: 100%;
+
+  .mat-mdc-form-field {
+    width: 100%;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+/* Buttons */
+.btn {
+  border: none;
+  padding: 0.65rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.green-btn {
+  background-color: #5cb85c;
+  color: white;
+
+  &:hover {
+    background-color: #4cae4c;
+  }
+
+  &:disabled {
+    background-color: #8dc68d;
+    cursor: not-allowed;
+  }
+}
+
+/* Table Styling */
+.grid-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+::ng-deep .dynamic-table-container {
+  .table-red-headers {
+    th {
+      background-color: #f8f9fa;
+      color: #003c5b;
+      font-weight: 600;
+      border-color: #e9ecef;
+      padding: 0.75rem 0.5rem;
+      vertical-align: middle;
+      white-space: normal;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    td {
+      vertical-align: middle;
+      padding: 0.75rem 0.5rem;
+      border-color: #e9ecef;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* Ensure all columns respect width */
+    th,
+    td {
+      min-width: 150px;
+    }
+  }
+
+  /* No pagination */
+  .pagination-container {
+    display: none;
+  }
+
+  /* Empty state */
+  .no-data {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    font-style: italic;
+    font-size: 1.1rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  ::ng-deep .dynamic-table-container .table-red-headers th,
+  ::ng-deep .dynamic-table-container .table-red-headers td {
+    padding: 0.6rem 0.4rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .container-fluid {
+    padding: 1rem;
+  }
+
+  .heading-text {
+    font-size: 1.3rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  ::ng-deep .dynamic-table-container .table-red-headers th,
+  ::ng-deep .dynamic-table-container .table-red-headers td {
+    min-width: 130px;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 0.75rem;
+  }
+
+  .heading-text {
+    font-size: 1.2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .row > .col-md-4 {
+    flex: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  ::ng-deep .dynamic-table-container .table-red-headers {
+    display: block;
+    width: 100%;
+
+    table {
+      display: block;
+    }
+
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+    }
+
+    thead {
+      display: none;
+    }
+
+    tr {
+      margin-bottom: 1rem;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 0.5rem;
+    }
+
+    td {
+      text-align: left;
+      position: relative;
+      padding-left: 50%;
+      border: none;
+
+      &:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 45%;
+        padding: 0.5rem;
+        font-weight: 600;
+        background: #f8f9fa;
+        border-radius: 4px 0 0 4px;
+        word-wrap: break-word;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  ::ng-deep .dynamic-table-container .table-red-headers td {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.3rem;
+  }
+
+  .heading-text {
+    font-size: 1.1rem;
+  }
+
+  .page-link,
+  .link-text {
+    font-size: 0.9rem;
+  }
+}
+

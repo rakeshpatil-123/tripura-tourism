@@ -1,23 +1,31 @@
 <div class="profile-page">
   <div class="profile-card shadow">
-  <p-tabs value="0" class="custom-tabs">
-    <p-tablist>
-      <p-tab value="0">Profile</p-tab>
-      <p-tab value="1">Change Password</p-tab>
-    </p-tablist>
-    <p-tabpanels>
-      <p-tabpanel value="0">
-        <form [formGroup]="profileForm" class="profile-form">
-        <div class="profile-fields">
-         <app-ilogi-input fieldLabel="Enterprise Name" formControlName="enterpriseName"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="First Name" formControlName="firstName"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="Last Name" formControlName="lastName"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="Email" type="email" formControlName="email"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="Phone" type="number" formControlName="phone"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="Address" type="textarea" formControlName="address"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="City" formControlName="city"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="User Type" [disabled]="true" formControlName="userType"></app-ilogi-input>
-
+    <p-tabs value="0" class="custom-tabs">
+      <p-tablist>
+        <p-tab value="0">Profile</p-tab>
+        <p-tab value="1">Change Password</p-tab>
+      </p-tablist>
+      <div class="p-4" >
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <form [formGroup]="profileForm" class="profile-form">
+            <div class="profile-fields">
+              <app-ilogi-input fieldLabel="Enterprise Name" formControlName="enterpriseName"
+                placeholder="Enter enterprise name"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="First Name" formControlName="firstName"
+                placeholder="Enter first name"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="Last Name" formControlName="lastName"
+                placeholder="Enter last name"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="Email" type="email" formControlName="email"
+                placeholder="Enter email"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="Phone" type="number" formControlName="phone"
+                placeholder="Enter phone number"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="Address" type="textarea" formControlName="address"
+                placeholder="Enter address"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="City" formControlName="city" placeholder="Enter city"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="User Type" [disabled]="true" formControlName="userType"
+                placeholder="Enter user type"></app-ilogi-input>
+ 
               <app-ilogi-select class="mb-10" fieldId="department_id" fieldLabel="Department" [mandatory]="true"
                 formControlName="department_id" [selectOptions]="departments" placeholder="Select department">
               </app-ilogi-select>
@@ -46,39 +54,43 @@
                 [disabled]="!ulbs.length || loadingWards">
               </app-ilogi-select>
 
-              <div class="form-actions">
-                <button type="button" class="btn btn-primary" [disabled]="!isProfileChanged || profileForm.invalid"
-                  (click)="updateProfile()">
-                  Update
-                </button>
-              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-success" [disabled]="!isProfileChanged || profileForm.invalid"
+                (click)="updateProfile()">
+                Update
+              </button>
             </div>
           </form>
         </p-tabpanel>
         <p-tabpanel value="1">
           <form class="change-password" [formGroup]="passwordForm">
-            <app-ilogi-input fieldLabel="Current Password" type="password" formControlName="currentPassword">
-        </app-ilogi-input>
+            <app-ilogi-input fieldLabel="Current Password" type="password" formControlName="currentPassword"
+              placeholder="Enter current password">
+            </app-ilogi-input>
 
-        <app-ilogi-input fieldLabel="New Password" type="password" formControlName="newPassword">
-        </app-ilogi-input>
+            <app-ilogi-input fieldLabel="New Password" type="password" formControlName="newPassword"
+              placeholder="Enter new password">
+            </app-ilogi-input>
 
-        <app-ilogi-input fieldLabel="Confirm Password" type="password" formControlName="confirmPassword">
-        </app-ilogi-input>
+            <app-ilogi-input fieldLabel="Confirm Password" type="password" formControlName="confirmPassword"
+              placeholder="Confirm new password">
+            </app-ilogi-input>
             <span
               *ngIf="passwordForm.value.newPassword && passwordForm.value.newPassword !== passwordForm.value.confirmPassword"
               class="warn">
               Make sure your passwords match
             </span>
             <div class="form-actions">
-          <button type="button" class="btn btn-primary" (click)="changePassword()"
-            [disabled]="passwordForm.invalid || passwordForm.value.newPassword !== passwordForm.value.confirmPassword">
-            Change Password
-          </button>
-        </div>
-      </form>
-      </p-tabpanel>
-    </p-tabpanels>
-  </p-tabs>
-</div>
+              <button type="button" class="btn btn-success" (click)="changePassword()"
+                [disabled]="passwordForm.invalid || passwordForm.value.newPassword !== passwordForm.value.confirmPassword">
+                Change Password 
+              </button>
+            </div>
+          </form>
+        </p-tabpanel>
+      </p-tabpanels>
+      </div>
+    </p-tabs>
+  </div>
 </div>

@@ -52,7 +52,6 @@
 
 
 
-            <!-- 👇 Icon Button Cell -->
             <div *ngIf="col.type === 'icon'" class="icon-cell text-center"
               [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''">
               <button mat-icon-button (click)="col.onClick ? col.onClick(row) : null" [title]="col.label || 'Action'"
@@ -120,7 +119,6 @@
                   </div>
 
                   <!-- Regular Action Button -->
-                  <!-- ✅ Added *ngIf with visible support -->
                   <button *ngIf="!hasActionComponent(action) && (action.visible ? action.visible(row) : true)"
                     mat-menu-item (click)="onRowActionAndClose(action, row)"
                     [class]="'btn-' + (action.color || 'primary')">

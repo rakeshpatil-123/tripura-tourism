@@ -72,15 +72,46 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                 loadComponent: () =>
                     import('./nav-pages/investor-facilitation-cell/investor-facilitation-cell.component').then(m => m.InvestorFacilitationCellComponent)
             },
-            {
+                   {
                 path: 'central-inspection-system',
                 loadComponent: () =>
                     import('./nav-pages/central-inspection-system/central-inspection-system.component').then(m => m.CentralInspectionSystemComponent)
             },
+         
             {
                 path: 'mis-reports',
                 loadComponent: () =>
                     import('./nav-pages/mis-reports/mis-reports.component').then(m => m.MisReportsComponent)
+            },
+            {
+                path: 'grievance',
+                loadComponent: () =>
+                    import('./nav-pages/grievance/grievance.component').then(m => m.GrievanceComponent)
+            },
+            {
+                path: 'queries',
+                loadComponent: () =>
+                    import('./nav-pages/queries/queries.component').then(m => m.QueriesComponent)
+            },
+            {
+                path: 'incentive-reports',
+                loadComponent: () =>
+                    import('./nav-pages/incentive-report/incentive-report.component').then(m => m.IncentiveReportComponent)
+            },
+            {
+                path: 'central-inspection-agency',
+                loadComponent: () =>
+                    import('./nav-pages/central-inspection-agency/central-inspection-agency.component').then(m => m.CentralInspectionAgencyComponent)
+            },
+            {
+                path: 'online-single-window-report',
+                loadComponent: () =>
+                    import('./nav-pages/online-single-window-report/online-single-window-report.component').then(m => m.OnlineSingleWindowReportComponent)
+            },
+            {
+                path: 'registration-report',
+                loadComponent: () =>
+                    import('./nav-pages/registration-report/registration-report.component').then(m => m.RegistrationReportComponent)
             },
             {
                 path: 'land-availability',
