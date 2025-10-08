@@ -143,15 +143,25 @@ export class ServicesComponent {
     }
   }
 
-  onApply(row: any): void {
-    console.log('Applying for service:', row.application_status);
-    this.router.navigate(['dashboard/service-application', row.id],{
-    queryParams: {
-      application_status: row.application_status, 
-    },
-    
-  });
+onApply(row: any): void {
+  console.log('Applying for service:', row);
+
+  if (row.service_mode === 'third_party' ) {
+    let url = row.third_party_portal_name.trim();
+
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url; 
+    }
+
+    window.open(url, '_blank');
+  } else {
+    this.router.navigate(['dashboard/service-application', row.id], {
+      queryParams: {
+        application_status: row.application_status,
+      },
+    });
   }
+}
 
   handleRowAction(event: any): void {
     console.log('Row action emitted:', event);

@@ -338,7 +338,6 @@ loadDefaultValues(): void {
   }
 
 isFieldReadonly(questionId: number): boolean {
-  // Only log once to avoid spam
   const isReadonly = !!this.readonlyFields[questionId];
   return isReadonly;
 }
@@ -364,7 +363,6 @@ isFieldReadonly(questionId: number): boolean {
         const label = question.question_label;
         const control = this.serviceForm.get(invalidControlKey);
 
-        // Use backend error message if available
         if (question.validation_rule?.errorMessage) {
           const backendMsg = question.validation_rule.errorMessage;
 
@@ -374,7 +372,6 @@ isFieldReadonly(questionId: number): boolean {
             errorMessage = `${label}: ${backendMsg}`;
           }
         }
-        // Handle required field errors FIRST
         else if (control?.hasError('required')) {
           if (question.question_type === 'radio') {
             errorMessage = `Please select ${label}`;
@@ -390,7 +387,6 @@ isFieldReadonly(questionId: number): boolean {
             errorMessage = `${label} is required.`;
           }
         }
-        // Handle minlength for checkbox
         else if (control?.hasError('minlength')) {
           const requiredLength =
             control.errors?.['minlength']?.requiredLength;
@@ -400,7 +396,6 @@ isFieldReadonly(questionId: number): boolean {
             errorMessage = `${label} must be at least ${requiredLength} characters.`;
           }
         }
-        // Handle maxlength for checkbox
         else if (control?.hasError('maxlength')) {
           const requiredLength =
             control.errors?.['maxlength']?.requiredLength;
@@ -424,7 +419,6 @@ isFieldReadonly(questionId: number): boolean {
     return;
   }
 
-  // Build application_data object
   const applicationData: { [key: string]: any } = {};
   
   const raw = this.serviceForm.getRawValue();
@@ -434,33 +428,28 @@ isFieldReadonly(questionId: number): boolean {
     if (question) {
       let value = raw[key];
 
-      // Format date for submission
       if (question.question_type === 'date' && value instanceof Date) {
         value = value.toISOString().split('T')[0]; // YYYY-MM-DD
       }
 
-      // File: send as null or filename
       if (question.question_type === 'file') {
         value = value ? value.name : null;
       }
 
-      // Checkbox: send as comma-separated string
       if (question.question_type === 'checkbox') {
         value = Array.isArray(value) ? value.join(', ') : value;
       }
 
-      // Add to application data with question ID as key
       applicationData[key] = value;
     }
   });
 
   const payload = {
-    user_id: Number(userId), // Convert to number if needed
+    user_id: Number(userId), 
     service_id: this.serviceId,
     application_data: applicationData
   };
 
-  // console.log(' Submission Payload:', payload);
 
   this.apiService
     .getByConditions(payload, 'api/user/service-application-store')

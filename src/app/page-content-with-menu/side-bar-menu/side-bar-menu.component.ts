@@ -108,7 +108,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       id: 'common-application-form',
       title: 'Common Application Form',
-      icon: 'track_changes',
+      icon: 'assignment',
       route: '/dashboard/caf',
       roles: ['individual', 'user', 'moderator', 'guest'],
     },
@@ -122,7 +122,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       id: 'incentive',
       title: 'Incentive',
-      icon: 'assessment',
+      icon: 'card_giftcard',
       roles: ['individual'],
       children: [
         {
@@ -158,28 +158,28 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       id: 'Upload Existing Licence',
       title: 'Upload Existing Licence',
-      icon: 'dynamic_form',
+      icon: 'chrome_reader_mode',
       route: '/dashboard/upload-existing-licence',
       roles: ['individual',],
     },
     {
       id: 'Renewal List',
       title: 'Renewal List',
-      icon: 'dynamic_form',
+      icon: 'description',
       route: '/dashboard/renewal-list',
       roles: ['individual',],
     },
     {
       id: 'Inspection List',
       title: 'Inspection List',
-      icon: 'dynamic_form',
+      icon: 'receipt',
       route: '/dashboard/inspection-list',
       roles: ['individual'],
     },
     {
       id: 'Application List',
       title: 'Application List',
-      icon: 'dynamic_form',
+      icon: 'list_alt',
       route: '/dashboard/application-list',
       roles: ['individual',],
     },
@@ -208,7 +208,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       id: 'User',
       title: 'Profile',
-      icon: 'dynamic_form',
+      icon: 'person_pin',
       route: '/dashboard/user-profile',
       roles: ['admin', 'individual', 'department',],
     },

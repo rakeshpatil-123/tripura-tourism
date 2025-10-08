@@ -343,6 +343,23 @@ $bg-dark: #ffffff;
   }
 }
 
+.val{
+  color: #003c5b;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+::ng-deep .submenu-link:hover {
+ background: #ff990083 !important;
+    color: #000000 !important;
+    font-weight: 700;
+}
+
+::ng-deep .submenu-link.active[_ngcontent-ng-c934965871] {
+   background: #ff990083 !important;
+    color: #000000 !important;
+    font-weight: 700;
+  }
 // Collapsed State
 .sidebar.collapsed {
   .nav-link {

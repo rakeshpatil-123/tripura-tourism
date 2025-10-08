@@ -5,37 +5,37 @@
 
   <div class="cards">
     <!-- GRIEVANCE -->
-    <div class="card orange">
+    <div class="card orange" (click)="navigateTo('page/grievance')" >
       <fa-icon icon="exclamation-triangle" class="card-icon"></fa-icon>
       GRIEVANCE
     </div>
 
     <!-- QUERIES -->
-    <div class="card blue">
+    <div class="card blue" (click)="navigateTo('page/queries')" >
       <fa-icon icon="search" class="card-icon"></fa-icon>
       QUERIES
     </div>
 
     <!-- CENTRAL INSPECTION SYSTEM -->
-    <div class="card yellow">
+    <div class="card yellow" (click)="navigateTo('page/central-inspection-agency')" >
       <fa-icon icon="check-circle" class="card-icon"></fa-icon>
       CENTRAL INSPECTION SYSTEM
     </div>
 
     <!-- INCENTIVE -->
-    <div class="card teal">
+    <div class="card teal" (click)="navigateTo('page/incentive-reports')" >
       <fa-icon icon="dollar-sign" class="card-icon"></fa-icon>
       INCENTIVE
     </div>
 
     <!-- ONLINE SINGLE WINDOW -->
-    <div class="card purple">
+    <div class="card purple" (click)="navigateTo('page/online-single-window-report')" >
       <fa-icon icon="window-maximize" class="card-icon"></fa-icon>
       ONLINE SINGLE WINDOW
     </div>
 
     <!-- REGISTRATION/RENEWAL GRANTED -->
-    <div class="card green">
+    <div class="card green" (click)="navigateTo('page/registration-report')" >
       <fa-icon icon="file-alt" class="card-icon"></fa-icon>
       REGISTRATION/RENEWAL GRANTED
     </div>

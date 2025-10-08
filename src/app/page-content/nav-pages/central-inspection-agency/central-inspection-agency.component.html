@@ -1,0 +1,87 @@
+<!-- central-inspection-agency.component.html -->
+<div class="container-fluid">
+  <div class="row mt-4 justify-content-center">
+    <div class="col-12 col-lg-11">
+      <!-- Breadcrumb -->
+     
+
+      <!-- Header -->
+      <div class="row mt-2 mb-4">
+        <div class="col-md-12">
+          <span class="heading-text">
+            Central
+            <span class="font-weight-bold">
+              Inspection Agency (<span class="red-text-color">*Updated on real time</span>)
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Filters Form -->
+      <form novalidate class="mb-4">
+        <div class="row">
+          <!-- Year -->
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-md-12">
+                <app-ilogi-select
+                  [(ngModel)]="selectedYear"
+                  name="year"
+                  fieldLabel="Year"
+                  [selectOptions]="years"
+                  [placeholder]="'Select'"
+                  [mandatory]="false"
+                >
+                </app-ilogi-select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Month -->
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-md-12">
+                <app-ilogi-select
+                  [(ngModel)]="selectedMonth"
+                  name="month"
+                  fieldLabel="Month"
+                  [selectOptions]="months"
+                  [placeholder]="'Select'"
+                  [mandatory]="false"
+                >
+                </app-ilogi-select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Button -->
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group mt-4">
+                  <button type="button" class="btn green-btn pl-4 pr-4" (click)="onSearch()">
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Results Section -->
+      <div class="row mt-4 mb-5">
+        <div class="col-md-12">
+          <div class="grid-container no-padding-first-last">
+            <app-dynamic-table
+              [data]="tableData"
+              [columns]="columns"
+              [searchable]="false"
+              [showPagination]="false"
+            ></app-dynamic-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

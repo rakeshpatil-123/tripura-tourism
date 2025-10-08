@@ -269,7 +269,7 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
           if (error.error && typeof error.error === 'object') {
             const message = error.error.message;
 
-            if (message === 'Unauthenticated.' || message === 'Unauthorised') {
+            if (message === 'Unauthenticated.' || message === 'Unauthorised' || message === 'Session expired or logged out' || message === 'Session expired due to inactivity') {
               console.warn(
                 'Session expired or invalid. Redirecting to login...'
               );

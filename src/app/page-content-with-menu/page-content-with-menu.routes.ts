@@ -90,6 +90,16 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department', 'individual'] }
       },
       {
+        path: 'eligibility/proforma-questionnaire-view/:proformaId/:schemeId',
+        loadComponent: () =>
+          import('./industrial-user/incentive/proforma-questionnaire-view/proforma-questionnaire-view.component').then(
+            (m) => m.ProformaQuestionnaireViewComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
+      },
+  
+      {
         path: 'user-app-view/:serviceId/:appId',
         loadComponent: () =>
           import('./industrial-user/user-application-view/user-application-view.component').then(

@@ -1,0 +1,133 @@
+<!-- online-single-window-report.component.html -->
+<div class="container-fluid">
+  <div class="row mt-4 justify-content-center">
+    <div class="col-12 col-lg-11">
+    
+
+      <!-- Header -->
+      <div class="row mt-2 mb-4">
+        <div class="col-md-12">
+          <span class="heading-text">
+            <span class="font-weight-bold">
+              Online Single Window (<span class="red-text-color">*Updated on real time</span>)
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Filters Form -->
+      <form novalidate class="mb-4">
+        <div class="row">
+          <!-- Department -->
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-12">
+                <app-ilogi-select
+                  [(ngModel)]="selectedDepartment"
+                  name="department_id"
+                  fieldLabel="Select Department/Organization"
+                  [selectOptions]="departments"
+                  [placeholder]="'Select'"
+                  [mandatory]="true"
+                  (ngModelChange)="onDepartmentChange()"
+                >
+                </app-ilogi-select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Service -->
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-12">
+                <app-ilogi-select
+                  [(ngModel)]="selectedService"
+                  name="noc_id"
+                  fieldLabel="Select Service"
+                  [selectOptions]="services"
+                  [placeholder]="'Select'"
+                  [mandatory]="false"
+                >
+                </app-ilogi-select>
+              </div>
+            </div>
+          </div>
+
+          <!-- From Date -->
+          <div class="col-md-6">
+            <div class="row no-padding-first-last">
+              <div class="col-md-12">
+                <app-ilogi-input-date
+                  [(ngModel)]="fromDate"
+                  name="from_dt"
+                  fieldLabel="From Date"
+                  fieldId="from_dt"
+                  [monthsRange]="24"
+                  [allowFutureDates]="true"
+                  placeholder="DD-MM-YYYY"
+                  [mandatory]="false"
+                  [readonly]="false"
+                >
+                </app-ilogi-input-date>
+              </div>
+            </div>
+          </div>
+
+          <!-- To Date -->
+          <div class="col-md-6">
+            <div class="row no-padding-first-last">
+              <div class="col-md-12">
+                <app-ilogi-input-date
+                  [(ngModel)]="toDate"
+                  name="to_dt"
+                  fieldLabel="To Date"
+                  fieldId="to_dt"
+                  [monthsRange]="24"
+                  [allowFutureDates]="true"
+                  placeholder="DD-MM-YYYY"
+                  [mandatory]="false"
+                  [readonly]="false"
+                >
+                </app-ilogi-input-date>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="row mt-3 no-padding-first-last justify-content-center">
+          <div class="col-md-4">
+            <div class="row no-padding-first-last">
+              <div class="col-md-12">
+                <div class="btns text-center">
+                  <button type="button" class="btn yellow-btn pl-4 pr-4 mr-3" (click)="onReset()">
+                    Reset
+                  </button>
+                  <button type="button" class="btn green-btn pl-4 pr-4" (click)="onSearch()">
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Results Section -->
+      <div class="mb-4">
+        <span class="heder-color">Result</span>
+
+        <!-- Dynamic Table -->
+        <div class="grid-container no-padding-first-last mt-4">
+          <app-dynamic-table
+            [data]="tableData"
+            [columns]="columns"
+            [searchable]="false"
+            [showPagination]="true"
+            [pageSize]="10"
+          ></app-dynamic-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
