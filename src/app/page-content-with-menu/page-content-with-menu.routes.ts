@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { PageContentWithMenuComponent } from './page-content-with-menu.component';
 import { authGuard } from '../guards/guards/auth.guard';
+import { ProformaListComponent } from './proforma-list/proforma-list.component';
 
 export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
   {
@@ -199,6 +200,31 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         loadComponent: () =>
           import('./admin-services/admin-services.component').then(
             (m) => m.AdminServicesComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
+      {
+        path: 'admin-incentive',
+        loadComponent: () =>
+          import('./admin-incentive/admin-incentive.component').then(
+            (m) => m.AdminIncentiveComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
+      {
+        path: 'admin-incentive/:schemeId/proformas',
+        loadComponent: () =>
+          import('./proforma-list/proforma-list.component').then(m => m.ProformaListComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
+      {
+        path: 'admin-incentive/:schemeId/proformas/:proformaId/questions',
+        loadComponent: () =>
+          import('./incentive-questions/incentive-questions.component').then(
+            (m) => m.IncentiveQuestionsComponent
           ),
         canActivate: [authGuard],
         data: { roles: ['admin'] }

@@ -3,11 +3,12 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { SidebarComponent } from "./side-bar-menu/side-bar-menu.component";
+import { MiniFooterComponent } from "../page-template/mini-footer/mini-footer.component";
 
 @Component({
   selector: 'app-page-content-with-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent],
+  imports: [CommonModule, RouterModule, SidebarComponent, MiniFooterComponent],
   templateUrl: './page-content-with-menu.component.html',
   styleUrl: './page-content-with-menu.component.scss'
 })

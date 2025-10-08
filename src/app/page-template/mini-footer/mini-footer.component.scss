@@ -1,14 +1,14 @@
 .main-footer {
   background: #00b2d8; // Updated background color
   color: #d1d5db; // gray-300
-  padding: 1rem 0; // Adjusted padding for mini-footer
+  padding: 1rem 0 1rem 0; // Adjusted padding for mini-footer
   position: relative;
   overflow: hidden;
 }
 
 .footer-bottom {
-  border-top: 1px solid #1f2937; // gray-800
-  padding-top: 1rem; // xl = 2rem
+  // border-top: 1px solid #1f2937; // gray-800
+  // padding-top: 1rem; // xl = 2rem
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -35,7 +35,7 @@
 
       &:hover {
         color: #ffffff; // white
-        text-decoration: underline;
+        // text-decoration: underline;
       }
     }
   }

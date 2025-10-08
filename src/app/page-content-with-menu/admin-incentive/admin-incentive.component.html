@@ -1,0 +1,181 @@
+<p-card class="page-card">
+  <div class="toolbar-row">
+    <div class="toolbar-left">
+      <h2 class="page-title">Incentive Schemes</h2>
+      <p class="subtitle">Create schemes, attach proformas and dynamic forms.</p>
+    </div>
+    <div class="toolbar-right">
+      <button pButton type="button" label="Add New Scheme" icon="pi pi-plus"
+        (click)="showAddSchemeDialog = true"></button>
+    </div>
+  </div>
+
+  <app-dynamic-table [data]="workflowData" [columns]="schemeColumns" [showPagination]="true" [pageSize]="5"
+    [searchable]="true" (rowAction)="onRowAction($event)">
+  </app-dynamic-table>
+</p-card>
+<p-dialog header="Add New Scheme" [(visible)]="showAddSchemeDialog" [modal]="true"
+  [style]="{ width: '720px', maxWidth: '95vw', minHeight: '520px', height: 'auto' }" [draggable]="false"
+  [resizable]="false" [closable]="true" [dismissableMask]="true" styleClass="custom-scheme-dialog">
+  <form [formGroup]="addSchemeForm" (ngSubmit)="onAddScheme()" class="dialog-form">
+    <div class="form-grid">
+      <div class="form-field">
+        <label for="schemeCode">Scheme Code</label>
+        <input type="text" id="schemeCode" formControlName="code" placeholder="Enter Scheme Code" class="p-inputtext" />
+        <small class="error-msg" *ngIf="addSchemeForm.get('code')?.invalid && addSchemeForm.get('code')?.touched">
+          Scheme Code is required
+        </small>
+      </div>
+      <div class="form-field">
+        <label for="schemeTitle">Scheme Title</label>
+        <input type="text" id="schemeTitle" formControlName="title" placeholder="Enter Scheme Title"
+          class="p-inputtext" />
+        <small class="error-msg" *ngIf="addSchemeForm.get('title')?.invalid && addSchemeForm.get('title')?.touched">
+          Scheme Title is required
+        </small>
+      </div>
+
+      <div class="form-field">
+        <label>Policy Start Date</label>
+        <p-datepicker formControlName="policy_start_date" (onSelect)="onStartDateChange()" [showIcon]="true"
+          inputId="policyStartDate" placeholder="dd/mm/yyyy" class="small-datepicker white-text-input" appendTo="body"
+          panelStyleClass="datepicker-above" dateFormat="dd/mm/yy">
+        </p-datepicker>
+        <small class="error-msg"
+          *ngIf="addSchemeForm.get('policy_start_date')?.invalid && addSchemeForm.get('policy_start_date')?.touched">
+          Start Date is required
+        </small>
+      </div>
+
+      <div class="form-field">
+        <label>Policy End Date</label>
+        <p-datepicker formControlName="policy_end_date" [minDate]="startDate" [showIcon]="true" inputId="policyEndDate"
+          placeholder="dd/mm/yyyy" class="small-datepicker white-text-input" appendTo="body"
+          panelStyleClass="datepicker-above" dateFormat="dd/mm/yy">
+        </p-datepicker>
+        <small class="error-msg"
+          *ngIf="addSchemeForm.get('policy_end_date')?.errors?.['required'] && addSchemeForm.get('policy_end_date')?.touched">
+          End Date is required
+        </small>
+        <small class="error-msg"
+          *ngIf="addSchemeForm.get('policy_end_date')?.errors?.['endBeforeStart'] && addSchemeForm.get('policy_end_date')?.touched">
+          End Date cannot be before Start Date
+        </small>
+      </div>
+
+      <div class="form-field card flex flex-col w-full md:w-56">
+        <label for="status" class="dropdown-label">Status</label>
+
+        <p-select [options]="statusOptions" formControlName="status" optionValue="value" optionLabel="name"
+          placeholder="Select Status" class="professional-dropdown" appendTo="body" (onBlur)="statusTouched = true">
+        </p-select>
+
+        <small class="text-danger" *ngIf="addSchemeForm.get('status')?.invalid && statusTouched">
+          Status is required
+        </small>
+      </div>
+
+
+    </div>
+
+    <p-footer>
+      <div class="footer-actions">
+        <button pButton type="button" label="Cancel" class="p-button-text cancel-btn"
+          (click)="showAddSchemeDialog = false"></button>
+        <button pButton type="submit" [label]="isEditMode ? 'Update' : 'Save'" class="save-btn"
+          [disabled]="addSchemeForm.invalid">
+        </button>
+      </div>
+    </p-footer>
+  </form>
+
+</p-dialog>
+<p-dialog header="Add Proforma" [(visible)]="showAddProformaDialog" [modal]="true" [style]="{width: '560px'}">
+  <form [formGroup]="addProformaForm" (ngSubmit)="onAddProforma()">
+    <div class="p-fluid">
+      <div class="p-field">
+        <label>Code</label>
+        <input pInputText formControlName="code" />
+      </div>
+      <div class="p-field">
+        <label>Title</label>
+        <input pInputText formControlName="title" />
+      </div>
+    </div>
+    <p-footer>
+      <button pButton type="button" label="Cancel" class="p-button-text"
+        (click)="showAddProformaDialog = false"></button>
+      <button pButton type="submit" label="Save" [disabled]="addProformaForm.invalid"></button>
+    </p-footer>
+  </form>
+</p-dialog>
+
+
+<p-dialog header="Scheme Details" [(visible)]="showSchemeDetailsDialog" [modal]="true"
+  [style]="{ width: '600px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="true"
+  [dismissableMask]="true" styleClass="scheme-details-dialog animate__animated animate__fadeInDown">
+  <div *ngIf="selectedScheme" class="scheme-details">
+
+    <div class="detail-row">
+      <i class="pi pi-hashtag icon"></i>
+      <label>Scheme ID</label>
+      <span>{{ selectedScheme.id }}</span>
+    </div>
+
+    <div class="detail-row">
+      <i class="pi pi-code icon"></i>
+      <label>Code</label>
+      <span>{{ selectedScheme.code }}</span>
+    </div>
+
+    <div class="detail-row">
+      <i class="pi pi-book icon"></i>
+      <label>Title</label>
+      <span>{{ selectedScheme.title }}</span>
+    </div>
+
+    <div class="detail-row">
+      <i class="pi pi-calendar-plus icon"></i>
+      <label>Policy Start Date</label>
+      <span>{{ selectedScheme.policy_start_date | date: 'dd MMM yyyy' }}</span>
+    </div>
+
+    <div class="detail-row">
+      <i class="pi pi-calendar-minus icon"></i>
+      <label>Policy End Date</label>
+      <span>{{ selectedScheme.policy_end_date | date: 'dd MMM yyyy' }}</span>
+    </div>
+
+    <div class="detail-row">
+      <i class="pi pi-check-circle icon"></i>
+      <label>Status</label>
+      <span [ngClass]="{
+        'status-active': selectedScheme.status === 1 || selectedScheme.status === true,
+        'status-inactive': selectedScheme.status === 0 || selectedScheme.status === false,
+        'status-draft': selectedScheme.status === 2
+      }">
+        {{ selectedScheme.status === 1 || selectedScheme.status === true ? 'Active'
+        : selectedScheme.status === 0 || selectedScheme.status === false ? 'Inactive'
+        : 'Draft' }}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <i class="pi pi-clock icon"></i>
+      <label>Created At</label>
+      <span>{{ selectedScheme.created_at | date: 'dd MMM yyyy, hh:mm a' }}</span>
+    </div>
+
+    <div class="detail-row">
+      <i class="pi pi-refresh icon"></i>
+      <label>Updated At</label>
+      <span>{{ selectedScheme.updated_at | date: 'dd MMM yyyy, hh:mm a' }}</span>
+    </div>
+
+  </div>
+
+  <p-footer>
+    <button pButton label="Close" class="p-button-rounded p-button-secondary" (click)="showSchemeDetailsDialog = false">
+    </button>
+  </p-footer>
+</p-dialog>

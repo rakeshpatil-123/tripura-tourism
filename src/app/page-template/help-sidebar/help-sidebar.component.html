@@ -1,0 +1,135 @@
+<div class="sidebar-overlay" (click)="closeSidebar()"></div>
+
+<div class="sidebar" [class.open]="isOpen">
+  <div class="sidebar-header">
+    <!-- <h3>Get help anytime, anywhere</h3> -->
+    <button class="close-btn" (click)="closeSidebar()" aria-label="Close sidebar">
+      ✕
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <div class="support-modules">
+      <!-- Live Chat Module -->
+      <div class="support-module">
+        <div class="module-header bg-gradient-to-r from-blue-500 to-blue-600">
+          <div class="flex items-center">
+            <div class="mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-white">
+                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Live Chat</h3>
+            </div>
+          </div>
+          <p class="text-white/90 text-sm">Instant support via our AI-powered chatbot</p>
+        </div>
+        <div class="module-body">
+          <div class="text-center">
+            <div class="text-sm text-gray-600 mb-3">24/7 Available</div>
+            <button class="w-full bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors hover:bg-blue-50 hover:text-blue-600" >
+              Start Chat
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone Support Module -->
+      <div class="support-module">
+        <div class="module-header bg-gradient-to-r from-green-500 to-green-600">
+          <div class="flex items-center">
+            <div class="mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-white">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Phone Support</h3>
+            </div>
+          </div>
+          <p class="text-white/90 text-sm">Direct assistance from our investment team</p>
+        </div>
+        <div class="module-body">
+          <div class="text-center">
+            <div class="text-sm text-gray-600 mb-3">Mon-Fri: 9 AM - 6 PM</div>
+            <button class="w-full bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors hover:bg-green-50 hover:text-green-600" >
+              Call Now
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Support Module -->
+      <div class="support-module">
+        <div class="module-header bg-gradient-to-r from-purple-500 to-purple-600">
+          <div class="flex items-center">
+            <div class="mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-white">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Email Support</h3>
+            </div>
+          </div>
+          <p class="text-white/90 text-sm">Send us your queries and questions</p>
+        </div>
+        <div class="module-body">
+          <div class="text-center">
+            <div class="text-sm text-gray-600 mb-3">Response within 4 hours</div>
+            <button class="w-full bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors hover:bg-purple-50 hover:text-purple-600" >
+              Send Email
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visit Office Module -->
+      <div class="support-module">
+        <div class="module-header bg-gradient-to-r from-orange-500 to-orange-600">
+          <div class="flex items-center">
+            <div class="mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-white">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Visit Office</h3>
+            </div>
+          </div>
+          <p class="text-white/90 text-sm">Schedule an in-person meeting</p>
+        </div>
+        <div class="module-body">
+          <div class="text-center">
+            <div class="text-sm text-gray-600 mb-3">By appointment only</div>
+            <button class="w-full bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors hover:bg-orange-50 hover:text-orange-600" >
+              Book Appointment
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Container (hidden by default) -->
+    <div *ngIf="isChatOpen" class="chat-container bg-white rounded-xl shadow-lg border border-gray-100">
+      <div class="chat-header bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-t-xl text-white">
+        <div class="flex justify-between items-center">
+          <h4 class="text-lg font-bold">Live Chat Support</h4>
+          <button class="minimize-btn text-white text-xl" (click)="closeChat()">−</button>
+        </div>
+      </div>
+      <div class="chat-messages p-4">
+        <div class="message bot bg-gray-100 p-3 rounded-lg mb-2">Hello! How can I assist you today?</div>
+      </div>
+      <div class="chat-input p-4 border-t border-gray-200">
+        <div class="flex">
+          <input type="text" [(ngModel)]="userMessage" placeholder="Type your message..." class="flex-1 border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition-colors" (click)="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

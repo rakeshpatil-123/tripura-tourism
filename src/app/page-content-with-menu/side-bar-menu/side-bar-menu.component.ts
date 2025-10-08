@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { GenericService } from '../../_service/generic/generic.service';
+import { HelpService } from '../../_service/help/help.service'; // Adjust path as needed
 
 export interface MenuItem {
   id: string;
@@ -23,7 +24,7 @@ export interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule,],
+  imports: [CommonModule, RouterModule],
   templateUrl: './side-bar-menu.component.html',
   styleUrls: ['./side-bar-menu.component.scss'],
 })
@@ -39,6 +40,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   currentUrl: string = '';
   currentUserType: string = '';
   routerSubscription: Subscription | undefined;
+  
+  // User data
   userName: string = 'User';
   deptName: string = '';
   emailId: string = '';
@@ -48,7 +51,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
   subDivisionUser: string = '';
   districtUser: string = '';
   filteredMenuItems: MenuItem[] = [];
-
   
   auth_person: string = '';
   bin: string = '';
@@ -73,6 +75,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Admin Services',
       icon: 'account_balance',
       route: '/dashboard/admin-services',
+      roles: ['admin'],
+    },
+    {
+      id: 'Incentive',
+      title: 'Incentive',
+      icon: 'military_tech',
+      route: '/dashboard/admin-incentive',
       roles: ['admin'],
     },
     {
@@ -110,8 +119,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/services',
       roles: ['individual', 'department','user', 'moderator', 'guest'],
     },
-
-     {
+    {
       id: 'incentive',
       title: 'Incentive',
       icon: 'card_giftcard',
@@ -133,42 +141,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
         },
       ],
     },
-     {
+    {
       id: 'Departmental services',
       title: 'Departmental Services',
       icon: 'important_devices',
       route: '/dashboard/departmental-services',
       roles: ['department', ],
     },
-  {
+    {
       id: 'all-departmental-applications',
       title: 'All departmental applications',
       icon: 'assignment',
       route: '/dashboard/all-departmental-applications',
       roles: ['department',  ],
     },
-  
-    // {
-    //   id: 'external-tracking',
-    //   title: 'Common Application Form',
-    //   icon: 'track_changes',
-    //   route: '/dashboard/external-services-tracking',
-    //   roles: ['admin', 'user'],
-    // },
-    // {
-    //   id: 'example-form',
-    //   title: 'Application List',
-    //   icon: 'dynamic_form',
-    //   route: '/dashboard/example-form',
-    //   roles: ['admin'],
-    // },
-    // {
-    //   id: 'application-list',
-    //   title: 'Application List',
-    //   icon: 'dynamic_form',
-    //   route: '/dashboard/application-list',
-    //   roles: ['admin'],
-    // },
     {
       id: 'Upload Existing Licence',
       title: 'Upload Existing Licence',
@@ -190,7 +176,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/inspection-list',
       roles: ['individual'],
     },
-
     {
       id: 'Application List',
       title: 'Application List',
@@ -198,7 +183,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/application-list',
       roles: ['individual',],
     },
-   
     {
       id: 'reports',
       title: 'Reports',
@@ -221,7 +205,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         },
       ],
     },
-     {
+    {
       id: 'User',
       title: 'Profile',
       icon: 'person_pin',
@@ -230,7 +214,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private router: Router, private genericService: GenericService) {
+  constructor(
+    private router: Router, 
+    private genericService: GenericService,
+    private helpService: HelpService  // Add HelpService injection
+  ) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
     this.userName = this.genericService.decryptLocalStorageItem('user_name') || 'User';
     this.deptName = localStorage.getItem('deptName') || '';
@@ -242,16 +230,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.blockUser = localStorage.getItem('block') || '';
     this.subDivisionUser = localStorage.getItem('subdivision') || '';
     this.districtUser = localStorage.getItem('district') || '';
-
   }
-
-  
 
   ngOnInit(): void {
     this.currentUrl = this.router.url;
     this.filterMenuItems();
     this.checkSidebarVisibility(this.currentUrl);
-    // Subscribe to router events to track URL changes
+    
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
@@ -268,7 +253,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   private checkSidebarVisibility(url: string): void {
-    // Show sidebar only if URL starts with '/dashboard'
     this.showSidebar = url.startsWith('/dashboard');
   }
 
@@ -298,8 +282,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.expandedSubmenu = submenuId;
       }, 300);
     } else {
-      this.expandedSubmenu =
-        this.expandedSubmenu === submenuId ? null : submenuId;
+      this.expandedSubmenu = this.expandedSubmenu === submenuId ? null : submenuId;
     }
   }
 
@@ -316,6 +299,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
   logout(): void {
     this.genericService.logoutUser(); 
   }
+  
+  // Add method to toggle help sidebar
+  toggleHelp(): void {
+    this.helpService.toggleHelpSidebar();
+  }
+  
   filterMenuItems(): void {
     if (!this.userRole) {
       this.filteredMenuItems = [];
@@ -334,5 +323,4 @@ export class SidebarComponent implements OnInit, OnDestroy {
         item.roles.includes(this.userRole!) || item.children.length > 0
       );
   }
-
 }

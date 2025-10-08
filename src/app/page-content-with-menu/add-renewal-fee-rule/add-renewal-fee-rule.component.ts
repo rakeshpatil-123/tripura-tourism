@@ -76,13 +76,13 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       fee_type: ['calculated', Validators.required],
       fixed_fee: [null],
       question_id: [null, Validators.required],
-      condition_operator: ['', Validators.required],
-      condition_value_start: ['', Validators.required],
+      condition_operator: [''],
+      condition_value_start: [''],
       condition_value_end: [null],
       fixed_calculated_fee: [null],
       per_unit_fee: [null],
-      priority: [1, [Validators.required, Validators.min(1)]],
-      status: [1, Validators.required],
+      priority: [1],
+      status: [1],
     });
   }
 

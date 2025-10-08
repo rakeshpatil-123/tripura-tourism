@@ -52,7 +52,7 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     private genericService: GenericService
   ) {
     this.feeRuleForm = this.fb.group({
-      fee_type: ['calculated', Validators.required],
+      fee_type: ['calculated'],
       question_id: [null],
       condition_operator: [null],
       condition_value_start: [null],
@@ -61,8 +61,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       calculated_fee: [null],
       fixed_calculated_fee: [null],
       per_unit_fee: [null],
-      priority: [1, Validators.required],
-      status: ['1', Validators.required],
+      priority: [1],
+      status: ['1'],
       renewal_cycle_id: [null],
     });
   }
@@ -115,15 +115,15 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
 
     [fixedFee, questionId, condStart, condEnd, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
 
-    if (feeType === 'hardcoded') {
-      fixedFee?.setValidators([Validators.required]);
-    } else {
-      condStart?.setValidators([Validators.required]);
-      if (operator === 'between') condEnd?.setValidators([Validators.required]);
-      calcFee?.setValidators([Validators.min(0)]);
-      fixedCalcFee?.setValidators([Validators.min(0)]);
-      perUnitFee?.setValidators([Validators.min(0)]);
-    }
+    // if (feeType === 'hardcoded') {
+    //   fixedFee?.setValidators([Validators.required]); 
+    // } else {
+    //   condStart?.setValidators([Validators.required]);
+    //   if (operator === 'between') condEnd?.setValidators([Validators.required]);
+    //   calcFee?.setValidators([Validators.min(0)]);
+    //   fixedCalcFee?.setValidators([Validators.min(0)]);
+    //   perUnitFee?.setValidators([Validators.min(0)]);
+    // }
 
     [fixedFee, questionId, condStart, condEnd, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
   }

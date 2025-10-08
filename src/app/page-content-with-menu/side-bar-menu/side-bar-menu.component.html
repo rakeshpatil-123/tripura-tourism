@@ -1,91 +1,85 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed" [class.visible-mobile]="isVisible">
+  <!-- Sidebar Header -->
   <div class="sidebar-header">
     <div class="brand-section" *ngIf="!isCollapsed">
       <div class="brand-logo">
         <span class="brand-name">Swaagat</span>
       </div>
     </div>
-    <button class="toggle-btn" (click)="onToggle.emit()"
+    <button class="toggle-btn" (click)="onToggle.emit()" 
       [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
-      <span class="material-icons">{{ isCollapsed ? 'menu' : 'menu_open' }}</span>
+      <span class="material-icons notranslate">{{ isCollapsed ? 'menu' : 'menu_open' }}</span>
     </button>
   </div>
 
-
-  <!-- <div class="user-profile" *ngIf="!isCollapsed">
+  <!-- User Profile Section -->
+  <div class="user-profile" *ngIf="!isCollapsed">
     <div class="user-info">
-      <div class="user-name"><b>{{ userName | titlecase}} <b *ngIf="currentUserType === 'department'" class="user-email">({{emailId}} )</b></b></div>
-      <div *ngIf="currentUserType === 'department'" class="dept-name"> <b>{{designation | titlecase}},</b> <b> {{deptName}}</b></div>
-      <div *ngIf="currentUserType === 'department'" class="hierarchy-level"> <b> Hierarchy </b>- <b>{{hierarchyLevel | titlecase}} ( {{ hierarchyLevel === 'block' ? blockUser : hierarchyLevel === 'subdivision' ? subDivisionUser : hierarchyLevel === 'district' ? districtUser : 'Tripura'}} )</b></div>
-      <div *ngIf="currentUserType !== 'department'" class="user-role">{{ currentUserType.toUpperCase() }} </div>
-    </div>
-    <div class="user-status">
-      <span class="status-indicator online"></span>
-    </div>
-  </div> -->
-
-
-  <div class="user-profile" *ngIf="!isCollapsed && currentUserType === 'individual'">
-    <div class="user-info">
-      <div class="user-name"><b>{{ auth_person | titlecase}} </b> <span class="val" >({{userName}})</span></div>
-      <div class="user-name"><b>BIN</b> - <span class="val"> {{bin}} </span></div>
-      <!-- <div *ngIf="currentUserType === 'individual'" class="user-role">{{ currentUserType | titlecase }} </div> -->
-
-    </div>
-    <div class="user-status">
-      <span class="status-indicator online"></span>
-    </div>
-  </div>
-  <div class="user-profile" *ngIf="!isCollapsed && currentUserType === 'admin'">
-    <div class="user-info">
-      <div class="user-name"><b>{{ userName | titlecase}} </b></div>
-      <div *ngIf="currentUserType === 'admin'" class="dept-name">  <b>
-          {{deptName}}</b></div>
-    
-      <div *ngIf="currentUserType === 'admin'" class="user-role">{{ currentUserType }} </div>
-
-    </div>
-    <div class="user-status">
-      <span class="status-indicator online"></span>
-    </div>
-  </div>
-
-  <div class="user-profile" *ngIf="!isCollapsed && currentUserType === 'department'">
-    <div class="user-info">
-      <div class="user-name"><b>{{ userName | titlecase}} <b *ngIf="currentUserType === 'department'"
-            class="user-email">({{emailId}} )</b></b></div>
-      <div *ngIf="currentUserType === 'department'" class="dept-name"> <b>{{designation | titlecase}},</b> <b>
-          {{deptName}}</b></div>
-      <div *ngIf="currentUserType === 'department'" class="hierarchy-level"> <b> Hierarchy </b>- <b>{{hierarchyLevel |
-          titlecase}}</b></div>
-      <!-- <div *ngIf="currentUserType === 'department'" class="user-role">{{ currentUserType | titlecase }}</div> -->
+      <!-- Individual User -->
+      <ng-container *ngIf="currentUserType === 'individual'">
+        <div class="user-name">
+          <span class="name">{{ auth_person | titlecase }}</span>
+          <span class="username">({{ userName }})</span>
+        </div>
+        <div class="user-detail">
+          <span class="label">BIN:</span>
+          <span class="value">{{ bin }}</span>
+        </div>
+      </ng-container>
+      
+      <!-- Admin User -->
+      <ng-container *ngIf="currentUserType === 'admin'">
+        <div class="user-name">
+          <span class="name">{{ userName | titlecase }}</span>
+        </div>
+        <div class="user-role">
+          <span class="badge">{{ currentUserType }}</span>
+        </div>
+      </ng-container>
+      
+      <!-- Department User -->
+      <ng-container *ngIf="currentUserType === 'department'">
+        <div class="user-name">
+          <span class="name">{{ userName | titlecase }}</span>
+          <span class="email">({{ emailId }})</span>
+        </div>
+        <div class="user-detail">
+          <span class="label">{{ designation | titlecase }}</span>
+          <span class="value">{{ deptName }}</span>
+        </div>
+        <div class="user-detail">
+          <span class="label">Hierarchy:</span>
+          <span class="value">{{ hierarchyLevel | titlecase }}</span>
+        </div>
+      </ng-container>
     </div>
     <div class="user-status">
       <span class="status-indicator online"></span>
     </div>
   </div>
+
+  <!-- Navigation Menu -->
   <nav class="sidebar-nav">
     <ul class="nav-list">
       <ng-container *ngFor="let item of menuItems">
-
         <ng-container *ngIf="canAccess(item)">
-
+          <!-- Menu Item without Children -->
           <li class="nav-item" *ngIf="!item.children">
             <a class="nav-link" [class.active]="isActive(item.route)" (click)="navigate(item.route)"
               [attr.title]="isCollapsed ? item.title : null">
-              <span class="nav-icon material-icons">{{ item.icon }}</span>
+              <span class="nav-icon material-icons notranslate">{{ item.icon }}</span>
               <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
             </a>
           </li>
 
-
+          <!-- Menu Item with Children -->
           <li class="nav-item" *ngIf="item.children">
             <div class="nav-link has-children" [class.expanded]="expandedSubmenu === item.id"
               [class.active]="hasActiveChild(item)" (click)="toggleSubmenu(item.id)"
               [attr.title]="isCollapsed ? item.title : null">
               <span class="nav-icon material-icons">{{ item.icon }}</span>
               <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
-              <span class="expand-icon material-icons" *ngIf="!isCollapsed">
+              <span class="expand-icon material-icons notranslate" *ngIf="!isCollapsed">
                 {{ expandedSubmenu === item.id ? 'expand_less' : 'expand_more' }}
               </span>
             </div>
@@ -93,8 +87,8 @@
               <li class="submenu-item" *ngFor="let child of item.children">
                 <ng-container *ngIf="canAccess(child)">
                   <a class="submenu-link" [class.active]="isActive(child.route)" (click)="navigate(child.route)">
-                    <span class="submenu-icon material-icons">{{ child.icon }}</span>
-                    <span class="submenu-text">{{ child.title }}</span>
+                    <span class="submenu-icon material-icons notranslate">{{ child.icon }}</span>
+                    <span class="submenu-text notranslate">{{ child.title }}</span>
                   </a>
                 </ng-container>
               </li>
@@ -105,26 +99,17 @@
     </ul>
   </nav>
 
-
-  <div class="sidebar-footer" *ngIf="!isCollapsed">
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
     <div class="footer-actions">
-      <button class="footer-btn" title="Help & Support">
-        <span class="material-icons">help</span>
-        <span>Help</span>
+      <button class="footer-btn" title="Help & Support" (click)="toggleHelp()">
+        <span class="material-icons notranslate">help</span>
+        <span *ngIf="!isCollapsed">Help</span>
       </button>
       <button class="footer-btn" title="Logout" (click)="logout()">
-        <span class="material-icons">logout</span>
-        <span>Logout</span>
+        <span class="material-icons notranslate">logout</span>
+        <span *ngIf="!isCollapsed">Logout</span>
       </button>
     </div>
-  </div>
-
-  <div class="sidebar-footer collapsed" *ngIf="isCollapsed">
-    <button class="footer-btn-collapsed" title="Help & Support">
-      <span class="material-icons">help</span>
-    </button>
-    <button class="footer-btn-collapsed" title="Logout">
-      <span class="material-icons">logout</span>
-    </button>
   </div>
 </aside>
