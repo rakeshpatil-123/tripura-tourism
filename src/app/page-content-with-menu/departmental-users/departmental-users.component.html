@@ -45,7 +45,7 @@
           <div class="header-wrapper">Subdivision</div>
         </th>
         <th>
-          <div class="header-wrapper">Ulb</div>
+          <div class="header-wrapper">ULB/Block</div>
         </th>
         <th>
           <div class="header-wrapper">Ward</div>
@@ -54,13 +54,10 @@
           <div class="header-wrapper">Department</div>
         </th>
         <th>
-          <div class="header-wrapper">Address</div>
-        </th>
-        <th>
-          <div class="header-wrapper">City</div>
-        </th>
-        <th>
           <div class="header-wrapper">Status</div>
+        </th>
+        <th>
+          <div class="header-wrapper">Action</div>
         </th>
       </tr>
     </ng-template>
@@ -97,16 +94,17 @@
         <td pTooltip="{{ user.department_name }}" tooltipPosition="right">
           {{ user.department_name || '----' }}
         </td>
-        <td pTooltip="{{ user.registered_enterprise_address }}" tooltipPosition="right">
-          {{ user.registered_enterprise_address || '----' }}
+        <td>
+          <form [formGroup]="userForms[user.id]">
+            <p-toggleswitch formControlName="status" (onChange)="confirmStatusChange($event, user)">
+            </p-toggleswitch>
+          </form>
         </td>
-        <td pTooltip="{{ user.registered_enterprise_city }}" tooltipPosition="right">
-          {{ user.registered_enterprise_city || '----' }}
-        </td>
-        <td pTooltip="{{ user.status }}" tooltipPosition="right">
-          <span [ngClass]="{'status-active': user.status === 'active', 'status-inactive': user.status !== 'active'}">
-            {{ user.status ? (user.status | titlecase) : '----' }}
-          </span>
+        <td class="text-center">
+          <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-sm edit-btn"
+            pTooltip="Edit User" tooltipPosition="left" (click)="editUser(user)">
+            <span class="ml-2 font-medium hidden sm:inline">Edit</span>
+          </button>
         </td>
       </tr>
     </ng-template>
@@ -125,12 +123,10 @@
 
   </p-table>
 </div>
-
-<p-dialog header="Register Departmental User" [(visible)]="displayDialog" [modal]="true" [closable]="true"
-  [style]="{width: '55vw'}" [draggable]="false" [resizable]="false" [baseZIndex]="10000" [dismissableMask]="true"
-  [contentStyle]="{'border-radius': '12px'}" (onHide)="closeDialog()" class="custom-dialog">
-
-  <app-registration [sourcePage]="'departmental-users'" (registrationSuccess)="handleRegistrationSuccess()">
+<p-dialog [header]="selectedUser ? 'Edit Departmental User' : 'Register Departmental User'" [(visible)]="displayDialog"
+ [modal]="true" [closable]="true" [style]="{width: '55vw'}" [draggable]="false" [resizable]="false" [baseZIndex]="10000" [dismissableMask]="true" [contentStyle]="{'border-radius': '12px'}" (onHide)="closeDialog()" class="custom-dialog">
+ <ng-container *ngIf="displayDialog">
+  <app-registration [sourcePage]="'departmental-users'" [editData]="selectedUser" [editMode]="editMode"(registrationSuccess)="handleRegistrationSuccess()">
   </app-registration>
-
+  </ng-container>
 </p-dialog>

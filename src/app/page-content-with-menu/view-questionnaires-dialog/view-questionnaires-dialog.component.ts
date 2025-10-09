@@ -63,6 +63,8 @@ export class ViewQuestionnairesDialogComponent implements OnInit {
     'group_label',
     'display_order',
     'display_width',
+    'created_by',
+    'updated_by',
     'actions',
   ];
 
@@ -145,5 +147,16 @@ export class ViewQuestionnairesDialogComponent implements OnInit {
           },
         });
     }
+  }
+  downloadPdf(pdfUrl: string): void {
+    if (!pdfUrl) return;
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.target = '_blank';
+    link.download = pdfUrl.split('/').pop() || 'template_format.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.genericService.openSnackBar('Template Format downloaded successfully.', 'Success');
   }
 }

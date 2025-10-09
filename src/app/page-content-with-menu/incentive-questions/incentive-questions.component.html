@@ -20,10 +20,10 @@
 
   <p-dialog [(visible)]="showQuestionDialog" [modal]="true"
     [style]="{ width: '760px', maxWidth: '95vw', minHeight: '600px', height: 'auto' }" [draggable]="false"
-    [resizable]="false" [closable]="false" [dismissableMask]="true" styleClass="custom-proforma-dialog">
+    [resizable]="false" [closable]="false" (onHide)="onDialogClose()" [dismissableMask]="true" styleClass="custom-proforma-dialog">
     <div class="dialog-header">
       <h2>{{ isEditMode ? 'Edit Question' : 'Add Question' }}</h2>
-      <button class="btn-close" (click)="showQuestionDialog = false">
+      <button class="btn-close" (click)="closeDialog()" (click)="showQuestionDialog = false">
         ✖
       </button>
     </div>
@@ -77,8 +77,8 @@
         <div class="form-group">
           <label>Required</label>
           <select formControlName="required" class="form-control">
-            <option [value]="true">Yes</option>
-            <option [value]="false">No</option>
+            <option [value]="'yes'">Yes</option>
+            <option [value]="'no'">No</option>
           </select>
         </div>
         <div class="form-group">
@@ -112,6 +112,58 @@
         </div>
 
 
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Source Table</label>
+          <p-select [options]="sourceTables" formControlName="default_source_table" optionLabel="name" optionValue="value"
+            placeholder="Select Source Table" (onChange)="onTableChange($event.value)" class="w-full"></p-select>
+        </div>
+        <div class="form-group">
+          <label>Source Column</label>
+          <p-select [options]="availableColumnsDropdown" formControlName="default_source_column" optionLabel="name"
+            optionValue="value" placeholder="Select Source Column" (click)="onSourceColumnClick()" [appendTo]="'body'"
+            [style]="{ width: '100%' }" class="w-full cursor-pointer"></p-select>
+          <small class="text-red-500" *ngIf="showSourceHint">
+            Please select a Source Table first to choose a Source Column.
+          </small>
+        </div>
+      
+      </div>
+      <div class="form-row claim-section">
+        <div class="form-group toggle-group">
+          <label>Is Claim?</label>
+          <p-toggleswitch formControlName="is_claim" [style]="{ width: '60px', height: '28px' }" onLabel="Yes"
+            offLabel="No"></p-toggleswitch>
+        </div>
+        <div class="form-group">
+          <label>Claim Per Unit</label>
+          <input pInputText type="number" formControlName="claim_per_unit" placeholder="e.g., 100"
+            (click)="onClaimFieldClick()" [readonly]="!questionForm.get('is_claim')?.value"
+            [style.cursor]="questionForm.get('is_claim')?.value ? 'text' : 'pointer'"
+            [class.disabled-field]="!questionForm.get('is_claim')?.value" />
+          <small class="text-red-500" *ngIf="showClaimHint">
+            Turn on 'Is Claim?' to enter value.
+          </small>
+          <small class="text-red-500"
+            *ngIf="questionForm.get('is_claim')?.value && !questionForm.get('claim_per_unit')?.valid">
+            Enter a valid claim amount.
+          </small>
+        </div>
+        <div class="form-group">
+          <label>Claim Percentage (%)</label>
+          <input pInputText type="number" formControlName="claim_percentage" placeholder="e.g., 25"
+            (click)="onClaimFieldClick()" [readonly]="!questionForm.get('is_claim')?.value"
+            [style.cursor]="questionForm.get('is_claim')?.value ? 'text' : 'pointer'"
+            [class.disabled-field]="!questionForm.get('is_claim')?.value" />
+          <small class="text-red-500" *ngIf="showClaimHint">
+            Turn on 'Is Claim?' to enter value.
+          </small>
+          <small class="text-red-500"
+            *ngIf="questionForm.get('is_claim')?.value && (questionForm.get('claim_percentage')?.value < 0 || questionForm.get('claim_percentage')?.value > 100)">
+            Must be between 0 and 100.
+          </small>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -337,22 +389,128 @@
         Max Size (MB): {{selectedQuestion.upload_rule.max_size_mb}}
       </span>
     </div>
-    <div class="preview-section" *ngIf="selectedQuestion.default_value || selectedQuestion.question_type">
-      <h4>Preview:</h4>
-      <ng-container [ngSwitch]="selectedQuestion.question_type">
-
-        <img *ngSwitchCase="'image'" [src]="selectedQuestion.default_value" class="preview-img" />
-        <video *ngSwitchCase="'video'" [src]="selectedQuestion.default_value" controls class="preview-video"></video>
-        <audio *ngSwitchCase="'audio'" [src]="selectedQuestion.default_value" controls class="preview-audio"></audio>
-        <a *ngSwitchCase="'file'" [href]="selectedQuestion.default_value" target="_blank" class="preview-file">
-          Download File
-        </a>
-        <span *ngSwitchDefault>{{selectedQuestion.default_value}}</span>
+<div class="preview-section" *ngIf="selectedQuestion && selectedQuestion.question_type">
+  <h4>Preview:</h4>
+  <div class="question-label" *ngIf="selectedQuestion.question_label">
+    <strong>{{ selectedQuestion.question_label }}</strong>
+  </div>
+  <ng-container [ngSwitch]="selectedQuestion.question_type">
+    <ng-container *ngSwitchCase="'image'">
+      <img *ngIf="selectedQuestion.default_value" [src]="selectedQuestion.default_value" class="preview-img" />
+      <span *ngIf="!selectedQuestion.default_value">No Image Uploaded</span>
+    </ng-container>
+  
+    <ng-container *ngSwitchCase="'video'">
+      <video *ngIf="selectedQuestion.default_value" [src]="selectedQuestion.default_value" controls class="preview-video">
+        Your browser does not support the video tag.
+      </video>
+      <span *ngIf="!selectedQuestion.default_value">No Video Uploaded</span>
+    </ng-container>
+  
+    <ng-container *ngSwitchCase="'audio'">
+      <audio *ngIf="selectedQuestion.default_value" [src]="selectedQuestion.default_value" controls class="preview-audio">
+        Your browser does not support the audio tag.
+      </audio>
+      <span *ngIf="!selectedQuestion.default_value">No Audio Uploaded</span>
+    </ng-container>
+  
+    <ng-container *ngSwitchCase="'file'">
+      <a href="#" target="_blank" rel="noopener noreferrer" class="preview-file" (click)="openDummyPdf($event)">
+        Download File
+      </a>
+    </ng-container>
+  
+    <ng-container *ngSwitchCase="'text'">
+      <span class="preview-text" *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Value</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'textarea'">
+      <span class="preview-textarea" *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Value</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'number'">
+      <span *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Value</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'email'">
+      <span *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Email Provided</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'password'">
+      <span *ngIf="selectedQuestion.default_value">******</span>
+      <span *ngIf="!selectedQuestion.default_value">No Password</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'tel'">
+      <span *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Phone Number</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'url'">
+      <span *ngIf="selectedQuestion.default_value">
+        <a [href]="selectedQuestion.default_value" target="_blank">{{selectedQuestion.default_value}}</a>
+      </span>
+      <span *ngIf="!selectedQuestion.default_value">No URL Provided</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'select'">
+      <span *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Option Selected</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'radio'">
+      <span *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Option Selected</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'checkbox'">
+      <span *ngIf="selectedQuestion.default_value">{{selectedQuestion.default_value}}</span>
+      <span *ngIf="!selectedQuestion.default_value">No Option Selected</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'switch'">
+      <span *ngIf="selectedQuestion.default_value !== undefined">
+        {{selectedQuestion.default_value ? 'ON' : 'OFF'}}
+      </span>
+      <span *ngIf="selectedQuestion.default_value === undefined">Not Set</span>
+    </ng-container>
+  
+    <ng-container *ngSwitchCase="'range'">
+      <input type="range" min="0" max="100" [value]="selectedQuestion.default_value || 0" disabled />
+      <span>{{selectedQuestion.default_value || 0}}</span>
+    </ng-container>
+  
+    <ng-container *ngSwitchCase="'color'">
+      <div *ngIf="selectedQuestion.default_value" class="color-preview">
+        <div class="color-box" [style.background]="selectedQuestion.default_value"></div>
+        {{selectedQuestion.default_value}}
+      </div>
+      <span *ngIf="!selectedQuestion.default_value">No Color Selected</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'rating'">
+      <span *ngIf="selectedQuestion.default_value">⭐ {{selectedQuestion.default_value}} / 5</span>
+      <span *ngIf="!selectedQuestion.default_value">Not Rated</span>
+    </ng-container>
+  
+    <ng-container *ngSwitchCase="'signature'">
+      <span>[Signature Preview]</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'location'">
+      <span>[Location Preview]</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'richtext'">
+      <span [innerHTML]="selectedQuestion.default_value || 'No Content'"></span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'matrix'">
+      <span>[Matrix Preview]</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'likert'">
+      <span>[Likert Scale Preview]</span>
+    </ng-container>
+    <ng-container *ngSwitchCase="'captcha'">
+      <span>[Captcha Preview]</span>
+    </ng-container>
+  
+    <ng-container *ngSwitchDefault>
+      <span>{{selectedQuestion.default_value || 'No Preview Available'}}</span>
+    </ng-container>
       </ng-container>
     </div>
-
   </div>
-
   <p-footer>
     <button pButton label="Close" class="p-button-rounded p-button-secondary"
       (click)="showQuestionDetailsDialog = false"></button>

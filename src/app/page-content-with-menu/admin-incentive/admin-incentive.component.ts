@@ -267,7 +267,7 @@ export class AdminIncentiveComponent implements OnInit {
       case 'View':
         this.openProformas(event.row);
         break;
-      case 'Add Proforma':
+      case 'Add Eligibility/Claim':
         this.openProformas(event.row);
         this.showAddProformaDialog = true;
         break;
@@ -464,7 +464,7 @@ export class AdminIncentiveComponent implements OnInit {
         this.msg.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to add proforma.'
+          detail: 'Failed to Add Eligibility/Claim.'
         });
       }
     });

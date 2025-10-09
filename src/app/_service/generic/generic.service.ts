@@ -318,9 +318,10 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   openSnackBar(message: string, action: string): void {
     const panelClass = action === 'Success' ? 'snack-bar-cumtom-style' : 'red';
     this.snackBar.open(message, action, {
-      duration: 4000,
+      duration: 3000,
       verticalPosition: 'top',
-      panelClass: [panelClass],
+      horizontalPosition: 'center',
+      panelClass: [panelClass, 'snack-bar-global']
     });
   }
 
@@ -1524,6 +1525,55 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
     return this.http.post<any>(
       `${this.baseUrl}/api/admin/incentive/proforma-questionnaire-delete`,
       { id: incentiveQuestionId },
+      { headers: this.getHeaders() }
+    );
+  }
+  createThirdPartyParams(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/store-service-third-party-params`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  updateThirdPartyParams(payload: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/store-service-third-party-params`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
+  viewThirdPartyParams(thirdPartyId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-third-party-params-view`,
+      { service_id: thirdPartyId },
+      { headers: this.getHeaders() }
+    );
+  }
+  deleteThirdPartyParams(thirdPartyId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/service-third-party-params-delete`,
+      { service_id: thirdPartyId },
+      { headers: this.getHeaders() }
+    );
+  }
+  getSingleDepartmentalUserDetails(deptUserId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/get-department-user-details`,
+      {
+        id: deptUserId
+      },
+      { headers: this.getHeaders() }
+    );
+  }
+  updateBusinessUserStatus(userId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/update-user-status/${userId.id}`, {},
+      { headers: this.getHeaders() }
+    );
+  }
+  updateDepartmentalUserStatus(userId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/update-user-status/${userId.id}`, {},
       { headers: this.getHeaders() }
     );
   }

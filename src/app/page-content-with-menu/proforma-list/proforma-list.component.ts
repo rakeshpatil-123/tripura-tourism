@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GenericService } from '../../_service/generic/generic.service';
 import { LoaderService } from '../../_service/loader/loader.service';
@@ -11,7 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
-
+import { MultiSelectModule, MultiSelect } from 'primeng/multiselect';
 @Component({
   selector: 'app-proforma-list',
   standalone: true,
@@ -22,7 +22,8 @@ import { finalize } from 'rxjs';
     ButtonModule,
     DialogModule,
     InputTextModule,
-    DynamicTableComponent
+    DynamicTableComponent,
+    MultiSelectModule
   ],
   templateUrl: './proforma-list.component.html',
   styleUrls: ['./proforma-list.component.scss']
@@ -33,7 +34,7 @@ export class ProformaListComponent implements OnInit {
   private genericService = inject(GenericService);
   private loaderService = inject(LoaderService);
   private fb = inject(FormBuilder);
-
+  @ViewChild('ms') ms!: MultiSelect;
   schemeId!: string;
   schemeTitle: string = '';
   proformas: any[] = [];
@@ -46,7 +47,12 @@ export class ProformaListComponent implements OnInit {
   readonly CLAIM_TYPES = [
     { label: 'One Time', value: 'one_time' },
     { label: 'Monthly', value: 'monthly' },
-    { label: 'Quarterly', value: 'quarterly' }
+    { label: 'Quarterly', value: 'quarterly' },
+    { label: 'Half Yearly', value: 'half_yearly' },
+    { label: 'Annually', value: 'annually' },
+    { label: 'Biennially', value: 'biennially' },
+    { label: 'Triennially', value: 'triennially' },
+    { label: 'Quinquennially', value: 'quinquennially' }
   ];
   // Dialog states
   showProformaDialog = false;
@@ -55,7 +61,10 @@ export class ProformaListComponent implements OnInit {
   editingProformaId: string | null = null;
   selectedProforma: any;
   proformaFields: { label: string; value: any; class?: string }[] = [];
-
+  selectedProformas: any[] = [];
+  selectAll: boolean = false;
+  selectedDependsProformas: any[] = [];
+  proformaOptions: any[] = [];  
 
   // Form
   proformaForm: FormGroup = this.fb.group({
@@ -65,7 +74,9 @@ export class ProformaListComponent implements OnInit {
     claim_type: [null],
     description: [''],
     display_order: [1, Validators.required],
-    status: [1]
+    status: [1],
+    depends_on_proforma_ids: [[]],
+    max_claim_count: [null, [Validators.min(1)]]
   });
 
   columns: TableColumn[] = [
@@ -125,20 +136,28 @@ export class ProformaListComponent implements OnInit {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.proformas = res.data.map((p: any) => ({
             ...p,
+            label: p.title,
+            value: p.id,
             statusLabel: p.status === 1 ? 'Active' : 'Inactive',
             statusColor: p.status === 1 ? 'green' : 'red'
           }));
+          this.proformaOptions = res.data.map((p: any) => ({
+            name: p.title,
+            code: p.id
+          }));
         } else {
           this.proformas = [];
+          this.proformaOptions = [];
         }
       },
       error: () => {
         this.loading = false;
         this.loaderService.hideLoader();
         this.proformas = [];
+        this.proformaOptions = [];
       }
     });
-  }
+}
 
   viewProforma(payload: any) {
     this.loaderService.showLoader();
@@ -185,7 +204,9 @@ export class ProformaListComponent implements OnInit {
         claim_type: p.claim_type,
         description: p.description,
         display_order: p.display_order,
-        status: p.status === 1 ? true : false
+        status: p.status === 1 ? true : false,
+        depends_on_proforma_ids: p.depends_on_proforma_ids || [],
+        max_claim_count: p.max_claim_count || null
       });
     } else {
       this.isEditMode = false;
@@ -193,7 +214,8 @@ export class ProformaListComponent implements OnInit {
       this.proformaForm.reset({
         proforma_type: 'eligibility',
         display_order: 1,
-        status: 1
+        status: 1,
+        depends_on_proforma_ids: []
       });
     }
     this.showProformaDialog = true; // opens the dialog
@@ -225,11 +247,16 @@ export class ProformaListComponent implements OnInit {
       code: fv.code,
       title: fv.title,
       proforma_type: fv.proforma_type,
-      claim_type: fv.claim_type,
       description: fv.description,
       display_order: fv.display_order,
-      status: fv.status === 'false' ? 0 : 1
+      status: fv.status === 'false' ? 0 : 1,
+      depends_on_proforma_ids: fv.depends_on_proforma_ids || [],
+      max_claim_count: fv.max_claim_count
     };
+    if (fv.proforma_type === 'claim') {
+      payload.claim_type = fv.claim_type;
+      payload.max_claim_count = fv.max_claim_count || null;
+    }
     if (this.isEditMode && this.editingProformaId) {
       payload.proforma_id = this.editingProformaId;
     }
@@ -252,9 +279,19 @@ export class ProformaListComponent implements OnInit {
         this.showProformaDialog = false;
         this.loadProformas();
       },
-      error: () => {
-        this.loaderService.hideLoader();
-        Swal.fire('Error', `Failed to ${this.isEditMode ? 'update' : 'create'} proforma.`, 'error');
+      error: (err: any) => {
+        this.showProformaDialog = false;
+        let errorMessage = `Failed to ${this.isEditMode ? 'update' : 'create'} proforma.`;
+        if (err?.error?.errors) {
+          const messages = Object.values(err.error.errors)
+            .flat()
+            .join('\n');
+          errorMessage = messages;
+        } else if (err?.error?.message) {
+          errorMessage = err.error.message;
+        }
+
+        Swal.fire('Error', errorMessage, 'error');
       }
     });
   }
@@ -285,6 +322,7 @@ export class ProformaListComponent implements OnInit {
             this.loadProformas();
           },
           error: () => {
+            this.showProformaDialog = false;
             this.loaderService.hideLoader();
             Swal.fire('Error', 'Failed to delete proforma.', 'error');
           }
@@ -312,5 +350,15 @@ export class ProformaListComponent implements OnInit {
         console.warn('Unknown action:', action);
     }
   }
-
+  onSelectAllChange(event: any) {
+    this.selectedProformas = event.checked ? [...this.ms.visibleOptions()] : [];
+    this.selectAll = event.checked;
+    this.proformaForm.patchValue({ depends_on_proforma_ids: this.selectedProformas.map(p => p.value) });
+  }
+  onChangeSelectedProformas() {
+    this.proformaForm.patchValue({ depends_on_proforma_ids: this.selectedProformas.map(p => p.value) });
+  }
+  goToSchemes(): void {
+    this.router.navigate(['/dashboard/admin-incentive']);
+  }
 }

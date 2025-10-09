@@ -63,7 +63,8 @@ export class AddServiceDialogComponent implements OnInit {
   serviceForm: FormGroup;
   departments : any[] = [];
   nocTypes = Object.values(NocType);
-
+  allServices: any[] = [];
+  loadingServices = false;
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddServiceDialogComponent>,
@@ -87,10 +88,6 @@ export class AddServiceDialogComponent implements OnInit {
       generated_id_format: [''],
       show_letter_date: [true],
 
-      label_noc_date: [''],
-      label_noc_doc: [''],
-      label_noc_no: [''],
-      label_valid_till: [''],
 
       show_valid_till: [true],
       auto_renewal: [false],
@@ -102,11 +99,19 @@ export class AddServiceDialogComponent implements OnInit {
       nsw_license_id: [''],
       status: [1, Validators.required],
       allow_repeat_application: [true],
+      service_mode: ['native'],
+      third_party_portal_name: [''],
+      third_party_redirect_url: [''],
+      third_party_return_url: [''],
+      third_party_status_api_url: [''],
+      third_party_payment_mode: ['unified'],
+      verification_token: [''],
+      is_special: ['no'],
     });
   }
 
   ngOnInit(): void {
-
+    this.loadServices();
     this.getAllDepartmentList();
     
     if (this.data?.id) {
@@ -124,17 +129,11 @@ export class AddServiceDialogComponent implements OnInit {
               noc_payment_type: s.noc_payment_type,
               target_days: s.target_days,
               has_input_form: s.has_input_form === 'yes',
-              depends_on_services: s.depends_on_services,
+              depends_on_services: s.depends_on_services ? (s.depends_on_services) : '',
               generate_id: s.generate_id === 'yes',
               generate_pdf: s.generate_pdf === 'yes',
               show_letter_date: s.show_letter_date === 'yes',
               generated_id_format: s.generated_id_format,
-              label_noc_date: s.label_noc_date,
-              label_noc_doc: s.label_noc_doc,
-              label_noc_no: s.label_noc_no,
-              label_valid_till: s.label_valid_till
-                ? (s.label_valid_till)
-                : null,
               show_valid_till: s.show_valid_till === 'yes',
               auto_renewal: s.auto_renewal === 'yes',
               external_data_share: s.external_data_share === 'yes',
@@ -143,6 +142,14 @@ export class AddServiceDialogComponent implements OnInit {
               nsw_license_id: s.nsw_license_id,
               status: s.status ?? 1,
               allow_repeat_application: s.allow_repeat_application === 'yes',
+              service_mode: s.service_mode ?? 'native',
+              third_party_portal_name: s.third_party_portal_name,
+              third_party_redirect_url: s.third_party_redirect_url,
+              third_party_return_url: s.third_party_return_url,
+              third_party_status_api_url: s.third_party_status_api_url,
+              third_party_payment_mode: s.third_party_payment_mode,
+              verification_token: s.verification_token,
+              is_special: s.is_special || 'no',
             });
           }
         });
@@ -151,6 +158,34 @@ export class AddServiceDialogComponent implements OnInit {
 
   closeDialog(): void {
     this.dialogRef.close();
+  }
+  loadServices(): void {
+    this.loadingServices = true;
+    this.genericService.getAdminServices().subscribe({
+      next: (res: any) => {
+        if (res.status === 1 && Array.isArray(res.data)) {
+          const mappedServices = res.data.map((item: any) => ({
+            id: item.id,
+            name: item.service_title_or_description,
+            department_name: item.department_name || 'N/A',
+          }));
+          this.allServices = [
+            { id: '', name: 'None', department_name: '' },
+            ...mappedServices,
+          ];
+        } else {
+          this.allServices = [{ id: '', name: 'None', department_name: '' }];
+        }
+        this.loadingServices = false;
+      },
+      error: (err) => {
+        console.error('Error fetching services:', err);
+        this.genericService.openSnackBar('Failed to load services', 'Error');
+        this.loadingServices = false;
+
+        this.allServices = [{ id: '', name: 'None', department_name: '' }];
+      },
+    });
   }
 
   getAllDepartmentList(): void {
@@ -185,13 +220,6 @@ export class AddServiceDialogComponent implements OnInit {
         generate_id: formValue.generate_id ? 'yes' : 'no',
         generate_pdf: formValue.generate_pdf ? 'yes' : 'no',
         show_letter_date: formValue.show_letter_date ? 'yes' : 'no',
-        generated_id_format: formValue.generated_id_format,
-        label_noc_date: formValue.label_noc_date,
-        label_noc_doc: formValue.label_noc_doc,
-        label_noc_no: formValue.label_noc_no,
-        label_valid_till: formValue.label_valid_till
-          ? (formValue.label_valid_till)
-          : null,
         show_valid_till: formValue.show_valid_till ? 'yes' : 'no',
         auto_renewal: formValue.auto_renewal ? 'yes' : 'no',
         external_data_share: formValue.external_data_share ? 'yes' : 'no',
@@ -202,8 +230,15 @@ export class AddServiceDialogComponent implements OnInit {
         allow_repeat_application: formValue.allow_repeat_application
           ? 'yes'
           : 'no',
+        service_mode: formValue.service_mode,
+        third_party_portal_name: formValue.third_party_portal_name,
+        third_party_redirect_url: formValue.third_party_redirect_url,
+        third_party_return_url: formValue.third_party_return_url,
+        third_party_status_api_url: formValue.third_party_status_api_url,
+        third_party_payment_mode: formValue.third_party_payment_mode,
+        verification_token: formValue.verification_token,
+        is_special: formValue.is_special,
       };
-
       if (isUpdate) {
         const finalPayload = { id: this.data.id, ...payload };
         this.genericService.updateAdminService(finalPayload).subscribe({

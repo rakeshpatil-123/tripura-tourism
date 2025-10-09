@@ -8,9 +8,10 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { GenericService } from '../../_service/generic/generic.service';
 import { IlogiSelectComponent } from "../../customInputComponents/ilogi-select/ilogi-select.component";
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
-
+import {ToggleSwitchModule} from "primeng/toggleswitch";
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-departmental-users',
   standalone: true,
@@ -24,7 +25,9 @@ import { TooltipModule } from 'primeng/tooltip';
     DialogModule,
     IlogiSelectComponent,
     FormsModule,
-    TooltipModule
+    TooltipModule,
+    ToggleSwitchModule,
+    ReactiveFormsModule
   ],
   templateUrl: './departmental-users.component.html',
   styleUrls: ['./departmental-users.component.scss']
@@ -36,7 +39,9 @@ export class DepartmentalUsersComponent implements OnInit {
   usersBackup: any[] = [];   // keep original users
   departments: any[] = [];
   selectedDepartment: any = null;
-
+  selectedUser: any = null; 
+  editMode: boolean = false;
+  userForms: { [key: number]: FormGroup } = {};
   constructor(private genericService: GenericService) { }
 
   ngOnInit(): void {
@@ -74,6 +79,11 @@ export class DepartmentalUsersComponent implements OnInit {
             status: user.status
           }));
           this.usersBackup = [...this.users];
+          this.users.forEach(user => {
+            this.userForms[user.id] = new FormGroup({
+              status: new FormControl(user.status === 'active')
+            });
+          });
         } else {
           console.warn('Failed to fetch profile');
           this.users = [];
@@ -117,11 +127,34 @@ export class DepartmentalUsersComponent implements OnInit {
   }
 
   openDialog() {
+    this.selectedUser = null;
     this.displayDialog = true;
+    this.editMode = false;
+  }
+  editUser(user: any): void {
+    this.editMode = true;
+    this.selectedUser = null;
+
+    const payload = { id: user.id };
+    this.genericService.getByConditions(payload, 'api/admin/get-department-user-details').subscribe({
+      next: (res: any) => {
+        if (res?.success && res?.data) {
+          this.selectedUser = { ...res.data, user_id: user.id };
+          this.displayDialog = true;
+        } else {
+          this.genericService.openSnackBar('Failed to load user details.', 'Error');
+        }
+      },
+      error: (err: any) => {
+        console.error('Error fetching user details:', err);
+        this.genericService.openSnackBar('Something went wrong while loading details.', 'Error');
+      }
+    });
   }
 
   closeDialog() {
     this.displayDialog = false;
+    this.selectedUser = null;
   }
 
   handleRegistrationSuccess() {
@@ -136,5 +169,51 @@ export class DepartmentalUsersComponent implements OnInit {
         table.classList.remove('table-fade-out');
       }, 250);
     }
+  }
+confirmStatusChange(event: any, user: any) {
+  const isCurrentlyActive = user.status === 'active';
+  const newStatus = isCurrentlyActive ? 'inactive' : 'active';
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you want to change status to "${newStatus}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: newStatus === 'active' ? '#10b981' : '#ef4444',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes, change it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.updateUserStatus(user, newStatus);
+    } else {
+      setTimeout(() => {
+        this.userForms[user.id].controls['status'].setValue(isCurrentlyActive, { emitEvent: false });
+      });
+    }
+  });
+}
+
+updateUserStatus(user: any, status: string) {
+  const payload = { id: user.id, status };
+
+  this.genericService.updateDepartmentalUserStatus(payload).subscribe({
+    next: () => {
+      user.status = status;
+      this.userForms[user.id].controls['status'].setValue(status === 'active', { emitEvent: false });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Status Updated',
+        text: `User status changed to "${status}".`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    },
+    error: () => {
+      this.userForms[user.id].controls['status'].setValue(user.status === 'active', { emitEvent: false });
+      Swal.fire('Error', 'Failed to update status.', 'error');
+    }
+  });
   }
 }

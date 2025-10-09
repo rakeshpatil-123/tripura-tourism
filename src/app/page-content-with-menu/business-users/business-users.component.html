@@ -14,8 +14,7 @@
   </div>
 
   <div class="p-4 fade-in">
-    <p-table #dt [value]="users" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 20]" [loading]="loading"
-      [responsiveLayout]="'scroll'" [globalFilterFields]="globalFilterFields"
+    <p-table #dt [value]="users" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 20]" [loading]="loading" [responsiveLayout]="'scroll'" [globalFilterFields]="globalFilterFields"
       class="p-datatable-gridlines p-mb-4 animated-table">
       <ng-template pTemplate="header">
         <tr class="header-bg-color">
@@ -39,15 +38,15 @@
               'col-ulb nowrap': col.field === 'ulb',
               'col-address wrap': col.field === 'address',
               'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'address'
-            }" pTooltip="{{ user[col.field] }}" tooltipPosition="top">
+            }" pTooltip="{{ user[col.field] }}" tooltipPosition="top">          
             <span *ngIf="col.field !== 'status'">
               {{ user[col.field] || '----' }}
             </span>
-            <span *ngIf="col.field === 'status'" class="status-badge" [ngClass]="{
-                'active-status': user.status === 'active',
-                'inactive-status': user.status !== 'active'
-              }">
-              {{ user.status ? (user.status | titlecase) : '----' }}
+            <span *ngIf="col.field === 'status'">
+              <form [formGroup]="userForms[user.id]">
+                <p-toggleswitch formControlName="status" (onChange)="confirmStatusChange(user)">
+                </p-toggleswitch>
+              </form>
             </span>
           </td>
         </tr>

@@ -1,10 +1,14 @@
 <div class="proforma-list-container">
   <div class="proforma-header">
+    <button class="btn btn-back" (click)="goToSchemes()">
+      <span class="material-icons">arrow_back</span>
+      Back to Schemes
+    </button>
     <h4 class="proforma-heading">
       {{ schemeTitle }} - Proformas
     </h4>
     <button class="add-proforma-btn" (click)="openProformaDialog()">
-      Add New Proforma
+      Add New Eligibility/Claim
     </button>
   </div>
   <app-dynamic-table [data]="proformas" [columns]="columns" [showPagination]="true" [pageSize]="5" [searchable]="true"
@@ -15,10 +19,10 @@
     [resizable]="false" [closable]="true" [dismissableMask]="true" styleClass="custom-proforma-dialog">
     <form [formGroup]="proformaForm" (ngSubmit)="saveProforma()" class="proforma-form">
 
-      <h3 class="dialog-header">{{ isEditMode ? 'Edit Proforma' : 'Add Proforma' }}</h3>
+      <h3 class="dialog-header">{{ isEditMode ? 'Edit Eligibility/Claim' : 'Add Eligibility/Claim' }}</h3>
 
       <div class="form-grid">
-        <div class="form-group">
+        <div class="form-group"> 
           <label>Title</label>
           <input pInputText formControlName="title" placeholder="Enter title" />
           <small class="error-message"
@@ -37,22 +41,38 @@
         </div>
 
         <div class="form-group">
-          <label>Proforma Type</label>
+          <label>Form Type</label>
           <select formControlName="proforma_type">
             <option *ngFor="let type of PROFORMA_TYPES" [value]="type.value">{{ type.label }}</option>
           </select>
           <small class="error-message"
             *ngIf="proformaForm.get('proforma_type')?.invalid && (proformaForm.get('proforma_type')?.touched || proformaForm.get('proforma_type')?.dirty)">
-            Proforma Type is required
+            Form Type is required
           </small>
         </div>
 
-        <div class="form-group">
+        <div *ngIf="proformaForm.get('proforma_type')?.value === 'claim'" class="form-group">
           <label>Claim Type</label>
           <select formControlName="claim_type">
             <option [value]="null">--Select--</option>
             <option *ngFor="let type of CLAIM_TYPES" [value]="type.value">{{ type.label }}</option>
           </select>
+        </div>
+        <div [formGroup]="proformaForm" class="card flex justify-center w-full">
+          <label class="w-full font-medium mb-1 block">Depends On Proformas</label>
+          <p-multiselect [options]="proformaOptions" formControlName="depends_on_proforma_ids" optionLabel="name"
+            optionValue="code" placeholder="Select Depends On Proformas" [maxSelectedLabels]="3" [showClear]="true"
+            [filter]="true" [display]="'chip'" class="w-full md:w-80">
+          </p-multiselect>
+        </div>
+        
+        <div *ngIf="proformaForm.get('proforma_type')?.value === 'claim'" class="form-group">
+          <label>Max Claim Count</label>
+          <input pInputText formControlName="max_claim_count" type="number" placeholder="Enter max claim count" />
+          <small class="error-message"
+            *ngIf="proformaForm.get('max_claim_count')?.invalid && (proformaForm.get('max_claim_count')?.touched || proformaForm.get('max_claim_count')?.dirty)">
+            max claim count must be a positive number
+          </small>
         </div>
 
         <div class="form-group full-width">
@@ -85,22 +105,23 @@
 
 
   <p-dialog header="Proforma Details" [(visible)]="showProformaDetailsDialog" [modal]="true"
-    [style]="{ width: '600px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="true"
+    [style]="{ width: '700px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="true"
     [dismissableMask]="true" styleClass="proforma-details-dialog animate__animated animate__fadeInDown">
     <div *ngIf="selectedProforma" class="proforma-details">
-
-      <div class="detail-row" *ngFor="let field of proformaFields">
-        <label>{{ field.label }}:</label>
-        <span [ngClass]="field.class ? field.class : ''">
-          {{ field.value }}
-        </span>
-      </div>
-
+      <table class="details-table">
+        <tbody>
+          <tr *ngFor="let field of proformaFields">
+            <th>{{ field.label }}</th>
+            <td [ngClass]="field.class ? field.class : ''">
+              {{ field.value }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <p-footer>
       <button pButton label="Close" class="p-button-rounded p-button-secondary"
-        (click)="showProformaDetailsDialog = false">
-      </button>
+        (click)="showProformaDetailsDialog = false"></button>
     </p-footer>
   </p-dialog>

@@ -67,70 +67,54 @@ export class AddDepartmentDialogComponent implements OnInit {
     this.isSubmitting = true;
     const payload = this.departmentForm.value;
 
-    if (this.mode === 'add') {
-      this.genericService.addDepartment(payload).subscribe({
-        next: (res: any) => {
+      const handleSuccess = (res: any, action: 'Created' | 'Updated') => {
+        this.dialogRef.close('updated');
+        setTimeout(() => {
           Swal.fire({
-            title: 'Created!',
+            title: `${action}!`,
             text: res.message,
             icon: 'success',
-            showClass: {
-              popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-              popup: 'animate__animated animate__fadeOutUp'
-            },
+            showClass: { popup: 'animate__animated animate__fadeInDown' },
+            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
             confirmButtonText: 'OK',
-            customClass: {
-              confirmButton: 'swal2-confirm-btn'
-            }
-          }).then(() => {
-            this.dialogRef.close('updated');
+            customClass: { confirmButton: 'swal2-confirm-btn' }
           });
-        },
-        error: (err: any) => {
+        }, 150);
+      };
+
+      const handleError = (message: string) => {
+        this.dialogRef.close();
+        setTimeout(() => {
           this.isSubmitting = false;
-          const backendErrors = err.error?.errors;
-          const errorMsg = backendErrors?.name ? backendErrors.name[0] : err.error?.message || 'Failed to create department.';
           Swal.fire({
             title: 'Error!',
-            text: errorMsg,
+            text: message,
             icon: 'error',
             showClass: { popup: 'animate__animated animate__fadeInDown' },
             hideClass: { popup: 'animate__animated animate__fadeOutUp' },
             confirmButtonText: 'OK',
             customClass: { confirmButton: 'swal2-confirm-btn' }
           });
+        }, 150);
+      };
+
+        if (this.mode === 'add') {
+          this.genericService.addDepartment(payload).subscribe({
+            next: (res: any) => handleSuccess(res, 'Created'),
+            error: (err: any) => {
+              const backendErrors = err.error?.errors;
+              const errorMsg =
+                backendErrors?.name
+                  ? backendErrors.name[0]
+                  : err.error?.message || 'Failed to create department.';
+              handleError(errorMsg);
         }
       });
     } else if (this.mode === 'edit') {
       payload.id = this.data.data.id;
       this.genericService.updateDepartment(payload).subscribe({
-        next: (res: any) => {
-          Swal.fire({
-            title: 'Updated!',
-            text: res.message,
-            icon: 'success',
-            showClass: { popup: 'animate__animated animate__fadeInDown' },
-            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-            confirmButtonText: 'OK',
-            customClass: { confirmButton: 'swal2-confirm-btn' }
-          }).then(() => {
-            this.dialogRef.close('updated');
-          });
-        },
-        error: () => {
-          this.isSubmitting = false;
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to update department.',
-            icon: 'error',
-            showClass: { popup: 'animate__animated animate__fadeInDown' },
-            hideClass: { popup: 'animate__animated animate__fadeOutUp' },
-            confirmButtonText: 'OK',
-            customClass: { confirmButton: 'swal2-confirm-btn' }
-          });
-        }
+        next: (res: any) => handleSuccess(res, 'Updated'),
+        error: () => handleError('Failed to update department.')
       });
     }
   }

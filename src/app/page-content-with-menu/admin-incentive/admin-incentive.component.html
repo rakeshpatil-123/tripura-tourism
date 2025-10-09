@@ -90,7 +90,7 @@
   </form>
 
 </p-dialog>
-<p-dialog header="Add Proforma" [(visible)]="showAddProformaDialog" [modal]="true" [style]="{width: '560px'}">
+<p-dialog header="Add Eligibility/Claim" [(visible)]="showAddProformaDialog" [modal]="true" [style]="{width: '560px'}">
   <form [formGroup]="addProformaForm" (ngSubmit)="onAddProforma()">
     <div class="p-fluid">
       <div class="p-field">
@@ -110,44 +110,32 @@
   </form>
 </p-dialog>
 
-
-<p-dialog header="Scheme Details" [(visible)]="showSchemeDetailsDialog" [modal]="true"
-  [style]="{ width: '600px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="true"
-  [dismissableMask]="true" styleClass="scheme-details-dialog animate__animated animate__fadeInDown">
-  <div *ngIf="selectedScheme" class="scheme-details">
-
-    <div class="detail-row">
-      <i class="pi pi-hashtag icon"></i>
-      <label>Scheme ID</label>
-      <span>{{ selectedScheme.id }}</span>
+<p-dialog header="Scheme Details" [(visible)]="showSchemeDetailsDialog" [modal]="true" [draggable]="false" [resizable]="false" [closable]="true" [dismissableMask]="true" [style]="{ width: '620px', maxWidth: '95vw' }"
+styleClass="scheme-details-dialog animate__animated animate__fadeInDown">
+  <div *ngIf="selectedScheme" class="scheme-details-container">
+    <div class="scheme-header">
+      <i class="pi pi-briefcase scheme-icon"></i>
+      <h2>{{ selectedScheme.title || 'Scheme Information' }}</h2>
+      <p class="scheme-code">Code: {{ selectedScheme.code || 'N/A' }}</p>
+    </div>
+<div class="scheme-details-grid">
+  <div class="detail-item" *ngFor="let field of [
+              { icon: 'pi-hashtag', label: 'Scheme ID', value: selectedScheme.id },
+              { icon: 'pi-calendar-plus', label: 'Policy Start Date', value: (selectedScheme.policy_start_date | date:'dd MMM yyyy') },
+              { icon: 'pi-calendar-minus', label: 'Policy End Date', value: (selectedScheme.policy_end_date | date:'dd MMM yyyy') },
+              { icon: 'pi-clock', label: 'Created At', value: (selectedScheme.created_at | date:'dd MMM yyyy, hh:mm a') },
+              { icon: 'pi-refresh', label: 'Updated At', value: (selectedScheme.updated_at | date:'dd MMM yyyy, hh:mm a') }
+            ]">
+    <i class="pi {{ field.icon }}"></i>
+    <div class="detail-text">
+      <label>{{ field.label }}</label>
+      <span>{{ field.value || '—' }}</span>
+    </div>
     </div>
 
-    <div class="detail-row">
-      <i class="pi pi-code icon"></i>
-      <label>Code</label>
-      <span>{{ selectedScheme.code }}</span>
-    </div>
-
-    <div class="detail-row">
-      <i class="pi pi-book icon"></i>
-      <label>Title</label>
-      <span>{{ selectedScheme.title }}</span>
-    </div>
-
-    <div class="detail-row">
-      <i class="pi pi-calendar-plus icon"></i>
-      <label>Policy Start Date</label>
-      <span>{{ selectedScheme.policy_start_date | date: 'dd MMM yyyy' }}</span>
-    </div>
-
-    <div class="detail-row">
-      <i class="pi pi-calendar-minus icon"></i>
-      <label>Policy End Date</label>
-      <span>{{ selectedScheme.policy_end_date | date: 'dd MMM yyyy' }}</span>
-    </div>
-
-    <div class="detail-row">
-      <i class="pi pi-check-circle icon"></i>
+    <div class="detail-item status">
+      <i class="pi pi-check-circle"></i>
+      <div class="detail-text">
       <label>Status</label>
       <span [ngClass]="{
         'status-active': selectedScheme.status === 1 || selectedScheme.status === true,
@@ -159,23 +147,12 @@
         : 'Draft' }}
       </span>
     </div>
-
-    <div class="detail-row">
-      <i class="pi pi-clock icon"></i>
-      <label>Created At</label>
-      <span>{{ selectedScheme.created_at | date: 'dd MMM yyyy, hh:mm a' }}</span>
-    </div>
-
-    <div class="detail-row">
-      <i class="pi pi-refresh icon"></i>
-      <label>Updated At</label>
-      <span>{{ selectedScheme.updated_at | date: 'dd MMM yyyy, hh:mm a' }}</span>
+ </div>
     </div>
 
   </div>
 
   <p-footer>
-    <button pButton label="Close" class="p-button-rounded p-button-secondary" (click)="showSchemeDetailsDialog = false">
-    </button>
+    <button pButton label="Close" icon="pi pi-times" class="p-button-rounded p-button-secondary close-btn" (click)="showSchemeDetailsDialog = false"></button>
   </p-footer>
 </p-dialog>

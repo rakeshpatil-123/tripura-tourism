@@ -112,6 +112,8 @@ export class ViewRenewalCycleDialogComponent
     'is_active',
     'created_at',
     'updated_at',
+    'created_by',
+    'updated_by',
     'actions',
   ];
 
