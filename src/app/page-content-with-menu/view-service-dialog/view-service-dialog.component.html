@@ -57,6 +57,10 @@
       </td>
     </tr>
     <tr>
+      <td><b>Service Mode</b></td>
+      <td>{{ serviceDetails.service_mode.replace('_',' ') | titlecase }}</td>
+    </tr>
+    <tr>
       <td><b>Created At</b></td>
       <td>{{serviceDetails.created_at | date:'medium'}}</td>
     </tr>
@@ -64,6 +68,40 @@
       <td><b>Updated At</b></td>
       <td>{{serviceDetails.updated_at | date:'medium'}}</td>
     </tr>
+    <tr>
+      <td><b>Created By</b></td>
+      <td>{{serviceDetails.created_by}}</td>
+    </tr>
+    <tr>
+      <td><b>Updated By</b></td>
+      <td>{{serviceDetails.updated_by}}</td>
+    </tr>
+    <ng-container *ngIf="serviceDetails.service_mode === 'third_party'">
+      <tr>
+        <td><b>Third Party Portal Name</b></td>
+        <td>{{serviceDetails.third_party_portal_name}}</td>
+      </tr>
+      <tr>
+        <td><b>Third Party Redirect URL</b></td>
+        <td>{{serviceDetails.third_party_redirect_url}}</td>
+      </tr>
+      <tr>
+        <td><b>Third Party Return URL</b></td>
+        <td>{{serviceDetails.third_party_return_url}}</td>
+      </tr>
+      <tr>
+        <td><b>Third Party Status API URL</b></td>
+        <td>{{serviceDetails.third_party_status_api_url}}</td>
+      </tr>
+      <tr>
+        <td><b>Is Special</b></td>
+        <td>{{serviceDetails.is_special === 'yes' ? 'Yes' : 'No'}}</td>
+      </tr>
+      <tr>
+        <td><b>Verification Token</b></td>
+        <td>{{serviceDetails.verification_token}}</td>
+      </tr>
+    </ng-container>
   </table>
 </mat-dialog-content>
 

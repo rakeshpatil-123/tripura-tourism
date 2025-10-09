@@ -18,7 +18,7 @@ import { AddApprovalFlowComponent } from '../add-approval-flow/add-approval-flow
   imports: [MatIconModule, MatPaginatorModule, MatInputModule, ReactiveFormsModule, MatSort, CommonModule, MatTableModule, MatPaginatorModule]
 })
 export class ViewApprovalFlowDialogComponent implements OnInit {
-  displayedColumns: string[] = ['step_number', 'step_type', 'department_id', 'hierarchy_level', 'actions'];
+  displayedColumns: string[] = ['step_number', 'step_type', 'department_id', 'hierarchy_level', 'created_by', 'updated_by', 'actions'];
   dataSource = new MatTableDataSource<any>([]);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;

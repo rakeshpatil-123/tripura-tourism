@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { filter, Subscription } from 'rxjs';
+import { filter, finalize, Subscription } from 'rxjs';
 import { GenericService } from '../../_service/generic/generic.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddServiceDialogComponent } from '../add-service-dialog/add-service-dialog.component';
@@ -26,12 +26,17 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatPaginator } from '@angular/material/paginator';
-import { IlogiSelectComponent } from "../../customInputComponents/ilogi-select/ilogi-select.component";
+import { IlogiSelectComponent, SelectOption } from "../../customInputComponents/ilogi-select/ilogi-select.component";
 import { IlogiInputComponent } from "../../customInputComponents/ilogi-input/ilogi-input.component";
 import { ServiceCertificateComponent } from '../service-certificate/service-certificate.component';
+import { ThirdPartyParamsComponent } from '../third-party-params/third-party-params.component';
+import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { ViewThirdPartyParamsComponent } from '../view-third-party-params/view-third-party-params.component';
 export interface Service {
   department_id: string;
   service_title_or_description: string;
@@ -64,8 +69,15 @@ export interface Service {
   nsw_license_id: string;
   status: number;
   allow_repeat_application: boolean;
+  service_mode: string;
 }
-
+export enum NocType {
+  CFE = 'CFE',
+  CFO = 'CFO',
+  RENEWAL = 'Renewal',
+  SPECIAL = 'Special',
+  OTHERS = 'Others',
+}
 @Component({
   selector: 'app-admin-services',
   templateUrl: './admin-services.component.html',
@@ -82,32 +94,51 @@ export interface Service {
     ButtonModule,
     MatPaginatorModule,
     IlogiSelectComponent,
-    IlogiInputComponent
+    IlogiInputComponent,
+    CommonModule,
+    FormsModule
 ],
   providers: [ConfirmationService],
 })
 export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit {
   subscription: Subscription;
+  nocTypes: SelectOption[] = [
+    { id: null, name: 'All' },
+    ...Object.values(NocType).map(n => ({ id: n, name: n }))
+  ];
+  selectedNocType: string | null = null;
   displayedColumns: string[] = [
     'sno',
     'name',
     'department',
     'noc_type',
+    'service_mode',
     'actions'
   ];
   dataSource = new MatTableDataSource<Service>([]);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  selectedDepartment: any = null;
+  departments: any[] = [];
+  allServices: Service[] = [];
+  serviceModes: SelectOption[] = [
+    { id: '', name: 'All Modes' },
+    { id: 'native', name: 'Native' },
+    { id: 'third_party', name: 'Third Party' }
+  ];
+  selectedServiceMode: string | null = null;
 
   constructor(
     private genericService: GenericService,
     private dialog: MatDialog,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private loaderService: LoaderService
   ) {
     this.subscription = new Subscription();
   }
 
   ngOnInit() {
     this.loadServices();
+    this.loadDepartments();
   }
 
   ngAfterViewInit(): void {
@@ -122,14 +153,17 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
     const sub = this.genericService.getAdminServices().subscribe({
       next: (res) => {
         if (res.status === 1 && res.data) {
-          this.dataSource.data = res.data.map((item: any) => ({
+          const services = res.data.map((item: any) => ({
             ...item,
             name: item.service_title_or_description,
             department: item.department_id,
-            department_name: item.department_name,
+            department_name: item.department_name || 'Native',
+            service_mode: item.service_mode,
             noc_type: item.noc_type,
             activeFrom: moment().format('YYYY-MM-DD'),
           }));
+          this.allServices = services;
+          this.dataSource.data = services;
         }
       },
       error: (err) => {
@@ -257,6 +291,12 @@ deleteService(service: Service): void {
         if (action === 'view') this.addOrEditServiceCertificate(service, 'add');
         if (action === 'add') this.addOrEditServiceCertificate(service, 'add');
         if (action === 'edit') this.addOrEditServiceCertificate(service, 'edit');
+        break;
+      case 'third_party':
+        if (action === 'add') this.addOrEditThirdPartyParams(service, 'add');
+        if (action === 'edit') this.addOrEditThirdPartyParams(service, 'edit');
+        if (action === 'view') this.viewThirdPartyParams(service, 'view');
+        if (action === 'delete') this.addOrEditThirdPartyParams(service, 'delete');
         break;
     }
   }
@@ -414,9 +454,133 @@ deleteService(service: Service): void {
       }
     });
   }
+  addOrEditThirdPartyParams(service: any, mode: 'add' | 'edit' | 'delete'): void {
+    if (mode === 'delete') {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `Delete parameter "${service.service_title_or_description}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.loaderService.showLoader();
+          this.genericService.deleteThirdPartyParams(service.id)
+            .pipe(finalize(() => this.loaderService.hideLoader()))
+            .subscribe({
+              next: (res: any) => {
+                if (res?.status === 1) {
+                  Swal.fire('Deleted!', `"${service.service_title_or_description}" deleted successfully.`, 'success');
+                  this.loadServices();
+                } else {
+                  Swal.fire('Error', res?.message || 'Failed to delete parameter.', 'error');
+                }
+              },
+              error: () => Swal.fire('Error', 'Failed to delete parameter.', 'error')
+            });
+        }
+      });
+      return;
+    }
+    const dialogRef = this.dialog.open(ThirdPartyParamsComponent, {
+      width: '70vw',
+      maxWidth: '95vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'custom-thirdparty-dialog',
+      data: { service, mode },
+      disableClose: true,
+      autoFocus: false
+    });
+
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'created' || result === 'updated') {
+        this.loadServices();
+      }
+    });
+  }
+  viewThirdPartyParams(service: Service, mode: 'view'): void {
+    this.dialog.open(ViewThirdPartyParamsComponent, {
+      width: '50vw',
+      maxWidth: '90vw',
+      height: '70vh',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog',
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '300ms',
+      data: { service, mode },
+    });
+  }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
     this.dataSource.filter = filterValue;
+  }
+  loadDepartments(): void {
+    this.genericService.getAllDepartmentNames().subscribe({
+      next: (res: any) => {
+        if (res?.status) {
+          this.departments = [
+            { id: '', name: 'All Departments' },
+            ...res.data.map((d: any) => ({ id: d.id, name: d.name }))
+          ];
+        }
+      },
+      error: () => {
+        this.departments = [{ id: '', name: 'All Departments' }];
+      }
+    });
+  }
+  filterByDepartment(departmentId: any): void {
+    this.selectedDepartment = departmentId;
+
+    if (departmentId) {
+      const depId = +departmentId;
+      this.dataSource.data = this.allServices.filter(s => +s.department_id === depId);
+    } else {
+      this.dataSource.data = [...this.allServices];
+    }
+
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+  }
+  filterByNocType(nocType: string | null): void {
+    this.selectedNocType = nocType;
+    let filteredServices = [...this.allServices];
+    if (this.selectedDepartment) {
+      const depId = +this.selectedDepartment;
+      filteredServices = filteredServices.filter(s => +s.department_id === depId);
+    }
+
+    if (nocType) {
+      filteredServices = filteredServices.filter(s => s.noc_type === nocType);
+    }
+    this.dataSource.data = filteredServices;
+
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+  }
+  filterByServiceMode(mode: string | null): void {
+    this.selectedServiceMode = mode;
+    let filteredData = [...this.allServices];
+    if (this.selectedDepartment) {
+      filteredData = filteredData.filter(s => +s.department_id === +this.selectedDepartment);
+    }
+    if (this.selectedNocType) {
+      filteredData = filteredData.filter(s => s.noc_type === this.selectedNocType);
+    }
+    if (this.selectedServiceMode) {
+      filteredData = filteredData.filter(s => s.service_mode === this.selectedServiceMode);
+    }
+
+    this.dataSource.data = filteredData;
+
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
   }
 }

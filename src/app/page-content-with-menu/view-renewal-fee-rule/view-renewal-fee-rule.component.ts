@@ -27,6 +27,8 @@ export class ViewRenewalFeeRuleComponent implements OnInit {
     'priority',
     'status',
     'createdAt',
+    'created_by',
+    'updated_by',
     'actions',
   ];
   constructor(

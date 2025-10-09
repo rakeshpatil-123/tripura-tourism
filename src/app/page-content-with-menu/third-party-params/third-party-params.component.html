@@ -1,0 +1,78 @@
+<div class="dialog-root" [@dialogAnim]>
+  <div class="dialog-card">
+    <div class="dialog-header">
+      <h2>{{ mode === 'edit' ? 'Edit Parameter' : 'Add Parameter' }}</h2>
+      <button mat-icon-button (click)="onCancel()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="paramForm" (ngSubmit)="onSubmit()" class="form-grid">
+      <div class="grid-row two-col">
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Parameter Name *</mat-label>
+          <input matInput formControlName="param_name" maxlength="120" placeholder="Enter parameter name" />
+          <mat-hint align="end">{{ paramForm.value.param_name?.length || 0 }}/120</mat-hint>
+          <mat-error *ngIf="paramForm.get('param_name')?.invalid && paramForm.get('param_name')?.touched">
+            Required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Parameter Type *</mat-label>
+          <mat-select formControlName="param_type">
+            <mat-option value="request">Request</mat-option>
+            <mat-option value="response">Response</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-row two-col">
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Default Value</mat-label>
+          <input matInput formControlName="default_value" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Data Source *</mat-label>
+          <mat-select formControlName="data_source">
+            <mat-option *ngFor="let s of dataSources" [value]="s">{{ s | titlecase }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-row two-col">
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Source Table</mat-label>
+          <mat-select formControlName="default_source_table" (selectionChange)="onTableChange($event.value)">
+            <mat-option value="">None</mat-option>
+            <mat-option value="unit_details">Unit Details</mat-option>
+            <mat-option value="enterprise_details">Enterprise Details</mat-option>
+            <mat-option value="management_details">Management Details</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col">
+          <mat-label>Source Column</mat-label>
+          <mat-select formControlName="default_source_column">
+            <mat-option *ngFor="let col of availableColumns" [value]="col">{{ col }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-row single-col">
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="4"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="actions">
+        <button mat-stroked-button type="button" (click)="onCancel()">Cancel</button>
+        <button mat-flat-button class="btn-submit" type="submit" [disabled]="loading">
+          {{ mode === 'add' ? 'Create' : 'Update' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

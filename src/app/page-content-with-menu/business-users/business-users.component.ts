@@ -6,16 +6,20 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { GenericService } from '../../_service/generic/generic.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from "@angular/forms";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-business-users',
   templateUrl: './business-users.component.html',
   styleUrls: ['./business-users.component.scss'],
-  imports: [CommonModule, TableModule, MatIconModule, MatInputModule, MatButtonModule, TooltipModule]
+  imports: [CommonModule, TableModule, MatIconModule, MatInputModule, MatButtonModule, TooltipModule, ToggleSwitchModule, ReactiveFormsModule]
 })
 export class BusinessUsersComponent implements OnInit {
   users: any[] = [];
   loading: boolean = false;
+  userForms: { [key: number]: FormGroup } = {};
 
   columns: { field: string; header: string }[] = [
     { field: 'id', header: 'ID' },
@@ -37,7 +41,7 @@ export class BusinessUsersComponent implements OnInit {
 
   globalFilterFields: string[] = this.columns.map(c => c.field);
 
-  constructor(private genericService: GenericService) { }
+  constructor(private genericService: GenericService, private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.fetchUsers();
@@ -49,6 +53,11 @@ export class BusinessUsersComponent implements OnInit {
       next: (res: any) => {
         this.users = res?.status === 1 && Array.isArray(res.data) ? res.data : [];
         this.loading = false;
+        this.users.forEach(user => {
+          this.userForms[user.id] = this.fb.group({
+            status: [user.status === 'active']
+          });
+        });
       },
       error: (err) => {
         console.error("Error fetching users:", err);
@@ -61,5 +70,51 @@ export class BusinessUsersComponent implements OnInit {
   applyFilter(event: Event, dt: any) {
     const filterValue = (event.target as HTMLInputElement).value;
     dt.filterGlobal(filterValue.trim().toLowerCase(), 'contains');
+  }
+
+  confirmStatusChange(user: any) {
+    const form = this.userForms[user.id];
+    const isActive = form.get('status')?.value;
+    const newStatus = isActive ? 'active' : 'inactive';
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you want to change status to "${newStatus}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: newStatus === 'active' ? '#10b981' : '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, change it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.updateUserStatus(user, newStatus);
+      } else {
+        form.patchValue({ status: !isActive }, { emitEvent: false });
+      }
+    });
+  }
+
+  updateUserStatus(user: any, status: string) {
+    this.genericService.updateBusinessUserStatus({ id: user.id, status }).subscribe({
+      next: () => {
+        user.status = status;
+        Swal.fire({
+          icon: 'success',
+          title: 'Status Updated',
+          text: `User status changed to ${status}.`,
+          timer: 1500,
+          showConfirmButton: false
+        });
+      },
+      error: () => {
+        const form = this.userForms[user.id];
+        form.patchValue(
+          { status: user.status === 'active' },
+          { emitEvent: false }
+        );
+        Swal.fire('Error', 'Failed to update status.', 'error');
+      }
+    });
   }
 }

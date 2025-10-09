@@ -26,11 +26,11 @@
               <app-ilogi-input fieldLabel="User Type" [disabled]="true" formControlName="userType"
                 placeholder="Enter user type"></app-ilogi-input>
  
-              <app-ilogi-select class="mb-10" fieldId="department_id" fieldLabel="Department" [mandatory]="true"
+              <app-ilogi-select *ngIf="profileForm.get('userType')?.value === 'department'" class="mb-10" fieldId="department_id" fieldLabel="Department"
                 formControlName="department_id" [selectOptions]="departments" placeholder="Select department">
               </app-ilogi-select>
 
-              <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" formControlName="hierarchy_level"
+              <app-ilogi-select *ngIf="profileForm.get('userType')?.value === 'department'" fieldId="hierarchy_level" fieldLabel="Hierarchy Level" formControlName="hierarchy_level"
                 [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
               </app-ilogi-select>
 
@@ -56,7 +56,7 @@
 
             </div>
             <div class="form-actions">
-              <button type="button" class="btn btn-success" [disabled]="!isProfileChanged || profileForm.invalid"
+              <button type="button" class="btn btn-success" [disabled]="!isProfileChanged"
                 (click)="updateProfile()">
                 Update
               </button>

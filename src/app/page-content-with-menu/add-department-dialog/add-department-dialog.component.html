@@ -40,6 +40,21 @@
             {{ departmentDetails.details || 'No details available' }}
           </span>
         </div>
+
+        <div class="info-row">
+          <span class="label">Created By:</span>
+          <span class="value desc">
+            {{ departmentDetails.created_by || 'No data available' }}
+          </span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Updated By:</span>
+          <span class="value desc">
+            {{ departmentDetails.updated_by || 'No data available' }}
+          </span>
+        </div>
+
       </mat-card-content>
     </mat-card>
   </div>

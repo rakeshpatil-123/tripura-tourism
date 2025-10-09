@@ -1,0 +1,102 @@
+::ng-deep .custom-dialog {
+  border-radius: 12px;
+  background: #f9f9fc;
+  padding: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transform: scale(0.95);
+  opacity: 0;
+  animation: dialogEnter 300ms forwards;
+
+  @keyframes dialogEnter {
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+.dialog-container {
+  max-height: 100%;
+  overflow-y: auto;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+
+    .dialog-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a237e;
+    }
+
+    .close-btn {
+      color: #616161;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #0d47a1;
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+
+    .detail-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .detail-key {
+        font-weight: 600;
+        color: #0d47a1;
+        margin-bottom: 0.4rem;
+        text-transform: capitalize;
+      }
+
+      .detail-value {
+        color: #424242;
+        word-break: break-word;
+      }
+    }
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+
+    button {
+      background-color: #1a237e;
+      color: #fff;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #0d47a1;
+      }
+    }
+  }
+}
+
+.dialog-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dialog-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}

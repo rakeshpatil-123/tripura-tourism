@@ -1,0 +1,20 @@
+<mat-dialog-content class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">Service: {{ data.service?.name || 'N/A' }}</h2>
+    <button mat-icon-button class="close-btn" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="details-grid">
+    <mat-card class="detail-card" *ngFor="let detail of serviceDetailsList">
+      <mat-card-content>
+        <div class="detail-key">{{ detail.label }}</div>
+        <div class="detail-value">{{ detail.value }}</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="dialog-footer">
+    <button mat-stroked-button color="primary" (click)="close()">Close</button>
+  </div>
+</mat-dialog-content>

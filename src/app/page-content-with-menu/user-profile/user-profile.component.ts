@@ -190,10 +190,6 @@ export class UserProfileComponent implements OnInit {
   }
 
   updateProfile(): void {
-    if (this.profileForm.invalid) {
-      this.genericService.openSnackBar('Please fill all required fields', 'Error');
-      return;
-    }
 
     const userId = Number(localStorage.getItem('userId'));
     const val = this.profileForm.getRawValue();
@@ -203,13 +199,17 @@ export class UserProfileComponent implements OnInit {
       name_of_enterprise: val.enterpriseName,
       authorized_person_name: `${val.firstName} ${val.lastName}`.trim(),
       email_id: val.email,
-      mobile_no: val.phone,
+      mobile_no: val.phone.toString(),
       registered_enterprise_address: val.address,
       registered_enterprise_city: val.city,
       user_type: val.userType,
       hierarchy_level: val.hierarchy_level,
       department_id: val.department_id
     };
+    if (val.userType === 'individual') {
+      delete payload.hierarchy_level;
+      delete payload.department_id;
+    }
 
     switch (val.hierarchy_level) {
       case 'district':

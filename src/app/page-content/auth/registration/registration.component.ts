@@ -41,6 +41,8 @@ interface Ward {
 export class RegistrationComponent implements OnInit {
   @Input() sourcePage: string | null = null;
   @Output() registrationSuccess = new EventEmitter<void>();
+  @Input() editMode: boolean = false;
+  @Input() editData: any = null;
   isSpecialRequired(): boolean {
     return this.sourcePage === 'departmental-users';
   }
@@ -111,6 +113,45 @@ export class RegistrationComponent implements OnInit {
         }
       });
     }
+  }
+  ngOnChanges(changes: any): void {
+    if (changes['editData'] && this.editData && this.editMode) {
+      setTimeout(() => this.prefillEditData(), 300);
+    }
+  }
+  prefillEditData(): void {
+
+    const data = this.editData;
+    if (!data) return;
+
+    const prefill = {
+      name_of_enterprise: data.name_of_enterprise || '',
+      authorized_person_name: data.authorized_person_name || '',
+      email_id: data.email_id || '',
+      mobile_no: data.mobile_no || '',
+      user_name: data.user_name || '',
+      registered_enterprise_address: data.registered_enterprise_address || '',
+      registered_enterprise_city: data.registered_enterprise_city || '',
+      hierarchy_level: data.hierarchy_level || '',
+      department_id: String(data.department_id) || '',
+      designation: data.designation || '',
+      district_id: String(data.district_code) || '',
+      subdivision_id: String(data.subdivision_code) || '',
+      ulb_id: String(data.ulb_code) || '',
+      ward_id: String(data.ward_code) || '',
+      user_type: data.user_type || 'department'
+    };
+
+    this.registrationForm.patchValue(prefill);
+    if (prefill.district_id) {
+      this.loadSubdivisions(prefill.district_id);
+    }
+    setTimeout(() => {
+      if (prefill.subdivision_id) this.loadUlbs(prefill.subdivision_id);
+    }, 300);
+    setTimeout(() => {
+      if (prefill.ulb_id) this.loadWards(prefill.ulb_id);
+    }, 600);
   }
 
   setupCascadingDropdowns(): void {
@@ -266,13 +307,34 @@ export class RegistrationComponent implements OnInit {
         delete payload.designation;
         delete payload.hierarchy_level;
       }
+      if (this.editMode && this.editData?.user_id) {
+        const payloadWithId = { ...payload, id: this.editData.user_id };
 
+        this.genericService.updateProfile(payloadWithId).subscribe({
+          next: (res: any) => {
+            this.genericService.openSnackBar('User updated successfully!', 'Success');
+            this.registrationSuccess.emit();
+          },
+          error: (err: any) => {
+            console.error('Update Failed:', err);
+            const message = this.extractErrorMessage(err);
+            this.genericService.openSnackBar(message, 'Error');
+          }
+        });
+      } else {
+        this.registerNewUser(payload);
+      }
+    } else {
+      this.genericService.openSnackBar('Please fill all required fields.', 'Error');
+    }
+  }
+
+  private registerNewUser(payload: any) {
       this.genericService.registerUser(payload).subscribe({
-        next: (res : any) => {
+        next: (res: any) => {
           console.log('Registration Success:', res);
           this.genericService.openSnackBar('Registration successful!', 'Success');
           this.registrationForm.reset();
-
           if (this.sourcePage === 'departmental-users') {
             this.registrationForm.patchValue({
               user_type: 'department'
@@ -286,27 +348,32 @@ export class RegistrationComponent implements OnInit {
             });
           }
           this.registrationSuccess.emit();
-          this.sourcePage === 'departmental-users' ? null : this.router.navigate(['page/login']);
-        },
+        if (this.sourcePage !== 'departmental-users') {
+          this.router.navigate(['page/login']);
+        }
+      },
         error: (err: any) => {
           console.error('Registration Failed:', err);
+        const message = this.extractErrorMessage(err);
+        this.genericService.openSnackBar(message, 'Error');
+      }
+    });
+  }
 
-          let errorMessage = 'Registration failed. Try again.';
-          if (err.error && err.error.errors) {
-            const validationMessages = Object.values(err.error.errors)
-              .flat()
-              .join(', ');
-
-            errorMessage = validationMessages || err.error.message || errorMessage;
-          } else if (err.error && err.error.message) {
-            errorMessage = err.error.message;
+  private extractErrorMessage(err: any): string {
+    if (err?.error?.errors) {
+      const messages: string[] = [];
+      for (const key in err.error.errors) {
+        if (err.error.errors.hasOwnProperty(key)) {
+          const fieldErrors = err.error.errors[key];
+          if (Array.isArray(fieldErrors)) {
+            messages.push(...fieldErrors);
           }
-          this.genericService.openSnackBar(errorMessage, 'Error');
         }
-      });
-    } else {
-      this.genericService.openSnackBar('Please fill all required fields', 'Error');
+      }
+      return messages.join(' ');
     }
+    return err?.error?.message || 'Something went wrong. Please try again.';
   }
   getAllDepartmentList(): void {
    this.genericService.getByConditions({}, 'api/department-get-all-departments').subscribe({

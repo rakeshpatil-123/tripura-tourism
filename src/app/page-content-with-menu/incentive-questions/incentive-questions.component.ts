@@ -12,6 +12,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DynamicTableComponent, TableColumn } from '../../shared/component/table/table.component';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { finalize } from 'rxjs';
+import { Select } from 'primeng/select';
+
+interface DropdownOption {
+  name: string;
+  value: string;
+}
 @Component({
   selector: 'app-incentive-questions',
   standalone: true,
@@ -23,11 +29,13 @@ import { finalize } from 'rxjs';
     DialogModule,
     InputTextModule,
     DynamicTableComponent,
-    ToggleSwitch
+    ToggleSwitch,
+    Select
   ],
   templateUrl: './incentive-questions.component.html',
   styleUrls: ['./incentive-questions.component.scss']
 })
+
 export class IncentiveQuestionsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   public router = inject(Router);
@@ -48,7 +56,8 @@ export class IncentiveQuestionsComponent implements OnInit {
   showPreviewDialog: boolean = false;
   showQuestionDetailsDialog: boolean = false;
   selectedQuestion: any = null;
-
+  showSourceHint: boolean = false;
+  showClaimHint: boolean = false;
   questionForm: FormGroup = this.fb.group({
     label: ['', Validators.required],
     type: ['text', Validators.required],
@@ -57,12 +66,19 @@ export class IncentiveQuestionsComponent implements OnInit {
     displayOrder: [1],
     groupLabel: [''],
     displayWidth: ['col-12'],
+    default_source_table: [null],
+    default_source_column: [null],
+    is_claim: [false],
+    claim_per_unit: ['', [Validators.min(0)]],
+    claim_percentage: ['', [Validators.min(0), Validators.max(100)]],
     mimes: ['jpg'],
     max_size_mb: [5],
     multiple: [false],
     min_files: [1],
     max_files: [1]
   });
+  sourceTables: DropdownOption[] = [];
+  availableColumnsDropdown: DropdownOption[] = [];
 
 
   columns: TableColumn[] = [
@@ -100,7 +116,27 @@ export class IncentiveQuestionsComponent implements OnInit {
     this.proformaId = this.route.snapshot.paramMap.get('proformaId')!;
     this.schemeTitle = history.state.schemeTitle || 'Scheme';
     this.proformaTitle = history.state.proformaTitle || 'Proforma';
+    this.sourceTables = [
+      { name: 'Unit Details', value: 'unit_details' },
+      { name: 'Enterprise Details', value: 'enterprise_details' },
+      { name: 'Management Details', value: 'management_details' },
+      { name: 'Line of Activity', value: 'line_of_activities' },
+      { name: 'General Attachments', value: 'general_attachments' },
+      { name: 'Clearances', value: 'clearances' },
+      { name: 'Bank Details', value: 'bank_details' },
+      { name: 'Activities', value: 'activities' }
+    ];
     this.loadQuestions();
+    this.questionForm.get('is_claim')?.valueChanges.subscribe((value) => {
+      if (value) {
+        this.questionForm.get('claim_per_unit')?.enable();
+        this.questionForm.get('claim_percentage')?.enable();
+        this.showClaimHint = false;
+      } else {
+        this.questionForm.get('claim_per_unit')?.reset();
+        this.questionForm.get('claim_percentage')?.reset();
+      }
+    });
   }
 
   loadQuestions() {
@@ -138,16 +174,34 @@ export class IncentiveQuestionsComponent implements OnInit {
       this.questionForm.patchValue({
         label: data.question_label,
         type: data.question_type,
-        required: data.is_required === 'yes',
+        required: data.is_required === 'yes' || data.is_required === true ? 'yes' : 'no',
         defaultValue: data.default_value,
         displayOrder: data.display_order,
         groupLabel: data.group_label,
-        displayWidth: data.display_width
+        displayWidth: data.display_width,
+        default_source_table: data.default_source_table || null,
+        is_claim: data.is_claim === 'yes' || data.is_claim === true,
+        claim_per_unit: data.claim_per_unit || null,
+        claim_percentage: data.claim_percentage || null
       });
+      if (data.default_source_table) {
+        this.onTableChange(data.default_source_table);
+        setTimeout(() => {
+          this.questionForm.patchValue({
+            default_source_column: data.default_source_column || null
+          });
+        });
+      }
     } else {
       this.isEditMode = false;
       this.editingQuestionId = null;
-      this.questionForm.reset({ type: 'text', required: true });
+      this.questionForm.reset({
+        type: 'text',
+        required: true,
+        is_claim: false,
+        claim_per_unit: null,
+        claim_percentage: null
+      });
     }
     this.showQuestionDialog = true;
   }
@@ -185,14 +239,21 @@ export class IncentiveQuestionsComponent implements OnInit {
       proforma_id: this.proformaId,
       question_label: fv.label,
       question_type: fv.type,
-      is_required: fv.required ? 'yes' : 'no',
+      is_required: fv.required === 'yes' ? 'yes' : 'no',
       default_value: fv.defaultValue || '',
       display_order: fv.displayOrder || 1,
       group_label: fv.groupLabel || '',
       display_width: fv.displayWidth || 'col-12',
+      default_source_table: fv.default_source_table || null,
+      default_source_column: fv.default_source_column || null,
       status: true,
       validation_required: fv.required ? 'yes' : 'no'
     };
+    questionnaire.is_claim = fv.is_claim ? 'yes' : 'no';
+    if (fv.is_claim) {
+      questionnaire.claim_per_unit = fv.claim_per_unit || null;
+      questionnaire.claim_percentage = fv.claim_percentage || null;
+    }
     if (['file', 'image', 'video', 'audio'].includes(fv.type)) {
       questionnaire.upload_rule = {
         mimes: fv.mimes?.split(',') || this.getDefaultMimes(fv.type).split(','),
@@ -310,5 +371,135 @@ export class IncentiveQuestionsComponent implements OnInit {
       { label: 'Created At', value: new Date(this.selectedQuestion.created_at).toLocaleString() },
       { label: 'Updated At', value: new Date(this.selectedQuestion.updated_at).toLocaleString() },
     ];
+  }
+  onTableChange(table: string, prefillColumn?: string) {
+    this.questionForm.patchValue({ default_source_column: null });
+    this.availableColumnsDropdown = [];
+    this.showSourceHint = false;
+
+    if (!table) return;
+
+    this.genericService.getColumns(table).subscribe({
+      next: (res: any) => {
+        if (res && Array.isArray(res.columns)) {
+          this.availableColumnsDropdown = res.columns.map((col: string) => ({
+            name: col,
+            value: col
+          }));
+          this.availableColumnsDropdown.unshift({ name: '-- Select None --', value: '' });
+          if (prefillColumn && this.availableColumnsDropdown.some(c => c.value === prefillColumn)) {
+            this.questionForm.patchValue({ default_source_column: prefillColumn });
+          }
+        } else {
+          this.availableColumnsDropdown = [];
+          this.questionForm.patchValue({ default_source_column: null });
+        }
+      },
+      error: () => {
+        this.availableColumnsDropdown = [];
+        this.questionForm.patchValue({ default_source_column: null });
+      }
+    });
+  }
+  onSourceColumnClick() {
+    if (!this.questionForm.get('default_source_table')?.value) {
+      this.showSourceHint = true;
+    } else {
+      this.showSourceHint = false;
+    }
+  }
+  onClaimFieldClick() {
+    const isClaim = this.questionForm.get('is_claim')?.value;
+    if (!isClaim) {
+      this.showClaimHint = true;
+    }
+  }
+  closeDialog() {
+    this.showQuestionDialog = false;
+    this.onDialogClose();
+  }
+
+  onDialogClose() {
+    if (this.questionForm) {
+      this.questionForm.reset();
+    }
+    this.isEditMode = false;
+    this.showClaimHint = false;
+    this.availableColumnsDropdown = [];
+  }
+  openDummyPdf(event: Event) {
+    event.preventDefault();
+    const pdfContent = `
+    %PDF-1.4
+    1 0 obj
+    << /Type /Catalog /Pages 2 0 R >>
+    endobj
+    2 0 obj
+    << /Type /Pages /Kids [3 0 R] /Count 1 >>
+    endobj
+    3 0 obj
+    << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842]
+       /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+    endobj
+    4 0 obj
+    << /Length 500 >>
+    stream
+      BT
+      /F1 28 Tf
+      80 780 Td
+      (SWAAGAT 2.0 PORTAL) Tj
+
+      /F1 16 Tf
+      80 740 Td
+      (Government of Tripura) Tj
+
+      /F1 12 Tf
+      80 700 Td
+      (-----------------------------------------------) Tj
+      80 680 Td
+      (🌐 A Single Window Clearance System for Entrepreneurs) Tj
+
+      80 660 Td
+      (⚙️ Streamlined Approval Process for Businesses) Tj
+      80 640 Td
+      (📄 Unified Interface to Apply, Track and Receive Approvals) Tj
+      80 620 Td
+      (🏛️ Integration with All Major Government Departments) Tj
+      80 600 Td
+      (🚀 Transparent, Fast and Paperless Workflow) Tj
+      80 580 Td
+      (🔒 Secure Digital Verification and Real-Time Updates) Tj
+      80 560 Td
+      (💡 Empowering Investors and Entrepreneurs in Tripura) Tj
+
+      /F1 12 Tf
+      80 520 Td
+      (-----------------------------------------------) Tj
+      80 500 Td
+      (Visit: https://swaagat.tripura.gov.in) Tj
+      ET
+    endstream
+    endobj
+    5 0 obj
+    << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+    endobj
+    xref
+    0 6
+    0000000000 65535 f 
+    0000000010 00000 n 
+    0000000060 00000 n 
+    0000000115 00000 n 
+    0000000640 00000 n 
+    0000001190 00000 n 
+    trailer
+    << /Root 1 0 R /Size 6 >>
+    startxref
+    1290
+    %%EOF
+  `;
+    const blob = new Blob([pdfContent], { type: 'application/pdf' });
+    const pdfUrl = URL.createObjectURL(blob);
+    window.open(pdfUrl, '_blank');
+    setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
   }
 }

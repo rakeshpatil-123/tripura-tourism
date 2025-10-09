@@ -26,6 +26,7 @@
           <mat-option value="text">Text</mat-option>
           <mat-option value="number">Number</mat-option>
           <mat-option value="select">Dropdown</mat-option>
+          <mat-option value="file">File</mat-option>
           <mat-option value="radio">Radio</mat-option>
           <mat-option value="checkbox">Checkbox</mat-option>
           <mat-option value="date">Date</mat-option>
@@ -38,14 +39,18 @@
         <input matInput formControlName="default_value" placeholder="Enter default value" />
       </mat-form-field>
     </div>
-
     <div class="form-row" *ngIf="['select','radio','checkbox'].includes(questionnaireForm.get('question_type')?.value)">
       <mat-form-field appearance="outline" class="form-field full-width">
         <mat-label>Options (comma separated)</mat-label>
         <input matInput formControlName="options" placeholder="Eg: Option1, Option2, Option3" />
       </mat-form-field>
     </div>
-
+    <div class="form-row" *ngIf="questionnaireForm.get('question_type')?.value === 'file'">
+      <app-ilogi-file-upload [formControlName]="'sample_format'" [fileUrl]="getExistingFileUrl('sample_format')"
+        accept=".png,.jpg,.jpeg,.pdf" label="Upload Template Format" (onRemove)="removeFile('sample_format')"
+        (fileSelected)="onFileSelected($event, 'sample_format')">
+      </app-ilogi-file-upload>
+    </div>
     <div class="form-row">
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>Is Required?</mat-label>
@@ -71,12 +76,9 @@
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>Source Column</mat-label>
         <mat-select formControlName="default_source_column">
-          <mat-option *ngFor="let col of availableColumns" [value]="col">
-            {{ col }}
-          </mat-option>
+          <mat-option *ngFor="let col of availableColumns" [value]="col">{{ col }}</mat-option>
         </mat-select>
       </mat-form-field>
-
     </div>
     <div class="form-row">
       <mat-form-field appearance="outline" class="form-field">
@@ -104,41 +106,24 @@
         </mat-select>
       </mat-form-field>
     </div>
-
     <div formGroupName="validation_rule" class="validation-section">
       <h3>Validation Rule</h3>
       <div class="form-row validation-row">
         <mat-form-field appearance="outline" class="form-field minmax-field">
           <mat-label>Min Length</mat-label>
           <input matInput type="number" formControlName="minLength" />
-          <mat-error *ngIf="questionnaireForm.get('validation_rule.minLength')?.hasError('required')">
-            Min Length is required
-          </mat-error>
-          <mat-error *ngIf="questionnaireForm.get('validation_rule.minLength')?.hasError('min')">
-            Min Length must be at least 1
-          </mat-error>
-          <mat-error *ngIf="questionnaireForm.get('validation_rule.minLength')?.hasError('max')">
-            Min Length cannot be more than 1000
-          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field minmax-field">
           <mat-label>Max Length</mat-label>
           <input matInput type="number" formControlName="maxLength" />
-          <mat-error *ngIf="questionnaireForm.get('validation_rule.maxLength')?.hasError('required')">
-            Max Length is required
-          </mat-error>
-          <mat-error *ngIf="questionnaireForm.get('validation_rule.maxLength')?.hasError('min')">
-            Max Length must be at least 1
-          </mat-error>
-          <mat-error *ngIf="questionnaireForm.get('validation_rule.maxLength')?.hasError('max')">
-            Max Length cannot be more than 1000
-          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field pattern-field">
           <mat-label>Pattern</mat-label>
-          <input matInput formControlName="pattern" placeholder="^[A-Za-z ]+$" />
+          <mat-select formControlName="pattern" placeholder="Select Pattern">
+            <mat-option *ngFor="let item of regexPatterns" [value]="item.value">{{ item.label }}</mat-option>
+          </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field error-field">
@@ -148,12 +133,10 @@
       </div>
     </div>
 
-
   </form>
 
   <div class="preview-section" *ngIf="apiQuestions.length">
     <h3>Questionnaires Preview</h3>
-
     <table mat-table [dataSource]="apiQuestions" class="mat-elevation-z2 preview-table full-width">
 
       <ng-container matColumnDef="question_label">

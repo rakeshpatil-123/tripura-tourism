@@ -2,8 +2,8 @@
 <div class="swgt-container">
   <div class="registration-container">
     <div class="card">
-      <h2 class="title">New User Registration</h2>
-      <p class="subtitle">Fill in your details to register</p>
+      <h2 class="title">{{ editMode ? 'Edit User Registration' : 'New User Registration' }}</h2>
+      <p class="subtitle">Fill in your details to {{ editMode ? 'update' : 'register' }}</p>
 
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form">
         <div class="enterprise-form">
@@ -28,11 +28,11 @@
             placeholder="Choose a username"></app-ilogi-input>
 
           <!-- City -->
-          <app-ilogi-input fieldId="registered_enterprise_city" fieldLabel="City" [mandatory]="true"
+          <app-ilogi-input *ngIf="!(sourcePage === 'departmental-users')" fieldId="registered_enterprise_city" fieldLabel="City" [mandatory]="true"
             formControlName="registered_enterprise_city" placeholder="Enter city"></app-ilogi-input>
         </div>
 
-        <div class="single-field">
+        <div *ngIf="!(sourcePage === 'departmental-users')" class="single-field">
           <!-- Address -->
           <app-ilogi-input class="height-20" fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
             [mandatory]="true" formControlName="registered_enterprise_address"
@@ -63,9 +63,9 @@
           </app-ilogi-select>
 
           <!-- ULB -->
-          <app-ilogi-select *ngIf="shouldShow('block')" fieldId="ulb_id" fieldLabel="ULB" [mandatory]="true" 
+          <app-ilogi-select *ngIf="shouldShow('block')" fieldId="ulb_id" fieldLabel="ULB/Block" [mandatory]="true" 
             formControlName="ulb_id" [selectOptions]="ulbs" 
-             placeholder="Select ULB" 
+             placeholder="Select ULB/Block" 
             [disabled]="!subdivisions.length || loadingSubdivisions">
           </app-ilogi-select>
 
@@ -90,7 +90,7 @@
         <!-- Submit Button -->
         <div class="form-actions">
           <button type="submit" class="btn-submit btn btn-primary" [disabled]="!registrationForm.valid">
-            Register
+           {{editMode ? 'Update' : 'Register'}}
           </button>
         </div>
       </form>

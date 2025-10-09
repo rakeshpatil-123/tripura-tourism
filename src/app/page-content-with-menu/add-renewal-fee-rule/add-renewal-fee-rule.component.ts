@@ -145,7 +145,7 @@ export class AddRenewalFeeRuleComponent implements OnInit {
     }
     const api$ =
       this.data.mode === 'edit'
-        ? this.genericService.updateServiceFeeRule(payload)
+        ? this.genericService.updateRenewalFeeRule(payload)
         : this.genericService.addRenewalFeeRule(payload);
 
     api$.pipe(finalize(() => (this.isSubmitting = false))).subscribe({
