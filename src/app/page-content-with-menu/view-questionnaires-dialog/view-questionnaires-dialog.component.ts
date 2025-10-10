@@ -63,6 +63,7 @@ export class ViewQuestionnairesDialogComponent implements OnInit {
     'group_label',
     'display_order',
     'display_width',
+    'section_name',
     'created_by',
     'updated_by',
     'actions',

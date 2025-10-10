@@ -1577,4 +1577,13 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
       { headers: this.getHeaders() }
     );
   }
+  getServiceQuestionnaireSection(serviceId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/fetch-questionnaire-section`,
+      {
+        service_id: serviceId
+      },
+      { headers: this.getHeaders() }
+    );
+  }
 }
