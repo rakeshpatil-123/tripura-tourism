@@ -80,7 +80,7 @@
       </mat-form-field>
       <mat-form-field appearance="outline" class="form-field full-width">
         <mat-label>Depend on Service</mat-label>
-        <mat-select formControlName="depends_on_services" placeholder="Select dependent service">
+        <mat-select formControlName="depends_on_services" placeholder="Select dependent service" multiple>
           <mat-option value="" disabled>Select a service</mat-option>
           <mat-option *ngFor="let service of allServices" [value]="service.name">
             {{ service.name }} — <small>{{ service.department_name || 'No Department' }}</small>
