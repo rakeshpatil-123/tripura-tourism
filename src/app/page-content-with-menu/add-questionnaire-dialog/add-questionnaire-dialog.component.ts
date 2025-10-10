@@ -44,6 +44,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
   apiQuestions: any[] = [];
   availableColumns: string[] = [];
   selectedFile: File | null = null;
+  sections: string[] = [];
   displayedColumns: string[] = [
     'question_label',
     'question_type',
@@ -53,6 +54,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     'display_order',
     'group_label',
     'display_width',
+    'status'
   ];
   regexPatterns = [
     { label: 'None', value: '' },
@@ -84,26 +86,26 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       service_id: [this.data?.service?.id || '', Validators.required],
       question_label: ['', Validators.required],
       question_type: ['text', Validators.required],
-      is_required: ['yes', Validators.required],
+      is_required: ['no'],
       options: [null],
       default_value: [null],
+      is_section: ['null'],
+      section_name: [''],
       default_source_table: [null],
       default_source_column: [null],
-      display_order: [1, [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+      display_order: [1],
       group_label: [''],
       sample_format: [null],
       display_width: ['50%'],
-      status: [1, Validators.required],
-      validation_required: ['yes', Validators.required],
+      status: [1],
+      validation_required: ['no'],
       validation_rule: this.fb.group({
         type: ['text'],
         minLength: [
-          3,
-          [Validators.required, Validators.min(1), Validators.max(100)],
+          null,
         ],
         maxLength: [
-          1000,
-          [Validators.required, Validators.min(1), Validators.max(1000)],
+          null,
         ],
         pattern: [''],
         errorMessage: [''],
@@ -112,6 +114,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getSectionList();
     if (this.data?.questionnaire) {
       this.questionnaireForm.patchValue(this.data.questionnaire);
       if (this.data.questionnaire.sample_format) {
@@ -146,9 +149,24 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][question_type]', formValue.question_type);
     formData.append('questionnaires[0][is_required]', formValue.is_required);
     formData.append('questionnaires[0][validation_required]', formValue.validation_required);
+    formData.append('questionnaires[0][options]', formValue.options || '');
+    formData.append('questionnaires[0][default_source_table]', formValue.default_source_table || '');
+    formData.append('questionnaires[0][default_source_column]', formValue.default_source_column || '');
+    formData.append('questionnaires[0][default_value]', formValue.default_value || '');
+    formData.append('questionnaires[0][section_name]', formValue.section_name || '');
+    formData.append('questionnaires[0][is_section]', formValue.is_section || "no");
+    formData.append('questionnaires[0][display_order]', formValue.display_order.toString());
+    formData.append('questionnaires[0][group_label]', formValue.group_label || '');
+    formData.append('questionnaires[0][display_width]', formValue.display_width || '');
+    formData.append('questionnaires[0][status]', formValue.status);
     if (this.selectedFile) {
       formData.append('questionnaires[0][sample_format]', this.selectedFile, this.selectedFile.name);
     }
+    const rule = formValue.validation_rule || {};
+    formData.append('questionnaires[0][validation_rule][minLength]', rule.minLength || '');
+    formData.append('questionnaires[0][validation_rule][maxLength]', rule.maxLength || '');
+    formData.append('questionnaires[0][validation_rule][pattern]', rule.pattern || '');
+    formData.append('questionnaires[0][validation_rule][errorMessage]', rule.errorMessage || '');
 
     if (this.data.mode === 'add') {
       this.genericService.saveQuestionnaire(formData).subscribe({
@@ -165,7 +183,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     } else {
       this.genericService.updateQuestionnaire(formData).subscribe({
         next: () => this.snackBar.open('Questionnaire updated successfully', 'success', { duration: 3000 }),
-      error: () => this.snackBar.open('Failed to update questionnaire', 'error', { duration: 3000 })
+      error: () => this.snackBar.open('Failed to update questionnaire', 'error', { duration: 3000 }),
     });
   }
 }
@@ -228,5 +246,13 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         });
       },
     });
+  }
+  
+  getSectionList() {
+    this.genericService
+      .getServiceQuestionnaireSection(this.data.service.id)
+      .subscribe((res: any) => {
+        this.sections = res.data || [];
+      });
   }
 }
