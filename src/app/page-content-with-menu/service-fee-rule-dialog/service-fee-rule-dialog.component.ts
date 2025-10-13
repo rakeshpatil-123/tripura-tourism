@@ -1,11 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,14 +19,14 @@ import { GenericService } from '../../_service/generic/generic.service';
   imports: [
     MatInputModule,
     MatSelectModule,
-    MatDialogModule,
     MatIconModule,
     CommonModule,
     ReactiveFormsModule,
     MatTableModule,
     MatFormFieldModule,
     MatButtonModule,
-  ],
+    MatDialogModule
+],
 })
 export class ServiceFeeRuleDialogComponent implements OnInit {
   feeRuleForm: FormGroup;
@@ -53,7 +53,7 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   ) {
     this.feeRuleForm = this.fb.group({
       fee_type: ['calculated'],
-      question_id: [null],
+      question_id: [null], // will store NUMBER (not string)
       condition_operator: [null],
       condition_value_start: [null],
       condition_value_end: [null],
@@ -75,33 +75,32 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
 
       this.feeRuleForm.patchValue({
         fee_type: r.fee_type ?? 'calculated',
-        question_id: r.question_id ? String(r.question_id) : null,
         condition_operator: r.condition_operator ?? null,
-        condition_value_start: r.condition_value_start ? String(r.condition_value_start) : null,
-        condition_value_end: r.condition_value_end ? String(r.condition_value_end) : null,
-        fixed_fee: r.fixed_fee && r.fixed_fee !== '-' ? String(r.fixed_fee) : null,
-        calculated_fee: r.calculated_fee && r.calculated_fee !== '-' ? String(r.calculated_fee) : null,
-        fixed_calculated_fee: r.fixed_calculated_fee && r.fixed_calculated_fee !== '-' ? String(r.fixed_calculated_fee) : null,
-        per_unit_fee: r.per_unit_fee && r.per_unit_fee !== '-' ? String(r.per_unit_fee) : null,
+        condition_value_start: r.condition_value_start !== '-' ? r.condition_value_start : null,
+        condition_value_end: r.condition_value_end !== '-' ? r.condition_value_end : null,
+        fixed_fee: r.fixed_fee && r.fixed_fee !== '-' ? r.fixed_fee : null,
+        calculated_fee: r.calculated_fee && r.calculated_fee !== '-' ? r.calculated_fee : null,
+        fixed_calculated_fee: r.fixed_calculated_fee && r.fixed_calculated_fee !== '-' ? r.fixed_calculated_fee : null,
+        per_unit_fee: r.per_unit_fee && r.per_unit_fee !== '-' ? r.per_unit_fee : null,
         priority: r.priority ?? 1,
-        status: r.status ? String(r.status) : '1',
-        renewal_cycle_id: r.renewal_cycle_id ? (r.renewal_cycle_id) : null,
+        status: r.status != null ? String(r.status) : '1',
+        renewal_cycle_id: r.renewal_cycle_id ?? null,
       });
     }
-
     this.applyDynamicValidations(
       this.feeRuleForm.get('fee_type')?.value,
       this.feeRuleForm.get('condition_operator')?.value
     );
-
     this.feeRuleForm.get('fee_type')?.valueChanges.subscribe((type) => {
       this.applyDynamicValidations(type, this.feeRuleForm.get('condition_operator')?.value);
     });
-
     this.feeRuleForm.get('condition_operator')?.valueChanges.subscribe((operator) => {
       this.applyDynamicValidations(this.feeRuleForm.get('fee_type')?.value, operator);
     });
-    this.loadQuestions(!!this.data.service?.id ? this.data.service.id : this.data.rules.service_id);
+    const serviceId = this.data.service?.id ?? this.data.rules?.service_id;
+    if (serviceId) {
+      this.loadQuestions(serviceId);
+    }
   }
 
   private applyDynamicValidations(feeType: string, operator: string) {
@@ -114,16 +113,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     const perUnitFee = this.feeRuleForm.get('per_unit_fee');
 
     [fixedFee, questionId, condStart, condEnd, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
-
-    // if (feeType === 'hardcoded') {
-    //   fixedFee?.setValidators([Validators.required]); 
-    // } else {
-    //   condStart?.setValidators([Validators.required]);
-    //   if (operator === 'between') condEnd?.setValidators([Validators.required]);
-    //   calcFee?.setValidators([Validators.min(0)]);
-    //   fixedCalcFee?.setValidators([Validators.min(0)]);
-    //   perUnitFee?.setValidators([Validators.min(0)]);
-    // }
 
     [fixedFee, questionId, condStart, condEnd, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
   }
@@ -142,17 +131,17 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     const payloadRule: any = {
       id: this.data.mode === 'edit' ? this.apiRules[0].id : undefined,
       fee_type: raw.fee_type,
-      question_id: raw.question_id ? String(raw.question_id) : null,
+      question_id: raw.question_id != null ? String(raw.question_id) : null,
       condition_operator: raw.condition_operator ?? null,
-      condition_value_start: raw.condition_value_start ? String(raw.condition_value_start) : null,
-      condition_value_end: raw.condition_value_end ? String(raw.condition_value_end) : null,
-      fixed_fee: raw.fixed_fee ? String(raw.fixed_fee) : null,
-      calculated_fee: raw.calculated_fee ? String(raw.calculated_fee) : null,
-      fixed_calculated_fee: raw.fixed_calculated_fee ? String(raw.fixed_calculated_fee) : null,
-      per_unit_fee: raw.per_unit_fee ? String(raw.per_unit_fee) : null,
+      condition_value_start: raw.condition_value_start != null ? String(raw.condition_value_start) : null,
+      condition_value_end: raw.condition_value_end != null ? String(raw.condition_value_end) : null,
+      fixed_fee: raw.fixed_fee != null ? String(raw.fixed_fee) : null,
+      calculated_fee: raw.calculated_fee != null ? String(raw.calculated_fee) : null,
+      fixed_calculated_fee: raw.fixed_calculated_fee != null ? String(raw.fixed_calculated_fee) : null,
+      per_unit_fee: raw.per_unit_fee != null ? String(raw.per_unit_fee) : null,
       priority: String(raw.priority ?? 1),
       status: String(raw.status ?? '1'),
-      service_id: String(this.data?.rules?.service_id ?? this.data?.service?.id ?? raw?.service_id ?? 1),
+      service_id: String(this.data?.rules?.service_id ?? this.data?.service?.id ?? 1),
       renewal_cycle_id: this.data.mode === 'edit' ? (this.apiRules[0].renewal_cycle_id) : (raw.renewal_cycle_id ?? null),
       rules: raw.rules ?? 'base_fee + (units * per_unit_fee)',
       created_at: this.data.mode === 'edit' ? this.apiRules[0].created_at : created_at,
@@ -164,6 +153,7 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       this.genericService.addServiceFeeRule(requestBody).subscribe(
         (response: any) => {
           if (response?.status) {
+            this.dialogRef.close('added');
             this.genericService.openSnackBar(response.message || 'Fee rule added successfully', 'Success');
             this.feeRuleForm.reset({
               fee_type: 'calculated',
@@ -202,32 +192,47 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   loadRenewalCycles(): void {
     const sid = this.data.service?.id ?? this.data.service?.service_id;
     if (!sid) return;
-    this.genericService
-      .getRenewalCycle(sid)
-      .subscribe({
+    this.genericService.getRenewalCycle(sid).subscribe({
         next: (res: any) => {
           if (res?.status) this.renewalCycles = Array.isArray(res.data) ? res.data : [{ id: 1, name: 'Annual Renewal' }, { id: 2, name: '3-Year Renewal' }];
         },
       });
   }
-
-  trackByCycle(index: number, item: any): number {
-    return item.id;
-  }
   loadQuestions(serviceId: number): void {
+    if (this.data.service?.questions?.length) {
+      this.questions = this.data.service.questions;
+      this.patchQuestionIfEdit();
+      return;
+    }
     this.genericService.getServiceQuestionnaires(serviceId).subscribe({
       next: (res: any) => {
         if (res.status === 1 && res.data?.length) {
-          const uniqueQuestions = res.data.filter(
-            (v: any, i: number, a: any[]) => a.findIndex(q => q.id === v.id) === i
-          );
-          this.questions = uniqueQuestions;
+          this.questions = res.data.filter((v: any, i: number, a: any[]) => a.findIndex(q => q.id === v.id) === i);
+        } else {
+          this.questions = [];
         }
+        this.patchQuestionIfEdit();
       },
       error: (err) => {
-        console.error(err);
-      }
+        console.error('Failed to load questions', err);
+        this.questions = [];
+        this.patchQuestionIfEdit();
+      },
     });
+  }
+  private patchQuestionIfEdit() {
+    if (this.data.mode === 'edit' && this.data.rules?.question_id != null) {
+      const qid = Number(this.data.rules.question_id);
+      const existing = this.questions.find(q => Number(q.id) === qid);
+      if (existing) {
+        this.feeRuleForm.patchValue({ question_id: qid });
+      } else {
+        console.warn('Edit question id not found in loaded questions:', qid);
+      }
+    }
+  }
+  trackByCycle(index: number, item: any): number {
+    return item.id;
   }
 
   close() {

@@ -89,8 +89,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       is_required: ['no'],
       options: [null],
       default_value: [null],
-      is_section: ['null'],
-      section_name: [''],
+      is_section: [null],
+      section_name: [null],
       default_source_table: [null],
       default_source_column: [null],
       display_order: [1],
@@ -153,7 +153,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][default_source_table]', formValue.default_source_table || '');
     formData.append('questionnaires[0][default_source_column]', formValue.default_source_column || '');
     formData.append('questionnaires[0][default_value]', formValue.default_value || '');
-    formData.append('questionnaires[0][section_name]', formValue.section_name || '');
+    const sectionNameValue = (formValue.is_section === 'no') ? null : (formValue.section_name ?? null);
+    formData.append('questionnaires[0][section_name]', sectionNameValue);
     formData.append('questionnaires[0][is_section]', formValue.is_section || "no");
     formData.append('questionnaires[0][display_order]', formValue.display_order.toString());
     formData.append('questionnaires[0][group_label]', formValue.group_label || '');
@@ -168,24 +169,22 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][validation_rule][pattern]', rule.pattern || '');
     formData.append('questionnaires[0][validation_rule][errorMessage]', rule.errorMessage || '');
 
-    if (this.data.mode === 'add') {
-      this.genericService.saveQuestionnaire(formData).subscribe({
+      const request$ = this.data.mode === 'add'
+        ? this.genericService.saveQuestionnaire(formData)
+        : this.genericService.updateQuestionnaire(formData);
+
+      request$.subscribe({
         next: (res: any) => {
-          if (res.status === 1) {
-            this.snackBar.open('Questionnaire added successfully', 'success', { duration: 3000 });
-              this.dialogRef.close('added');
+          const successMsg = this.data.mode === 'add' ? 'added' : 'updated';
+          if (res.status === 1 || this.data.mode === 'edit') {
+            this.snackBar.open(`Questionnaire ${successMsg} successfully`, 'success', { duration: 3000 });
+            this.dialogRef.close(successMsg);
           } else {
-            this.snackBar.open(res.message || 'Failed to add questionnaire', 'error', { duration: 3000 });
+            this.snackBar.open(res.message || `Failed to ${this.data.mode === 'add' ? 'add' : 'update'} questionnaire`, 'error', { duration: 3000 });
           }
         },
-        error: () => this.snackBar.open('Failed to add questionnaire', 'error', { duration: 3000 })
-      });
-    } else {
-      this.genericService.updateQuestionnaire(formData).subscribe({
-        next: () => this.snackBar.open('Questionnaire updated successfully', 'success', { duration: 3000 }),
-      error: () => this.snackBar.open('Failed to update questionnaire', 'error', { duration: 3000 }),
+        error: () => this.snackBar.open(`Failed to ${this.data.mode === 'add' ? 'add' : 'update'} questionnaire`, 'error', { duration: 3000 })
     });
-  }
 }
 
   onFileSelected(file: File, controlName: string): void {

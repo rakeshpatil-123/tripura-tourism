@@ -117,7 +117,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
   ];
   dataSource = new MatTableDataSource<Service>([]);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  selectedDepartment: any = null;
+  selectedDepartment: any = '';
   departments: any[] = [];
   allServices: Service[] = [];
   serviceModes: SelectOption[] = [
@@ -125,7 +125,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
     { id: 'native', name: 'Native' },
     { id: 'third_party', name: 'Third Party' }
   ];
-  selectedServiceMode: string | null = null;
+  selectedServiceMode: string | null = '';
 
   constructor(
     private genericService: GenericService,
@@ -296,7 +296,6 @@ deleteService(service: Service): void {
         if (action === 'add') this.addOrEditThirdPartyParams(service, 'add');
         if (action === 'edit') this.addOrEditThirdPartyParams(service, 'edit');
         if (action === 'view') this.viewThirdPartyParams(service, 'view');
-        if (action === 'delete') this.addOrEditThirdPartyParams(service, 'delete');
         break;
     }
   }
@@ -320,8 +319,8 @@ deleteService(service: Service): void {
 
   viewQuestionnaire(service: Service): void {
     this.dialog.open(ViewQuestionnairesDialogComponent, {
-      width: '90vw',
-      maxWidth: '1000px',
+      width: '97vw',
+      maxWidth: '1200px',
       height: '80vh',
       maxHeight: '90vh',
       data: { service },
@@ -454,35 +453,7 @@ deleteService(service: Service): void {
       }
     });
   }
-  addOrEditThirdPartyParams(service: any, mode: 'add' | 'edit' | 'delete'): void {
-    if (mode === 'delete') {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: `Delete parameter "${service.service_title_or_description}"?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel'
-      }).then(result => {
-        if (result.isConfirmed) {
-          this.loaderService.showLoader();
-          this.genericService.deleteThirdPartyParams(service.id)
-            .pipe(finalize(() => this.loaderService.hideLoader()))
-            .subscribe({
-              next: (res: any) => {
-                if (res?.status === 1) {
-                  Swal.fire('Deleted!', `"${service.service_title_or_description}" deleted successfully.`, 'success');
-                  this.loadServices();
-                } else {
-                  Swal.fire('Error', res?.message || 'Failed to delete parameter.', 'error');
-                }
-              },
-              error: () => Swal.fire('Error', 'Failed to delete parameter.', 'error')
-            });
-        }
-      });
-      return;
-    }
+  addOrEditThirdPartyParams(service: any, mode: 'add' | 'edit'): void {
     const dialogRef = this.dialog.open(ThirdPartyParamsComponent, {
       width: '70vw',
       maxWidth: '95vw',
@@ -502,10 +473,11 @@ deleteService(service: Service): void {
     });
   }
   viewThirdPartyParams(service: Service, mode: 'view'): void {
+    const isMobile = window.innerWidth < 768;
     this.dialog.open(ViewThirdPartyParamsComponent, {
-      width: '50vw',
-      maxWidth: '90vw',
-      height: '70vh',
+      width: isMobile ? '95vw' : '75vw',
+      height: isMobile ? '85vh' : '80vh',
+      maxWidth: '95vw',
       maxHeight: '90vh',
       panelClass: 'custom-dialog',
       enterAnimationDuration: '300ms',
@@ -513,6 +485,7 @@ deleteService(service: Service): void {
       data: { service, mode },
     });
   }
+
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();

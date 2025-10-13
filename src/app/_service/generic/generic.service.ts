@@ -1530,14 +1530,14 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   }
   createThirdPartyParams(payload: any) {
     return this.http.post<any>(
-      `${this.baseUrl}/api/admin/store-service-third-party-params`,
+      `${this.baseUrl}/api/admin/service-third-party-params-store`,
       payload,
       { headers: this.getHeaders() }
     );
   }
   updateThirdPartyParams(payload: any) {
     return this.http.post<any>(
-      `${this.baseUrl}/api/admin/store-service-third-party-params`,
+      `${this.baseUrl}/api/admin/service-third-party-params-update`,
       payload,
       { headers: this.getHeaders() }
     );
@@ -1552,7 +1552,7 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   deleteThirdPartyParams(thirdPartyId: any) {
     return this.http.post<any>(
       `${this.baseUrl}/api/admin/service-third-party-params-delete`,
-      { service_id: thirdPartyId },
+      { id: thirdPartyId },
       { headers: this.getHeaders() }
     );
   }

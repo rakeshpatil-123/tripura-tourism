@@ -127,7 +127,7 @@ export class ViewServiceFeeRuleComponent implements OnInit, AfterViewInit {
       height: 'auto',
       maxHeight: '90vh',
       panelClass: 'center-dialog',
-      data: { service: this.data.service.name, mode: 'edit', rules: row },
+      data: { service: this.data.service, mode: 'edit', rules: row },
     });
 
     dialogRef.afterClosed().subscribe((result: string) => {
