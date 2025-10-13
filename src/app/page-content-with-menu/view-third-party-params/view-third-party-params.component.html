@@ -1,18 +1,92 @@
 <mat-dialog-content class="dialog-container">
   <div class="dialog-header">
-    <h2 class="dialog-title">Service: {{ data.service?.name || 'N/A' }}</h2>
-    <button mat-icon-button class="close-btn" (click)="close()">
-      <mat-icon>close</mat-icon>
-    </button>
+    <div class="title-wrap">
+      <h2 class="dialog-title">Service: {{ data.service?.name || 'N/A' }}</h2>
+      <div class="sub-title">ID: <strong>{{ data.service?.id }}</strong></div>
+    </div>
+
+    <div class="header-actions">
+      <button mat-icon-button class="close-btn" (click)="close()" matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
   </div>
-  <div class="details-grid">
-    <mat-card class="detail-card" *ngFor="let detail of serviceDetailsList">
-      <mat-card-content>
-        <div class="detail-key">{{ detail.label }}</div>
-        <div class="detail-value">{{ detail.value }}</div>
-      </mat-card-content>
-    </mat-card>
+  <div class="table-area" *ngIf="!loading; else loadingTpl">
+    <div *ngIf="noDataMessage; else dataTpl" class="no-data-wrapper">
+      <mat-icon class="no-data-icon" color="warn">info</mat-icon>
+      <p class="no-data-text">{{ noDataMessage }}</p>
+    </div>
+    <ng-template #dataTpl>
+      <div class="table-wrapper mat-elevation-z2">
+        <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
+
+          <ng-container matColumnDef="sno">
+            <th mat-header-cell *matHeaderCellDef class="header text-center">S.No</th>
+            <td mat-cell *matCellDef="let element; let i = index" class="text-center">
+              {{ (pageIndex * pageSize) + (i + 1) }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="param_name">
+            <th mat-header-cell *matHeaderCellDef class="header" mat-sort-header>Parameter</th>
+            <td mat-cell *matCellDef="let e">{{ e.param_name || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="param_type">
+            <th mat-header-cell *matHeaderCellDef class="header" mat-sort-header>Type</th>
+            <td mat-cell *matCellDef="let e">{{ e.param_type || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="param_required">
+            <th mat-header-cell *matHeaderCellDef class="header" mat-sort-header>Required</th>
+            <td mat-cell *matCellDef="let e">{{ e.param_required ? 'Yes' : 'No' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="default_value">
+            <th mat-header-cell *matHeaderCellDef class="header" mat-sort-header>Default Value</th>
+            <td mat-cell *matCellDef="let e">{{ e.default_value || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="data_source">
+            <th mat-header-cell *matHeaderCellDef class="header" mat-sort-header>Data Source</th>
+            <td mat-cell *matCellDef="let e">{{ e.data_source || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef class="header">Description</th>
+            <td mat-cell *matCellDef="let e">{{ e.description || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef class="header" mat-sort-header>Created</th>
+            <td mat-cell *matCellDef="let e">{{ formatDate(e.created_at) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="updated_at">
+            <th mat-header-cell *matHeaderCellDef class="header" mat-sort-header>Updated</th>
+            <td mat-cell *matCellDef="let e">{{ formatDate(e.updated_at) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-center header">Actions</th>
+            <td mat-cell *matCellDef="let e" class="text-center">
+              <button mat-icon-button matTooltip="Edit" (click)="onEdit(e)" aria-label="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Delete" (click)="onDelete(e)" aria-label="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="data-row"></tr>
+        </table>
+      </div>
+
+      <div class="footer-controls">
+        <div class="total">Total: {{ dataSource.data?.length || 0 }}</div>
+        <mat-paginator [pageSize]="6" [pageSizeOptions]="[6, 12, 24]" showFirstLastButtons></mat-paginator>
+      </div>
+    </ng-template>
   </div>
+  <ng-template #loadingTpl>
+    <div class="loading-wrapper">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    </div>
+  </ng-template>
 
   <div class="dialog-footer">
     <button mat-stroked-button color="primary" (click)="close()">Close</button>

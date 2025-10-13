@@ -103,17 +103,11 @@
           </button>
         </mat-menu>
         <mat-menu #thirdPartyParamsMenu="matMenu">
-          <button mat-menu-item *ngIf="element.third_party_params_id !== null" (click)="handleAction('third_party','view',element)">
+          <button mat-menu-item (click)="handleAction('third_party','view',element)">
             <mat-icon>visibility</mat-icon> View
           </button>
-          <button mat-menu-item *ngIf="element.third_party_params_id === null" (click)="handleAction('third_party','add',element)">
+          <button mat-menu-item (click)="handleAction('third_party','add',element)">
             <mat-icon>post_add</mat-icon> Add
-          </button>
-          <button mat-menu-item *ngIf="element.third_party_params_id !== null" (click)="handleAction('third_party','edit',element)">
-            <mat-icon>edit</mat-icon> Edit
-          </button>
-          <button mat-menu-item *ngIf="element.third_party_params_id !== null" (click)="handleAction('third_party','delete',element)">
-            <mat-icon>delete</mat-icon> Delete
           </button>
         </mat-menu>
 

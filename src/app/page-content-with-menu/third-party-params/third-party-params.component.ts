@@ -89,58 +89,27 @@ export class ThirdPartyParamsComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
 
-    // only load details if edit/view mode and id exists
-    if (this.mode !== 'add' && this.data?.service?.id) {
-      this.loadViewDetails(this.data.service.id);
-    }
   }
 
   initForm(): void {
-    const svc = this.data?.service || {};
+    const param = this.data?.parameter || {};
+    const isEdit = this.mode === 'edit';
+
     this.paramForm = this.fb.group({
-      param_name: [svc.param_name || '', [Validators.required, Validators.maxLength(120)]],
-      param_type: [svc.param_type || 'request', Validators.required],
-      param_required: [svc.param_required ?? 0, Validators.required],
-      default_value: [svc.default_value || '', Validators.maxLength(250)],
-      default_source_table: [svc.default_source_table || ''],
-      default_source_column: [svc.default_source_column || ''],
-      data_source: [svc.data_source || DataSourceType.USER_INPUT, Validators.required],
-      description: [svc.description || '', Validators.maxLength(500)],
-      created_at: [svc.created_at || ''],
-      updated_at: [svc.updated_at || '']
+      param_name: [param.param_name || '', [Validators.required, Validators.maxLength(120)]],
+      param_type: [param.param_type || 'request', Validators.required],
+      param_required: [param.param_required ?? 0, Validators.required],
+      default_value: [param.default_value || '', Validators.maxLength(250)],
+      default_source_table: [param.default_source_table || ''],
+      default_source_column: [param.default_source_column || ''],
+      data_source: [param.data_source || DataSourceType.USER_INPUT, Validators.required],
+      description: [param.description || '', Validators.maxLength(500)],
     });
+    if (isEdit && param.default_source_table) {
+      this.onTableChange(param.default_source_table, true);
+    }
   }
 
-loadViewDetails(id: number) {
-  this.loaderService.showLoader();
-  this.genericService.viewThirdPartyParams(id)
-    .pipe(finalize(() => this.loaderService.hideLoader()))
-    .subscribe({
-      next: (res: any) => {
-        if (res?.status === 1 && res.data) {
-          this.serviceDetails = res.data;
-
-          // Patch all fields
-          this.paramForm.patchValue(res.data);
-          this.prepareDetailsList(res.data);
-
-          // ✅ Trigger table -> column logic after patching
-          if (res.data.default_source_table) {
-            this.onTableChange(res.data.default_source_table, true);
-          }
-        } else {
-          if (this.mode === 'edit') {
-            Swal.fire('Info', 'No data found for this service.', 'info');
-          }
-        }
-      },
-      error: () => {
-        if (this.mode === 'edit') {
-          Swal.fire('Error', 'Failed to load parameter details.', 'error');
-        }
-      }
-    });
-}
 
 
   prepareDetailsList(data: any) {
@@ -209,10 +178,13 @@ onTableChange(table: string, initial = false) {
       return;
     }
 
-    const payload = {
+    const singleParam = {
       ...this.paramForm.value,
-      service_id: this.data?.service?.id
+      service_id: this.data?.service?.id,
+      id: this.data?.parameter?.id
     };
+
+    const payload = { params: [singleParam] };
 
     this.loading = true;
     const obs = this.mode === 'add'

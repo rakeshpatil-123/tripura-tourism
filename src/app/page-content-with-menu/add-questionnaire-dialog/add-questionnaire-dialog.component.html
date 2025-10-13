@@ -107,7 +107,7 @@
     <div class="form-row">
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>Display Order</mat-label>
-        <input matInput type="number" formControlName="display_order" />
+        <input matInput type="number" value="1" formControlName="display_order" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
@@ -174,46 +174,46 @@
     <table mat-table [dataSource]="apiQuestions" class="mat-elevation-z2 preview-table full-width">
 
       <ng-container matColumnDef="question_label">
-        <th mat-header-cell *matHeaderCellDef> Question </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Question </th>
         <td mat-cell *matCellDef="let q"> {{q.question_label}} </td>
       </ng-container>
 
       <ng-container matColumnDef="question_type">
-        <th mat-header-cell *matHeaderCellDef> Type </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Type </th>
         <td mat-cell *matCellDef="let q"> {{q.question_type}} </td>
       </ng-container>
 
       <ng-container matColumnDef="options">
-        <th mat-header-cell *matHeaderCellDef> Options </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Options </th>
         <td mat-cell *matCellDef="let q"> {{ getOptionsAsString(q) || '-' }} </td>
       </ng-container>
 
       <ng-container matColumnDef="default_value">
-        <th mat-header-cell *matHeaderCellDef> Default </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Default </th>
         <td mat-cell *matCellDef="let q"> {{q.default_value || '-'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="is_required">
-        <th mat-header-cell *matHeaderCellDef> Required </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Required </th>
         <td mat-cell *matCellDef="let q"> {{q.is_required}} </td>
       </ng-container>
 
       <ng-container matColumnDef="display_order">
-        <th mat-header-cell *matHeaderCellDef> Order </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Order </th>
         <td mat-cell *matCellDef="let q"> {{q.display_order}} </td>
       </ng-container>
 
       <ng-container matColumnDef="group_label">
-        <th mat-header-cell *matHeaderCellDef> Group </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Group </th>
         <td mat-cell *matCellDef="let q"> {{q.group_label}} </td>
       </ng-container>
 
       <ng-container matColumnDef="display_width">
-        <th mat-header-cell *matHeaderCellDef> Width </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Width </th>
         <td mat-cell *matCellDef="let q"> {{q.display_width}} </td>
       </ng-container>
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <th mat-header-cell *matHeaderCellDef class="header-class"> Status </th>
         <td mat-cell *matCellDef="let q"> {{q.status}} </td>
       </ng-container>
 

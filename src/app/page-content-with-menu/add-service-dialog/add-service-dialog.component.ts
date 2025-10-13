@@ -217,7 +217,7 @@ export class AddServiceDialogComponent implements OnInit {
         noc_payment_type: formValue.noc_payment_type,
         target_days: formValue.target_days,
         has_input_form: formValue.has_input_form ? 'yes' : 'no',
-        depends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.map((s: any) => `${s}`) : formValue.depends_on_services,
+        depends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.filter((s: any) => s !== '').map((s: any) => `${s}`) : formValue.depends_on_services,
         generate_id: formValue.generate_id ? 'yes' : 'no',
         generate_pdf: formValue.generate_pdf ? 'yes' : 'no',
         show_letter_date: formValue.show_letter_date ? 'yes' : 'no',
