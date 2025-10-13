@@ -80,7 +80,6 @@ export class EligibilityComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data)) {
-            // Map API response to match your table structure
             this.applications = res.data.map((item: any, index: number) => ({
               slNo: index + 1,
               applicationCode: item.application_code || '—',
@@ -91,7 +90,7 @@ export class EligibilityComponent implements OnInit {
               status: item.workflow_status || '_',
               proforma_id: item.proforma_id,
               // Optional: build dynamic link if needed later
-              link: '', // You can fill this if you have routing logic
+              link: '', 
             }));
           } else {
             this.applications = [];

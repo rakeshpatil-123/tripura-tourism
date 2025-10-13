@@ -5,8 +5,11 @@ import {
   FormArray,
   ReactiveFormsModule,
   Validators,
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiRadioComponent } from '../../../customInputComponents/ilogi-radio/ilogi-radio.component';
@@ -21,8 +24,8 @@ import { IlogiCheckboxComponent } from '../../../customInputComponents/ilogi-che
 
 interface ValidationRule {
   type: string;
-  minLength?: number;
-  maxLength?: number;
+  minLength?: number | string;
+  maxLength?: number | string;
   pattern?: string;
   errorMessage?: string;
 }
@@ -89,12 +92,32 @@ export class ServiceApplicationComponent implements OnInit {
   serviceId!: number;
   loading = true;
   readonlyFields: { [key: number]: boolean } = {};
-
+  private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (value == null || value === '') {
+        return null;
+      }
+      const stringValue = String(value).replace(/[^0-9]/g, '');
+      if (min !== undefined && stringValue.length < min) {
+        return {
+          minLength: { requiredLength: min, actualLength: stringValue.length },
+        };
+      }
+      if (max !== undefined && stringValue.length > max) {
+        return {
+          maxLength: { requiredLength: max, actualLength: stringValue.length },
+        };
+      }
+      return null;
+    };
+  }
   constructor(
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private apiService: GenericService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -141,12 +164,15 @@ export class ServiceApplicationComponent implements OnInit {
 
   processSections(): void {
     this.sectionGroups = [];
-    
-    // Group questions by section_name (only where is_section === "yes" AND section_name is not null/empty)
+
     const sectionMap = new Map<string, ServiceQuestion[]>();
-    
-    this.questions.forEach(question => {
-      if (question.is_section === 'yes' && question.section_name && question.section_name.trim() !== '') {
+
+    this.questions.forEach((question) => {
+      if (
+        question.is_section === 'yes' &&
+        question.section_name &&
+        question.section_name.trim() !== ''
+      ) {
         if (!sectionMap.has(question.section_name)) {
           sectionMap.set(question.section_name, []);
         }
@@ -154,22 +180,25 @@ export class ServiceApplicationComponent implements OnInit {
       }
     });
 
-    // Create section groups
     sectionMap.forEach((questions, sectionName) => {
-      const sortedQuestions = [...questions].sort((a, b) => 
-        (a.display_order || 0) - (b.display_order || 0)
+      const sortedQuestions = [...questions].sort(
+        (a, b) => (a.display_order || 0) - (b.display_order || 0)
       );
-      
+
       this.sectionGroups.push({
         sectionName,
         questions: sortedQuestions,
-        formArray: this.fb.array([])
+        formArray: this.fb.array([]),
       });
     });
 
-    // Keep only non-section questions in the main array
-    this.questions = this.questions.filter(q => 
-      !(q.is_section === 'yes' && q.section_name && q.section_name.trim() !== '')
+    this.questions = this.questions.filter(
+      (q) =>
+        !(
+          q.is_section === 'yes' &&
+          q.section_name &&
+          q.section_name.trim() !== ''
+        )
     );
   }
 
@@ -203,14 +232,21 @@ export class ServiceApplicationComponent implements OnInit {
         .subscribe({
           next: (res: any) => {
             let defaultValue: any = null;
-            
-            if (res && (res.hasOwnProperty('value') || res.hasOwnProperty(columnKey))) {
+
+            if (
+              res &&
+              (res.hasOwnProperty('value') || res.hasOwnProperty(columnKey))
+            ) {
               defaultValue = res.value || res[columnKey];
             } else if (res?.status === 1 && res.data && res.data.length > 0) {
               defaultValue = res.data[0].value || res.data[0][columnKey];
             }
 
-            if (defaultValue !== undefined && defaultValue !== null && defaultValue !== '') {
+            if (
+              defaultValue !== undefined &&
+              defaultValue !== null &&
+              defaultValue !== ''
+            ) {
               const controlName = question.id.toString();
               const control = this.serviceForm.get(controlName);
               if (control) {
@@ -221,8 +257,11 @@ export class ServiceApplicationComponent implements OnInit {
             }
           },
           error: (err) => {
-            console.error(`Failed to load default value for question ${question.id}:`, err);
-          }
+            console.error(
+              `Failed to load default value for question ${question.id}:`,
+              err
+            );
+          },
         });
     });
   }
@@ -238,10 +277,11 @@ export class ServiceApplicationComponent implements OnInit {
     });
   }
 
+ 
+
   buildForm(): void {
     const group: any = {};
 
-    // Build form for regular questions
     this.questions.forEach((q) => {
       const validators = [];
 
@@ -252,13 +292,38 @@ export class ServiceApplicationComponent implements OnInit {
       if (q.validation_required === 'yes' && q.validation_rule) {
         const rule = q.validation_rule;
 
-        if (rule.minLength !== undefined) {
-          validators.push(Validators.minLength(rule.minLength));
-        }
-        if (rule.maxLength !== undefined) {
-          validators.push(Validators.maxLength(rule.maxLength));
+        // For 'number' type, use digitLengthValidator instead of minLength/maxLength
+        // For 'number' type, use digitLengthValidator instead of minLength/maxLength
+        if (q.question_type === 'number') {
+          let min: number | undefined = undefined;
+          let max: number | undefined = undefined;
+
+          if (rule.minLength != null && rule.minLength !== '') {
+            const parsed = Number(rule.minLength);
+            if (!isNaN(parsed)) min = parsed;
+          }
+
+          if (rule.maxLength != null && rule.maxLength !== '') {
+            const parsed = Number(rule.maxLength);
+            if (!isNaN(parsed)) max = parsed;
+          }
+
+          validators.push(
+            ServiceApplicationComponent.digitLengthValidator(min, max)
+          );
+        } else {
+          // For text, use standard minLength/maxLength
+          if (rule.minLength != null && rule.minLength !== '') {
+            const min = Number(rule.minLength);
+            if (!isNaN(min)) validators.push(Validators.minLength(min));
+          }
+          if (rule.maxLength != null && rule.maxLength !== '') {
+            const max = Number(rule.maxLength);
+            if (!isNaN(max)) validators.push(Validators.maxLength(max));
+          }
         }
 
+        // Pattern validation (if needed)
         if (
           rule.pattern &&
           rule.pattern.trim() !== '' &&
@@ -267,7 +332,7 @@ export class ServiceApplicationComponent implements OnInit {
           try {
             validators.push(Validators.pattern(new RegExp(rule.pattern)));
           } catch (e) {
-            console.warn(`Invalid regex pattern for question ${q.id}:`, rule.pattern);
+            console.warn(`Invalid regex for ${q.id}:`, rule.pattern);
           }
         }
       }
@@ -291,7 +356,7 @@ export class ServiceApplicationComponent implements OnInit {
     });
 
     // Build form arrays for sections
-    this.sectionGroups.forEach(sectionGroup => {
+    this.sectionGroups.forEach((sectionGroup) => {
       const initialRow = this.createSectionRow(sectionGroup.questions);
       sectionGroup.formArray.push(initialRow);
     });
@@ -301,28 +366,75 @@ export class ServiceApplicationComponent implements OnInit {
       ...this.sectionGroups.reduce((acc, section) => {
         acc[section.sectionName] = section.formArray;
         return acc;
-      }, {} as any)
+      }, {} as any),
     });
   }
 
+ 
+
   createSectionRow(questions: ServiceQuestion[]): FormGroup {
     const rowGroup: any = {};
-    
-    questions.forEach(q => {
+
+    questions.forEach((q) => {
       const validators = [];
-      
+
       if (q.is_required === 'yes') {
         validators.push(Validators.required);
       }
 
       if (q.validation_required === 'yes' && q.validation_rule) {
         const rule = q.validation_rule;
-        
-        if (rule.minLength !== undefined) {
-          validators.push(Validators.minLength(rule.minLength));
+
+        // Handle number fields with digit validator
+        if (q.question_type === 'number') {
+          let min: number | undefined = undefined;
+          let max: number | undefined = undefined;
+
+          if (rule.minLength != null && rule.minLength !== '') {
+            const parsed = Number(rule.minLength);
+            if (!isNaN(parsed)) min = parsed;
+          }
+
+          if (rule.maxLength != null && rule.maxLength !== '') {
+            const parsed = Number(rule.maxLength);
+            if (!isNaN(parsed)) max = parsed;
+          }
+
+          validators.push(
+            ServiceApplicationComponent.digitLengthValidator(min, max)
+          );
+        } else {
+          // Handle minLength (convert string to number)
+          if (rule.minLength != null && rule.minLength !== '') {
+            const min = Number(rule.minLength);
+            if (!isNaN(min)) {
+              validators.push(Validators.minLength(min));
+            }
+          }
+
+          // Handle maxLength (convert string to number)
+          if (rule.maxLength != null && rule.maxLength !== '') {
+            const max = Number(rule.maxLength);
+            if (!isNaN(max)) {
+              validators.push(Validators.maxLength(max));
+            }
+          }
         }
-        if (rule.maxLength !== undefined) {
-          validators.push(Validators.maxLength(rule.maxLength));
+
+        // Handle pattern (regex)
+        if (
+          rule.pattern &&
+          rule.pattern.trim() !== '' &&
+          !['radio', 'select', 'file', 'checkbox'].includes(q.question_type)
+        ) {
+          try {
+            validators.push(Validators.pattern(new RegExp(rule.pattern)));
+          } catch (e) {
+            console.warn(
+              `Invalid regex pattern for question ${q.id}:`,
+              rule.pattern
+            );
+          }
         }
       }
 
@@ -348,7 +460,9 @@ export class ServiceApplicationComponent implements OnInit {
   }
 
   addSectionRow(sectionName: string): void {
-    const sectionGroup = this.sectionGroups.find(s => s.sectionName === sectionName);
+    const sectionGroup = this.sectionGroups.find(
+      (s) => s.sectionName === sectionName
+    );
     if (sectionGroup) {
       const newRow = this.createSectionRow(sectionGroup.questions);
       sectionGroup.formArray.push(newRow);
@@ -356,7 +470,9 @@ export class ServiceApplicationComponent implements OnInit {
   }
 
   removeSectionRow(sectionName: string, index: number): void {
-    const sectionGroup = this.sectionGroups.find(s => s.sectionName === sectionName);
+    const sectionGroup = this.sectionGroups.find(
+      (s) => s.sectionName === sectionName
+    );
     if (sectionGroup && sectionGroup.formArray.length > 1) {
       sectionGroup.formArray.removeAt(index);
     }
@@ -390,10 +506,18 @@ export class ServiceApplicationComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // if (this.serviceForm.invalid) {
+    //   console.log('Form errors:', this.serviceForm);
+    //   Object.keys(this.serviceForm.controls).forEach((key) => {
+    //     const control = this.serviceForm.get(key);
+    //     if (control?.invalid) {
+    //       console.log('Invalid control:', key, control.errors);
+    //     }
+    //   });
+    // }
     this.serviceForm.markAllAsTouched();
 
     if (this.serviceForm.invalid) {
-      // Your existing validation error handling
       const invalidControlKey = Object.keys(this.serviceForm.controls).find(
         (key) => {
           const control = this.serviceForm.get(key);
@@ -433,14 +557,16 @@ export class ServiceApplicationComponent implements OnInit {
               errorMessage = `${label} is required.`;
             }
           } else if (control?.hasError('minlength')) {
-            const requiredLength = control.errors?.['minlength']?.requiredLength;
+            const requiredLength =
+              control.errors?.['minlength']?.requiredLength;
             if (question.question_type === 'checkbox') {
               errorMessage = `Please select at least ${requiredLength} ${label}.`;
             } else {
               errorMessage = `${label} must be at least ${requiredLength} characters.`;
             }
           } else if (control?.hasError('maxlength')) {
-            const requiredLength = control.errors?.['maxlength']?.requiredLength;
+            const requiredLength =
+              control.errors?.['maxlength']?.requiredLength;
             if (question.question_type === 'checkbox') {
               errorMessage = `You can select at most ${requiredLength} ${label}.`;
             } else {
@@ -466,7 +592,7 @@ export class ServiceApplicationComponent implements OnInit {
     let hasFileToUpload = false;
 
     // Check regular file fields
-    hasFileToUpload = this.questions.some(q => {
+    hasFileToUpload = this.questions.some((q) => {
       const key = q.id.toString();
       const value = raw[key];
       return q.question_type === 'file' && value instanceof File;
@@ -474,10 +600,10 @@ export class ServiceApplicationComponent implements OnInit {
 
     // Check section file fields
     if (!hasFileToUpload) {
-      this.sectionGroups.forEach(section => {
+      this.sectionGroups.forEach((section) => {
         const sectionData = raw[section.sectionName] || [];
         sectionData.forEach((row: any) => {
-          section.questions.forEach(q => {
+          section.questions.forEach((q) => {
             if (q.question_type === 'file' && row[q.id] instanceof File) {
               hasFileToUpload = true;
             }
@@ -493,17 +619,16 @@ export class ServiceApplicationComponent implements OnInit {
     }
   }
 
-  // ✅ KEY CHANGE: Store section data by question ID, not by section
   private submitAsJson(userId: string, raw: any): void {
     const applicationData: { [key: string]: any } = {};
 
     // Regular fields
-    Object.keys(raw).forEach(key => {
-      if (this.sectionGroups.some(s => s.sectionName === key)) {
+    Object.keys(raw).forEach((key) => {
+      if (this.sectionGroups.some((s) => s.sectionName === key)) {
         return; // Skip section arrays for now
       }
 
-      const question = this.questions.find(q => q.id.toString() === key);
+      const question = this.questions.find((q) => q.id.toString() === key);
       if (!question) return;
 
       let value = raw[key];
@@ -523,32 +648,31 @@ export class ServiceApplicationComponent implements OnInit {
       applicationData[key] = value;
     });
 
-    // ✅ SECTION FIELDS: Store by question ID with array values
-    this.sectionGroups.forEach(section => {
+    this.sectionGroups.forEach((section) => {
       const sectionData = raw[section.sectionName] || [];
-      
-      section.questions.forEach(q => {
+
+      section.questions.forEach((q) => {
         const questionId = q.id.toString();
         const values: any[] = [];
-        
+
         sectionData.forEach((row: any) => {
           let value = row[q.id];
-          
+
           if (q.question_type === 'date' && value instanceof Date) {
             value = value.toISOString().split('T')[0];
           }
-          
+
           if (q.question_type === 'checkbox') {
             value = Array.isArray(value) ? value.join(', ') : value;
           }
-          
+
           if (q.question_type === 'file') {
             value = null; // Files handled separately in FormData
           }
-          
+
           values.push(value);
         });
-        
+
         applicationData[questionId] = values;
       });
     });
@@ -556,16 +680,24 @@ export class ServiceApplicationComponent implements OnInit {
     const payload = {
       user_id: Number(userId),
       service_id: this.serviceId,
-      application: applicationData,
+      application_data: applicationData,
     };
 
-    this.apiService.getByConditions(payload, 'api/user/service-application-store')
+    this.apiService
+      .getByConditions(payload, 'api/user/service-application-store')
       .subscribe({
         next: (res) => {
           if (res?.status === 1) {
-            this.apiService.openSnackBar('Application submitted successfully!', 'success');
+            this.apiService.openSnackBar(
+              'Application submitted successfully!',
+              'success'
+            );
+            this.router.navigate(['/dashboard/services']);
           } else {
-            this.apiService.openSnackBar(res?.message || 'Submission failed.', 'error');
+            this.apiService.openSnackBar(
+              res?.message || 'Submission failed.',
+              'error'
+            );
           }
         },
         error: (err) => {
@@ -574,7 +706,7 @@ export class ServiceApplicationComponent implements OnInit {
             err?.error?.message || 'Submission failed. Please try again.',
             'error'
           );
-        }
+        },
       });
   }
 
@@ -584,12 +716,12 @@ export class ServiceApplicationComponent implements OnInit {
     formData.append('service_id', this.serviceId.toString());
 
     // Regular fields
-    Object.keys(raw).forEach(key => {
-      if (this.sectionGroups.some(s => s.sectionName === key)) {
+    Object.keys(raw).forEach((key) => {
+      if (this.sectionGroups.some((s) => s.sectionName === key)) {
         return;
       }
 
-      const question = this.questions.find(q => q.id.toString() === key);
+      const question = this.questions.find((q) => q.id.toString() === key);
       if (!question) return;
 
       let value = raw[key];
@@ -609,11 +741,10 @@ export class ServiceApplicationComponent implements OnInit {
       }
     });
 
-    // ✅ SECTION FIELDS: Store files by question ID with array indexing
-    this.sectionGroups.forEach(section => {
+    this.sectionGroups.forEach((section) => {
       const sectionData = raw[section.sectionName] || [];
-      
-      section.questions.forEach(q => {
+
+      section.questions.forEach((q) => {
         const questionId = q.id.toString();
         sectionData.forEach((row: any, rowIndex: number) => {
           let value = row[q.id];
@@ -628,21 +759,36 @@ export class ServiceApplicationComponent implements OnInit {
 
           if (q.question_type === 'file' && value instanceof File) {
             // Store as application_data[questionId][rowIndex]
-            formData.append(`application_data[${questionId}][${rowIndex}]`, value, value.name);
+            formData.append(
+              `application_data[${questionId}][${rowIndex}]`,
+              value,
+              value.name
+            );
           } else {
-            formData.append(`application_data[${questionId}][${rowIndex}]`, value ?? '');
+            formData.append(
+              `application_data[${questionId}][${rowIndex}]`,
+              value ?? ''
+            );
           }
         });
       });
     });
 
-    this.apiService.getByConditions(formData, 'api/user/service-application-store')
+    this.apiService
+      .getByConditions(formData, 'api/user/service-application-store')
       .subscribe({
         next: (res) => {
           if (res?.status === 1) {
-            this.apiService.openSnackBar('Application submitted successfully!', 'success');
+            this.apiService.openSnackBar(
+              'Application submitted successfully!',
+              'success'
+            );
+            this.router.navigate(['/dashboard/services']);
           } else {
-            this.apiService.openSnackBar(res?.message || 'Submission failed.', 'error');
+            this.apiService.openSnackBar(
+              res?.message || 'Submission failed.',
+              'error'
+            );
           }
         },
         error: (err) => {
@@ -651,7 +797,7 @@ export class ServiceApplicationComponent implements OnInit {
             err?.error?.message || 'Submission failed. Please try again.',
             'error'
           );
-        }
+        },
       });
   }
 
