@@ -9,7 +9,7 @@
         <h1>Proforma Questionnaire</h1>
       </div>
 
-      <div *ngFor="let group of getKeys(groupedQuestions)" class="mb-5 p-4">
+      <div *ngFor="let group of getKeys(groupedQuestions)" class=" p-4">
         <h5 class="mb-2 info-head">{{ group }}</h5>
         <hr />
         <div class="row">
@@ -24,10 +24,10 @@
 
             <!-- File Upload -->
             <ng-container *ngIf="q.question_type === 'file'">
+              <p>{{q.question_label}}</p>
               <ng-container *ngIf="q.upload_rule?.max_files > 1; else singleFile">
                 <div class="mb-2" *ngFor="let i of getRange(q.upload_rule.max_files); trackBy: trackByIndex">
                   <app-ilogi-file-upload [formControlName]="getMultiFileControlName(q.id, i)"
-                    [label]="i === 1 ? q.question_label : ''" [accept]="q.upload_rule?.mimes?.join(',') || '*'"
                     [maxFileSize]="(q.upload_rule?.max_size_mb || 5) * 1024 * 1024"
                     [fileUrl]="isFieldReadonly(q.id) ? getFullFileUrl(getFileUrl(q.id)) : null"
                     [disabled]="isFieldReadonly(q.id)">
