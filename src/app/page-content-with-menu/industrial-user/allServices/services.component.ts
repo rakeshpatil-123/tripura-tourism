@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { DynamicTableComponent } from '../../../shared/component/table/table.component';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { Router } from '@angular/router';
-import { IlogiSelectComponent } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 
 @Component({
   selector: 'app-services',
-  imports: [DynamicTableComponent, IlogiSelectComponent],
+  imports: [DynamicTableComponent],
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.scss'],
   standalone: true,
@@ -15,11 +14,10 @@ export class ServicesComponent {
   ApplicationData: any[] = [];
   ApplicationColumns: any[] = [];
 
-  // Filter properties
   filterLabel = 'Filter by NOC Type';
   filterPlaceholder = 'Select NOC Type';
   filterOptions: Array<{ id: any; name: string }> = [];
-  selectedNocType: any = null; // Holds selected NOC type
+  selectedNocType: any = null;
 
   constructor(private apiService: GenericService, private router: Router) {}
 
@@ -33,7 +31,6 @@ export class ServicesComponent {
         if (response?.status === 1 && Array.isArray(response.data)) {
           this.ApplicationData = [...response.data];
 
-          // Extract unique noc_type values for filter dropdown
           const nocTypes = [
             ...new Set(response.data.map((item: any) => item.noc_type)),
           ] as string[];
@@ -42,7 +39,6 @@ export class ServicesComponent {
             name: type,
           }));
 
-          // Add "All" option at the top
           this.filterOptions.unshift({ id: null, name: 'All NOC Types' });
 
           this.createColumns(response.data);
@@ -63,7 +59,6 @@ export class ServicesComponent {
     const columns: any[] = [];
 
     Object.keys(sample).forEach((key) => {
-      // Skip internal or redundant fields
       if (key === 'actions' || key === 'department_id') return;
 
       const label = this.formatLabel(key);
@@ -90,7 +85,6 @@ export class ServicesComponent {
       });
     });
 
-    // Add Actions column
     columns.push({
       key: 'actions',
       label: 'Actions',
@@ -117,9 +111,8 @@ export class ServicesComponent {
     this.router.navigate(['/dashboard/user-app-view', row.id, row.application_id]);
   },
   cellClass: (value: any, row: any) => {
-    // 👇 Show ONLY if status is NOT null AND NOT 'send_back'
    const shouldShow = row.application_status !== null && row.application_status !== 'send_back';
-    return shouldShow ? '' : 'd-none'; // Hide if condition not met
+    return shouldShow ? '' : 'd-none'; 
   },
 });
 
@@ -147,7 +140,7 @@ onApply(row: any): void {
   console.log('Applying for service:', row);
 
   if (row.service_mode === 'third_party' ) {
-    let url = row.third_party_portal_name.trim();
+    let url = row.thirdPartyPortal.thirdPartyRedirectUrl.trim();
 
     if (!/^https?:\/\//i.test(url)) {
       url = 'https://' + url; 
