@@ -27,6 +27,7 @@ import {
 } from '@angular/material/core';
 import moment from 'moment';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 export enum NocType {
   CFE = 'CFE',
@@ -55,6 +56,7 @@ export enum NocType {
     MatNativeDateModule,
     MatMomentDateModule,
     MatDatepickerModule,
+    MatSlideToggleModule
   ],
   templateUrl: './add-service-dialog.component.html',
   styleUrls: ['./add-service-dialog.component.scss'],
@@ -94,11 +96,11 @@ export class AddServiceDialogComponent implements OnInit {
       auto_renewal: [false],
       external_data_share: [true],
 
-      noc_validity: [365, Validators.required],
+      noc_validity: [365],
       valid_for_upload: [true],
 
       nsw_license_id: [''],
-      status: [1, Validators.required],
+      status: [true],
       allow_repeat_application: [true],
       service_mode: ['native'],
       third_party_portal_name: [''],
@@ -141,7 +143,7 @@ export class AddServiceDialogComponent implements OnInit {
               noc_validity: s.noc_validity,
               valid_for_upload: s.valid_for_upload === 'yes',
               nsw_license_id: s.nsw_license_id,
-              status: s.status ?? 1,
+              status: s.status === 1,
               allow_repeat_application: s.allow_repeat_application === 'yes',
               service_mode: s.service_mode ?? 'native',
               third_party_portal_name: s.third_party_portal_name,
@@ -217,7 +219,7 @@ export class AddServiceDialogComponent implements OnInit {
         noc_payment_type: formValue.noc_payment_type,
         target_days: formValue.target_days,
         has_input_form: formValue.has_input_form ? 'yes' : 'no',
-        depends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.filter((s: any) => s !== '').map((s: any) => `${s}`) : formValue.depends_on_services,
+        dpends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.filter((s: any) => s !== '').map((s: any) => `${s}`) : formValue.depends_on_services,
         generate_id: formValue.generate_id ? 'yes' : 'no',
         generate_pdf: formValue.generate_pdf ? 'yes' : 'no',
         show_letter_date: formValue.show_letter_date ? 'yes' : 'no',
@@ -227,7 +229,7 @@ export class AddServiceDialogComponent implements OnInit {
         noc_validity: formValue.noc_validity,
         valid_for_upload: formValue.valid_for_upload ? 'yes' : 'no',
         nsw_license_id: formValue.nsw_license_id,
-        status: formValue.status ?? 1,
+        status: formValue.status ? 1 : 0,
         allow_repeat_application: formValue.allow_repeat_application
           ? 'yes'
           : 'no',

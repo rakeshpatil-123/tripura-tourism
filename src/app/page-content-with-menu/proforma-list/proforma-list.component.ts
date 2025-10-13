@@ -251,7 +251,6 @@ export class ProformaListComponent implements OnInit {
       display_order: fv.display_order,
       status: fv.status === 'false' ? 0 : 1,
       depends_on_proforma_ids: fv.depends_on_proforma_ids || [],
-      max_claim_count: fv.max_claim_count
     };
     if (fv.proforma_type === 'claim') {
       payload.claim_type = fv.claim_type;

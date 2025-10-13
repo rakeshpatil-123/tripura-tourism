@@ -85,8 +85,13 @@ export class GenericService {
   }
 
   registerUser(userData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/api/user/register`, userData);
+    return this.http.post<any>(
+      `${this.baseUrl}/api/user/register`,
+      userData,
+      { headers: this.getHeaders() }
+    );
   }
+
 
   loginAdmin(adminData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/api/user/login`, adminData);
@@ -1583,6 +1588,12 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
       {
         service_id: serviceId
       },
+      { headers: this.getHeaders() }
+    );
+  }
+  updateAdminServiceStatus(serviceId: any) {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/admin/update-service-status/${serviceId.id}`, {},
       { headers: this.getHeaders() }
     );
   }

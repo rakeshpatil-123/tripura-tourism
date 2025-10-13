@@ -56,6 +56,14 @@
         {{ (element.service_mode === 'native' ? 'Native' : element.service_mode.replace('_', ' ')) | titlecase }}
       </td>
     </ng-container>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Status </th>
+      <td mat-cell *matCellDef="let element">
+        <mat-slide-toggle color="primary" [checked]="element.status === 1"
+          [matTooltip]="element.status === 1 ? 'Active' : 'Inactive'" (change)="onStatusToggle(element)">
+        </mat-slide-toggle>
+      </td>
+    </ng-container>
 
 
     <ng-container matColumnDef="actions">

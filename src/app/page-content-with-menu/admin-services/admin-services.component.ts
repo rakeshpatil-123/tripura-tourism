@@ -37,6 +37,7 @@ import { ThirdPartyParamsComponent } from '../third-party-params/third-party-par
 import Swal from 'sweetalert2';
 import { LoaderService } from '../../_service/loader/loader.service';
 import { ViewThirdPartyParamsComponent } from '../view-third-party-params/view-third-party-params.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 export interface Service {
   department_id: string;
   service_title_or_description: string;
@@ -96,7 +97,8 @@ export enum NocType {
     IlogiSelectComponent,
     IlogiInputComponent,
     CommonModule,
-    FormsModule
+    FormsModule,
+    MatSlideToggleModule
 ],
   providers: [ConfirmationService],
 })
@@ -113,6 +115,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
     'department',
     'noc_type',
     'service_mode',
+    'status',
     'actions'
   ];
   dataSource = new MatTableDataSource<Service>([]);
@@ -555,5 +558,49 @@ deleteService(service: Service): void {
     if (this.paginator) {
       this.paginator.firstPage();
     }
+  }
+  onStatusToggle(element: any): void {
+    const newStatus = element.status === 1 ? 0 : 1;
+
+    Swal.fire({
+      title: newStatus === 1 ? 'Activate Service?' : 'Deactivate Service?',
+      text:
+        newStatus === 1
+          ? 'This will activate the service.'
+          : 'This will deactivate the service.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1976d2',
+      cancelButtonColor: '#d33',
+      confirmButtonText: newStatus === 1 ? 'Yes, Activate' : 'Yes, Deactivate',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        element.status = newStatus;
+        const payload = {
+          id: element.id,
+          status: newStatus,
+        };
+
+        this.genericService.updateAdminServiceStatus(payload).subscribe({
+          next: (res: any) => {
+            if (res.status === 1) {
+              this.genericService.openSnackBar(
+                newStatus === 1
+                  ? 'Service activated successfully'
+                  : 'Service deactivated successfully',
+                'Success'
+              );
+            } else {
+              element.status = newStatus === 1 ? 0 : 1;
+              this.genericService.openSnackBar('Failed to update status', 'Error');
+            }
+          },
+          error: () => {
+            element.status = newStatus === 1 ? 0 : 1;
+            this.genericService.openSnackBar('Error while updating status', 'Error');
+          },
+        });
+      }
+    });
   }
 }

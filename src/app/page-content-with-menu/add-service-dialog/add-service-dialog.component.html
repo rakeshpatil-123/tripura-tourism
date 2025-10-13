@@ -169,6 +169,12 @@
       <mat-checkbox formControlName="show_letter_date">Show Letter Date</mat-checkbox>
       <mat-checkbox formControlName="external_data_share">External Data Share</mat-checkbox>
       <mat-checkbox formControlName="valid_for_upload">Valid For Upload</mat-checkbox>
+      <mat-checkbox formControlName="has_input_form">Has Input Form</mat-checkbox>
+      </div>
+      <div class="form-row">
+        <mat-slide-toggle formControlName="status" color="primary" [checked]="serviceForm.get('status')?.value === 1">
+          {{ serviceForm.get('status')?.value ? 'Active' : 'Inactive' }}
+        </mat-slide-toggle>
     </div>
 
   </form>
