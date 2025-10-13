@@ -275,6 +275,13 @@ export class ServiceApplicationComponent implements OnInit {
       }
       this.groupedQuestions[group].push(q);
     });
+     Object.keys(this.groupedQuestions).forEach(group => {
+    this.groupedQuestions[group].sort((a, b) => {
+      const orderA = a.display_order ?? 9999; 
+      const orderB = b.display_order ?? 9999;
+      return orderA - orderB;
+    });
+  });
   }
 
  
@@ -292,8 +299,6 @@ export class ServiceApplicationComponent implements OnInit {
       if (q.validation_required === 'yes' && q.validation_rule) {
         const rule = q.validation_rule;
 
-        // For 'number' type, use digitLengthValidator instead of minLength/maxLength
-        // For 'number' type, use digitLengthValidator instead of minLength/maxLength
         if (q.question_type === 'number') {
           let min: number | undefined = undefined;
           let max: number | undefined = undefined;
@@ -625,7 +630,7 @@ export class ServiceApplicationComponent implements OnInit {
     // Regular fields
     Object.keys(raw).forEach((key) => {
       if (this.sectionGroups.some((s) => s.sectionName === key)) {
-        return; // Skip section arrays for now
+        return; 
       }
 
       const question = this.questions.find((q) => q.id.toString() === key);
@@ -667,7 +672,7 @@ export class ServiceApplicationComponent implements OnInit {
           }
 
           if (q.question_type === 'file') {
-            value = null; // Files handled separately in FormData
+            value = null; 
           }
 
           values.push(value);

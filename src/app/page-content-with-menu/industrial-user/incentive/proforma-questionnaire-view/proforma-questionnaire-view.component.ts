@@ -59,9 +59,10 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
     private apiService: GenericService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { this.proformaForm = this.fb.group({});}
 
   ngOnInit(): void {
+    //  this.proformaForm = this.fb.group({});
     const proformaId = this.route.snapshot.paramMap.get('proformaId');
     const schemeId = this.route.snapshot.paramMap.get('schemeId');
 
@@ -107,8 +108,8 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
       )
       .subscribe({
         next: (res: any) => {
-          if (res?.status === 1 && Array.isArray(res.data)) {
-            this.questionnaireData = res.data.map((q: any) => {
+          if (res?.status === 1 && Array.isArray(res.data.questions)) {
+            this.questionnaireData = res.data.questions.map((q: any) => {
               let parsedOptions: any = [];
 
               if (q.question_type === 'select') {
