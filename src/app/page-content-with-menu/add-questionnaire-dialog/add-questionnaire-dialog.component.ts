@@ -162,11 +162,11 @@ export class AddQuestionnaireDialogComponent implements OnInit {
   }
 
   submit() {
-    if (this.questionnaireForm.invalid) {
-      this.questionnaireForm.markAllAsTouched();
-      this.snackBar.open('Please fix the errors before submitting', 'error', { duration: 3000 });
-      return;
-    }
+    // if (this.questionnaireForm.invalid) {
+    //   this.questionnaireForm.markAllAsTouched();
+    //   this.snackBar.open('Please fix the errors before submitting', 'error', { duration: 3000 });
+    //   return;
+    // }
 
     const formValue = this.questionnaireForm.value;
     const formData = new FormData();
