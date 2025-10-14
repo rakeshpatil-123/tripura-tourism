@@ -82,7 +82,7 @@ export class AddServiceDialogComponent implements OnInit {
       noc_type: [NocType.CFE, Validators.required],
       noc_payment_type: ['Calculated', Validators.required],
       target_days: [15, Validators.required],
-
+      fixed_expiry_date: [null],
       has_input_form: [true],
       depends_on_services: [''],
 
@@ -131,6 +131,7 @@ export class AddServiceDialogComponent implements OnInit {
               noc_type: s.noc_type,
               noc_payment_type: s.noc_payment_type,
               target_days: s.target_days,
+              fixed_expiry_date: s.fixed_expiry_date ? moment(s.fixed_expiry_date, 'YYYY-MM-DD').toDate() : null,
               has_input_form: s.has_input_form === 'yes',
               depends_on_services: (() => { const deps = s.depends_on_services; if (!deps) return []; if (Array.isArray(deps)) return deps; try { const parsed = JSON.parse(deps); if (Array.isArray(parsed)) return parsed; } catch (e) { return deps.replace(/[\[\]"']/g, '').split(',').map((x: string) => x.trim()).filter((x: any) => x); } return [];})(),
               generate_id: s.generate_id === 'yes',
@@ -218,6 +219,7 @@ export class AddServiceDialogComponent implements OnInit {
         noc_type: formValue.noc_type,
         noc_payment_type: formValue.noc_payment_type,
         target_days: formValue.target_days,
+        fixed_expiry_date: formValue.fixed_expiry_date ? moment(formValue.fixed_expiry_date).format('YYYY-MM-DD') : null,
         has_input_form: formValue.has_input_form ? 'yes' : 'no',
         dpends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.filter((s: any) => s !== '').map((s: any) => `${s}`) : formValue.depends_on_services,
         generate_id: formValue.generate_id ? 'yes' : 'no',

@@ -70,8 +70,14 @@
         <mat-error *ngIf="serviceForm.get('target_days')?.hasError('required')">
           Target Days is required
         </mat-error>
-      </mat-form-field>
-    </div>
+        </mat-form-field>
+        <mat-form-field *ngIf="serviceForm.get('service_mode')?.value === 'native'" appearance="outline" class="form-field">
+          <mat-label>Fixed Expiry Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fixed_expiry_date" placeholder="Select expiry date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        </div>
     <div *ngIf="serviceForm.get('service_mode')?.value !== 'third_party'" class="form-row">
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>Generated ID Format</mat-label>
