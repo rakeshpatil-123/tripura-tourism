@@ -128,6 +128,13 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
     { id: 'native', name: 'Native' },
     { id: 'third_party', name: 'Third Party' }
   ];
+  statusOptions: { id: string; name: string }[] = [
+    { id: '', name: 'All' },
+    { id: '1', name: 'Active' },
+    { id: '0', name: 'Disabled' }
+  ];
+  filteredServices: any[] = [];
+  selectedStatus: string = '';
   selectedServiceMode: string | null = '';
 
   constructor(
@@ -166,6 +173,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
             activeFrom: moment().format('YYYY-MM-DD'),
           }));
           this.allServices = services;
+          this.filteredServices = [...this.allServices];
           this.dataSource.data = services;
         }
       },
@@ -603,4 +611,20 @@ deleteService(service: Service): void {
       }
     });
   }
+filterByStatus(selectedStatus: string) {
+  let filtered = this.allServices;
+
+  if (selectedStatus) {
+    filtered = this.allServices.filter(
+      (service: Service) => String(service.status) === selectedStatus
+    );
+  }
+
+  this.dataSource.data = filtered;
+
+  if (this.paginator) {
+    this.paginator.firstPage();
+  }
+}
+
 }

@@ -201,3 +201,29 @@ mat-dialog-actions button {
 .header-class {
   color: black !important;
 }
+.upload-rule-section {
+  background: #fafafa;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  border: 1px solid #ddd;
+}
+
+.section-title {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
+.mat-error {
+  color: #e53935 !important;
+  font-size: 13px;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-row {
+  margin-bottom: 1rem;
+}

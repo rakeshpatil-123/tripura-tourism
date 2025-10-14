@@ -110,13 +110,40 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         pattern: [''],
         errorMessage: [''],
       }),
+      upload_rule: this.fb.group({
+        mimes: [''],
+        max_size_mb: [3, [Validators.max(3)]],
+      }),
     });
   }
 
   ngOnInit(): void {
     this.getSectionList();
+    const uploadRuleGroup = this.questionnaireForm.get('upload_rule');
+    if (uploadRuleGroup) {
+      uploadRuleGroup.get('mimes')?.setValidators([Validators.required]);
+      uploadRuleGroup
+        .get('max_size_mb')
+        ?.setValidators([Validators.required, Validators.min(1), Validators.max(3)]);
+    }
+    uploadRuleGroup?.updateValueAndValidity();
     if (this.data?.questionnaire) {
       this.questionnaireForm.patchValue(this.data.questionnaire);
+      const q = { ...this.data.questionnaire };
+      if (q.status === 1 || q.status === true) q.status = '1';
+      else if (q.status === 0 || q.status === false) q.status = '0';
+      else q.status = '1';
+      if (q.upload_rule && typeof q.upload_rule.mimes === 'string') {
+        try {
+          const parsed = JSON.parse(q.upload_rule.mimes);
+          if (Array.isArray(parsed)) {
+            q.upload_rule.mimes = parsed.join(', ');
+          }
+        } catch {
+        }
+      }
+
+      this.questionnaireForm.patchValue(q);
       if (this.data.questionnaire.sample_format) {
         this.selectedFile = null;
       }
@@ -153,7 +180,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][default_source_table]', formValue.default_source_table || '');
     formData.append('questionnaires[0][default_source_column]', formValue.default_source_column || '');
     formData.append('questionnaires[0][default_value]', formValue.default_value || '');
-    const sectionNameValue = (formValue.is_section === 'no') ? null : (formValue.section_name ?? null);
+    const sectionNameValue = (formValue.is_section === 'no') ? '' : (formValue.section_name ?? '');
     formData.append('questionnaires[0][section_name]', sectionNameValue);
     formData.append('questionnaires[0][is_section]', formValue.is_section || "no");
     formData.append('questionnaires[0][display_order]', formValue.display_order.toString());
@@ -168,6 +195,13 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][validation_rule][maxLength]', rule.maxLength || '');
     formData.append('questionnaires[0][validation_rule][pattern]', rule.pattern || '');
     formData.append('questionnaires[0][validation_rule][errorMessage]', rule.errorMessage || '');
+    if (formValue.question_type === 'file') {
+      const rule = formValue.upload_rule || {};
+      const mimesArray = (rule.mimes || '').split(',').map((m: string) => m.trim()).filter(Boolean);
+
+      formData.append('questionnaires[0][upload_rule][mimes]', JSON.stringify(mimesArray));
+      formData.append('questionnaires[0][upload_rule][max_size_mb]', rule.max_size_mb || '5');
+    }
 
       const request$ = this.data.mode === 'add'
         ? this.genericService.saveQuestionnaire(formData)
@@ -253,5 +287,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       .subscribe((res: any) => {
         this.sections = res.data || [];
       });
+  }
+  get uploadRule() {
+    return this.questionnaireForm.get('upload_rule')!;
   }
 }
