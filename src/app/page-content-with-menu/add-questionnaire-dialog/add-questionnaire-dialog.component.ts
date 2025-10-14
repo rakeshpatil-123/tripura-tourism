@@ -111,7 +111,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         errorMessage: [''],
       }),
       upload_rule: this.fb.group({
-        mimes: [''],
+        mimes: ['jpg, jpeg, png, pdf, docx'],
         max_size_mb: [3, [Validators.max(3)]],
       }),
     });
@@ -162,11 +162,18 @@ export class AddQuestionnaireDialogComponent implements OnInit {
   }
 
   submit() {
-    // if (this.questionnaireForm.invalid) {
-    //   this.questionnaireForm.markAllAsTouched();
-    //   this.snackBar.open('Please fix the errors before submitting', 'error', { duration: 3000 });
-    //   return;
-    // }
+    if (this.questionnaireForm.invalid) {
+      this.questionnaireForm.markAllAsTouched();
+      const uploadRuleGroup = this.questionnaireForm.get('upload_rule');
+      if (uploadRuleGroup && uploadRuleGroup.invalid) {
+        uploadRuleGroup.markAllAsTouched();
+      }
+
+      this.snackBar.open('Please fix all validation errors before submitting.', 'error', {
+        duration: 3000,
+      });
+      return;
+    }
 
     const formValue = this.questionnaireForm.value;
     const formData = new FormData();
