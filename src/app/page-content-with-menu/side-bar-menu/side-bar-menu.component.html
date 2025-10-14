@@ -1,3 +1,15 @@
+@if (hidden) {
+<div class="sidebar-mbl">
+
+
+    <button class="toggle-btn" (click)="toggleSidebar()"
+      [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+      <span class="material-icons notranslate">{{ isCollapsed ? 'menu' : 'menu_open' }}</span>
+    </button>
+  </div>
+}
+@if (!hidden) {
+
 <aside class="sidebar" [class.collapsed]="isCollapsed" [class.visible-mobile]="isVisible">
   <!-- Sidebar Header -->
   <div class="sidebar-header">
@@ -6,10 +18,12 @@
         <span class="brand-name">SWAAGAT</span>
       </div>
     </div>
-    <button class="toggle-btn" (click)="onToggle.emit()" 
+    <button class="toggle-btn" (click)="toggleSidebar()"
       [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
       <span class="material-icons notranslate">{{ isCollapsed ? 'menu' : 'menu_open' }}</span>
     </button>
+
+
   </div>
 
   <!-- User Profile Section -->
@@ -26,7 +40,7 @@
           <span class="value">{{ bin }}</span>
         </div>
       </ng-container>
-      
+
       <!-- Admin User -->
       <ng-container *ngIf="currentUserType === 'admin'">
         <div class="user-name">
@@ -36,7 +50,7 @@
           <span class="badge">{{ currentUserType }}</span>
         </div>
       </ng-container>
-      
+
       <!-- Department User -->
       <ng-container *ngIf="currentUserType === 'department'">
         <div class="user-name">
@@ -98,7 +112,6 @@
       </ng-container>
     </ul>
   </nav>
-
   <!-- Sidebar Footer -->
   <div class="sidebar-footer">
     <div class="footer-actions">
@@ -112,4 +125,6 @@
       </button>
     </div>
   </div>
+
 </aside>
+}

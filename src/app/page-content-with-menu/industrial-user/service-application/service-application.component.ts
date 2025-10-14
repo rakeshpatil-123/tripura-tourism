@@ -156,7 +156,7 @@ export class ServiceApplicationComponent implements OnInit {
         },
         error: (err) => {
           console.error('Failed to load service details:', err);
-          this.apiService.openSnackBar('Could not load form.', 'error');
+          this.apiService.openSnackBar('No form data found', 'error');
           this.loading = false;
         },
       });
@@ -276,6 +276,8 @@ export class ServiceApplicationComponent implements OnInit {
       this.groupedQuestions[group].push(q);
     });
      Object.keys(this.groupedQuestions).forEach(group => {
+      console.log(group, "groupqqqqqq");
+      
     this.groupedQuestions[group].sort((a, b) => {
       const orderA = a.display_order ?? 9999; 
       const orderB = b.display_order ?? 9999;

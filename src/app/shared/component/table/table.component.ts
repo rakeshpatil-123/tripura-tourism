@@ -45,8 +45,8 @@ export interface TableColumn {
   linkHref?: (row: any) => string;
   linkText?: (row: any) => string;
 
-  icon?: string;             // mat-icon name, e.g., 'visibility'
-  onClick?: (row: any) => void; // handler for icon click
+  icon?: string;            
+  onClick?: (row: any) => void; 
 
   actions?: Array<{
     label: string;
@@ -81,7 +81,15 @@ export interface TableRowAction {
 export class DynamicTableComponent implements OnChanges {
   @Input() data: any[] = [];
   @Input() columns: TableColumn[] = [];
-  @Input() pageSize: number = 10;
+ private _pageSize = 10;
+  @Input() 
+  set pageSize(value: number) {
+    this._pageSize = value;
+    this.applyPagination();
+  }
+  get pageSize(): number {
+    return this._pageSize;
+  }
   @Input() showPagination: boolean = true;
   @Input() searchable: boolean = true;
 @Input() filterColumnKey?: string;           // e.g., 'status'
@@ -94,7 +102,7 @@ export class DynamicTableComponent implements OnChanges {
 //   return this._selectedFilterValue;
 // }
   @Output() rowAction = new EventEmitter<TableRowAction>();
-
+pageSizes = [5, 10, 20, 30, 40, 50];
   filteredData: any[] = [];
   paginatedData: any[] = [];
   currentPage: number = 1;

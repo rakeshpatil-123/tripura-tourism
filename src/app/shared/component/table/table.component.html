@@ -15,6 +15,18 @@
     </div>
   </div>
 
+<div class="table-controls d-flex justify-content-end align-items-center mb-2" *ngIf="showPagination">
+  <label class="me-2 text-nowrap">Rows per page:</label>
+  <select 
+    [(ngModel)]="pageSize" 
+    (ngModelChange)="applyPagination()" 
+    class="form-control page-size-select"
+    style="width: auto; padding: 0.375rem 0.75rem; font-size: 0.9rem;"
+  >
+    <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+  </select>
+</div>
+
   <div class="table-wrapper">
     <table class="dynamic-table table-red-headers">
       <thead class="">

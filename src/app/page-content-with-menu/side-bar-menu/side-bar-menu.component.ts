@@ -31,6 +31,7 @@ export interface MenuItem {
 export class SidebarComponent implements OnInit, OnDestroy {
   @Input() isCollapsed = false;
   @Input() isVisible = false;
+  @Input() hidden = false;
   @Input() userRole: string = 'admin';
   @Output() onToggle = new EventEmitter<void>();
   @Output() onNavigate = new EventEmitter<void>();
@@ -40,7 +41,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   currentUrl: string = '';
   currentUserType: string = '';
   routerSubscription: Subscription | undefined;
-  
+
   // User data
   userName: string = 'User';
   deptName: string = '';
@@ -51,17 +52,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
   subDivisionUser: string = '';
   districtUser: string = '';
   filteredMenuItems: MenuItem[] = [];
-  
+
   auth_person: string = '';
   bin: string = '';
-      
+
   menuItems: MenuItem[] = [
     {
       id: 'dashboard',
       title: 'Dashboard',
       icon: 'dashboard',
       route: '/dashboard/home',
-      roles: ['admin', 'individual', 'department', 'user', 'moderator', 'guest'],
+      roles: [
+        'admin',
+        'individual',
+        'department',
+        'user',
+        'moderator',
+        'guest',
+      ],
     },
     {
       id: 'Departments',
@@ -117,7 +125,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Services',
       icon: 'work',
       route: '/dashboard/services',
-      roles: ['individual', 'department','user', 'moderator', 'guest'],
+      roles: ['individual', 'department', 'user', 'moderator', 'guest'],
     },
     {
       id: 'incentive',
@@ -130,7 +138,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
           title: 'Eligibility',
           icon: 'trending_up',
           route: '/dashboard/eligibility',
-          roles: [ 'individual' ],
+          roles: ['individual'],
         },
         {
           id: 'claim',
@@ -146,28 +154,28 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Departmental Services',
       icon: 'important_devices',
       route: '/dashboard/departmental-services',
-      roles: ['department', ],
+      roles: ['department'],
     },
     {
       id: 'all-departmental-applications',
       title: 'All departmental applications',
       icon: 'assignment',
       route: '/dashboard/all-departmental-applications',
-      roles: ['department',  ],
+      roles: ['department'],
     },
     {
       id: 'Upload Existing Licence',
       title: 'Upload Existing Licence',
       icon: 'chrome_reader_mode',
       route: '/dashboard/upload-existing-licence',
-      roles: ['individual',],
+      roles: ['individual'],
     },
     {
       id: 'Renewal List',
       title: 'Renewal List',
       icon: 'description',
       route: '/dashboard/renewal-list',
-      roles: ['individual',],
+      roles: ['individual'],
     },
     {
       id: 'Inspection List',
@@ -181,7 +189,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Application List',
       icon: 'list_alt',
       route: '/dashboard/application-list',
-      roles: ['individual',],
+      roles: ['individual'],
     },
     {
       id: 'reports',
@@ -194,14 +202,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
           title: 'Usage Report',
           icon: 'trending_up',
           route: '/reports/sales',
-          roles: [ 'moderator', 'individual', 'department', ],
+          roles: ['moderator', 'individual', 'department'],
         },
         {
           id: 'user-report',
           title: 'Engagement',
           icon: 'people_outline',
           route: '/reports/users',
-          roles: ['individual', 'department',],
+          roles: ['individual', 'department'],
         },
       ],
     },
@@ -210,23 +218,27 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Profile',
       icon: 'person_pin',
       route: '/dashboard/user-profile',
-      roles: ['admin', 'individual', 'department',],
+      roles: ['admin', 'individual', 'department'],
     },
   ];
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private genericService: GenericService,
-    private helpService: HelpService  // Add HelpService injection
+    private helpService: HelpService // Add HelpService injection
   ) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
-    this.userName = this.genericService.decryptLocalStorageItem('user_name') || 'User';
+    this.userName =
+      this.genericService.decryptLocalStorageItem('user_name') || 'User';
     this.deptName = localStorage.getItem('deptName') || '';
     this.emailId = localStorage.getItem('email_id') || '';
     this.hierarchyLevel = localStorage.getItem('hierarchy') || 'India';
     this.designation = localStorage.getItem('designation') || '';
     this.bin = this.genericService.decryptLocalStorageItem('bin') || '';
-    this.auth_person = this.genericService.decryptLocalStorageItem('authorized_person_name')?.toUpperCase() || '';
+    this.auth_person =
+      this.genericService
+        .decryptLocalStorageItem('authorized_person_name')
+        ?.toUpperCase() || '';
     this.blockUser = localStorage.getItem('block') || '';
     this.subDivisionUser = localStorage.getItem('subdivision') || '';
     this.districtUser = localStorage.getItem('district') || '';
@@ -236,7 +248,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.currentUrl = this.router.url;
     this.filterMenuItems();
     this.checkSidebarVisibility(this.currentUrl);
-    
+
     this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
@@ -244,6 +256,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.checkSidebarVisibility(event.url);
         this.checkAndExpandActiveParent();
       });
+    // this.hideSidebar();
   }
 
   ngOnDestroy(): void {
@@ -282,7 +295,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.expandedSubmenu = submenuId;
       }, 300);
     } else {
-      this.expandedSubmenu = this.expandedSubmenu === submenuId ? null : submenuId;
+      this.expandedSubmenu =
+        this.expandedSubmenu === submenuId ? null : submenuId;
     }
   }
 
@@ -297,14 +311,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.genericService.logoutUser(); 
+    this.genericService.logoutUser();
   }
-  
+
   // Add method to toggle help sidebar
   toggleHelp(): void {
     this.helpService.toggleHelpSidebar();
   }
-  
+
   filterMenuItems(): void {
     if (!this.userRole) {
       this.filteredMenuItems = [];
@@ -312,15 +326,37 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
 
     this.filteredMenuItems = this.menuItems
-      .map(item => {
+      .map((item) => {
         const children = item.children
-          ? item.children.filter(child => child.roles.includes(this.userRole!))
+          ? item.children.filter((child) =>
+              child.roles.includes(this.userRole!)
+            )
           : [];
 
         return { ...item, children };
       })
-      .filter(item =>
-        item.roles.includes(this.userRole!) || item.children.length > 0
+      .filter(
+        (item) =>
+          item.roles.includes(this.userRole!) || item.children.length > 0
       );
   }
+  toggleSidebar(): void {
+    this.isCollapsed = !this.isCollapsed;
+    this.hidden = false;
+    if (window.innerWidth <= 1024 && !this.isVisible) {
+      this.isVisible = true;
+    }
+    if (window.innerWidth <= 1024 && this.isCollapsed) {
+      this.hidden = true;
+    }
+
+    this.onToggle.emit();
+  }
+
+  // hideSidebar():void{
+  //   if (window.innerWidth <= 1024 && this.isCollapsed) {
+  //     this.hidden = true;
+  //     this.onToggle.emit();
+  //   }
+  // }
 }
