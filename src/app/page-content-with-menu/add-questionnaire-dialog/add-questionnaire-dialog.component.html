@@ -30,7 +30,7 @@
           <mat-option value="radio">Radio</mat-option>
           <mat-option value="checkbox">Checkbox</mat-option>
           <mat-option value="date">Date</mat-option>
-          <mat-option value="button">Button</mat-option>
+          <!-- <mat-option value="button">Button</mat-option> -->
         </mat-select>
       </mat-form-field>
 
@@ -139,6 +139,42 @@
           <mat-option value="0">Inactive</mat-option>
         </mat-select>
       </mat-form-field>
+    </div>
+    <div class="form-row upload-rule-section" *ngIf="questionnaireForm.get('question_type')?.value === 'file'"
+      formGroupName="upload_rule">
+      <h3 class="section-title">Upload Rules</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Allowed File Types</mat-label>
+          <input matInput formControlName="mimes" placeholder="e.g. jpg, jpeg, png, pdf, docx" />
+          <mat-hint align="start">Tip: Separate types with commas (e.g. <b>jpg, png, pdf</b>)</mat-hint>
+          <mat-error *ngIf="uploadRule.get('mimes')?.hasError('required')">
+            Allowed file types are <b>required</b>.
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Maximum File Size (MB)</mat-label>
+          <input matInput type="number" formControlName="max_size_mb" placeholder="e.g. 3" max="3" />
+          <mat-hint align="start">Recommended: 1–3 MB</mat-hint>
+          <mat-error *ngIf="uploadRule.get('max_size_mb')?.hasError('required')">
+            Max file size is <b>required</b>.
+          </mat-error>
+          <mat-error *ngIf="uploadRule.get('max_size_mb')?.hasError('max')">
+            File size cannot exceed <b>3 MB</b>.
+          </mat-error>
+          <mat-error *ngIf="uploadRule.get('max_size_mb')?.hasError('min')">
+            File size must be at least <b>1 MB</b>.
+          </mat-error>
+          <mat-error *ngIf="
+              uploadRule.get('max_size_mb')?.value &&
+              uploadRule.get('max_size_mb')?.value > 3
+            ">
+            ⚠️ Recommended maximum is <b>3 MB</b> for optimal performance.
+          </mat-error>
+        </mat-form-field>
+      </div>
     </div>
     <div formGroupName="validation_rule" class="validation-section">
       <h3>Validation Rule</h3>

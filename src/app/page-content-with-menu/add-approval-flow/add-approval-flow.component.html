@@ -61,7 +61,7 @@
     </ng-container>
   </div>
   <mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-stroked-button color="accent" (click)="addStep()" class="add-step-btn">
+    <button mat-stroked-button color="accent" *ngIf="mode === 'add'" (click)="addStep()" class="add-step-btn">
       <mat-icon>add_circle</mat-icon>
       Add Step
     </button>
