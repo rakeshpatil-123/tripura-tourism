@@ -136,17 +136,43 @@ export class ServicesComponent {
     }
   }
 
+// onApply(row: any): void {
+//   console.log('Applying for service:', row);
+
+//   if (row.service_mode === 'third_party' ) {
+//     this.apiService.getByConditions({}, `api/user/third-party-apply/${row.id}`).subscribe({
+//       next: (response: any) => {
+//         if (response?.status === 1) {
+//           console.log(row.id,"Redirecting....");
+          
+//       }}
+//     })
+//   } else {
+//     this.router.navigate(['dashboard/service-application', row.id], {
+//       queryParams: {
+//         application_status: row.application_status,
+//       },
+//     });
+//   }
+// }
+
 onApply(row: any): void {
-  console.log('Applying for service:', row);
-
-  if (row.service_mode === 'third_party' ) {
-    let url = row.thirdPartyPortal.thirdPartyRedirectUrl.trim();
-
-    if (!/^https?:\/\//i.test(url)) {
-      url = 'https://' + url; 
-    }
-
-    window.open(url, '_blank');
+  if (row.service_mode === 'third_party') {
+    this.apiService.getThirdPartyRedirect(`api/user/third-party-apply/${row.id}`)
+      .subscribe({
+        next: (html) => {
+          const temp = document.createElement('div');
+          temp.innerHTML = html;
+          document.body.appendChild(temp);
+          const form = temp.querySelector('form');
+          if (form) {
+            form.submit();
+          }
+        },
+        error: (err) => {
+          this.apiService.openSnackBar('Redirect failed.', 'error');
+        }
+      });
   } else {
     this.router.navigate(['dashboard/service-application', row.id], {
       queryParams: {
