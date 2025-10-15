@@ -71,11 +71,11 @@ export class AddRenewalFeeRuleComponent implements OnInit {
 
   initForm() {
     this.feeRuleForm = this.fb.group({
-      service_id: [this.data.service?.id || '', Validators.required],
-      renewal_cycle_id: ['', Validators.required],
-      fee_type: ['calculated', Validators.required],
+      service_id: [this.data.service?.id || ''],
+      renewal_cycle_id: [''],
+      fee_type: ['calculated'],
       fixed_fee: [null],
-      question_id: [null, Validators.required],
+      question_id: [null],
       condition_operator: [''],
       condition_value_start: [''],
       condition_value_end: [null],

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
@@ -68,6 +68,7 @@ export class ViewThirdPartyParamsComponent implements OnInit, AfterViewInit {
     private dialogRef: MatDialogRef<ViewThirdPartyParamsComponent>,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) public data: { service: any, mode: 'view' }
   ) { }
 
@@ -82,7 +83,11 @@ export class ViewThirdPartyParamsComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-
+  private reattachPaginatorAndSort(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+    this.cdr.detectChanges();
+  }
 
   loadViewDetails(id: number) {
     this.loading = true;
@@ -100,7 +105,8 @@ export class ViewThirdPartyParamsComponent implements OnInit, AfterViewInit {
             this.serviceDetailsList = Array.isArray(res.data) ? res.data : [res.data];
             this.serviceDetails = this.serviceDetailsList.length ? this.serviceDetailsList[0] : {};
             this.dataSource.data = this.serviceDetailsList;
-
+            this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
             if (!this.serviceDetailsList.length) {
               this.noDataMessage = 'No parameters found for this service.';
             }

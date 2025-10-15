@@ -68,10 +68,12 @@ export class ServiceCertificateComponent implements OnInit {
 
     this.genericService.generateServiceCertificateGenerate(payload).subscribe({
       next: (res) => {
+        this.closeDialog();
+        if (res.status === 1) {
         Swal.fire({
           icon: 'success',
-          title: 'Template Saved!',
-          text: 'The service certificate template has been saved successfully.',
+          title: `Template ${this.data.mode === 'add' ? 'Saved!' : 'Updated'}`,
+          text: `The ${this.data.service.service_title_or_description} service certificate template has been ${this.data.mode === 'add' ? 'saved' : 'updated'} successfully.`,
           showConfirmButton: true,
           confirmButtonText: 'OK',
           timer: 2500,
@@ -80,18 +82,20 @@ export class ServiceCertificateComponent implements OnInit {
           toast: false,
           position: 'center'
         });
-      },
-      error: (err) => {
+      } else {
+      error: () => {
         Swal.fire({
           icon: 'error',
           title: 'Save Failed!',
-          text: 'There was an error saving the template. Please try again.',
+          text: `There was an error ${this.data.mode === 'add' ? 'saving' : 'updating'} the template. Please try again.`,
           showConfirmButton: true,
           confirmButtonText: 'Retry',
           backdrop: true,
           toast: false,
           position: 'center'
         });
+      }
+        }
       }
     });
   }

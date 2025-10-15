@@ -51,7 +51,7 @@
       </ng-container>
 
       <ng-container matColumnDef="renewal_target_days">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">Target Days</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="header-color">Post-Expiry Window Days</th>
         <td mat-cell *matCellDef="let element" [@rowHighlight]="rowState(element)">{{ element.renewal_target_days }}
         </td>
       </ng-container>
