@@ -39,7 +39,7 @@
         <input matInput formControlName="default_value" placeholder="Enter default value" />
       </mat-form-field>
     </div>
-    <div class="form-row" style="display: flex; gap: 16px; flex-wrap: wrap;">
+    <div class="form-row">
       <mat-form-field appearance="outline"
         [style.flex]="questionnaireForm.get('is_section')?.value === 'yes' ? '1 1 auto' : '0 0 150px'">
         <mat-label>Is Section</mat-label>
@@ -52,15 +52,33 @@
         style="flex: 1 1 auto;">
         <mat-label>Select Section</mat-label>
         <mat-select formControlName="section_name">
-          <mat-option *ngFor="let section of sections" [value]="section">
-            {{ section }}
+          <mat-option>
+            <ngx-mat-select-search placeholderLabel="Search sections..." (keyup)="filterSections($event)">
+            </ngx-mat-select-search>
           </mat-option>
+          <h3 class="panel-title">Available Sections</h3>
+          <mat-option *ngFor="let section of filteredSections" [value]="section">
+            <mat-icon class="custom-icon">view_list</mat-icon>
+            <span>{{ section }}</span>
+          </mat-option>
+          
+          <mat-divider></mat-divider>
+          <ng-container *ngIf="!isAddingNewSection">
+            <button mat-button class="add-new-btn" (click)="showAddNewSectionInput($event)">
+              <mat-icon>add</mat-icon>
+              Add New Section
+            </button>
+          </ng-container>
+          <div *ngIf="isAddingNewSection" class="add-new-form">
+            <input matInput placeholder="Enter new section" [(ngModel)]="newSectionName" [ngModelOptions]="{ standalone: true }"
+              (keydown.space)="stopEvent($event)" (keydown)="stopEvent($event)" (keyup.enter)="onSaveNewSection($event)"
+              class="new-section-input" />
+            <button mat-icon-button color="primary" (click)="onSaveNewSection($event)">
+              <mat-icon>save</mat-icon>
+            </button>
+          </div>
         </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="form-field" *ngIf="questionnaireForm.get('is_section')?.value === 'yes'"
-        style="flex: 1 1 auto;">
-        <mat-label>Add New Section</mat-label>
-        <input matInput formControlName="section_name" placeholder="Enter new section" />
+        <mat-icon matSuffix>category</mat-icon>
       </mat-form-field>
     </div>
     <div class="form-row" *ngIf="['select','radio','checkbox'].includes(questionnaireForm.get('question_type')?.value)">

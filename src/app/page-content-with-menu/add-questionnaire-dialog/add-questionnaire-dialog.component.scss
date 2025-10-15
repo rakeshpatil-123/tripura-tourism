@@ -227,3 +227,57 @@ mat-dialog-actions button {
 .form-row {
   margin-bottom: 1rem;
 }
+.panel-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  padding: 8px 16px;
+  margin: 0;
+}
+
+.custom-icon {
+  font-size: 20px;
+  color: #888;
+  margin-right: 8px;
+}
+
+::ng-deep .mat-mdc-select-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 350px !important;
+}
+
+.options-container {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.action-row {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.add-new-button-container,
+.add-new-form {
+  padding: 4px 16px;
+}
+
+.add-new-button-container button {
+  width: 100%;
+  justify-content: flex-start;
+  font-weight: 500;
+  color: #3f51b5;
+}
+
+.add-new-form {
+  display: flex;
+  align-items: center;
+}
+
+.add-new-form input {
+  border: none;
+  color: black;
+  background-color: white;
+  outline: none;
+  flex-grow: 1;
+}

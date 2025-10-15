@@ -3,13 +3,16 @@
     <h2 class="service-title">{{ serviceName }}</h2>
     <button class="close-btn" (click)="closeDialog()">✕</button>
   </div>
-  <div class="editor-section">
+  <div *ngIf="data.mode !== 'view'" class="editor-section">
     <label class="editor-label">Certificate Template</label>
     <p-editor [(ngModel)]="formTemplate" [modules]="editorModules" [readonly]="false" class="custom-editor">
     </p-editor>
   </div>
+  <div *ngIf="data.mode === 'view'" class="preview-section">
+    <div class="preview-content" [innerHTML]="formTemplate"></div>
+  </div>
 
-  <div class="footer">
+  <div class="footer" *ngIf="data.mode !== 'view'">
     <button pButton type="button" label="Preview" class="p-button-outlined p-button-info"
       (click)="previewTemplate()">
     </button>
@@ -17,7 +20,7 @@
     <button pButton type="button" label="Download" class="p-button-secondary" (click)="downloadTemplate()">
     </button>
 
-    <button pButton type="button" label=" Save Template" class="p-button-success" (click)="saveTemplate()">
+    <button pButton type="button" [label]="data?.mode === 'edit' ? 'Update Template' : 'Save Template'" class="p-button-success" (click)="saveTemplate()">
     </button>
   </div>
 </div>

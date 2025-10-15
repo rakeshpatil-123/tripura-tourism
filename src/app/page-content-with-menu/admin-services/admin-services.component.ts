@@ -299,7 +299,7 @@ deleteService(service: Service): void {
         if (action === 'add') this.addOrEditApprovalFlow(service, 'add');
         break;
       case 'serviceCertificate':
-        if (action === 'view') this.addOrEditServiceCertificate(service, 'add');
+        if (action === 'view') this.addOrEditServiceCertificate(service, 'view');
         if (action === 'add') this.addOrEditServiceCertificate(service, 'add');
         if (action === 'edit') this.addOrEditServiceCertificate(service, 'edit');
         break;
@@ -447,7 +447,7 @@ deleteService(service: Service): void {
       data: { service },
     });
   }
-  addOrEditServiceCertificate(service: Service, mode: 'add' | 'edit'): void {
+  addOrEditServiceCertificate(service: Service, mode: 'add' | 'edit' | 'view'): void {
     const dialogRef = this.dialog.open(ServiceCertificateComponent, {
       width: '100%',
       height: '100%',
@@ -486,8 +486,8 @@ deleteService(service: Service): void {
   viewThirdPartyParams(service: Service, mode: 'view'): void {
     const isMobile = window.innerWidth < 768;
     this.dialog.open(ViewThirdPartyParamsComponent, {
-      width: isMobile ? '95vw' : '75vw',
-      height: isMobile ? '85vh' : '80vh',
+      width: isMobile ? '98vw' : '90vw',
+      height: isMobile ? '90vh' : '85vh',
       maxWidth: '95vw',
       maxHeight: '90vh',
       panelClass: 'custom-dialog',
@@ -567,13 +567,13 @@ deleteService(service: Service): void {
       this.paginator.firstPage();
     }
   }
-  onStatusToggle(element: any): void {
+  onStatusToggle(event: any, element: any): void {
+    event.source.checked = element.status === 1;
     const newStatus = element.status === 1 ? 0 : 1;
 
     Swal.fire({
       title: newStatus === 1 ? 'Activate Service?' : 'Deactivate Service?',
-      text:
-        newStatus === 1
+      text: newStatus === 1
           ? 'This will activate the service.'
           : 'This will deactivate the service.',
       icon: 'warning',
@@ -584,29 +584,27 @@ deleteService(service: Service): void {
     }).then((result) => {
       if (result.isConfirmed) {
         element.status = newStatus;
-        const payload = {
-          id: element.id,
-          status: newStatus,
-        };
+        event.source.checked = newStatus === 1;
+      const payload = { id: element.id, status: newStatus };
 
         this.genericService.updateAdminServiceStatus(payload).subscribe({
           next: (res: any) => {
             if (res.status === 1) {
               this.genericService.openSnackBar(
-                newStatus === 1
-                  ? 'Service activated successfully'
-                  : 'Service deactivated successfully',
+                newStatus === 1 ? 'Service activated successfully' : 'Service deactivated successfully',
                 'Success'
               );
             } else {
               element.status = newStatus === 1 ? 0 : 1;
+              event.source.checked = element.status === 1;
               this.genericService.openSnackBar('Failed to update status', 'Error');
             }
           },
           error: () => {
             element.status = newStatus === 1 ? 0 : 1;
+            event.source.checked = element.status === 1;
             this.genericService.openSnackBar('Error while updating status', 'Error');
-          },
+          }
         });
       }
     });
@@ -626,5 +624,50 @@ filterByStatus(selectedStatus: string) {
     this.paginator.firstPage();
   }
 }
+exportServicesExcel() {
+  Swal.fire({
+    title: 'Do you want to export services data?',
+    text: 'An Excel file will be downloaded to your system.',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Export',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    background: '#fff',
+    heightAuto: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.loaderService.showLoader();
 
+      this.genericService.getServiceExportExcel().subscribe({
+        next: (res: Blob) => {
+          this.loaderService.hideLoader();
+
+          if (res && res.size > 0) {
+            const blob = new Blob([res], {
+              type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'services_export.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            Swal.fire('Exported!', 'Your Excel file has been downloaded successfully.', 'success');
+          } else {
+            Swal.fire('No Data', 'No records available for export.', 'info');
+          }
+        },
+        error: (err: any) => {
+          this.loaderService.hideLoader();
+          Swal.fire('Error', 'Failed to export data. Please try again.', err);
+        },
+      });
+    }
+  });
+}
 }

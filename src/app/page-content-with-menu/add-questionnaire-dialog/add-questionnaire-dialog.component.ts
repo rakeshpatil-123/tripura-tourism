@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
@@ -18,6 +18,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { IlogiFileUploadComponent } from '../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { MatDividerModule } from "@angular/material/divider";
 
 @Component({
   selector: 'app-add-questionnaire-dialog',
@@ -36,8 +38,11 @@ import { IlogiFileUploadComponent } from '../../customInputComponents/ilogi-file
     MatCheckboxModule,
     MatRadioModule,
     MatTableModule,
-    IlogiFileUploadComponent
-  ],
+    IlogiFileUploadComponent,
+    FormsModule,
+    NgxMatSelectSearchModule,
+    MatDividerModule
+],
 })
 export class AddQuestionnaireDialogComponent implements OnInit {
   questionnaireForm: FormGroup;
@@ -45,6 +50,9 @@ export class AddQuestionnaireDialogComponent implements OnInit {
   availableColumns: string[] = [];
   selectedFile: File | null = null;
   sections: string[] = [];
+  public filteredSections: string[] = [];
+  public isAddingNewSection = false;
+  public newSectionName = '';
   displayedColumns: string[] = [
     'question_label',
     'question_type',
@@ -119,6 +127,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSectionList();
+    this.filteredSections = [...this.sections];
     const uploadRuleGroup = this.questionnaireForm.get('upload_rule');
     if (uploadRuleGroup) {
       uploadRuleGroup.get('mimes')?.setValidators([Validators.required]);
@@ -126,6 +135,20 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         .get('max_size_mb')
         ?.setValidators([Validators.required, Validators.min(1), Validators.max(3)]);
     }
+    this.questionnaireForm.get('question_type')?.valueChanges.subscribe((type) => {
+      const uploadRuleGroup = this.questionnaireForm.get('upload_rule');
+
+      if (type === 'file') {
+        uploadRuleGroup?.enable({ emitEvent: false });
+      } else {
+        uploadRuleGroup?.disable({ emitEvent: false });
+        uploadRuleGroup?.reset({
+          mimes: '',
+          max_size_mb: 3
+        }, { emitEvent: false });
+      }
+    });
+
     uploadRuleGroup?.updateValueAndValidity();
     if (this.data?.questionnaire) {
       this.questionnaireForm.patchValue(this.data.questionnaire);
@@ -224,7 +247,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
             this.snackBar.open(res.message || `Failed to ${this.data.mode === 'add' ? 'add' : 'update'} questionnaire`, 'error', { duration: 3000 });
           }
         },
-        error: () => this.snackBar.open(`Failed to ${this.data.mode === 'add' ? 'add' : 'update'} questionnaire`, 'error', { duration: 3000 })
+        error: (err) => this.snackBar.open(`Failed to ${this.data.mode === 'add' ? 'add' : 'update'} questionnaire ${err.error.error}`, 'error', { duration: 3000 })
     });
 }
 
@@ -293,9 +316,46 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       .getServiceQuestionnaireSection(this.data.service.id)
       .subscribe((res: any) => {
         this.sections = res.data || [];
+        this.filteredSections = [...this.sections];
       });
   }
   get uploadRule() {
     return this.questionnaireForm.get('upload_rule')!;
+  }
+
+  filterSections(event: any) {
+    const searchTerm = event.target.value?.toLowerCase() || '';
+    this.filteredSections = this.sections.filter(section =>
+      section.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  showAddNewSectionInput(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.isAddingNewSection = true;
+    setTimeout(() => {
+      const input = document.querySelector('.new-section-input') as HTMLElement;
+      input?.focus();
+    });
+  }
+  onSaveNewSection(evt?: Event) {
+    evt?.stopPropagation();
+    this.saveNewSection();
+  }
+  stopEvent(event: Event | KeyboardEvent) {
+    event.stopPropagation();
+  }
+  saveNewSection() {
+    const newName = this.newSectionName.trim();
+    if (!newName) return;
+    if (!this.sections.includes(newName)) {
+      this.sections.push(newName);
+    }
+    this.filteredSections = [...this.sections];
+    this.questionnaireForm.get('section_name')?.setValue(newName);
+
+    this.newSectionName = '';
+    this.isAddingNewSection = false;
+    this.snackBar.open(`New section "${newName}" added`, 'OK', { duration: 2000 });
   }
 }

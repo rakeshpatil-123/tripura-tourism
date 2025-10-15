@@ -1615,4 +1615,14 @@ getThirdPartyRedirect(url: string): Observable<string> {
       { headers: this.getHeaders() }
     );
   }
+  getServiceExportExcel(): any {
+    return this.http.post(
+      `${this.baseUrl}/api/admin/export-services`,
+      {},
+      {
+        headers: this.getHeaders(),
+        responseType: 'blob'
+      }
+    );
+  }
 }

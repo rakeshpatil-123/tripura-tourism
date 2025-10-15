@@ -14,7 +14,7 @@
       class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Renewal Cycle</mat-label>
-        <mat-select formControlName="renewal_cycle_id" required>
+        <mat-select formControlName="renewal_cycle_id">
           <mat-option *ngFor="let c of renewalCycles" [value]="c.id">
             {{ c.renewal_title }}
           </mat-option>
@@ -22,14 +22,11 @@
             No more renewal cycles found. Please add a renewal cycle first.
           </mat-option>
         </mat-select>
-        <mat-error *ngIf="feeRuleForm.get('renewal_cycle_id')?.hasError('required')">
-          Renewal Cycle is required
-        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Fee Type</mat-label>
-        <mat-select formControlName="fee_type" required>
+        <mat-select formControlName="fee_type">
           <mat-option value="calculated">Calculated</mat-option>
           <mat-option value="hardcoded">HardCoded</mat-option>
           <mat-option value="estimated">Estimated</mat-option>
@@ -38,7 +35,7 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Question</mat-label>
-        <mat-select formControlName="question_id" required>
+        <mat-select formControlName="question_id">
           <mat-option *ngFor="let q of serviceQuestions" [value]="q.id">
             {{ q.question_label || q.title || q.label || q.id }}
           </mat-option>
@@ -46,9 +43,6 @@
             No more questions found. Please add a question first.
           </mat-option>
         </mat-select>
-          <mat-error *ngIf="feeRuleForm.get('question_id')?.hasError('required')">
-            Question is required
-          </mat-error>
       </mat-form-field>
     </div>
 

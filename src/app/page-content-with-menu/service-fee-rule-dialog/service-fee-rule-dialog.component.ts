@@ -30,6 +30,7 @@ import { GenericService } from '../../_service/generic/generic.service';
 })
 export class ServiceFeeRuleDialogComponent implements OnInit {
   feeRuleForm: FormGroup;
+  previewRule: any = {};
   questions: any[] = [];
   apiRules: any[] = [];
   renewalCycles: any[] = [];
@@ -69,6 +70,26 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadRenewalCycles();
+    if (this.data.mode === 'add') {
+      this.feeRuleForm.valueChanges.subscribe(values => {
+        this.previewRule = {
+          fee_type: values.fee_type,
+          question_id: values.question_id,
+          condition_operator: values.condition_operator,
+          condition_value_start: values.condition_value_start,
+          condition_value_end: values.condition_value_end,
+          fixed_fee: values.fixed_fee,
+          calculated_fee: values.calculated_fee,
+          fixed_calculated_fee: values.fixed_calculated_fee,
+          per_unit_fee: values.per_unit_fee,
+          priority: values.priority,
+          status: values.status,
+          renewal_cycle_id: values.renewal_cycle_id,
+          rules: 'base_fee + (units * per_unit_fee)'
+        };
+        this.apiRules = [this.previewRule];
+      });
+    }
     if (this.data.mode === 'edit' && this.data.rules) {
       this.apiRules = [this.data.rules];
       const r = this.data.rules;

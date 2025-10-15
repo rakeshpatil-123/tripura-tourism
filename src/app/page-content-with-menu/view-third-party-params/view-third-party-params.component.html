@@ -23,7 +23,7 @@
           <ng-container matColumnDef="sno">
             <th mat-header-cell *matHeaderCellDef class="header text-center">S.No</th>
             <td mat-cell *matCellDef="let element; let i = index" class="text-center">
-              {{ (pageIndex * pageSize) + (i + 1) }}
+              {{ i + 1 + (paginator?.pageIndex || 0) * (paginator?.pageSize || 6) }}
             </td>
           </ng-container>
           <ng-container matColumnDef="param_name">
@@ -78,7 +78,7 @@
 
       <div class="footer-controls">
         <div class="total">Total: {{ dataSource.data?.length || 0 }}</div>
-        <mat-paginator [pageSize]="6" [pageSizeOptions]="[6, 12, 24]" showFirstLastButtons></mat-paginator>
+        <mat-paginator #paginator [pageSize]="6" [pageSizeOptions]="[6, 12, 24]" showFirstLastButtons></mat-paginator>
       </div>
     </ng-template>
   </div>
