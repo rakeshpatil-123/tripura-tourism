@@ -290,6 +290,24 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
 }
 
 
+getThirdPartyRedirect(url: string): Observable<string> {
+  const token = localStorage.getItem('token');
+  let headers = new HttpHeaders();
+
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+  }
+
+  return this.http.post<string>(
+    `${this.baseUrl}/${url}`, 
+    {}, 
+    { 
+      responseType: 'text' as 'json', 
+      headers 
+    }
+  );
+}
+
   private handleUnauthenticated(): void {
     localStorage.clear();
     this.setLoginStatus(false);
