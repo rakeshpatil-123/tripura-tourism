@@ -7,6 +7,8 @@ import { MatIconModule } from "@angular/material/icon";
 import { NgIf, NgFor } from '@angular/common';
 import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from "@angular/material/card";
 import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-add-department-dialog',
@@ -26,7 +28,8 @@ export class AddDepartmentDialogComponent implements OnInit {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddDepartmentDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private genericService: GenericService
+    private genericService: GenericService,
+    private loaderService: LoaderService
   ) { }
 
   ngOnInit(): void {
@@ -43,9 +46,10 @@ export class AddDepartmentDialogComponent implements OnInit {
   }
 
   loadDepartmentDetails(id: number): void {
+    this.loaderService.showLoader();
     if (!id) return;
     this.isLoadingDetails = true;
-    this.genericService.getDepartmentDetails(id).subscribe({
+    this.genericService.getDepartmentDetails(id).pipe(finalize(()=>this.loaderService.showLoader())).subscribe({
       next: (res: any) => {
         this.departmentDetails = res?.data || null;
         this.isLoadingDetails = false;
@@ -99,7 +103,8 @@ export class AddDepartmentDialogComponent implements OnInit {
       };
 
         if (this.mode === 'add') {
-          this.genericService.addDepartment(payload).subscribe({
+          this.loaderService.showLoader();
+          this.genericService.addDepartment(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
             next: (res: any) => handleSuccess(res, 'Created'),
             error: (err: any) => {
               const backendErrors = err.error?.errors;
@@ -111,8 +116,9 @@ export class AddDepartmentDialogComponent implements OnInit {
         }
       });
     } else if (this.mode === 'edit') {
+      this.loaderService.showLoader();
       payload.id = this.data.data.id;
-      this.genericService.updateDepartment(payload).subscribe({
+      this.genericService.updateDepartment(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
         next: (res: any) => handleSuccess(res, 'Updated'),
         error: () => handleError('Failed to update department.')
       });

@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { AddDepartmentDialogComponent } from '../add-department-dialog/add-department-dialog.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-departments',
@@ -34,6 +36,7 @@ export class DepartmentsComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private genericService: GenericService,
+    private loaderService: LoaderService,
     private fb: FormBuilder,
     public dialog: MatDialog
   ) { }
@@ -63,9 +66,11 @@ export class DepartmentsComponent implements OnInit {
   }
 
   getAllDepartmentList(): void {
+    this.loaderService.showLoader();
     this.genericService.getAllDepartmentNames().subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
+          this.loaderService.hideLoader();
           this.dataSource.data = res.data || [];
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
@@ -109,7 +114,8 @@ export class DepartmentsComponent implements OnInit {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        this.genericService.deleteDepartment(dept.id).subscribe({
+        this.loaderService.showLoader();
+        this.genericService.deleteDepartment(dept.id).pipe(finalize(()=>this.loaderService.showLoader())).subscribe({
           next: () => {
             Swal.fire(
               'Deleted!',

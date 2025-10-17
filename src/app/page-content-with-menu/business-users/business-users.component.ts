@@ -9,6 +9,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from "@angular/forms";
 import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-business-users',
@@ -41,7 +43,7 @@ export class BusinessUsersComponent implements OnInit {
 
   globalFilterFields: string[] = this.columns.map(c => c.field);
 
-  constructor(private genericService: GenericService, private fb: FormBuilder) {}
+  constructor(private genericService: GenericService, private fb: FormBuilder, private loaderService : LoaderService) {}
 
   ngOnInit(): void {
     this.fetchUsers();
@@ -49,7 +51,8 @@ export class BusinessUsersComponent implements OnInit {
 
   fetchUsers() {
     this.loading = true;
-    this.genericService.getBusinessUsersDetails().subscribe({
+    this.loaderService.showLoader();
+    this.genericService.getBusinessUsersDetails().pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         this.users = res?.status === 1 && Array.isArray(res.data) ? res.data : [];
         this.loading = false;

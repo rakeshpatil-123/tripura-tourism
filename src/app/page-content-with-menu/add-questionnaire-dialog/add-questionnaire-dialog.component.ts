@@ -53,6 +53,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
   public filteredSections: string[] = [];
   public isAddingNewSection = false;
   public newSectionName = '';
+  allowedFileTypes = ['jpg', 'jpeg', 'png', 'pdf', 'docx', 'xls', 'xlsx', 'csv', 'txt'];
   displayedColumns: string[] = [
     'question_label',
     'question_type',
@@ -117,55 +118,21 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         ],
         pattern: [''],
         errorMessage: [''],
-      }),
-      upload_rule: this.fb.group({
-        mimes: ['jpg, jpeg, png, pdf, docx'],
-        max_size_mb: [3, [Validators.max(3)]],
-      }),
+        mimes: [['jpg', 'jpeg', 'png', 'pdf']],
+        max_size_mb: [3],
+      })
     });
   }
 
   ngOnInit(): void {
     this.getSectionList();
     this.filteredSections = [...this.sections];
-    const uploadRuleGroup = this.questionnaireForm.get('upload_rule');
-    if (uploadRuleGroup) {
-      uploadRuleGroup.get('mimes')?.setValidators([Validators.required]);
-      uploadRuleGroup
-        .get('max_size_mb')
-        ?.setValidators([Validators.required, Validators.min(1), Validators.max(3)]);
-    }
-    this.questionnaireForm.get('question_type')?.valueChanges.subscribe((type) => {
-      const uploadRuleGroup = this.questionnaireForm.get('upload_rule');
-
-      if (type === 'file') {
-        uploadRuleGroup?.enable({ emitEvent: false });
-      } else {
-        uploadRuleGroup?.disable({ emitEvent: false });
-        uploadRuleGroup?.reset({
-          mimes: '',
-          max_size_mb: 3
-        }, { emitEvent: false });
-      }
-    });
-
-    uploadRuleGroup?.updateValueAndValidity();
     if (this.data?.questionnaire) {
       this.questionnaireForm.patchValue(this.data.questionnaire);
       const q = { ...this.data.questionnaire };
       if (q.status === 1 || q.status === true) q.status = '1';
       else if (q.status === 0 || q.status === false) q.status = '0';
       else q.status = '1';
-      if (q.upload_rule && typeof q.upload_rule.mimes === 'string') {
-        try {
-          const parsed = JSON.parse(q.upload_rule.mimes);
-          if (Array.isArray(parsed)) {
-            q.upload_rule.mimes = parsed.join(', ');
-          }
-        } catch {
-        }
-      }
-
       this.questionnaireForm.patchValue(q);
       if (this.data.questionnaire.sample_format) {
         this.selectedFile = null;
@@ -173,6 +140,25 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       if (this.data.questionnaire.default_source_table) {
         this.onTableChange(this.data.questionnaire.default_source_table);
       }
+      if (this.data?.questionnaire?.validation_rule) {
+        const rule = this.data.questionnaire.validation_rule;
+        let mimesArray: string[] = [];
+        if (Array.isArray(rule.mimes)) {
+          mimesArray = rule.mimes;
+        } else if (typeof rule.mimes === 'string') {
+          try {
+            const parsed = JSON.parse(rule.mimes);
+            if (Array.isArray(parsed)) mimesArray = parsed;
+            else mimesArray = rule.mimes.split(',').map((m: any) => m.trim()).filter(Boolean);
+          } catch {
+            mimesArray = rule.mimes.split(',').map((m: any) => m.trim()).filter(Boolean);
+          }
+        }
+        this.validationRule.patchValue({
+          mimes: mimesArray,
+          max_size_mb: rule.max_size_mb || 3
+        });
+      }      
     } else {
       this.genericService
         .getServiceQuestionnaires(this.data.service.id)
@@ -197,7 +183,6 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       });
       return;
     }
-
     const formValue = this.questionnaireForm.value;
     const formData = new FormData();
     formData.append('questionnaires[0][id]', formValue.id || '');
@@ -226,11 +211,19 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][validation_rule][pattern]', rule.pattern || '');
     formData.append('questionnaires[0][validation_rule][errorMessage]', rule.errorMessage || '');
     if (formValue.question_type === 'file') {
-      const rule = formValue.upload_rule || {};
-      const mimesArray = (rule.mimes || '').split(',').map((m: string) => m.trim()).filter(Boolean);
+      const rule = formValue.validation_rule || {};
+    let mimesArray: string[] = [];
 
-      formData.append('questionnaires[0][upload_rule][mimes]', JSON.stringify(mimesArray));
-      formData.append('questionnaires[0][upload_rule][max_size_mb]', rule.max_size_mb || '5');
+    if (Array.isArray(rule.mimes)) {
+      mimesArray = rule.mimes;
+    } else if (typeof rule.mimes === 'string') {
+      mimesArray = rule.mimes.split(',').map((m: string) => m.trim()).filter(Boolean);
+    }
+
+    mimesArray.forEach((mime: string, index: number) => {
+      formData.append(`questionnaires[0][validation_rule][mimes][${index}]`, mime);
+    });
+      formData.append('questionnaires[0][validation_rule][max_size_mb]', rule.max_size_mb || '3');
     }
 
       const request$ = this.data.mode === 'add'
@@ -264,13 +257,20 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     this.questionnaireForm.get(controlName)?.setValue(null);
   }
 
-  getExistingFileUrl(controlName: string): string | null {
+getExistingFileUrl(controlName: string): string | null {
     const filePath = this.data?.questionnaire?.[controlName];
     if (!filePath || this.selectedFile) return null;
     if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
       return filePath;
     }
     return `/uploads/${filePath}`;
+  }
+
+  getExistingFileName(controlName: string): string | null {
+    const fileUrl = this.getExistingFileUrl(controlName);
+    if (!fileUrl) return null;
+    const parts = fileUrl.split('/');
+    return parts[parts.length - 1];
   }
 
   close() {
@@ -357,5 +357,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     this.newSectionName = '';
     this.isAddingNewSection = false;
     this.snackBar.open(`New section "${newName}" added`, 'OK', { duration: 2000 });
+  }
+  get validationRule() {
+    return this.questionnaireForm.get('validation_rule') as FormGroup;
   }
 }

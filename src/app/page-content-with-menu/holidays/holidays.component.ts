@@ -14,6 +14,8 @@ import { AddHolidaysDialogComponent } from '../add-holidays-dialog/add-holidays-
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-holidays',
@@ -36,7 +38,8 @@ export class HolidaysComponent implements OnInit, AfterViewInit {
   constructor(
     private genericService: GenericService,
     private fb: FormBuilder,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private loaderService: LoaderService
   ) { }
 
   ngOnInit(): void {
@@ -76,7 +79,8 @@ export class HolidaysComponent implements OnInit, AfterViewInit {
 
   getAllHolidays(): void {
     this.isLoading = true;
-    this.genericService.viewHolidays({}).subscribe({
+    this.loaderService.showLoader();
+    this.genericService.viewHolidays({}).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.dataSource.data = res.data || [];

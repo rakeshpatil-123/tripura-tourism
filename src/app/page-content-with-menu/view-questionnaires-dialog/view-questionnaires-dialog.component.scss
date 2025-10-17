@@ -108,4 +108,58 @@
     font-size: 12px;
     padding: 8px;
   }
+}.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f9f9fb;
+  border-bottom: 1px solid #e0e0e0;
+
+  .header-left {
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2c3e50;
+
+      b {
+        color: #1976d2; // Primary color for service name
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .preview-btn {
+      min-width: 150px;
+    }
+
+    .close-btn {
+      mat-icon {
+        color: #555;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .dialog-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .header-actions {
+      margin-top: 0.75rem;
+      width: 100%;
+      justify-content: flex-start;
+      gap: 0.5rem;
+
+      .preview-btn {
+        width: auto;
+        flex: 1;
+      }
+    }
+  }
 }

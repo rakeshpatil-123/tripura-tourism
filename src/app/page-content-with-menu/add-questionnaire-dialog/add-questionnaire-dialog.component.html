@@ -89,7 +89,7 @@
     </div>
     <div class="form-row" *ngIf="questionnaireForm.get('question_type')?.value === 'file'">
       <app-ilogi-file-upload [formControlName]="'sample_format'" [fileUrl]="getExistingFileUrl('sample_format')"
-        accept=".png,.jpg,.jpeg,.pdf" label="Upload Template Format" (onRemove)="removeFile('sample_format')"
+        accept=".png,.jpg,.jpeg,.pdf,.docx,.xls,.xlsx,.csv,.txt" label="Upload Template Format" (onRemove)="removeFile('sample_format')"
         (fileSelected)="onFileSelected($event, 'sample_format')">
       </app-ilogi-file-upload>
     </div>
@@ -158,15 +158,18 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="form-row upload-rule-section" *ngIf="questionnaireForm.get('question_type')?.value === 'file'"
-      formGroupName="upload_rule">
+  <div formGroupName="validation_rule" class="validation-section">
+    <h3>Validation Rule</h3>
+      <div class="form-row upload-rule-section" *ngIf="questionnaireForm.get('question_type')?.value === 'file'">
       <h3 class="section-title">Upload Rules</h3>
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field full-width">
           <mat-label>Allowed File Types</mat-label>
-          <input matInput formControlName="mimes" placeholder="e.g. jpg, jpeg, png, pdf, docx" />
-          <mat-hint align="start">Tip: Separate types with commas (e.g. <b>jpg, png, pdf</b>)</mat-hint>
-          <mat-error *ngIf="uploadRule.get('mimes')?.hasError('required')">
+          <mat-select formControlName="mimes" multiple>
+            <mat-option *ngFor="let type of allowedFileTypes" [value]="type">{{ type }}</mat-option>
+          </mat-select>
+          <mat-hint align="start">Select multiple file types (e.g. pdf, jpg, png)</mat-hint>
+          <mat-error *ngIf="validationRule.get('mimes')?.hasError('required')">
             Allowed file types are <b>required</b>.
           </mat-error>
         </mat-form-field>
@@ -174,53 +177,48 @@
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Maximum File Size (MB)</mat-label>
-          <input matInput type="number" formControlName="max_size_mb" placeholder="e.g. 3" max="3" />
+          <input matInput type="number" formControlName="max_size_mb" placeholder="e.g. 3" min="1" max="3" />
           <mat-hint align="start">Recommended: 1–3 MB</mat-hint>
-          <mat-error *ngIf="uploadRule.get('max_size_mb')?.hasError('required')">
+          <mat-error *ngIf="validationRule.get('max_size_mb')?.hasError('required')">
             Max file size is <b>required</b>.
           </mat-error>
-          <mat-error *ngIf="uploadRule.get('max_size_mb')?.hasError('max')">
+          <mat-error *ngIf="validationRule.get('max_size_mb')?.hasError('max')">
             File size cannot exceed <b>3 MB</b>.
           </mat-error>
-          <mat-error *ngIf="uploadRule.get('max_size_mb')?.hasError('min')">
+          <mat-error *ngIf="validationRule.get('max_size_mb')?.hasError('min')">
             File size must be at least <b>1 MB</b>.
-          </mat-error>
-          <mat-error *ngIf="
-              uploadRule.get('max_size_mb')?.value &&
-              uploadRule.get('max_size_mb')?.value > 3
-            ">
-            ⚠️ Recommended maximum is <b>3 MB</b> for optimal performance.
           </mat-error>
         </mat-form-field>
       </div>
     </div>
-    <div formGroupName="validation_rule" class="validation-section">
-      <h3>Validation Rule</h3>
       <div class="form-row validation-row">
-        <mat-form-field appearance="outline" class="form-field minmax-field">
+        <mat-form-field *ngIf="questionnaireForm.get('question_type')?.value !== 'file'" appearance="outline"
+          class="form-field minmax-field">
           <mat-label>Min Length</mat-label>
           <input matInput type="number" formControlName="minLength" />
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field minmax-field">
+        <mat-form-field *ngIf="questionnaireForm.get('question_type')?.value !== 'file'" appearance="outline"
+          class="form-field minmax-field">
           <mat-label>Max Length</mat-label>
           <input matInput type="number" formControlName="maxLength" />
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field pattern-field">
+        <mat-form-field *ngIf="questionnaireForm.get('question_type')?.value !== 'file'" appearance="outline"
+          class="form-field pattern-field">
           <mat-label>Pattern</mat-label>
           <mat-select formControlName="pattern" placeholder="Select Pattern">
             <mat-option *ngFor="let item of regexPatterns" [value]="item.value">{{ item.label }}</mat-option>
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field error-field">
+        <mat-form-field *ngIf="questionnaireForm.get('question_type')?.value !== 'file'" appearance="outline"
+          class="form-field error-field">
           <mat-label>Error Message</mat-label>
           <input matInput formControlName="errorMessage" placeholder="Only alphabets allowed" />
         </mat-form-field>
       </div>
     </div>
-
   </form>
 
   <div class="preview-section" *ngIf="apiQuestions.length">

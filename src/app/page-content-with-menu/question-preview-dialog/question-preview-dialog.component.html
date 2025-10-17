@@ -1,0 +1,102 @@
+<div class="dialog-header">
+  <h2>Questionnaire Preview</h2>
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-divider></mat-divider>
+
+<ng-container *ngIf="loading; else contentTpl">
+  <div class="loading-container">
+    <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+    <p>Loading questions…</p>
+  </div>
+</ng-container>
+
+<ng-template #contentTpl>
+  <ng-container *ngIf="questionnaires.length; else noDataTpl">
+    <div class="content-area">
+      <div *ngFor="let q of questionnaires" @fadeInUp class="question-card" [style.flex]="q.display_width || '100%'">
+        <mat-card class="animate-card">
+          <mat-card-title>
+            {{ q.question_label }}
+            <span *ngIf="q.is_required === 'yes'" class="required">*</span>
+          </mat-card-title>
+          <mat-card-subtitle>
+            Type: {{ q.question_type | titlecase }}
+            <span *ngIf="q.section_name === null"> | Section: {{ q.section_name || '---' }}</span>
+          </mat-card-subtitle>
+
+          <mat-card-content>
+            <!-- TEXT -->
+            <div *ngIf="q.question_type === 'text'">
+              <input matInput placeholder="Enter {{ q.question_label }}" class="preview-input" />
+            </div>
+
+            <!-- NUMBER -->
+            <div *ngIf="q.question_type === 'number'">
+              <input type="number" matInput placeholder="Enter number" class="preview-input" />
+            </div>
+
+            <!-- FILE -->
+            <div *ngIf="q.question_type === 'file'" class="file-preview">
+              <button mat-stroked-button color="accent">
+                <mat-icon>upload_file</mat-icon> Upload File
+              </button>
+              <p class="hint">
+                Allowed: {{ q.upload_rule?.mimes || 'any' }} | Max: {{ q.upload_rule?.max_size_mb || '—' }}MB
+              </p>
+            </div>
+
+            <!-- SELECT -->
+            <div *ngIf="q.question_type === 'select'">
+              <mat-form-field appearance="fill" class="full-width">
+                <mat-label>{{ q.question_label }}</mat-label>
+                <mat-select>
+                  <mat-option *ngFor="let opt of getOptions(q)" [value]="opt">{{ opt }}</mat-option>
+                  <mat-option *ngIf="!getOptions(q).length" disabled>No options provided</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <!-- RADIO -->
+            <div *ngIf="q.question_type === 'radio'" class="options-grid">
+              <mat-radio-group>
+                <mat-radio-button *ngFor="let opt of getOptions(q)" [value]="opt">
+                  {{ opt }}
+                </mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <!-- CHECKBOX -->
+            <div *ngIf="q.question_type === 'checkbox'" class="options-grid">
+              <mat-checkbox *ngFor="let opt of getOptions(q)">{{ opt }}</mat-checkbox>
+            </div>
+
+            <!-- DATE -->
+            <!-- <div *ngIf="q.question_type === 'date'">
+              <mat-form-field appearance="outline" class="full-width">
+                <input matInput [matDatepicker]="picker{{ q.id }}" placeholder="Choose a date" />
+                <mat-datepicker-toggle matSuffix [for]="picker{{ q.id }}"></mat-datepicker-toggle>
+                <mat-datepicker #picker{{ q.id }}></mat-datepicker>
+              </mat-form-field>
+            </div> -->
+          </mat-card-content>
+
+          <mat-card-actions class="card-footer">
+            <small class="muted">ID: {{ q.id || '—' }}</small>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #noDataTpl>
+    <div class="no-data">
+      <mat-icon>info</mat-icon>
+      <h3>No questions available</h3>
+      <p>This questionnaire doesn't contain any questions yet.</p>
+    </div>
+  </ng-template>
+</ng-template>

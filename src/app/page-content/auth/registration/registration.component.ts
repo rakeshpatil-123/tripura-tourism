@@ -58,8 +58,12 @@ export class RegistrationComponent implements OnInit {
   loadingWards = false;
   hierarchyLevels = [
     { id: 'block', name: 'Block' },
-    { id: 'subdivision', name: 'Subdivision' },
-    { id: 'district', name: 'District' },
+    { id: 'subdivision1', name: 'Subdivision 1' },
+    { id: 'subdivision2', name: 'Subdivision 2' },
+    { id: 'subdivision3', name: 'Subdivision 3' },
+    { id: 'district1', name: 'District 1' },
+    { id: 'district2', name: 'District 2' },
+    { id: 'district3', name: 'District 3' },
     { id: 'state1', name: 'State 1' },
     { id: 'state2', name: 'State 2' },
     { id: 'state3', name: 'State 3' },
@@ -398,10 +402,10 @@ export class RegistrationComponent implements OnInit {
     if (['state1', 'state2', 'state3'].includes(h)) {
       return false;
     }
-    if (h === 'district') {
+    if (h === 'district1' || h === 'district2' || h === 'district3') {
       return field === 'district';
     }
-    if (h === 'subdivision') {
+    if (h === 'subdivision1' || h === 'subdivision2' || h === 'subdivision3') {
       return ['district', 'subdivision'].includes(field);
     }
     if (h === 'block') {
