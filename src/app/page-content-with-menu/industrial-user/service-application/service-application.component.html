@@ -33,7 +33,7 @@
             <!-- File Upload -->
             <ng-container *ngIf="q.question_type === 'file'">
               <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
-                [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024">
+                [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024"  [fileUrl]="getDefaultFileUrl(q.id)">
               </app-ilogi-file-upload>
               <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" 
                 type="button" class="sample" (click)="downloadSample(q.sample_format)">
@@ -104,7 +104,7 @@
                         <!-- File Upload -->
                         <ng-container *ngIf="q.question_type === 'file'">
                           <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
-                            [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024">
+                           [fileUrl]="getDefaultFileUrl(q.id)"  [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024">
                           </app-ilogi-file-upload>
                           <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" 
                             type="button" class="sample" (click)="downloadSample(q.sample_format)">

@@ -117,6 +117,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department', 'individual'] }
       },
+      {
+        path: 'repeat-application/:serviceid',
+        loadComponent: () =>
+          import(
+            './industrial-user/repeat-applications/repeat-applications.component'
+          ).then((m) => m.RepeatApplicationsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
+      },
      {
         path: 'departmental-services',
         loadComponent: () =>

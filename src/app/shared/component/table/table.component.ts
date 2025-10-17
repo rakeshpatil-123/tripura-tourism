@@ -484,4 +484,11 @@ shouldEnableActionMenu(col: TableColumn, row: any): boolean {
     !action.visible || action.visible(row)
   );
 }
+
+getActionLabel(action: any, row: any): string {
+  if (typeof action.label === 'function') {
+    return action.label(row);
+  }
+  return action.label || 'Action';
+}
 }

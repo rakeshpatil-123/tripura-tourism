@@ -48,7 +48,6 @@ export class AttachmentComponent implements OnInit {
     file: File | null;
   }> = [];
 
-  // Track which files are marked for deletion (only for your list)
   filesToDelete: Set<string> = new Set<string>();
 
   yesNoOptions = [
@@ -208,10 +207,9 @@ export class AttachmentComponent implements OnInit {
               }
             });
 
-            // Additional docs (just basic)
             if (data.other_supporting_docuement1_pdf) {
               const url = data.other_supporting_docuement1_pdf;
-              this.additionalDocUrl = url; // ✅ Store for preview
+              this.additionalDocUrl = url; 
 
               const fileName = decodeURIComponent(
                 url.split('/').pop() || 'additional-document.pdf'
@@ -222,7 +220,6 @@ export class AttachmentComponent implements OnInit {
 
               this.additionalDoc.file = placeholderFile;
 
-              // Optional: fetch real blob
               fetch(url)
                 .then((res) => res.blob())
                 .then((blob) => {
@@ -252,7 +249,7 @@ export class AttachmentComponent implements OnInit {
     const flag = deletableFields[fieldName];
     if (flag) {
       this.filesToDelete.add(flag);
-      console.log('Marked for deletion:', flag); // 🔥 ADD THIS
+      // console.log('Marked for deletion:', flag); 
     }
 
     this.form.get(fieldName)?.reset();
@@ -268,7 +265,6 @@ export class AttachmentComponent implements OnInit {
 
     const raw = this.form.getRawValue();
 
-    // === GENERAL ===
     formData.append('do_you_have_trees_in_the_land_for_industry', raw.haveTree);
     formData.append('type_of_tree', raw.typeOfTree || '');
 
@@ -285,7 +281,6 @@ export class AttachmentComponent implements OnInit {
         raw.tree_registration_certificate
       );
 
-    // === ENTERPRISE ===
     if (raw.owner_pan_pdf) formData.append('owner_pan_pdf', raw.owner_pan_pdf);
     formData.append('owner_pan_number', raw.owner_pan_number || '');
 
