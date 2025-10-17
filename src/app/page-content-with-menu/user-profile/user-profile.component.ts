@@ -6,6 +6,8 @@ import { TabsModule } from 'primeng/tabs';
 import { GenericService } from '../../_service/generic/generic.service';
 import { IlogiInputComponent } from "../../customInputComponents/ilogi-input/ilogi-input.component";
 import { IlogiSelectComponent, SelectOption } from "../../customInputComponents/ilogi-select/ilogi-select.component";
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 export interface BackendProfile {
   id?: number;
@@ -66,8 +68,12 @@ export class UserProfileComponent implements OnInit {
 
   hierarchyLevels = [
     { id: 'block', name: 'Block' },
-    { id: 'subdivision', name: 'Subdivision' },
-    { id: 'district', name: 'District' },
+    { id: 'subdivision1', name: 'Subdivision 1' },
+    { id: 'subdivision2', name: 'Subdivision 2' },
+    { id: 'subdivision3', name: 'Subdivision 3' },
+    { id: 'district1', name: 'District 1' },
+    { id: 'district2', name: 'District 2' },
+    { id: 'district3', name: 'District 3' },
     { id: 'state1', name: 'State 1' },
     { id: 'state2', name: 'State 2' },
     { id: 'state3', name: 'State 3' },
@@ -83,15 +89,14 @@ export class UserProfileComponent implements OnInit {
   loadingUlbs = false;
   loadingWards = false;
 
-  constructor(private genericService: GenericService, private fb: FormBuilder) { }
+  constructor(private genericService: GenericService, private fb: FormBuilder, private loaderService: LoaderService) { }
 
   ngOnInit(): void {
     this.initForms();
     this.getAllDepartmentList();
     this.loadDistricts();
     this.setupCascadingDropdowns();
-
-    this.genericService.getProfile().subscribe((res: any) => {
+    this.genericService.getProfile().pipe(finalize(()=>this.loaderService.hideLoader())).subscribe((res: any) => {
       if (res?.success || res?.status === 1) {
         this.backendProfile = {
           ...res.data,
@@ -190,7 +195,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   updateProfile(): void {
-
+    this.loaderService.showLoader();
     const userId = Number(localStorage.getItem('userId'));
     const val = this.profileForm.getRawValue();
 
@@ -232,7 +237,7 @@ export class UserProfileComponent implements OnInit {
         break;
     }
 
-    this.genericService.updateProfile(payload).subscribe({
+    this.genericService.updateProfile(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1) {
           this.genericService.openSnackBar(res?.message || 'Profile updated successfully!', 'Success');
@@ -271,8 +276,8 @@ export class UserProfileComponent implements OnInit {
       old_password: this.passwordForm.value.currentPassword,
       new_password: newPassword
     };
-
-    this.genericService.changePassword(payload).subscribe({
+    this.loaderService.showLoader();
+    this.genericService.changePassword(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.success === true) {
           this.genericService.openSnackBar('Password changed successfully!', 'Success');
@@ -317,7 +322,8 @@ export class UserProfileComponent implements OnInit {
   }
 
   getAllDepartmentList(): void {
-    this.genericService.getByConditions({}, 'api/department-get-all-departments').subscribe({
+    this.loaderService.showLoader();
+    this.genericService.getByConditions({}, 'api/department-get-all-departments').pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.departments = res.data;
@@ -334,7 +340,8 @@ export class UserProfileComponent implements OnInit {
 
   loadDistricts(): void {
     this.loadingDistricts = true;
-    this.genericService.getByConditions({}, 'api/tripura/get-all-districts').subscribe({
+    this.loaderService.showLoader();
+    this.genericService.getByConditions({}, 'api/tripura/get-all-districts').pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.districts)) {
           this.districts = res.districts.map((d: District) => ({
@@ -353,6 +360,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   loadSubdivisions(districtCode: string): void {
+    this.loaderService.showLoader();
     this.loadingSubdivisions = true;
     const selectedDistrict = this.districts.find(d => d.id === districtCode);
     if (!selectedDistrict) {
@@ -360,7 +368,7 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     const payload = { district: selectedDistrict.name };
-    this.genericService.getByConditions(payload, 'api/tripura/get-sub-subdivisions').subscribe({
+    this.genericService.getByConditions(payload, 'api/tripura/get-sub-subdivisions').pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.subdivision)) {
           this.subdivisions = res.subdivision.map((s: Subdivision) => ({
@@ -379,9 +387,10 @@ export class UserProfileComponent implements OnInit {
   }
 
   loadUlbs(subdivision: string): void {
+    this.loaderService.showLoader();
     this.loadingUlbs = true;
     const payload = { subdivision: subdivision };
-    this.genericService.getByConditions(payload, 'api/tripura/get-block-names').subscribe({
+    this.genericService.getByConditions(payload, 'api/tripura/get-block-names').pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.ulbs)) {
           this.ulbs = res.ulbs.map((u: ULB) => ({
@@ -401,8 +410,9 @@ export class UserProfileComponent implements OnInit {
 
   loadWards(ulb: string): void {
     this.loadingWards = true;
+    this.loaderService.showLoader();
     const payload = { ulb: ulb };
-    this.genericService.getByConditions(payload, 'api/tripura/get-gp-vc-wards').subscribe({
+    this.genericService.getByConditions(payload, 'api/tripura/get-gp-vc-wards').pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.ward)) {
           this.wards = res.ward.map((w: Ward) => ({
@@ -426,8 +436,8 @@ export class UserProfileComponent implements OnInit {
     if (u === 'individual') return true;
     if (['state1', 'state2', 'state3'].includes(h)) return false;
 
-    if (h === 'district') return field === 'district';
-    if (h === 'subdivision') return ['district', 'subdivision'].includes(field);
+    if (h === 'district1' || h === 'district2' || h === 'district3') return field === 'district';
+    if (h === 'subdivision1' || h === 'subdivision2' || h === 'subdivision3') return ['district', 'subdivision'].includes(field);
     if (h === 'block') return ['district', 'subdivision', 'block'].includes(field);
     if (h === 'ward') return ['district', 'subdivision', 'block', 'ward'].includes(field);
 

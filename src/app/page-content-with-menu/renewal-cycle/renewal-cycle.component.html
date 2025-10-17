@@ -26,6 +26,7 @@
           <mat-option value="biannual">Biannual</mat-option>
           <mat-option value="biennial">Biennial</mat-option>
           <mat-option value="triennial">Triennial</mat-option>
+          <mat-option value="4year">4 Year</mat-option>
           <mat-option value="5year">5 Year</mat-option>
           <mat-option value="custom">Custom</mat-option>
         </mat-select>
@@ -53,8 +54,7 @@
     <div class="grid-2">
       <mat-form-field appearance="outline">
         <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="fixed_renewal_start_date"
-          (click)="picker1.open()" />
+        <input matInput [matDatepicker]="picker1" formControlName="fixed_renewal_start_date" (click)="picker1.open()" />
         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
       </mat-form-field>

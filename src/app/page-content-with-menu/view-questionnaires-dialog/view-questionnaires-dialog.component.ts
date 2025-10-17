@@ -15,6 +15,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { GenericService } from '../../_service/generic/generic.service';
 import { AddQuestionnaireDialogComponent } from '../add-questionnaire-dialog/add-questionnaire-dialog.component';
 import { Service } from '../admin-services/admin-services.component';
+import { QuestionPreviewDialogComponent } from '../question-preview-dialog/question-preview-dialog.component';
 
 @Component({
   selector: 'app-view-questionnaires-dialog',
@@ -159,5 +160,15 @@ export class ViewQuestionnairesDialogComponent implements OnInit {
     link.click();
     document.body.removeChild(link);
     this.genericService.openSnackBar('Template Format downloaded successfully.', 'Success');
+  }
+  openQuestionPreview() {
+    this.dialog.open(QuestionPreviewDialogComponent, {
+      width: '80vw',
+      height: '80vh',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-preview-dialog',
+      data: { serviceId: this.data.service.id }
+    });
   }
 }

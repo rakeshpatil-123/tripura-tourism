@@ -7,26 +7,29 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { LoaderService } from '../../_service/loader/loader.service';
 
 @Component({
   selector: 'app-add-approval-flow',
   templateUrl: './add-approval-flow.component.html',
   styleUrls: ['./add-approval-flow.component.scss'],
   standalone: true,
-  imports: [MatInputModule, MatIconModule, MatCardModule, ReactiveFormsModule, MatSelectModule, CommonModule, MatDialogModule],
+  imports: [MatInputModule, MatIconModule, MatCardModule, ReactiveFormsModule, MatSelectModule, CommonModule, MatDialogModule, MatProgressSpinnerModule],
 })
 export class AddApprovalFlowComponent implements OnInit {
   approvalFlowForm!: FormGroup;
   stepTypes = ['validation', 'review', 'screening', 'scrutiny', 'approval'];
-  hierarchyLevels = ['block', 'subdivision', 'district', 'state1', 'state2', 'state3'];
+  hierarchyLevels = ['block', 'subdivision1', 'subdivision2', 'subdivision3', 'district1', 'district2', 'district3', 'state1', 'state2', 'state3'];
   mode!: 'add' | 'edit';
   departments: { id: number; name: string }[] = [];
-
+  loading = false;
   constructor(
     private fb: FormBuilder,
     private genericService: GenericService,
     private dialogRef: MatDialogRef<AddApprovalFlowComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private loaderService: LoaderService
   ) {
     this.mode = data.mode;
   }
@@ -34,13 +37,13 @@ export class AddApprovalFlowComponent implements OnInit {
   ngOnInit(): void {
     this.loadDepartments();
     this.approvalFlowForm = this.fb.group({
-      service_id: [this.data.service?.id || this.data.row.service?.id || '', Validators.required],
+      service_id: [this.data.service?.id || this.data.row.service?.id || ''],
       steps: this.fb.array([]),
     });
     if (this.mode === 'edit' && this.data.row) {
       const step = this.data.row;
       this.steps.push(this.fb.group({
-        step_number: [step.step_number, Validators.required],
+        step_number: [step.step_number],
         step_type: [step.step_type, Validators.required],
         department_id: [step.department_id, Validators.required],
         hierarchy_level: [step.hierarchy_level, Validators.required],
@@ -56,7 +59,7 @@ export class AddApprovalFlowComponent implements OnInit {
 
   addStep(): void {
     this.steps.push(this.fb.group({
-      step_number: [this.steps.length + 1, Validators.required],
+      step_number: [this.steps.length + 1],
       step_type: ['', Validators.required],
       department_id: ['', Validators.required],
       hierarchy_level: ['', Validators.required],
@@ -68,11 +71,13 @@ export class AddApprovalFlowComponent implements OnInit {
   }
 
   submit(): void {
+    this.approvalFlowForm.markAllAsTouched();
+
     if (this.approvalFlowForm.invalid) {
       this.genericService.openSnackBar('Please fill all required fields correctly.', 'Close');
       return;
     }
-
+    this.loading = true;
     const payload = {
       flows: this.steps.value.map((step: any) => ({
         service_id: Number(this.approvalFlowForm.value.service_id),
@@ -110,15 +115,18 @@ export class AddApprovalFlowComponent implements OnInit {
   }
 
   private handleError(err: any) {
+    this.loading = false;
     let message = 'Something went wrong. Please try again.';
     if (err?.error?.message) {
       message = err.error.message;
-    } else if (err?.error?.errors) {
-      const firstKey = Object.keys(err.error.errors)[0];
-      message = `${err.error.errors[firstKey][0]}`;
+    } if (err?.error?.errors) {
+      const errorMessages = Object.values(err.error.errors)
+        .flat()
+        .map((msg: any) => msg)
+        .join('\n');
+      message = errorMessages || message;
     }
     this.genericService.openSnackBar(message, 'Close');
-    console.error('API Error:', err);
   }
 
   loadDepartments(): void {

@@ -12,6 +12,8 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { TooltipModule } from 'primeng/tooltip';
 import {ToggleSwitchModule} from "primeng/toggleswitch";
 import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 @Component({
   selector: 'app-departmental-users',
   standalone: true,
@@ -42,7 +44,7 @@ export class DepartmentalUsersComponent implements OnInit {
   selectedUser: any = null; 
   editMode: boolean = false;
   userForms: { [key: number]: FormGroup } = {};
-  constructor(private genericService: GenericService) { }
+  constructor(private genericService: GenericService, private loaderService: LoaderService) { }
 
   ngOnInit(): void {
     this.fetchProfile();
@@ -50,6 +52,7 @@ export class DepartmentalUsersComponent implements OnInit {
   }
 
   fetchProfile() {
+    this.loaderService.showLoader();
     this.loading = true;
     const currentUserType = localStorage.getItem('userRole');
     const apiCall =
@@ -57,7 +60,7 @@ export class DepartmentalUsersComponent implements OnInit {
         ? this.genericService.getAdminDepartmentalUserProfile()
         : this.genericService.getDepartmentalUserProfile();
 
-    apiCall.subscribe({
+    apiCall.pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res.status === 1 && res.data) {
           this.users = res.data.map((user: any) => ({
@@ -76,7 +79,9 @@ export class DepartmentalUsersComponent implements OnInit {
             registered_enterprise_city: user.registered_enterprise_city,
             department_name: user.department_name,
             department_id: user.department_id,
-            status: user.status
+            status: user.status,
+            created_by: user.created_by,
+            updated_by: user.updated_by
           }));
           this.usersBackup = [...this.users];
           this.users.forEach(user => {
@@ -100,7 +105,8 @@ export class DepartmentalUsersComponent implements OnInit {
   }
 
   loadDepartments(): void {
-    this.genericService.getAllDepartmentNames().subscribe({
+    this.loaderService.showLoader();
+    this.genericService.getAllDepartmentNames().pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status) {
           this.departments = res.data.map((d: any) => ({
@@ -134,9 +140,9 @@ export class DepartmentalUsersComponent implements OnInit {
   editUser(user: any): void {
     this.editMode = true;
     this.selectedUser = null;
-
+    this.loaderService.showLoader();
     const payload = { id: user.id };
-    this.genericService.getByConditions(payload, 'api/admin/get-department-user-details').subscribe({
+    this.genericService.getByConditions(payload, 'api/admin/get-department-user-details').pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.success && res?.data) {
           this.selectedUser = { ...res.data, user_id: user.id };
@@ -196,8 +202,8 @@ confirmStatusChange(event: any, user: any) {
 
 updateUserStatus(user: any, status: string) {
   const payload = { id: user.id, status };
-
-  this.genericService.updateDepartmentalUserStatus(payload).subscribe({
+  this.loaderService.showLoader();
+  this.genericService.updateDepartmentalUserStatus(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
     next: () => {
       user.status = status;
       this.userForms[user.id].controls['status'].setValue(status === 'active', { emitEvent: false });

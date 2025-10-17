@@ -186,9 +186,9 @@
   </form>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button color="warn" (click)="closeDialog()">Cancel</button>
-  <button mat-raised-button color="primary" [disabled]="!serviceForm.valid"
+<mat-dialog-actions align="end" class="dialog-footer">
+  <button mat-raised-button color="warn" (click)="closeDialog()">Cancel</button>
+  <button mat-stroked-button color="primary" [disabled]="!serviceForm.valid"
     (click)="data ? submit(true) : submit(false)">
     {{ data ? 'Update' : 'Create' }}
   </button>

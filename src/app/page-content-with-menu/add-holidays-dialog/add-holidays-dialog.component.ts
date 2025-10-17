@@ -12,6 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMomentDateModule, provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import moment from 'moment';
 import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 export const MY_DATE_FORMATS = {
   parse: {
     dateInput: 'DD/MM/YYYY',
@@ -60,7 +62,8 @@ export class AddHolidaysDialogComponent implements OnInit {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddHolidaysDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private genericService: GenericService
+    private genericService: GenericService,
+    private loaderService: LoaderService
   ) { }
 
   ngOnInit(): void {
@@ -96,8 +99,10 @@ export class AddHolidaysDialogComponent implements OnInit {
     const payload = { ...formValue, holiday_date: formattedDate };
 
     if (this.mode === 'add') {
-      this.genericService.addHoliday(payload).subscribe({
+      this.loaderService.showLoader();
+      this.genericService.addHoliday(payload).pipe(finalize(()=> this.loaderService.hideLoader())).subscribe({
         next: (res: any) => {
+          this.dialogRef.close();
           Swal.fire({
             title: 'Holiday Created!',
             text: res.message,
@@ -109,6 +114,7 @@ export class AddHolidaysDialogComponent implements OnInit {
           }).then(() => this.dialogRef.close('updated'));
         },
         error: (err: any) => {
+          this.dialogRef.close();
           this.isSubmitting = false;
           const errorMsg = err.error?.message || 'Failed to create holiday.';
           Swal.fire({
@@ -123,9 +129,11 @@ export class AddHolidaysDialogComponent implements OnInit {
         }
       });
     } else if (this.mode === 'edit') {
+      this.loaderService.showLoader();
       payload.id = this.data.data.id;
-      this.genericService.updateHoliday(payload).subscribe({
+      this.genericService.updateHoliday(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
         next: (res: any) => {
+          this.dialogRef.close();
           Swal.fire({
             title: 'Holiday Updated!',
             text: res.message,
@@ -137,6 +145,7 @@ export class AddHolidaysDialogComponent implements OnInit {
           }).then(() => this.dialogRef.close('updated'));
         },
         error: () => {
+          this.dialogRef.close();
           this.isSubmitting = false;
           Swal.fire({
             title: 'Error!',

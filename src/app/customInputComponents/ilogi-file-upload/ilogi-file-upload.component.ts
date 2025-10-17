@@ -4,7 +4,9 @@
     ElementRef,
     EventEmitter,
     Input,
+    OnChanges,
     Output,
+    SimpleChanges,
     ViewChild,
     forwardRef,
   } from '@angular/core';
@@ -29,7 +31,7 @@
       },
     ],
   })
-  export class IlogiFileUploadComponent implements ControlValueAccessor {
+  export class IlogiFileUploadComponent implements ControlValueAccessor, OnChanges {
     @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
     @Input() name: string = 'file';
@@ -45,6 +47,7 @@
     @Output() onRemove = new EventEmitter<string>();
 
     selectedFile: File | null = null;
+    selectedFileName: string | null = null;
     error: string | null = null;
 
     // ControlValueAccessor callbacks
@@ -53,6 +56,12 @@
 
     writeValue(file: File | null): void {
       this.selectedFile = file;
+    }
+    ngOnChanges(changes: SimpleChanges): void {
+      if (changes['fileUrl'] && this.fileUrl && !this.selectedFile) {
+        const parts = this.fileUrl.split('/');
+        this.selectedFileName = parts[parts.length - 1];
+      }
     }
 
     registerOnChange(fn: (file: File | null) => void): void {
@@ -87,6 +96,7 @@
         }
 
         this.selectedFile = file;
+        this.selectedFileName = file.name;
         this.onChange(file);
         this.onTouched();
         this.fileSelected.emit(file);
@@ -99,6 +109,7 @@
       }
 
       this.selectedFile = null;
+      this.selectedFileName = null;
       this.onChange(null);
       this.onTouched();
       this.fileCleared.emit();

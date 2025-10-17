@@ -160,7 +160,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   loadServices() {
-    const sub = this.genericService.getAdminServices().subscribe({
+    this.loaderService.showLoader();
+    const sub = this.genericService.getAdminServices().pipe(finalize(()=> this.loaderService.hideLoader())).subscribe({
       next: (res) => {
         if (res.status === 1 && res.data) {
           const services = res.data.map((item: any) => ({
@@ -503,9 +504,11 @@ deleteService(service: Service): void {
     this.dataSource.filter = filterValue;
   }
   loadDepartments(): void {
+    this.loaderService.showLoader();
     this.genericService.getAllDepartmentNames().subscribe({
       next: (res: any) => {
         if (res?.status) {
+          this.loaderService.hideLoader();
           this.departments = [
             { id: '', name: 'All Departments' },
             ...res.data.map((d: any) => ({ id: d.id, name: d.name }))

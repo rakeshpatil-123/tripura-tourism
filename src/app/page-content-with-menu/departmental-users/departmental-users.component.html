@@ -57,6 +57,12 @@
           <div class="header-wrapper">Status</div>
         </th>
         <th>
+          <div class="header-wrapper">Created By</div>
+        </th>
+        <th>
+          <div class="header-wrapper">Updated By</div>
+        </th>
+        <th>
           <div class="header-wrapper">Action</div>
         </th>
       </tr>
@@ -99,6 +105,12 @@
             <p-toggleswitch formControlName="status" (onChange)="confirmStatusChange($event, user)">
             </p-toggleswitch>
           </form>
+        </td>
+        <td pTooltip="{{ user.created_by }}" tooltipPosition="right">
+          {{ user.created_by || '----' }}
+        </td>
+        <td pTooltip="{{ user.updated_by }}" tooltipPosition="right">
+          {{ user.updated_by || '----' }}
         </td>
         <td class="text-center">
           <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-sm edit-btn"

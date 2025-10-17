@@ -28,6 +28,9 @@ import {
 import moment from 'moment';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
+import Swal from 'sweetalert2';
 
 export enum NocType {
   CFE = 'CFE',
@@ -56,7 +59,7 @@ export enum NocType {
     MatNativeDateModule,
     MatMomentDateModule,
     MatDatepickerModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
   ],
   templateUrl: './add-service-dialog.component.html',
   styleUrls: ['./add-service-dialog.component.scss'],
@@ -71,6 +74,7 @@ export class AddServiceDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddServiceDialogComponent>,
+    private loaderService: LoaderService,
     private genericService: GenericService,
     @Inject(MAT_DIALOG_DATA) public data: any 
   ) {
@@ -118,8 +122,9 @@ export class AddServiceDialogComponent implements OnInit {
     this.getAllDepartmentList();
     
     if (this.data?.id) {
+      this.loaderService.showLoader();
       this.genericService
-        .getUpdationDataServiceAdmin({ service_id: this.data.id })
+        .getUpdationDataServiceAdmin({ service_id: this.data.id }).pipe(finalize(()=> this.loaderService.hideLoader()))
         .subscribe((res: any) => {
           if (res?.status === 1 && res.data) {
             const s = res.data;
@@ -165,7 +170,8 @@ export class AddServiceDialogComponent implements OnInit {
   }
   loadServices(): void {
     this.loadingServices = true;
-    this.genericService.getAdminServices().subscribe({
+    this.loaderService.showLoader();
+    this.genericService.getAdminServices().pipe(finalize(()=> this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res.status === 1 && Array.isArray(res.data)) {
           const mappedServices = res.data.map((item: any) => ({
@@ -245,26 +251,86 @@ export class AddServiceDialogComponent implements OnInit {
         verification_token: formValue.verification_token,
         is_special: formValue.is_special,
       };
-      if (isUpdate) {
-        const finalPayload = { id: this.data.id, ...payload };
-        this.genericService.updateAdminService(finalPayload).subscribe({
-          next: () => {
-            this.genericService.openSnackBar('Service updated successfully', 'Success');
-            this.dialogRef.close('updated');
-          },
-          error: (err) => console.error(err),
-        });
-      } else {
-        this.genericService.addNewService(payload).subscribe({
-          next: () => {
-            this.genericService.openSnackBar('Service created successfully', 'Success');
-            this.dialogRef.close('created');
-          },
-          error: (err) => console.error(err),
-        });
-      }
+      this.dialogRef.close();
+      Swal.fire({
+        title: isUpdate ? 'Update this service?' : 'Create new service?',
+        text: isUpdate
+          ? 'You are about to update this service details.'
+          : 'You are about to create a new service entry.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: isUpdate ? 'Yes, Update!' : 'Yes, Create!',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#1a237e',
+        cancelButtonColor: '#d33',
+        background: 'white',
+        color: 'black',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.loaderService.showLoader();
+          const apiCall = isUpdate
+            ? this.genericService.updateAdminService({
+              id: this.data.id,
+              ...payload,
+            })
+            : this.genericService.addNewService(payload);
+
+          apiCall.pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
+            next: (res: any) => {
+              Swal.fire({
+                title: isUpdate
+                  ? 'Service Updated Successfully'
+                  : 'Service Created Successfully',
+                text: isUpdate
+                  ? 'The service has been updated in the system.'
+                  : 'A new service has been added successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#1a237e',
+                timer: 2000,
+                timerProgressBar: true,
+                showClass: {
+                  popup: 'animate__animated animate__zoomIn'
+                },
+                hideClass: {
+                  popup: 'animate__animated animate__zoomOut'
+                }
+              }).then(() => {
+                this.dialogRef.close(isUpdate ? 'updated' : 'created');
+              });
+            },
+            error: (err) => {
+              console.error(err);
+              Swal.fire({
+                title: 'Something went wrong',
+                text: 'Please try again later.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                showClass: {
+                  popup: 'animate__animated animate__shakeX'
+                },
+              });
+            },
+          });
+        }
+      });
     } else {
       this.serviceForm.markAllAsTouched();
+      Swal.fire({
+        title: 'Form Incomplete ⚠️',
+        text: 'Please fill all required fields before submitting.',
+        icon: 'warning',
+        confirmButtonColor: '#ff9800',
+        showClass: {
+          popup: 'animate__animated animate__tada'
+        },
+      });
     }
   }
 }

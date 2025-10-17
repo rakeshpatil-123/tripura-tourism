@@ -5,7 +5,11 @@
   </button>
 </div>
 
-<div class="table-container">
+<div class="table-container" style="position: relative;">
+  <div *ngIf="dataSource.data.length === 0" class="no-data-overlay">
+    <mat-icon>info</mat-icon>
+    <p>No data found</p>
+  </div>
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 animated-table" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell class="header-color" *matHeaderCellDef mat-sort-header> ID </th>
