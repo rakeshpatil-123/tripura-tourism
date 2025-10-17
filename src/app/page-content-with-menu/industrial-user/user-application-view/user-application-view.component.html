@@ -1,9 +1,6 @@
 <!-- user-application-view.component.html -->
 <div class="application-view-container">
-  <!-- <div class="header">
-    <h1>Application Details</h1>
-    <p class="subtitle">View and track your submitted application</p>
-  </div> -->
+
 
   <div class="loading" *ngIf="isLoading">
     <div class="spinner"></div>
@@ -17,8 +14,7 @@
   </div>
 
   <div class="application-card" *ngIf="application && !isLoading">
-    <!-- Application Info -->
-    <!-- Application Info -->
+  
     <section class="section">
       <div class="app-header">
         <h2 class="app-title">Application Information</h2>
@@ -54,7 +50,6 @@
       </div>
     </section>
 
-    <!-- Status -->
     <section class="section">
       <h2> Status</h2>
       <div class="status-display">
@@ -67,20 +62,18 @@
       </div>
     </section>
 
-    <!-- Applicant Data -->
     <section class="section" *ngIf="application?.application_data_structured?.length">
       <h2> Applicant Information</h2>
       <div class="grid">
         <div class="field" *ngFor="let qa of application.application_data_structured">
           <label>{{ qa.question }}</label>
-          <span>{{ qa.answer || '—' }}</span>
+          <span>{{ formatAnswerForDisplay(qa.answer) }}</span>
         </div>
       </div>
     </section>
 
-    <!-- Fallback if structured data is missing -->
     <section class="section" *ngIf="!application?.application_data_structured?.length && application?.application_data">
-      <h2> Applicant Information (Fallback)</h2>
+      <h2> Applicant Information </h2>
       <div class="grid">
         <div class="field" *ngFor="let entry of application.application_data | keyvalue">
           <label>{{ getLabel(entry.key) }}</label>
@@ -89,7 +82,6 @@
       </div>
     </section>
 
-    <!-- Payment Info -->
     <section class="section">
       <h2> Payment Information</h2>
       <div class="grid">
@@ -118,7 +110,6 @@
       </div>
     </section>
 
-    <!-- NOC Details (if issued) -->
     <section class="section" *ngIf="application?.NOC_letter_number">
       <h2>📄 NOC Details</h2>
       <div class="grid">

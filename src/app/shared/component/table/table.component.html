@@ -15,17 +15,13 @@
     </div>
   </div>
 
-<div class="table-controls d-flex justify-content-end align-items-center mb-2" *ngIf="showPagination">
-  <label class="me-2 text-nowrap">Rows per page:</label>
-  <select 
-    [(ngModel)]="pageSize" 
-    (ngModelChange)="applyPagination()" 
-    class="form-control page-size-select"
-    style="width: auto; padding: 0.375rem 0.75rem; font-size: 0.9rem;"
-  >
-    <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-  </select>
-</div>
+  <div class="table-controls d-flex justify-content-end align-items-center mb-2" *ngIf="showPagination">
+    <label class="me-2 text-nowrap">Rows per page:</label>
+    <select [(ngModel)]="pageSize" (ngModelChange)="applyPagination()" class="form-control page-size-select"
+      style="width: auto; padding: 0.375rem 0.75rem; font-size: 0.9rem;">
+      <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+    </select>
+  </div>
 
   <div class="table-wrapper">
     <table class="dynamic-table table-red-headers">
@@ -131,13 +127,19 @@
                   </div>
 
                   <!-- Regular Action Button -->
-                  <button *ngIf="!hasActionComponent(action) && (action.visible ? action.visible(row) : true)"
+                  <!-- <button *ngIf="!hasActionComponent(action) && (action.visible ? action.visible(row) : true)"
                     mat-menu-item (click)="onRowActionAndClose(action, row)"
                     [class]="'btn-' + (action.color || 'primary')">
                     <span *ngIf="action.icon" class="icon mr-1">{{
                       action.icon
                       }}</span>
                     <span>{{ action.label }}</span>
+                  </button> -->
+                  <button *ngIf="!hasActionComponent(action) && (action.visible ? action.visible(row) : true)"
+                    mat-menu-item (click)="onRowActionAndClose(action, row)"
+                    [class]="'btn-' + (action.color || 'primary')">
+                    <span *ngIf="action.icon" class="icon mr-1">{{ action.icon }}</span>
+                    <span>{{ getActionLabel(action, row) }}</span>
                   </button>
                 </ng-container>
               </mat-menu>

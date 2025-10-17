@@ -16,8 +16,8 @@ interface ApplicationDetail {
   }[];
   payment_status: string | null;
   final_fee: string;
-  extra_payment?: string; // <-- Add this
-  total_fee?: string; // <-- Add this (optional, can compute too)
+  extra_payment?: string; 
+  total_fee?: string;
   current_step_number: string;
   max_processing_date: string;
   NOC_application_date?: string | null;
@@ -78,53 +78,102 @@ export class UserApplicationViewComponent implements OnInit {
     }
   }
 
+  // fetchApplicationDetails(): void {
+  //   this.isLoading = true;
+  //   this.error = null;
+
+  //   const payload = {
+  //     service_id: this.serviceId,
+  //     application_id: this.appId,
+  //   };
+
+  //   this.apiService
+  //     .getByConditions(
+  //       payload,
+  //       'api/user/get-details-user-service-applications'
+  //     )
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         this.isLoading = false;
+  //         if (
+  //           res?.status === 1 &&
+  //           Array.isArray(res.data) &&
+  //           res.data.length > 0
+  //         ) {
+  //           const appData = res.data[0];
+
+  //           this.application = {
+  //             ...appData,
+  //             application_data_structured: Array.isArray(res.application_data)
+  //               ? res.application_data.map((item: any) => ({
+  //                   id: item.id,
+  //                   question: item.question,
+  //                   answer: item.answer || '—',
+  //                 }))
+  //               : [],
+  //             extra_payment: appData.extra_payment || '0',
+  //             total_fee: appData.total_fee || '0',
+  //           };
+  //         } else {
+  //           this.error = res?.message || 'No application details found.';
+  //         }
+  //       },
+  //       error: (err) => {
+  //         this.isLoading = false;
+  //         this.error = 'Failed to load application. Please try again later.';
+  //         console.error('API Error:', err);
+  //       },
+  //     });
+  // }
+
   fetchApplicationDetails(): void {
-    this.isLoading = true;
-    this.error = null;
+  this.isLoading = true;
+  this.error = null;
 
-    const payload = {
-      service_id: this.serviceId,
-      application_id: this.appId,
-    };
+  const payload = {
+    service_id: this.serviceId,
+    application_id: this.appId,
+  };
 
-    this.apiService
-      .getByConditions(
-        payload,
-        'api/user/get-details-user-service-applications'
-      )
-      .subscribe({
-        next: (res: any) => {
-          this.isLoading = false;
-          if (
-            res?.status === 1 &&
-            Array.isArray(res.data) &&
-            res.data.length > 0
-          ) {
-            const appData = res.data[0];
+  this.apiService
+    .getByConditions(
+      payload,
+      'api/user/get-details-user-service-applications'
+    )
+    .subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+        if (
+          res?.status === 1 &&
+          res.data &&
+          typeof res.data === 'object'
+        ) {
+          const appData = res.data;
 
-            this.application = {
-              ...appData,
-              application_data_structured: Array.isArray(res.application_data)
-                ? res.application_data.map((item: any) => ({
-                    id: item.id,
-                    question: item.question,
-                    answer: item.answer || '—',
-                  }))
-                : [],
-              extra_payment: appData.extra_payment || '0',
-              total_fee: appData.total_fee || '0',
-            };
-          } else {
-            this.error = res?.message || 'No application details found.';
-          }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.error = 'Failed to load application. Please try again later.';
-          console.error('API Error:', err);
-        },
-      });
-  }
+          this.application = {
+            ...appData,
+            application_data: res.application_data || appData.application_data || {},
+            application_data_structured: Array.isArray(res.application_data)
+              ? res.application_data.map((item: any) => ({
+                  id: item.id,
+                  question: item.question,
+                  answer: item.answer || '—',
+                }))
+              : [],
+            extra_payment: appData.extra_payment || '0',
+            total_fee: appData.total_fee || '0',
+          };
+        } else {
+          this.error = res?.message || 'No application details found.';
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.error = 'Failed to load application. Please try again later.';
+        console.error('API Error:', err);
+      },
+    });
+}
 
   getLabel(key: string): string {
     return this.fieldLabelMap[key] || `Field ${key}`;
@@ -183,4 +232,41 @@ export class UserApplicationViewComponent implements OnInit {
       }
     });
   }
+  formatAnswerForDisplay(answer: any): string {
+  if (!answer) return '—';
+
+  // Case 1: It's a string (likely a file URL)
+  if (typeof answer === 'string') {
+    // Check if it looks like a URL (has http or .pdf, etc.)
+    if (answer.startsWith('http') || answer.includes('uploads/')) {
+      // Extract filename from URL or path
+      const url = new URL(answer, 'http://dummy.base'); // dummy base to avoid error if relative
+      return url.pathname.split('/').pop() || answer;
+    }
+    return answer;
+  }
+
+  // Case 2: It's an array (like TestSection)
+  if (Array.isArray(answer)) {
+    // Flatten array of objects into comma-separated values
+    const flatValues: string[] = [];
+    for (const item of answer) {
+      if (typeof item === 'object' && item !== null) {
+        // Push all values (ignore keys like "616", "617")
+        flatValues.push(...Object.values(item).map(v => String(v)));
+      } else {
+        flatValues.push(String(item));
+      }
+    }
+    return flatValues.join(', ');
+  }
+
+  // Case 3: It's a plain object (unlikely based on your data, but safe)
+  if (typeof answer === 'object') {
+    return Object.values(answer).join(', ');
+  }
+
+  // Fallback
+  return String(answer);
+}
 }

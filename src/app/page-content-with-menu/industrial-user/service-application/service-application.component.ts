@@ -84,7 +84,10 @@ interface SectionGroup {
   standalone: true,
 })
 export class ServiceApplicationComponent implements OnInit {
+  existingFileUrls: { [questionId: number]: string } = {};
   public Object = Object;
+  applicationId: number | null = null;
+  appId2: number | null = null;
   serviceForm!: FormGroup;
   questions: ServiceQuestion[] = [];
   groupedQuestions: { [group: string]: ServiceQuestion[] } = {};
@@ -120,8 +123,27 @@ export class ServiceApplicationComponent implements OnInit {
     private router: Router
   ) {}
 
+  // ngOnInit(): void {
+  //   this.serviceId = Number(this.route.snapshot.paramMap.get('id'));
+  //   const queryParams = this.route.snapshot.queryParams;
+  //   const appIdParam = queryParams['application_id'];
+  //   this.applicationId = appIdParam ? Number(appIdParam) : null;
+  //   if (this.serviceId) {
+  //     this.loadServiceDetails();
+  //   } else {
+  //     this.apiService.openSnackBar('Invalid service ID.', 'error');
+  //     this.loading = false;
+  //   }
+  // }
+
   ngOnInit(): void {
     this.serviceId = Number(this.route.snapshot.paramMap.get('id'));
+    const queryParams = this.route.snapshot.queryParams;
+    const appIdParam = queryParams['application_id'];
+    const appid2 = queryParams['appid2'];
+    this.applicationId = appIdParam ? Number(appIdParam) : null;
+    this.appId2 = appid2 ? Number(appid2) : null;
+
     if (this.serviceId) {
       this.loadServiceDetails();
     } else {
@@ -129,6 +151,38 @@ export class ServiceApplicationComponent implements OnInit {
       this.loading = false;
     }
   }
+
+  // loadServiceDetails(): void {
+  //   const payload = { service_id: this.serviceId };
+
+  //   this.apiService
+  //     .getByConditions(payload, 'api/service-questionnaire-view')
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         if (res?.status === 1 && Array.isArray(res.data)) {
+  //           this.questions = res.data
+  //             .filter((q: ServiceQuestion) => q.status === 1)
+  //             .map((q: any) => ({
+  //               ...q,
+  //               parsedOptions: this.parseOptions(q.options),
+  //             }));
+
+  //           this.processSections();
+  //           this.groupQuestions();
+  //           this.buildForm();
+  //           this.loadDefaultValues();
+  //         } else {
+  //           this.apiService.openSnackBar('No form data found.', 'error');
+  //         }
+  //         this.loading = false;
+  //       },
+  //       error: (err) => {
+  //         console.error('Failed to load service details:', err);
+  //         this.apiService.openSnackBar('No form data found', 'error');
+  //         this.loading = false;
+  //       },
+  //     });
+  // }
 
   loadServiceDetails(): void {
     const payload = { service_id: this.serviceId };
@@ -149,6 +203,10 @@ export class ServiceApplicationComponent implements OnInit {
             this.groupQuestions();
             this.buildForm();
             this.loadDefaultValues();
+
+            if (this.applicationId !== null || this.appId2 !== null) {
+              this.loadExistingApplication();
+            }
           } else {
             this.apiService.openSnackBar('No form data found.', 'error');
           }
@@ -202,6 +260,70 @@ export class ServiceApplicationComponent implements OnInit {
     );
   }
 
+  // loadDefaultValues(): void {
+  //   const userId = this.apiService.getDecryptedUserId();
+  //   if (!userId) {
+  //     console.warn('User ID not found, skipping default value loading');
+  //     return;
+  //   }
+
+  //   const questionsWithDefaults = this.questions.filter(
+  //     (q) => q.default_source_table && q.default_source_column
+  //   );
+
+  //   if (questionsWithDefaults.length === 0) {
+  //     return;
+  //   }
+
+  //   questionsWithDefaults.forEach((question) => {
+  //     const columnKey = question.default_source_column;
+  //     if (!columnKey) return;
+
+  //     const payload = {
+  //       user_id: userId,
+  //       default_source_table: question.default_source_table,
+  //       default_source_column: columnKey,
+  //     };
+
+  //     this.apiService
+  //       .getByConditions(payload, 'api/get-default-source')
+  //       .subscribe({
+  //         next: (res: any) => {
+  //           let defaultValue: any = null;
+
+  //           if (
+  //             res &&
+  //             (res.hasOwnProperty('value') || res.hasOwnProperty(columnKey))
+  //           ) {
+  //             defaultValue = res.value || res[columnKey];
+  //           } else if (res?.status === 1 && res.data && res.data.length > 0) {
+  //             defaultValue = res.data[0].value || res.data[0][columnKey];
+  //           }
+
+  //           if (
+  //             defaultValue !== undefined &&
+  //             defaultValue !== null &&
+  //             defaultValue !== ''
+  //           ) {
+  //             const controlName = question.id.toString();
+  //             const control = this.serviceForm.get(controlName);
+  //             if (control) {
+  //               control.setValue(defaultValue);
+  //               this.readonlyFields[question.id] = true;
+  //               this.cdr?.detectChanges();
+  //             }
+  //           }
+  //         },
+  //         error: (err) => {
+  //           console.error(
+  //             `Failed to load default value for question ${question.id}:`,
+  //             err
+  //           );
+  //         },
+  //       });
+  //   });
+  // }
+
   loadDefaultValues(): void {
     const userId = this.apiService.getDecryptedUserId();
     if (!userId) {
@@ -250,8 +372,22 @@ export class ServiceApplicationComponent implements OnInit {
               const controlName = question.id.toString();
               const control = this.serviceForm.get(controlName);
               if (control) {
-                control.setValue(defaultValue);
-                this.readonlyFields[question.id] = true;
+                if (question.question_type === 'file') {
+                  const url = defaultValue;
+                  const fileName = decodeURIComponent(
+                    url.split('/').pop() || 'file.pdf'
+                  );
+
+                  const fakeFile = new File([], fileName, {
+                    type: this.getFileMimeType(fileName),
+                  });
+
+                  control.setValue(fakeFile);
+                  this.readonlyFields[question.id] = true;
+                } else {
+                  control.setValue(defaultValue);
+                  this.readonlyFields[question.id] = true;
+                }
                 this.cdr?.detectChanges();
               }
             }
@@ -275,18 +411,16 @@ export class ServiceApplicationComponent implements OnInit {
       }
       this.groupedQuestions[group].push(q);
     });
-     Object.keys(this.groupedQuestions).forEach(group => {
-      console.log(group, "groupqqqqqq");
-      
-    this.groupedQuestions[group].sort((a, b) => {
-      const orderA = a.display_order ?? 9999; 
-      const orderB = b.display_order ?? 9999;
-      return orderA - orderB;
-    });
-  });
-  }
+    Object.keys(this.groupedQuestions).forEach((group) => {
+      console.log(group, 'groupqqqqqq');
 
- 
+      this.groupedQuestions[group].sort((a, b) => {
+        const orderA = a.display_order ?? 9999;
+        const orderB = b.display_order ?? 9999;
+        return orderA - orderB;
+      });
+    });
+  }
 
   buildForm(): void {
     const group: any = {};
@@ -319,7 +453,6 @@ export class ServiceApplicationComponent implements OnInit {
             ServiceApplicationComponent.digitLengthValidator(min, max)
           );
         } else {
-          // For text, use standard minLength/maxLength
           if (rule.minLength != null && rule.minLength !== '') {
             const min = Number(rule.minLength);
             if (!isNaN(min)) validators.push(Validators.minLength(min));
@@ -330,7 +463,6 @@ export class ServiceApplicationComponent implements OnInit {
           }
         }
 
-        // Pattern validation (if needed)
         if (
           rule.pattern &&
           rule.pattern.trim() !== '' &&
@@ -362,7 +494,6 @@ export class ServiceApplicationComponent implements OnInit {
       group[q.id] = [defaultValue, validators];
     });
 
-    // Build form arrays for sections
     this.sectionGroups.forEach((sectionGroup) => {
       const initialRow = this.createSectionRow(sectionGroup.questions);
       sectionGroup.formArray.push(initialRow);
@@ -377,8 +508,6 @@ export class ServiceApplicationComponent implements OnInit {
     });
   }
 
- 
-
   createSectionRow(questions: ServiceQuestion[]): FormGroup {
     const rowGroup: any = {};
 
@@ -392,7 +521,6 @@ export class ServiceApplicationComponent implements OnInit {
       if (q.validation_required === 'yes' && q.validation_rule) {
         const rule = q.validation_rule;
 
-        // Handle number fields with digit validator
         if (q.question_type === 'number') {
           let min: number | undefined = undefined;
           let max: number | undefined = undefined;
@@ -411,7 +539,6 @@ export class ServiceApplicationComponent implements OnInit {
             ServiceApplicationComponent.digitLengthValidator(min, max)
           );
         } else {
-          // Handle minLength (convert string to number)
           if (rule.minLength != null && rule.minLength !== '') {
             const min = Number(rule.minLength);
             if (!isNaN(min)) {
@@ -419,7 +546,6 @@ export class ServiceApplicationComponent implements OnInit {
             }
           }
 
-          // Handle maxLength (convert string to number)
           if (rule.maxLength != null && rule.maxLength !== '') {
             const max = Number(rule.maxLength);
             if (!isNaN(max)) {
@@ -428,7 +554,6 @@ export class ServiceApplicationComponent implements OnInit {
           }
         }
 
-        // Handle pattern (regex)
         if (
           rule.pattern &&
           rule.pattern.trim() !== '' &&
@@ -524,69 +649,6 @@ export class ServiceApplicationComponent implements OnInit {
     // }
     this.serviceForm.markAllAsTouched();
 
-    if (this.serviceForm.invalid) {
-      const invalidControlKey = Object.keys(this.serviceForm.controls).find(
-        (key) => {
-          const control = this.serviceForm.get(key);
-          return control?.invalid && (control.touched || control.dirty);
-        }
-      );
-
-      if (invalidControlKey) {
-        const question = this.questions.find(
-          (q) => q.id.toString() === invalidControlKey
-        );
-        let errorMessage = 'Please fix errors.';
-
-        if (question) {
-          const label = question.question_label;
-          const control = this.serviceForm.get(invalidControlKey);
-
-          if (question.validation_rule?.errorMessage) {
-            const backendMsg = question.validation_rule.errorMessage;
-            if (backendMsg.includes(label)) {
-              errorMessage = backendMsg;
-            } else {
-              errorMessage = `${label}: ${backendMsg}`;
-            }
-          } else if (control?.hasError('required')) {
-            if (question.question_type === 'radio') {
-              errorMessage = `Please select ${label}`;
-            } else if (question.question_type === 'select') {
-              errorMessage = `Please select a ${label}.`;
-            } else if (question.question_type === 'file') {
-              errorMessage = `Please upload a ${label}.`;
-            } else if (question.question_type === 'date') {
-              errorMessage = `Please select a ${label}.`;
-            } else if (question.question_type === 'checkbox') {
-              errorMessage = `Please select at least one ${label}.`;
-            } else {
-              errorMessage = `${label} is required.`;
-            }
-          } else if (control?.hasError('minlength')) {
-            const requiredLength =
-              control.errors?.['minlength']?.requiredLength;
-            if (question.question_type === 'checkbox') {
-              errorMessage = `Please select at least ${requiredLength} ${label}.`;
-            } else {
-              errorMessage = `${label} must be at least ${requiredLength} characters.`;
-            }
-          } else if (control?.hasError('maxlength')) {
-            const requiredLength =
-              control.errors?.['maxlength']?.requiredLength;
-            if (question.question_type === 'checkbox') {
-              errorMessage = `You can select at most ${requiredLength} ${label}.`;
-            } else {
-              errorMessage = `${label} must be at most ${requiredLength} characters.`;
-            }
-          }
-        }
-
-        this.apiService.openSnackBar(errorMessage, 'error');
-        return;
-      }
-    }
-
     const userId = this.apiService.getDecryptedUserId();
     if (!userId) {
       this.apiService.openSnackBar('User not authenticated.', 'error');
@@ -595,17 +657,17 @@ export class ServiceApplicationComponent implements OnInit {
 
     const raw = this.serviceForm.getRawValue();
 
-    // Check if any file exists (regular or section fields)
     let hasFileToUpload = false;
 
-    // Check regular file fields
-    hasFileToUpload = this.questions.some((q) => {
-      const key = q.id.toString();
-      const value = raw[key];
-      return q.question_type === 'file' && value instanceof File;
+    this.questions.forEach((q) => {
+      if (q.question_type === 'file') {
+        const value = raw[q.id.toString()];
+        if (value instanceof File) {
+          hasFileToUpload = true;
+        }
+      }
     });
 
-    // Check section file fields
     if (!hasFileToUpload) {
       this.sectionGroups.forEach((section) => {
         const sectionData = raw[section.sectionName] || [];
@@ -626,77 +688,109 @@ export class ServiceApplicationComponent implements OnInit {
     }
   }
 
+  private getSubmissionEndpoint(): string {
+    return this.applicationId !== null
+      ? 'api/user/service-application-update'
+      : 'api/user/service-application-store';
+  }
+
   private submitAsJson(userId: string, raw: any): void {
     const applicationData: { [key: string]: any } = {};
 
-    // Regular fields
+    // Process regular fields
     Object.keys(raw).forEach((key) => {
-      if (this.sectionGroups.some((s) => s.sectionName === key)) {
-        return; 
-      }
+      if (this.sectionGroups.some((s) => s.sectionName === key)) return;
 
       const question = this.questions.find((q) => q.id.toString() === key);
       if (!question) return;
 
       let value = raw[key];
-
       if (question.question_type === 'date' && value instanceof Date) {
         value = value.toISOString().split('T')[0];
       }
-
       if (question.question_type === 'checkbox') {
         value = Array.isArray(value) ? value.join(', ') : value;
       }
 
-      if (question.question_type === 'file') {
-        value = null;
+      if (
+        question.is_required === 'yes' ||
+        (value !== null && value !== '' && value !== undefined)
+      ) {
+        applicationData[key] = value;
       }
-
-      applicationData[key] = value;
     });
 
+    // Add existing file URLs
+    Object.keys(this.existingFileUrls).forEach((idStr) => {
+      const questionId = Number(idStr);
+      const question = this.questions.find((q) => q.id === questionId);
+      if (!question) return;
+
+      const currentVal = raw[questionId];
+      if (
+        !(currentVal instanceof File) &&
+        applicationData[questionId] === undefined
+      ) {
+        applicationData[questionId] = this.existingFileUrls[questionId];
+      }
+    });
+
+    // Process section fields
     this.sectionGroups.forEach((section) => {
       const sectionData = raw[section.sectionName] || [];
+      const validRows = sectionData.filter((row: any) =>
+        section.questions.some((q) => {
+          const val = row[q.id];
+          return val !== null && val !== '' && val !== undefined;
+        })
+      );
 
-      section.questions.forEach((q) => {
-        const questionId = q.id.toString();
-        const values: any[] = [];
-
-        sectionData.forEach((row: any) => {
-          let value = row[q.id];
-
-          if (q.question_type === 'date' && value instanceof Date) {
-            value = value.toISOString().split('T')[0];
+      if (validRows.length > 0) {
+        const processedRows: any[] = [];
+        validRows.forEach((row: any) => {
+          const processedRow: any = {};
+          section.questions.forEach((q) => {
+            let value = row[q.id];
+            if (q.question_type === 'date' && value instanceof Date) {
+              value = value.toISOString().split('T')[0];
+            }
+            if (q.question_type === 'checkbox') {
+              value = Array.isArray(value) ? value.join(', ') : value;
+            }
+            if (
+              q.is_required === 'yes' ||
+              (value !== null && value !== '' && value !== undefined)
+            ) {
+              processedRow[q.id] = value;
+            }
+          });
+          if (Object.keys(processedRow).length > 0) {
+            processedRows.push(processedRow);
           }
-
-          if (q.question_type === 'checkbox') {
-            value = Array.isArray(value) ? value.join(', ') : value;
-          }
-
-          if (q.question_type === 'file') {
-            value = null; 
-          }
-
-          values.push(value);
         });
-
-        applicationData[questionId] = values;
-      });
+        if (processedRows.length > 0) {
+          applicationData[section.sectionName] = processedRows;
+        }
+      }
     });
 
-    const payload = {
+    const payload: any = {
       user_id: Number(userId),
       service_id: this.serviceId,
       application_data: applicationData,
     };
 
+    if (this.applicationId !== null) {
+      payload.id = this.applicationId;
+    }
+
     this.apiService
-      .getByConditions(payload, 'api/user/service-application-store')
+      .getByConditions(payload, this.getSubmissionEndpoint())
       .subscribe({
         next: (res) => {
           if (res?.status === 1) {
             this.apiService.openSnackBar(
-              'Application submitted successfully!',
+              'Application saved successfully!',
               'success'
             );
             this.router.navigate(['/dashboard/services']);
@@ -722,72 +816,76 @@ export class ServiceApplicationComponent implements OnInit {
     formData.append('user_id', userId);
     formData.append('service_id', this.serviceId.toString());
 
-    // Regular fields
-    Object.keys(raw).forEach((key) => {
-      if (this.sectionGroups.some((s) => s.sectionName === key)) {
-        return;
-      }
+    if (this.applicationId !== null) {
+      formData.append('id', this.applicationId.toString());
+    }
 
+    Object.keys(raw).forEach((key) => {
+      if (this.sectionGroups.some((s) => s.sectionName === key)) return;
       const question = this.questions.find((q) => q.id.toString() === key);
       if (!question) return;
 
       let value = raw[key];
-
       if (question.question_type === 'date' && value instanceof Date) {
         value = value.toISOString().split('T')[0];
       }
-
       if (question.question_type === 'checkbox') {
         value = Array.isArray(value) ? value.join(', ') : value;
       }
 
-      if (question.question_type === 'file' && value instanceof File) {
-        formData.append(`application_data[${key}]`, value, value.name);
-      } else {
-        formData.append(`application_data[${key}]`, value ?? '');
+      if (
+        question.is_required === 'yes' ||
+        (value !== null && value !== '' && value !== undefined)
+      ) {
+        if (question.question_type === 'file' && value instanceof File) {
+          formData.append(`application_data[${key}]`, value, value.name);
+        } else {
+          formData.append(`application_data[${key}]`, value ?? '');
+        }
       }
     });
 
     this.sectionGroups.forEach((section) => {
       const sectionData = raw[section.sectionName] || [];
+      const validRows = sectionData.filter((row: any) =>
+        section.questions.some((q) => {
+          const val = row[q.id];
+          return val !== null && val !== '' && val !== undefined;
+        })
+      );
 
-      section.questions.forEach((q) => {
-        const questionId = q.id.toString();
-        sectionData.forEach((row: any, rowIndex: number) => {
+      validRows.forEach((row: any, rowIndex: number) => {
+        section.questions.forEach((q) => {
           let value = row[q.id];
-
           if (q.question_type === 'date' && value instanceof Date) {
             value = value.toISOString().split('T')[0];
           }
-
           if (q.question_type === 'checkbox') {
             value = Array.isArray(value) ? value.join(', ') : value;
           }
 
-          if (q.question_type === 'file' && value instanceof File) {
-            // Store as application_data[questionId][rowIndex]
-            formData.append(
-              `application_data[${questionId}][${rowIndex}]`,
-              value,
-              value.name
-            );
-          } else {
-            formData.append(
-              `application_data[${questionId}][${rowIndex}]`,
-              value ?? ''
-            );
+          if (
+            q.is_required === 'yes' ||
+            (value !== null && value !== '' && value !== undefined)
+          ) {
+            const fieldName = `application_data[${section.sectionName}][${rowIndex}][${q.id}]`;
+            if (q.question_type === 'file' && value instanceof File) {
+              formData.append(fieldName, value, value.name);
+            } else {
+              formData.append(fieldName, value ?? '');
+            }
           }
         });
       });
     });
 
     this.apiService
-      .getByConditions(formData, 'api/user/service-application-store')
+      .getByConditions(formData, this.getSubmissionEndpoint())
       .subscribe({
         next: (res) => {
           if (res?.status === 1) {
             this.apiService.openSnackBar(
-              'Application submitted successfully!',
+              'Application saved successfully!',
               'success'
             );
             this.router.navigate(['/dashboard/services']);
@@ -815,4 +913,187 @@ export class ServiceApplicationComponent implements OnInit {
     }
     window.open(sampleUrl, '_blank');
   }
+
+  getDefaultFileUrl(questionId: number): string | null {
+    const question = this.questions.find((q) => q.id === questionId);
+    if (question?.default_value && !this.readonlyFields[questionId]) {
+    }
+
+    const currentValue = this.serviceForm.get(questionId.toString())?.value;
+    return typeof currentValue === 'string' ? currentValue : null;
+  }
+  private getFileMimeType(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    const mimeMap: { [key: string]: string } = {
+      pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      txt: 'text/plain',
+    };
+    return mimeMap[ext || ''] || 'application/octet-stream';
+  }
+
+  private loadExistingApplication(): void {
+    const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
+
+    if (actualAppId === null) return;
+
+    const payload = {
+      service_id: this.serviceId,
+      application_id: actualAppId,
+    };
+
+    this.apiService
+      .getByConditions(
+        payload,
+        'api/user/get-details-user-service-applications'
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status === 1 && res.data?.application_data) {
+            this.patchFormWithExistingData(res.data.application_data);
+          }
+        },
+        error: (err) => {
+          console.error('Failed to load existing application:', err);
+          this.apiService.openSnackBar(
+            'Could not load existing application data.',
+            'error'
+          );
+        },
+      });
+  }
+  // private patchFormWithExistingData(applicationData: any): void {
+  //   Object.keys(applicationData).forEach((key) => {
+  //     if (Array.isArray(applicationData[key])) {
+  //       const question = this.questions.find((q) => q.id.toString() === key);
+  //       if (question) {
+  //         let value = applicationData[key];
+
+  //         if (question.question_type === 'checkbox') {
+  //         } else if (question.question_type === 'file') {
+  //           if (value.length > 0 && typeof value[0] === 'string') {
+  //             this.existingFileUrls[question.id] = value[0];
+  //             const fileName = decodeURIComponent(
+  //               value[0].split('/').pop() || 'file.pdf'
+  //             );
+  //             const fakeFile = new File([], fileName, {
+  //               type: this.getFileMimeType(fileName),
+  //             });
+  //             this.serviceForm.get(key)?.setValue(fakeFile);
+  //           }
+  //         } else {
+  //           value = value.length > 0 ? value[0] : '';
+  //           this.serviceForm.get(key)?.setValue(value);
+  //         }
+  //       }
+  //     } else if (
+  //       typeof applicationData[key] === 'object' &&
+  //       !Array.isArray(applicationData[key])
+  //     ) {
+  //     }
+  //   });
+
+  //   this.sectionGroups.forEach((section) => {
+  //     const sectionData = applicationData[section.sectionName];
+
+  //     if (Array.isArray(sectionData) && sectionData.length > 0) {
+  //       while (section.formArray.length > 1) {
+  //         section.formArray.removeAt(0);
+  //       }
+
+  //       sectionData.forEach((row: any, index: number) => {
+  //         if (index === 0) {
+  //           const rowGroup = section.formArray.at(0) as FormGroup;
+  //           section.questions.forEach((q) => {
+  //             const value = row[q.id] ?? '';
+  //             rowGroup.get(q.id.toString())?.setValue(value);
+  //           });
+  //         } else {
+  //           const newRow = this.createSectionRow(section.questions);
+  //           section.questions.forEach((q) => {
+  //             const value = row[q.id] ?? '';
+  //             newRow.get(q.id.toString())?.setValue(value);
+  //           });
+  //           section.formArray.push(newRow);
+  //         }
+  //       });
+  //     }
+  //   });
+
+  //   this.cdr.detectChanges();
+  // }
+
+  private patchFormWithExistingData(applicationData: any): void {
+  Object.keys(applicationData).forEach(key => {
+    const value = applicationData[key];
+    
+    // Handle section fields (objects/arrays of objects)
+    if (this.sectionGroups.some(section => section.sectionName === key)) {
+      if (Array.isArray(value) && value.length > 0) {
+        const section = this.sectionGroups.find(s => s.sectionName === key);
+        if (section) {
+          // Clear extra rows
+          while (section.formArray.length > 1) {
+            section.formArray.removeAt(0);
+          }
+          
+          // Patch rows
+          value.forEach((row: any, index: number) => {
+            if (index === 0) {
+              const rowGroup = section.formArray.at(0) as FormGroup;
+              section.questions.forEach(q => {
+                const rowValue = row[q.id] ?? '';
+                rowGroup.get(q.id.toString())?.setValue(rowValue);
+              });
+            } else {
+              const newRow = this.createSectionRow(section.questions);
+              section.questions.forEach(q => {
+                const rowValue = row[q.id] ?? '';
+                newRow.get(q.id.toString())?.setValue(rowValue);
+              });
+              section.formArray.push(newRow);
+            }
+          });
+        }
+      }
+      return;
+    }
+
+    const question = this.questions.find(q => q.id.toString() === key);
+    if (!question) return;
+
+    let formValue: any;
+
+    if (Array.isArray(value)) {
+      if (question.question_type === 'checkbox') {
+        formValue = value;
+      } else if (question.question_type === 'file') {
+        if (value.length > 0 && typeof value[0] === 'string') {
+          this.existingFileUrls[question.id] = value[0];
+          const fileName = decodeURIComponent(value[0].split('/').pop() || 'file.pdf');
+          formValue = new File([], fileName, { type: this.getFileMimeType(fileName) });
+        } else {
+          formValue = null;
+        }
+      } else {
+        formValue = value.length > 0 ? value[0] : '';
+      }
+    } else if (typeof value === 'string' || typeof value === 'number' || value === null) {
+      formValue = value;
+    } else {
+      formValue = '';
+    }
+
+    this.serviceForm.get(key)?.setValue(formValue);
+  });
+
+  this.cdr.detectChanges();
+}
 }

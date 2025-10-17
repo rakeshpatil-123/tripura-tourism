@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import * as XLSX from 'xlsx';
 import { GenericService } from '../../_service/generic/generic.service';
 import {
   DynamicTableComponent,
@@ -446,4 +447,39 @@ export class ApplicationsComponent implements OnInit {
       );
     });
   }
+  downloadExcel(): void {
+  if (this.filteredApplications.length === 0) {
+    this.apiService.openSnackBar('No data to export.', 'Close');
+    return;
+  }
+
+  const excelData = this.filteredApplications.map(app => ({
+    'Application ID': app.application_id,
+    'Service Name': app.service_name,
+    'Applicant Name': app.applicant_name,
+    'Applicant Email': app.applicant_email || '',
+    'Applicant Phone': app.applicant_phone,
+    'Department': app.department || '',
+    'Status': app.status,
+    'District': app.district_name || app.district || '',
+    'Subdivision': app.subdivision_name || app.sub_division || '',
+    'ULB': app.ulb_name || '',
+    'Ward': app.ward_name || '',
+    'Hierarchy': app.hierarchy || '',
+    'Payment Status': app.payment_status,
+    'Final Fee': app.final_fee || '0',
+    'Extra Payment': app.extra_payment || '0',
+    'Total Fee': app.total_fee || '0',
+    'Submission Date': app.submission_date,
+    'Max Processing Date': app.max_processing_date,
+    'Current Step': app.current_step_number || '',
+  }));
+
+  const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelData);
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Applications');
+
+  const fileName = `Applications_${this.serviceId || 'export'}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  XLSX.writeFile(workbook, fileName);
+}
 }

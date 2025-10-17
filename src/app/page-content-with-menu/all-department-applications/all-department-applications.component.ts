@@ -137,7 +137,6 @@ export class AllDepartmentApplicationsComponent implements OnInit {
           label: 'View applications',
           color: 'success',
           onClick: (row: any) => {
-            // Use the stored selectedDepartmentId or get fresh from localStorage
             const deptId =
               this.selectedDepartmentId ||
               Number(localStorage.getItem('deptId'));
