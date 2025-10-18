@@ -33,9 +33,18 @@
         <td mat-cell *matCellDef="let row">{{ row.question_id }}</td>
       </ng-container>
 
+      <ng-container matColumnDef="question_label">
+        <th mat-header-cell *matHeaderCellDef class="header-color" mat-sort-header>Question Label</th>
+        <td mat-cell *matCellDef="let row">{{ row.question_label }}</td>
+      </ng-container>
+
       <ng-container matColumnDef="condition_operator">
         <th mat-header-cell *matHeaderCellDef class="header-color" mat-sort-header>Operator</th>
         <td mat-cell *matCellDef="let row">{{ row.condition_operator }}</td>
+      </ng-container>
+      <ng-container matColumnDef="condition_label">
+        <th mat-header-cell *matHeaderCellDef class="header-color" mat-sort-header>Condition Label</th>
+        <td mat-cell *matCellDef="let row">{{ row.condition_label }}</td>
       </ng-container>
 
       <ng-container matColumnDef="condition_value_start">

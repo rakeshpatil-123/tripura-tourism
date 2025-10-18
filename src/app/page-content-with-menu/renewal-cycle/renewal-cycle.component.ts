@@ -56,12 +56,31 @@ export class RenewalCycleComponent implements OnInit {
       fixed_renewal_start_date: [null],
       fixed_renewal_end_date: [null],
       late_fee_applicable: ['no'],
+      late_fee_start_type: ['date_of_expiry'],
+      late_fee_start_date: [null], 
       late_fee_calculation_dynamic: ['no'],
       late_fee_fixed_amount: ['0'],
       late_fee_calculated_amount: ['0'],
       allow_renewal_input_form: ['yes'],
       is_active: ['1'],
     });
+    this.renewalForm.get('late_fee_start_type')?.valueChanges.subscribe((value) => {
+      if (value === 'date_of_expiry') {
+        this.renewalForm.get('late_fee_start_date')?.setValue(null);
+      }
+    });
+    if (this.data.mode === 'edit' && this.data.service) {
+      const cycle = this.data.service;
+      this.renewalForm.patchValue({
+        ...cycle,
+        fixed_renewal_start_date: cycle.fixed_renewal_start_date ? moment(cycle.fixed_renewal_start_date) : null,
+        fixed_renewal_end_date: cycle.fixed_renewal_end_date ? moment(cycle.fixed_renewal_end_date) : null,
+        late_fee_start_date: cycle.late_fee_start_date ? moment(cycle.late_fee_start_date) : null,
+      });
+
+      this.showLateFeeFields = cycle.late_fee_applicable === 'yes';
+    }
+
 
     if (this.data.mode === 'edit' && this.data.service) {
       const cycle = this.data.service;
@@ -145,13 +164,25 @@ export class RenewalCycleComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  // onLateFeeChange(value: string) {
+  //   this.showLateFeeFields = value === 'yes';
+  //   if (!this.showLateFeeFields) {
+  //     this.renewalForm.patchValue({
+  //       late_fee_fixed_amount: '0',
+  //       late_fee_calculated_amount: '0',
+  //     });
+  //   }
+  // }
   onLateFeeChange(value: string) {
-    this.showLateFeeFields = value === 'yes';
-    if (!this.showLateFeeFields) {
-      this.renewalForm.patchValue({
-        late_fee_fixed_amount: '0',
-        late_fee_calculated_amount: '0',
-      });
-    }
+  this.showLateFeeFields = value === 'yes';
+  if (!this.showLateFeeFields) {
+    this.renewalForm.patchValue({
+      late_fee_fixed_amount: '0',
+      late_fee_calculated_amount: '0',
+      late_fee_start_type: 'date_of_expiry',
+      late_fee_start_date: null,
+    });
   }
+}
+
 }
