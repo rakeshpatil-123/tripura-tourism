@@ -44,7 +44,7 @@
             <mat-label>Question</mat-label>
             <mat-select formControlName="question_id" placeholder="Select question">
               <mat-option *ngFor="let q of questions" [value]="q.id">
-                {{ q.question_label }}
+                {{ q.question_label }} <span *ngIf="q.condition_label">({{ q.condition_label }})</span>
               </mat-option>
               <mat-option *ngIf="questions.length === 0" [value]="null" disabled>
                 No more questions found. Please add a question first.
@@ -150,6 +150,10 @@
         <ng-container matColumnDef="condition_operator">
           <th mat-header-cell *matHeaderCellDef> Operator </th>
           <td mat-cell *matCellDef="let r"> {{r.condition_operator}} </td>
+        </ng-container>
+        <ng-container matColumnDef="condition_label">
+          <th mat-header-cell *matHeaderCellDef> Condition Label </th>
+          <td mat-cell *matCellDef="let r"> {{r.condition_label}} </td>
         </ng-container>
 
         <ng-container matColumnDef="condition_value_start">

@@ -98,6 +98,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       is_required: ['no'],
       options: [null],
       default_value: [null],
+      condition_label: [null],
       is_section: [null],
       section_name: [null],
       default_source_table: [null],
@@ -195,6 +196,14 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][default_source_table]', formValue.default_source_table || '');
     formData.append('questionnaires[0][default_source_column]', formValue.default_source_column || '');
     formData.append('questionnaires[0][default_value]', formValue.default_value || '');
+    const conditionArray = formValue.condition_label
+      ? formValue.condition_label.split(',').map((item: string) => item.trim()).filter((item: string) => item)
+      : [];
+
+    conditionArray.forEach((label: string, index: number) => {
+      formData.append(`questionnaires[0][condition_label][${index}]`, label);
+    });
+
     const sectionNameValue = (formValue.is_section === 'no') ? '' : (formValue.section_name ?? '');
     formData.append('questionnaires[0][section_name]', sectionNameValue);
     formData.append('questionnaires[0][is_section]', formValue.is_section || "no");

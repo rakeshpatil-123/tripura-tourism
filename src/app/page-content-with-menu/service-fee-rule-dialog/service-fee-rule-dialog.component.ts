@@ -36,6 +36,7 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   renewalCycles: any[] = [];
   displayedColumns: string[] = [
     'condition_operator',
+    'condition_label',
     'condition_value_start',
     'condition_value_end',
     'fixed_fee',
@@ -149,10 +150,13 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     const created_at = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
     const raw = this.feeRuleForm.value;
+    const selectedQuestion = this.questions.find(q => q.id === raw.question_id);
+    const conditionLabel = selectedQuestion?.condition_label ?? null;
     const payloadRule: any = {
       id: this.data.mode === 'edit' ? this.apiRules[0].id : undefined,
       fee_type: raw.fee_type,
       question_id: raw.question_id != null ? String(raw.question_id) : null,
+      condition_label: conditionLabel,
       condition_operator: raw.condition_operator ?? null,
       condition_value_start: raw.condition_value_start != null ? String(raw.condition_value_start) : null,
       condition_value_end: raw.condition_value_end != null ? String(raw.condition_value_end) : null,
@@ -167,6 +171,7 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       rules: raw.rules ?? 'base_fee + (units * per_unit_fee)',
       created_at: this.data.mode === 'edit' ? this.apiRules[0].created_at : created_at,
     };
+    
 
     const requestBody = { rules: [payloadRule] };
 

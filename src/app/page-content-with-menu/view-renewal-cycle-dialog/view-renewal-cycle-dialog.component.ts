@@ -108,6 +108,8 @@ export class ViewRenewalCycleDialogComponent
     'late_fee_applicable',
     'late_fee_fixed_amount',
     'late_fee_calculated_amount',
+    'late_fee_start_type',
+    'late_fee_start_date',
     'allow_renewal_input_form',
     'is_active',
     'created_at',
