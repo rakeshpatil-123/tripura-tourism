@@ -36,8 +36,9 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   renewalCycles: any[] = [];
   displayedColumns: string[] = [
     'condition_operator',
-    'condition_label',
+    'pre_condition_operator',
     'condition_value_start',
+    'pre_condition_value',
     'condition_value_end',
     'fixed_fee',
     'calculated_fee',
@@ -55,9 +56,13 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   ) {
     this.feeRuleForm = this.fb.group({
       fee_type: ['calculated'],
-      question_id: [null], // will store NUMBER (not string)
+      question_id: [null],
+      condition_label_question_id: [null],
       condition_operator: [null],
+      pre_condition_operator: [null],  
       condition_value_start: [null],
+      multi_condition: ['no'],
+      pre_condition_value: [null], 
       condition_value_end: [null],
       fixed_fee: [null],
       calculated_fee: [null],
@@ -76,8 +81,12 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
         this.previewRule = {
           fee_type: values.fee_type,
           question_id: values.question_id,
+          condition_label_question_id: values.condition_label_question_id,
           condition_operator: values.condition_operator,
+          pre_condition_operator: values.pre_condition_operator,
           condition_value_start: values.condition_value_start,
+          multi_condition: values.multi_condition,
+          pre_condition_value: values.pre_condition_value,
           condition_value_end: values.condition_value_end,
           fixed_fee: values.fixed_fee,
           calculated_fee: values.calculated_fee,
@@ -91,14 +100,19 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
         this.apiRules = [this.previewRule];
       });
     }
+    this.feeRuleForm.get('multi_condition')?.valueChanges.subscribe(value => {
+      this.toggleMultiConditionFields(value);
+    });
     if (this.data.mode === 'edit' && this.data.rules) {
       this.apiRules = [this.data.rules];
       const r = this.data.rules;
-
       this.feeRuleForm.patchValue({
         fee_type: r.fee_type ?? 'calculated',
         condition_operator: r.condition_operator ?? null,
+        pre_condition_operator: r.pre_condition_operator ?? null,
         condition_value_start: r.condition_value_start !== '-' ? r.condition_value_start : null,
+        multi_condition: r.multi_condition !== '-' ? r.multi_condition : null,
+        pre_condition_value: r.pre_condition_value !== '-' ? r.pre_condition_value : null,
         condition_value_end: r.condition_value_end !== '-' ? r.condition_value_end : null,
         fixed_fee: r.fixed_fee && r.fixed_fee !== '-' ? r.fixed_fee : null,
         calculated_fee: r.calculated_fee && r.calculated_fee !== '-' ? r.calculated_fee : null,
@@ -124,19 +138,40 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       this.loadQuestions(serviceId);
     }
   }
+  private toggleMultiConditionFields(value: string): void {
+    const preOp = this.feeRuleForm.get('pre_condition_operator');
+    const preVal = this.feeRuleForm.get('pre_condition_value');
+    const condLabel = this.feeRuleForm.get('condition_label_question_id');
+
+    if (value === 'yes') {
+      preOp?.enable();
+      preVal?.enable();
+      condLabel?.enable();
+    } else {
+      preOp?.reset();
+      preVal?.reset();
+      condLabel?.reset();
+      preOp?.disable();
+      preVal?.disable();
+      condLabel?.disable();
+    }
+  }
 
   private applyDynamicValidations(feeType: string, operator: string) {
     const fixedFee = this.feeRuleForm.get('fixed_fee');
     const questionId = this.feeRuleForm.get('question_id');
+    const condLabel = this.feeRuleForm.get('condition_label_question_id');
     const condStart = this.feeRuleForm.get('condition_value_start');
+    const isMulti = this.feeRuleForm.get('multi_condition');
+    const condValue = this.feeRuleForm.get('pre_condition_value');
     const condEnd = this.feeRuleForm.get('condition_value_end');
     const calcFee = this.feeRuleForm.get('calculated_fee');
     const fixedCalcFee = this.feeRuleForm.get('fixed_calculated_fee');
     const perUnitFee = this.feeRuleForm.get('per_unit_fee');
 
-    [fixedFee, questionId, condStart, condEnd, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
+    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
 
-    [fixedFee, questionId, condStart, condEnd, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
+    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, calcFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
   }
 
   submit() {
@@ -150,20 +185,18 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     const created_at = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
     const raw = this.feeRuleForm.value;
-    const selectedQuestion = this.questions.find(q => q.id === raw.question_id);
-    const conditionLabel = selectedQuestion?.condition_label ?? null;
     const payloadRule: any = {
       id: this.data.mode === 'edit' ? this.apiRules[0].id : undefined,
       fee_type: raw.fee_type,
-      question_id: raw.question_id != null ? String(raw.question_id) : null,
-      condition_label: conditionLabel,
-      condition_operator: raw.condition_operator ?? null,
-      condition_value_start: raw.condition_value_start != null ? String(raw.condition_value_start) : null,
-      condition_value_end: raw.condition_value_end != null ? String(raw.condition_value_end) : null,
-      fixed_fee: raw.fixed_fee != null ? String(raw.fixed_fee) : null,
-      calculated_fee: raw.calculated_fee != null ? String(raw.calculated_fee) : null,
-      fixed_calculated_fee: raw.fixed_calculated_fee != null ? String(raw.fixed_calculated_fee) : null,
-      per_unit_fee: raw.per_unit_fee != null ? String(raw.per_unit_fee) : null,
+      question_id: raw.question_id ? String(raw.question_id) : null,
+      condition_operator: raw.condition_operator || null,
+      condition_value_start: raw.condition_value_start ? String(raw.condition_value_start) : null,
+      multi_condition: raw.multi_condition ? String(raw.multi_condition) : null,
+      condition_value_end: raw.condition_value_end ? String(raw.condition_value_end) : null,
+      fixed_fee: raw.fixed_fee ? String(raw.fixed_fee) : null,
+      calculated_fee: raw.calculated_fee ? String(raw.calculated_fee) : null,
+      fixed_calculated_fee: raw.fixed_calculated_fee ? String(raw.fixed_calculated_fee) : null,
+      per_unit_fee: raw.per_unit_fee ? String(raw.per_unit_fee) : null,
       priority: String(raw.priority ?? 1),
       status: String(raw.status ?? '1'),
       service_id: String(this.data?.rules?.service_id ?? this.data?.service?.id ?? 1),
@@ -171,7 +204,11 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       rules: raw.rules ?? 'base_fee + (units * per_unit_fee)',
       created_at: this.data.mode === 'edit' ? this.apiRules[0].created_at : created_at,
     };
-    
+    if (raw.multi_condition === 'yes') {
+      payloadRule.pre_condition_operator = raw.pre_condition_operator || null;
+      payloadRule.pre_condition_value = raw.pre_condition_value || null;
+      payloadRule.condition_label_question_id = raw.condition_label_question_id ? Number(raw.condition_label_question_id) : null;
+    }
 
     const requestBody = { rules: [payloadRule] };
 
@@ -184,8 +221,12 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
             this.feeRuleForm.reset({
               fee_type: 'calculated',
               question_id: null,
+              condition_label_question_id: null,
               condition_operator: null,
+              pre_condition_operator: null,
               condition_value_start: null,
+              multi_condition: null,
+              pre_condition_value: null,
               condition_value_end: null,
               fixed_fee: null,
               calculated_fee: null,
@@ -227,7 +268,7 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   loadQuestions(serviceId: number): void {
     if (this.data.service?.questions?.length) {
       this.questions = this.data.service.questions;
-      this.patchQuestionIfEdit();
+      setTimeout(() => this.patchQuestionIfEdit(), 0);
       return;
     }
     this.genericService.getServiceQuestionnaires(serviceId).subscribe({
@@ -237,25 +278,35 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
         } else {
           this.questions = [];
         }
-        this.patchQuestionIfEdit();
+        setTimeout(() => this.patchQuestionIfEdit(), 0);
       },
       error: (err) => {
         console.error('Failed to load questions', err);
         this.questions = [];
-        this.patchQuestionIfEdit();
+        setTimeout(() => this.patchQuestionIfEdit(), 0);
       },
     });
   }
   private patchQuestionIfEdit() {
-    if (this.data.mode === 'edit' && this.data.rules?.question_id != null) {
-      const qid = Number(this.data.rules.question_id);
-      const existing = this.questions.find(q => Number(q.id) === qid);
-      if (existing) {
-        this.feeRuleForm.patchValue({ question_id: qid });
-      } else {
-        console.warn('Edit question id not found in loaded questions:', qid);
-      }
+    if (this.data.mode !== 'edit') return;
+
+    const rule = this.data.rules;
+    if (!rule) return;
+
+    const qid = Number(rule.question_id);
+    const condLabelQid = Number(rule.condition_label_question_id);
+
+    const patchValues: any = {};
+    if (this.questions.find(q => Number(q.id) === qid)) {
+      patchValues.question_id = qid;
     }
+    if (this.questions.find(q => Number(q.id) === condLabelQid)) {
+      patchValues.condition_label_question_id = condLabelQid;
+    }
+    patchValues.pre_condition_operator = rule.pre_condition_operator ?? null;
+    patchValues.pre_condition_value = rule.pre_condition_value ?? null;
+
+    this.feeRuleForm.patchValue(patchValues, { emitEvent: false });
   }
   trackByCycle(index: number, item: any): number {
     return item.id;

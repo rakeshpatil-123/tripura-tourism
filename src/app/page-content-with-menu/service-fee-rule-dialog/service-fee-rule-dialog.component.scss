@@ -193,3 +193,18 @@ mat-dialog-actions {
 .form-field.full-width {
   width: 100%;
 }
+
+.multi-cond-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 1rem;
+}
+
+.multi-cond-grid .grid-item {
+  width: 100%;
+}
+
+.multi-cond-grid .mat-form-field {
+  width: 100%;
+}

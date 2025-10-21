@@ -104,7 +104,7 @@
           <input matInput type="number" step="0.1" formControlName="late_fee_calculated_amount" />
         </mat-form-field>
       </div>
-     <div class="grid-2">
+<div class="grid-2">
   <mat-form-field appearance="outline">
     <mat-label>Late Fee Start Type</mat-label>
     <mat-select formControlName="late_fee_start_type">
@@ -112,12 +112,9 @@
       <mat-option value="fixed_date">Fixed Date</mat-option>
     </mat-select>
   </mat-form-field>
-
- <mat-form-field appearance="outline">
-  <mat-label>
-    {{ renewalForm.get('late_fee_start_type')?.value === 'fixed_date' ? 'Select Fixed Date' : 'Late Fee Starts After Expiry Date' }}
-  </mat-label>
-  <input matInput [matDatepicker]="lateFeePicker" formControlName="late_fee_start_date" [hidden]="renewalForm.get('late_fee_start_type')?.value !== 'fixed_date'" />
+<mat-form-field *ngIf="renewalForm.get('late_fee_start_type')?.value === 'fixed_date'" appearance="outline">
+  <mat-label>Select Fixed Date</mat-label>
+  <input matInput [matDatepicker]="lateFeePicker" formControlName="late_fee_start_date" />
   <mat-datepicker-toggle matSuffix [for]="lateFeePicker"></mat-datepicker-toggle>
   <mat-datepicker #lateFeePicker></mat-datepicker>
 </mat-form-field>

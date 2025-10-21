@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
@@ -81,58 +81,45 @@ export class RenewalCycleComponent implements OnInit {
       this.showLateFeeFields = cycle.late_fee_applicable === 'yes';
     }
 
-
-    if (this.data.mode === 'edit' && this.data.service) {
-      const cycle = this.data.service;
-      this.renewalForm.patchValue({
-        ...cycle,
-        fixed_renewal_start_date: cycle.fixed_renewal_start_date
-          ? moment(cycle.fixed_renewal_start_date)
-          : null,
-        fixed_renewal_end_date: cycle.fixed_renewal_end_date
-          ? moment(cycle.fixed_renewal_end_date)
-          : null,
-      });
-
-      this.showLateFeeFields = cycle.late_fee_applicable === 'yes';
-    }
   }
   submit(): void {
-    if (this.renewalForm.invalid) {
-      this.renewalForm.markAllAsTouched();
+    const svcCtrl = this.renewalForm.get('service_id');
+    const titleCtrl = this.renewalForm.get('renewal_title');
+
+    if (svcCtrl?.invalid || titleCtrl?.invalid) {
+      svcCtrl?.markAsTouched();
+      titleCtrl?.markAsTouched();
       this.genericService.openSnackBar('Please fill all required fields', 'Error');
       return;
     }
 
-    const startDate = moment(this.renewalForm.value.fixed_renewal_start_date);
-    const endDate = moment(this.renewalForm.value.fixed_renewal_end_date);
-
-    // if (startDate.isBefore(this.today, 'day')) {
-    //   this.genericService.openSnackBar('Start date cannot be earlier than today', 'Error');
-    //   return;
-    // }
-
+    const startVal = this.renewalForm.value.fixed_renewal_start_date;
+    const endVal = this.renewalForm.value.fixed_renewal_end_date;
+    const startDate = startVal ? moment(startVal) : null;
+    const endDate = endVal ? moment(endVal) : null;
+    if (startDate && endDate && startDate.isValid() && endDate.isValid()) {
     if (endDate.isBefore(startDate, 'day')) {
       this.genericService.openSnackBar('End date cannot be earlier than start date', 'Error');
       return;
     }
+    }
 
     this.isSubmitting = true;
 
-    const formValue = this.renewalForm.value;
     const renewalData = {
       ...Object.fromEntries(
         Object.entries(this.renewalForm.value).map(([key, val]) => {
-          if (moment.isMoment(val)) return [key, val.format('YYYY-MM-DD')];
-          return [key, val === null ? null : String(val)];
+          if (moment.isMoment(val)) {
+            return [key, val.isValid() ? val.format('YYYY-MM-DD') : null];
+          }
+          if (val === null || val === undefined || val === '') return [key, null];
+          return [key, String(val)];
         })
       ),
-      id: this.data.service.id,
+      id: this.data.service?.id ?? null,
     };
 
-    const payload = {
-      renewals: [renewalData],
-    };
+    const payload = { renewals: [renewalData] };
 
     const api$ =
       this.data.mode === 'edit'

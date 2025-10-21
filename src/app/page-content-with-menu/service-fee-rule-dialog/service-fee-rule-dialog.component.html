@@ -22,11 +22,61 @@
             <mat-option value="estimated">Estimated</mat-option>
           </mat-select>
         </mat-form-field>
-      </div>
-
-      <div class="grid-item">
-        <ng-container *ngIf="data.service?.questions?.length; else questionInput">
+        </div>
+        
+        <div class="grid-item">
           <mat-form-field appearance="outline" class="form-field full">
+            <mat-label>Is Multi Conditional</mat-label>
+            <mat-select formControlName="multi_condition">
+              <mat-option value="no">No</mat-option>
+              <mat-option value="yes">Yes</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="grid-item">
+          <mat-form-field appearance="outline" class="form-field full"
+            [hidden]="feeRuleForm.get('multi_condition')?.value !== 'yes'">
+            <mat-label>Pre-Set Conditional Question</mat-label>
+            <mat-select formControlName="condition_label_question_id" placeholder="Select question">
+              <mat-option *ngFor="let q of questions" [value]="q.id">
+                {{ q.question_label || q.label || q.name || ('Q: ' + q.id) }}
+                <span *ngIf="q.condition_label">({{ q.condition_label }})</span>
+              </mat-option>
+              <mat-option *ngIf="questions.length === 0" [value]="null" disabled>
+                No questions found. Please add a question first.
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        
+        
+        <div class="grid-item">
+          <mat-form-field appearance="outline" class="form-field full"
+            [hidden]="feeRuleForm.get('multi_condition')?.value !== 'yes'">
+            <mat-label>Pre Condition Operator</mat-label>
+            <mat-select formControlName="pre_condition_operator">
+              <mat-option value="<">&lt;</mat-option>
+              <mat-option value="<=">&lt;=</mat-option>
+              <mat-option value=">">&gt;</mat-option>
+              <mat-option value=">=">&gt;=</mat-option>
+              <mat-option value="=">=</mat-option>
+              <mat-option value="!=">!=</mat-option>
+              <mat-option value="between">Between</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        
+        <div class="grid-item">
+        
+          <mat-form-field appearance="outline" class="form-field full grid-item"
+            [hidden]="feeRuleForm.get('multi_condition')?.value !== 'yes'">
+            <mat-label>Pre Condition Value</mat-label>
+            <input matInput formControlName="pre_condition_value" placeholder="e.g. 10" />
+          </mat-form-field>
+        </div>      
+        <div class="grid-item">
+        <ng-container *ngIf="data.service?.questions?.length; else questionInput">
+          <mat-form-field appearance="outline" class="form-field grid-item full">
             <mat-label>Question</mat-label>
             <mat-select formControlName="question_id">
               <mat-option *ngFor="let q of data.service.questions" [value]="q.id + ''">
@@ -54,7 +104,6 @@
         </ng-template>
 
       </div>
-
       <div class="grid-item">
         <mat-form-field appearance="outline" class="form-field full">
           <mat-label>Condition Operator</mat-label>
@@ -69,6 +118,7 @@
           </mat-select>
         </mat-form-field>
       </div>
+      
       <div class="grid-item">
         <mat-form-field appearance="outline" class="form-field full">
           <mat-label>Start Value</mat-label>
@@ -164,6 +214,15 @@
         <ng-container matColumnDef="condition_value_end">
           <th mat-header-cell *matHeaderCellDef> End </th>
           <td mat-cell *matCellDef="let r"> {{r.condition_value_end || '-' }} </td>
+        </ng-container>
+        <ng-container matColumnDef="pre_condition_operator">
+          <th mat-header-cell *matHeaderCellDef> Pre Operator </th>
+          <td mat-cell *matCellDef="let r"> {{r.pre_condition_operator || '-' }} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="pre_condition_value">
+          <th mat-header-cell *matHeaderCellDef> Pre Value </th>
+          <td mat-cell *matCellDef="let r"> {{r.pre_condition_value || '-' }} </td>
         </ng-container>
 
         <ng-container matColumnDef="fixed_fee">
