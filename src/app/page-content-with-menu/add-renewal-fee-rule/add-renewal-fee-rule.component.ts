@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -59,8 +59,8 @@ export class AddRenewalFeeRuleComponent implements OnInit {
         fixed_fee: svc.fixed_fee && svc.fixed_fee !== 'null' ? svc.fixed_fee : null,
         question_id: svc.question_id ?? null,
         condition_operator: svc.condition_operator ?? '',
-        condition_value_start: svc.condition_value_start ?? '',
-        condition_value_end: svc.condition_value_end && svc.condition_value_end !== 'null' ? svc.condition_value_end : null,
+        condition_value_start: svc.condition_value_start && svc.condition_value_start !== 'null' && svc.condition_value_start !== 'Invalid Date' ? svc.condition_value_start : null,
+        condition_value_end: svc.condition_value_end && svc.condition_value_end !== 'null' && svc.condition_value_end !== 'Invalid Date' ? svc.condition_value_end : null,
         fixed_calculated_fee: svc.fixed_calculated_fee && svc.fixed_calculated_fee !== 'null' ? svc.fixed_calculated_fee : null,
         per_unit_fee: svc.per_unit_fee && svc.per_unit_fee !== 'null' ? svc.per_unit_fee : null,
         priority: svc.priority ?? 1,
@@ -77,7 +77,7 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       fixed_fee: [null],
       question_id: [null],
       condition_operator: [''],
-      condition_value_start: [''],
+      condition_value_start: [null],
       condition_value_end: [null],
       fixed_calculated_fee: [null],
       per_unit_fee: [null],
@@ -112,14 +112,9 @@ export class AddRenewalFeeRuleComponent implements OnInit {
 
   saveFeeRule(): void {
     this.serverError = null;
-    if (this.feeRuleForm.invalid) {
-      this.feeRuleForm.markAllAsTouched();
-      return;
-    }
 
     this.isSubmitting = true;
     const form = this.feeRuleForm.value;
-
     const ruleObj: any = {
       service_id: String(form.service_id),
       renewal_cycle_id: String(form.renewal_cycle_id),
@@ -127,8 +122,8 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       fixed_fee: form.fixed_fee ? String(form.fixed_fee) : null,
       question_id: form.question_id ? String(form.question_id) : null,
       condition_operator: form.condition_operator,
-      condition_value_start: form.condition_value_start ? String(form.condition_value_start) : null,
-      condition_value_end: form.condition_value_end ? String(form.condition_value_end) : null,
+      condition_value_start: form.condition_value_start && form.condition_value_start !== 'null' && form.condition_value_start !== 'Invalid Date' ? String(form.condition_value_start) : null,
+      condition_value_end: form.condition_value_end && form.condition_value_end !== 'null' && form.condition_value_end !== 'Invalid Date' ? String(form.condition_value_end) : null,
       fixed_calculated_fee: form.fixed_calculated_fee ? String(form.fixed_calculated_fee) : null,
       per_unit_fee: form.per_unit_fee ? String(form.per_unit_fee) : null,
       priority: String(form.priority ?? 1),
