@@ -23,20 +23,21 @@
               " [formControlName]="q.id" [fieldLabel]="q.question_label" [placeholder]="q.question_label"
               [mandatory]="q.is_required === 'yes'" [type]="q.question_type" [errorMessages]="{
                 pattern: q.validation_rule?.errorMessage || 'Invalid input.'
-              }" [readonly]="isFieldReadonly(q.id)"></app-ilogi-input>
+              }"></app-ilogi-input>
 
             <!-- Date -->
             <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
-              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" [submitted]="serviceForm.touched"
-              [readonly]="isFieldReadonly(q.id)"></app-ilogi-input-date>
+              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+              [submitted]="serviceForm.touched"></app-ilogi-input-date>
 
             <!-- File Upload -->
             <ng-container *ngIf="q.question_type === 'file'">
               <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
-                [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024"  [fileUrl]="getDefaultFileUrl(q.id)">
+                [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024"
+                [fileUrl]="getDefaultFileUrl(q.id)">
               </app-ilogi-file-upload>
-              <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" 
-                type="button" class="sample" (click)="downloadSample(q.sample_format)">
+              <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button" class="sample"
+                (click)="downloadSample(q.sample_format)">
                 Download Sample
               </button>
             </ng-container>
@@ -72,7 +73,7 @@
                   <tr>
                     <th style="width: 70px;">SL No</th>
                     <ng-container *ngFor="let q of section.questions">
-                      <th>{{ q.question_label }} 
+                      <th>{{ q.question_label }}
                         <span *ngIf="q.is_required === 'yes'" class="text-danger">*</span>
                       </th>
                     </ng-container>
@@ -80,8 +81,8 @@
                   </tr>
                 </thead>
                 <tbody formArrayName="{{section.sectionName}}">
-                  <tr *ngFor="let row of getSectionFormArray(section.sectionName).controls; let i = index" 
-                      [formGroupName]="i">
+                  <tr *ngFor="let row of getSectionFormArray(section.sectionName).controls; let i = index"
+                    [formGroupName]="i">
                     <td>{{ i + 1 }}</td>
                     <ng-container *ngFor="let q of section.questions">
                       <td>
@@ -98,16 +99,17 @@
 
                         <!-- Date -->
                         <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
-                          [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" 
+                          [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
                           [submitted]="serviceForm.touched"></app-ilogi-input-date>
 
                         <!-- File Upload -->
                         <ng-container *ngIf="q.question_type === 'file'">
                           <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
-                           [fileUrl]="getDefaultFileUrl(q.id)"  [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024">
+                            [fileUrl]="getDefaultFileUrl(q.id)" [accept]="q.validation_rule?.pattern || '*'"
+                            [maxFileSize]="5 * 1024 * 1024">
                           </app-ilogi-file-upload>
-                          <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" 
-                            type="button" class="sample" (click)="downloadSample(q.sample_format)">
+                          <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button" class="sample"
+                            (click)="downloadSample(q.sample_format)">
                             Download Sample
                           </button>
                         </ng-container>
@@ -130,9 +132,9 @@
                       </td>
                     </ng-container>
                     <td>
-                      <button type="button" class="btn btn-danger btn-sm" 
-                              (click)="removeSectionRow(section.sectionName, i)"
-                              [disabled]="getSectionFormArray(section.sectionName).length <= 1">
+                      <button type="button" class="btn btn-danger btn-sm"
+                        (click)="removeSectionRow(section.sectionName, i)"
+                        [disabled]="getSectionFormArray(section.sectionName).length <= 1">
                         Remove
                       </button>
                     </td>
@@ -146,9 +148,23 @@
           </div>
         </div>
       </div>
+      <div class="m-4 btnss">
+        @if(visible) {
 
-      <div class="m-4">
-        <button type="submit" class="btn btn-success">Submit</button>
+        <div class="">
+          <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+        }
+        <div class="btnss">
+          <div *ngIf="calculatedFee !== null" class="">
+            <strong>Final Fee:</strong> ₹{{ calculatedFee }}
+          </div>
+
+          <button *ngIf="calculatedFee === null" type="button" class="btn btn-success" (click)="calFee()"
+            [disabled]="feeCalculating">
+            {{ feeCalculating ? 'Calculating...' : 'Calculate Fee' }}
+          </button>
+        </div>
       </div>
     </form>
   </ng-template>

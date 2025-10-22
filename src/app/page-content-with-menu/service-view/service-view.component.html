@@ -10,29 +10,26 @@
 
   <div *ngIf="!isLoading && !applicationData" class="text-center text-muted py-5">
     <p> Application not found.</p>
-    <!-- <button class="btn btn-outline-primary" (click)="router.navigate(['/departmental-services'])">
-      Go Back
-    </button> -->
+
   </div>
 
-  <!-- Only show content if data is loaded -->
   <div *ngIf="!isLoading && applicationData">
 
     <!-- Workflow History -->
     @if (workflowData.length > 0) {
     <div class="btn-right">
       <h3 class=" page-head">Workflow Steps</h3>
-    <div class="btn-group-right">
-  <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
-  <button (click)="downloadCertificate()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate <mat-icon>picture_as_pdf</mat-icon>
-  </button>
-  </div>
-  </div>
+      <div class="btn-group-right">
+        <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
+        <button (click)="downloadCertificate()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate
+          <mat-icon>picture_as_pdf</mat-icon>
+        </button>
+      </div>
+    </div>
     <app-dynamic-table [data]="workflowData" [columns]="workflowColumns" [showPagination]="true" [pageSize]="5"
       [searchable]="true"></app-dynamic-table>
     }
 
-    <!-- Application Questions & Answers -->
     @if (applicationQAColumns.length > 0) {
     <h3 class="mt-4 page-head">Application Questions & Answers</h3>
     <app-dynamic-table [data]="applicationQATableData" [columns]="applicationQAColumns" [showPagination]="false"
@@ -63,17 +60,19 @@
         <div class="extra-payment" *ngIf="statusModal.action === 'raise_extra_payment'">
           <app-ilogi-input formControlName="extraAmount" fieldLabel="Extra Payment Amount" [mandatory]="true"
             placeholder="Enter extra payment amount" inputType="number"></app-ilogi-input>
-        
+
           @if (remarkForm.get('extraAmount')?.invalid && remarkForm.get('extraAmount')?.touched) {
           <small class="text-danger">Extra Payment Amount is required.</small>
           }
         </div>
-        <app-ilogi-input
-          formControlName="remarks"
-          fieldLabel="Remarks"
-          [mandatory]="true"
-          placeholder="Enter remarks for this action (min 5 characters)"
-        ></app-ilogi-input>
+        <div class="mb-3">
+          <app-ilogi-input formControlName="remarks" label="Remarks" [mandatory]="true"
+            placeholder="Enter remarks for this action (min 5 characters)"></app-ilogi-input>
+        </div>
+        <div>
+          <app-ilogi-file-upload formControlName="attachment"  [mandatory]="false"
+            placeholder="Upload supporting document" accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
+        </div>
 
         @if (remarkForm.get('remarks')?.invalid && remarkForm.get('remarks')?.touched) {
         <small class="text-danger">

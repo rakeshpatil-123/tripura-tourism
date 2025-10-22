@@ -26,6 +26,7 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class AttachmentComponent implements OnInit {
   selfCertificationUrl: string | null = null;
+  existingFileUrls: { [key: string]: string } = {};
   selfCertificateFormat3AUrl: string | null = null;
   treeRegistrationCertificateUrl: string | null = null;
   ownerPanPdfUrl: string | null = null;
@@ -196,6 +197,7 @@ export class AttachmentComponent implements OnInit {
               const url = data[urlKey];
               if (url) {
                 (this[urlProp] as string) = url;
+                 this.existingFileUrls[controlName] = url;
 
                 const fileName = decodeURIComponent(
                   url.split('/').pop() || 'file.pdf'

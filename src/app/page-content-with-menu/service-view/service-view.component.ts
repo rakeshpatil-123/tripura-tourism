@@ -11,6 +11,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
 import { MatIcon } from '@angular/material/icon';
 import Swal from 'sweetalert2';
+import { IlogiFileUploadComponent } from '../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
 
 interface StatusActionModal {
   visible: boolean;
@@ -21,7 +22,7 @@ interface StatusActionModal {
 
 @Component({
   selector: 'app-service-view',
-  imports: [CommonModule, DynamicTableComponent, IlogiInputComponent, ReactiveFormsModule, MatIcon],
+  imports: [CommonModule, DynamicTableComponent, IlogiInputComponent, ReactiveFormsModule, MatIcon, IlogiFileUploadComponent],
   templateUrl: './service-view.component.html',
   styleUrl: './service-view.component.scss',
   standalone: true,
@@ -32,19 +33,15 @@ export class ServiceViewComponent implements OnInit {
   isLoading: boolean = false;
   isFinalApproval: string = '';
 
-  // Application Info Table
   infoData: any[] = [];
   infoColumns: TableColumn[] = [];
 
-  // Workflow Table
   workflowColumns: TableColumn[] = [];
   workflowData: any[] = [];
 
-  // Application Q&A Table
   applicationQATableData: any[] = [];
   applicationQAColumns: TableColumn[] = [];
 
-  // Modal state
   statusModal: StatusActionModal = {
     visible: false,
     applicationId: 0,
@@ -52,7 +49,6 @@ export class ServiceViewComponent implements OnInit {
     title: '',
   };
 
-  // Form for remarks
   remarkForm: FormGroup;
 
   constructor(
@@ -65,6 +61,7 @@ export class ServiceViewComponent implements OnInit {
     this.remarkForm = this.fb.group({
       extraAmount: [null],
       remarks: ['', [Validators.required, Validators.minLength(5)]],
+      attachment: [null],
     });
   }
 
@@ -99,7 +96,6 @@ export class ServiceViewComponent implements OnInit {
           if (res?.status === 1 && res.data) {
             this.applicationData = res.data;
             this.isFinalApproval = res.data.status;
-            // ❌ Remove JSON.parse — it's already an object/array
             console.log('Application Data:', this.applicationData.application_data);
 
             this.processDataForDisplay();
@@ -185,18 +181,58 @@ export class ServiceViewComponent implements OnInit {
       { key: 'value', label: 'Value', type: 'text', sortable: true },
     ];
 
-    // ➤ Process Application Q&A
-    if (Array.isArray(data.application_data) && data.application_data.length > 0) {
-      this.applicationQATableData = data.application_data.map((item: any) => ({
-        question: item.question || '—',
-        answer: item.answer || '—',
-      }));
+// ➤ Process Application Q&A
+if (Array.isArray(data.application_data) && data.application_data.length > 0) {
+  this.applicationQATableData = data.application_data.map((item: any) => {
+    let formattedAnswer = '—';
 
-      this.applicationQAColumns = [
-        { key: 'question', label: 'Question', type: 'text' },
-        { key: 'answer', label: 'Answer', type: 'text' },
-      ];
+    if (Array.isArray(item.answer)) {
+      if (item.answer.length === 0) {
+        formattedAnswer = '—';
+      } else {
+        const allValues: string[] = [];
+
+        for (const ans of item.answer) {
+          if (ans === null || ans === undefined) continue;
+
+          if (typeof ans === 'string') {
+            // Plain string answer
+            if (ans.trim()) allValues.push(ans);
+          } else if (typeof ans === 'object') {
+            for (const key in ans) {
+              if (ans.hasOwnProperty(key)) {
+                const value = ans[key];
+                if (value !== null && value !== undefined && value !== '') {
+                  allValues.push(String(value));
+                }
+              }
+            }
+          }
+        }
+
+        if (allValues.length > 0) {
+          formattedAnswer = allValues.join(', ');
+        } else {
+          formattedAnswer = '—';
+        }
+      }
+    } else if (typeof item.answer === 'string' && item.answer.trim()) {
+      formattedAnswer = item.answer;
     } else {
+      formattedAnswer = '—';
+    }
+
+    return {
+      question: item.question || '—',
+      answer: formattedAnswer,
+    };
+  });
+
+  this.applicationQAColumns = [
+    { key: 'question', label: 'Question', type: 'text' },
+    { key: 'answer', label: 'Answer', type: 'text' }, // no HTML needed now
+  ];
+} else {
       this.applicationQATableData = [];
       this.applicationQAColumns = [];
     }
@@ -292,34 +328,41 @@ export class ServiceViewComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  closeModal(): void {
-    this.statusModal.visible = false;
-    this.remarkForm.reset();
-  }
+closeModal(): void {
+  this.statusModal.visible = false;
+  this.remarkForm.reset();
+  this.remarkForm.get('attachment')?.setValue(null);
+}
 
-  onSubmitStatus(): void {
+
+onSubmitStatus(): void {
   if (this.remarkForm.invalid) {
     this.remarkForm.markAllAsTouched();
     return;
   }
 
-  const { remarks, extraAmount } = this.remarkForm.value;
+  const { remarks, extraAmount, attachment } = this.remarkForm.value;
   const { applicationId, action } = this.statusModal;
 
-    const payload: any = {
-      status: action === 'raise_extra_payment' ? 'extra_payment' : action,
-      remarks,
-    };
+  const statusValue = action === 'raise_extra_payment' ? 'extra_payment' : action;
+  const displayAction = statusValue.replace('_', ' ').toUpperCase();
 
-    if (action === 'raise_extra_payment') {
-      payload.extra_payment = extraAmount;
-    }
+  const formData = new FormData();
+  formData.append('status', statusValue);
+  formData.append('remarks', remarks);
 
-  this.updateApplicationStatus(applicationId, payload);
+  if (action === 'raise_extra_payment' && extraAmount != null) {
+    formData.append('extra_payment', extraAmount.toString());
+  }
+
+  if (attachment) {
+    formData.append('status_file', attachment); 
+  }
+
+  this.updateApplicationStatus(applicationId, formData, displayAction);
   this.closeModal();
 }
-
- updateApplicationStatus(applicationId: number, payload: any): void {
+updateApplicationStatus(applicationId: number, payload: any, displayAction: string = 'updated'): void {
   this.apiService
     .getByConditions(payload, `api/department/applications/${applicationId}/status`)
     .subscribe({
@@ -327,7 +370,7 @@ export class ServiceViewComponent implements OnInit {
         if (res?.status === 1) {
           Swal.fire({
             title: 'Success!',
-            text: `Application step ${payload.status.replace('_', ' ').toUpperCase()} successfully.`,
+            text: `Application step ${displayAction} successfully.`,
             icon: 'success',
             showConfirmButton: false,
             timer: 2000,
@@ -344,7 +387,7 @@ export class ServiceViewComponent implements OnInit {
         Swal.fire('Error', err.error?.message || 'Update failed.', 'error');
       }
     });
-  }
+}
   navigateToCAF(): void {
     if ( this.applicationData.user.id) {
       const userId = this.applicationData.user.id;
