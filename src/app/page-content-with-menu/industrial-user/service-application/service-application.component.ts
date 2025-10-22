@@ -84,8 +84,12 @@ interface SectionGroup {
   standalone: true,
 })
 export class ServiceApplicationComponent implements OnInit {
+  fileUrls: { [questionId: number]: string } = {};
+  defaultValue: any = null;
   existingFileUrls: { [questionId: number]: string } = {};
   public Object = Object;
+  calculatedFee: number | null = null;
+  feeCalculating = false;
   applicationId: number | null = null;
   appId2: number | null = null;
   serviceForm!: FormGroup;
@@ -94,6 +98,7 @@ export class ServiceApplicationComponent implements OnInit {
   sectionGroups: SectionGroup[] = [];
   serviceId!: number;
   loading = true;
+  visible = false;
   readonlyFields: { [key: number]: boolean } = {};
   private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -123,19 +128,6 @@ export class ServiceApplicationComponent implements OnInit {
     private router: Router
   ) {}
 
-  // ngOnInit(): void {
-  //   this.serviceId = Number(this.route.snapshot.paramMap.get('id'));
-  //   const queryParams = this.route.snapshot.queryParams;
-  //   const appIdParam = queryParams['application_id'];
-  //   this.applicationId = appIdParam ? Number(appIdParam) : null;
-  //   if (this.serviceId) {
-  //     this.loadServiceDetails();
-  //   } else {
-  //     this.apiService.openSnackBar('Invalid service ID.', 'error');
-  //     this.loading = false;
-  //   }
-  // }
-
   ngOnInit(): void {
     this.serviceId = Number(this.route.snapshot.paramMap.get('id'));
     const queryParams = this.route.snapshot.queryParams;
@@ -151,38 +143,6 @@ export class ServiceApplicationComponent implements OnInit {
       this.loading = false;
     }
   }
-
-  // loadServiceDetails(): void {
-  //   const payload = { service_id: this.serviceId };
-
-  //   this.apiService
-  //     .getByConditions(payload, 'api/service-questionnaire-view')
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         if (res?.status === 1 && Array.isArray(res.data)) {
-  //           this.questions = res.data
-  //             .filter((q: ServiceQuestion) => q.status === 1)
-  //             .map((q: any) => ({
-  //               ...q,
-  //               parsedOptions: this.parseOptions(q.options),
-  //             }));
-
-  //           this.processSections();
-  //           this.groupQuestions();
-  //           this.buildForm();
-  //           this.loadDefaultValues();
-  //         } else {
-  //           this.apiService.openSnackBar('No form data found.', 'error');
-  //         }
-  //         this.loading = false;
-  //       },
-  //       error: (err) => {
-  //         console.error('Failed to load service details:', err);
-  //         this.apiService.openSnackBar('No form data found', 'error');
-  //         this.loading = false;
-  //       },
-  //     });
-  // }
 
   loadServiceDetails(): void {
     const payload = { service_id: this.serviceId };
@@ -204,9 +164,9 @@ export class ServiceApplicationComponent implements OnInit {
             this.buildForm();
             this.loadDefaultValues();
 
-            if (this.applicationId !== null || this.appId2 !== null) {
-              this.loadExistingApplication();
-            }
+            // if (this.applicationId !== null || this.appId2 !== null) {
+            //   this.loadExistingApplication();
+            // }
           } else {
             this.apiService.openSnackBar('No form data found.', 'error');
           }
@@ -260,70 +220,6 @@ export class ServiceApplicationComponent implements OnInit {
     );
   }
 
-  // loadDefaultValues(): void {
-  //   const userId = this.apiService.getDecryptedUserId();
-  //   if (!userId) {
-  //     console.warn('User ID not found, skipping default value loading');
-  //     return;
-  //   }
-
-  //   const questionsWithDefaults = this.questions.filter(
-  //     (q) => q.default_source_table && q.default_source_column
-  //   );
-
-  //   if (questionsWithDefaults.length === 0) {
-  //     return;
-  //   }
-
-  //   questionsWithDefaults.forEach((question) => {
-  //     const columnKey = question.default_source_column;
-  //     if (!columnKey) return;
-
-  //     const payload = {
-  //       user_id: userId,
-  //       default_source_table: question.default_source_table,
-  //       default_source_column: columnKey,
-  //     };
-
-  //     this.apiService
-  //       .getByConditions(payload, 'api/get-default-source')
-  //       .subscribe({
-  //         next: (res: any) => {
-  //           let defaultValue: any = null;
-
-  //           if (
-  //             res &&
-  //             (res.hasOwnProperty('value') || res.hasOwnProperty(columnKey))
-  //           ) {
-  //             defaultValue = res.value || res[columnKey];
-  //           } else if (res?.status === 1 && res.data && res.data.length > 0) {
-  //             defaultValue = res.data[0].value || res.data[0][columnKey];
-  //           }
-
-  //           if (
-  //             defaultValue !== undefined &&
-  //             defaultValue !== null &&
-  //             defaultValue !== ''
-  //           ) {
-  //             const controlName = question.id.toString();
-  //             const control = this.serviceForm.get(controlName);
-  //             if (control) {
-  //               control.setValue(defaultValue);
-  //               this.readonlyFields[question.id] = true;
-  //               this.cdr?.detectChanges();
-  //             }
-  //           }
-  //         },
-  //         error: (err) => {
-  //           console.error(
-  //             `Failed to load default value for question ${question.id}:`,
-  //             err
-  //           );
-  //         },
-  //       });
-  //   });
-  // }
-
   loadDefaultValues(): void {
     const userId = this.apiService.getDecryptedUserId();
     if (!userId) {
@@ -353,39 +249,42 @@ export class ServiceApplicationComponent implements OnInit {
         .getByConditions(payload, 'api/get-default-source')
         .subscribe({
           next: (res: any) => {
-            let defaultValue: any = null;
+           debugger; 
 
             if (
               res &&
               (res.hasOwnProperty('value') || res.hasOwnProperty(columnKey))
             ) {
-              defaultValue = res.value || res[columnKey];
+              this.defaultValue = res.value || res[columnKey];
+              debugger;
             } else if (res?.status === 1 && res.data && res.data.length > 0) {
-              defaultValue = res.data[0].value || res.data[0][columnKey];
+              this.defaultValue = res.data[0].value || res.data[0][columnKey];
             }
 
             if (
-              defaultValue !== undefined &&
-              defaultValue !== null &&
-              defaultValue !== ''
+              this.defaultValue !== undefined &&
+              this.defaultValue !== null &&
+              this.defaultValue !== ''
             ) {
               const controlName = question.id.toString();
               const control = this.serviceForm.get(controlName);
               if (control) {
                 if (question.question_type === 'file') {
-                  const url = defaultValue;
+                  this.fileUrls[question.id] = this.defaultValue;
+                  // const url = defaultValue;
                   const fileName = decodeURIComponent(
-                    url.split('/').pop() || 'file.pdf'
+                    this.defaultValue.split('/').pop() || 'file.pdf'
                   );
 
                   const fakeFile = new File([], fileName, {
                     type: this.getFileMimeType(fileName),
                   });
+                  (fakeFile as any)._isFake =true;
 
                   control.setValue(fakeFile);
                   this.readonlyFields[question.id] = true;
                 } else {
-                  control.setValue(defaultValue);
+                  control.setValue(this.defaultValue);
                   this.readonlyFields[question.id] = true;
                 }
                 this.cdr?.detectChanges();
@@ -637,56 +536,109 @@ export class ServiceApplicationComponent implements OnInit {
     return this.serviceForm.get(sectionName) as FormArray;
   }
 
-  onSubmit(): void {
-    // if (this.serviceForm.invalid) {
-    //   console.log('Form errors:', this.serviceForm);
-    //   Object.keys(this.serviceForm.controls).forEach((key) => {
-    //     const control = this.serviceForm.get(key);
-    //     if (control?.invalid) {
-    //       console.log('Invalid control:', key, control.errors);
-    //     }
-    //   });
-    // }
-    this.serviceForm.markAllAsTouched();
+  private getFormValidationErrors(): string[] {
+    const errors: string[] = [];
 
-    const userId = this.apiService.getDecryptedUserId();
-    if (!userId) {
-      this.apiService.openSnackBar('User not authenticated.', 'error');
-      return;
-    }
-
-    const raw = this.serviceForm.getRawValue();
-
-    let hasFileToUpload = false;
-
-    this.questions.forEach((q) => {
-      if (q.question_type === 'file') {
-        const value = raw[q.id.toString()];
-        if (value instanceof File) {
-          hasFileToUpload = true;
+    // Check regular fields
+    this.questions.forEach((question) => {
+      const control = this.serviceForm.get(question.id.toString());
+      if (control?.invalid && control.touched) {
+        const label = question.question_label || `Field ${question.id}`;
+        if (control.hasError('required')) {
+          errors.push(`${label} is required`);
+        } else if (control.hasError('minlength')) {
+          const minLength = control.getError('minlength')?.requiredLength || 0;
+          errors.push(`${label} must be at least ${minLength} characters`);
+        } else if (control.hasError('maxlength')) {
+          const maxLength = control.getError('maxlength')?.requiredLength || 0;
+          errors.push(`${label} cannot exceed ${maxLength} characters`);
+        } else if (control.hasError('pattern')) {
+          errors.push(
+            question.validation_rule?.errorMessage ||
+              `${label} has invalid format`
+          );
+        } else if (
+          control.hasError('minLength') ||
+          control.hasError('maxLength')
+        ) {
+          const err =
+            control.getError('minLength') || control.getError('maxLength');
+          if (err?.requiredLength) {
+            errors.push(
+              `${label} must be exactly ${err.requiredLength} digits`
+            );
+          } else {
+            errors.push(`${label} has invalid length`);
+          }
         }
       }
     });
 
-    if (!hasFileToUpload) {
-      this.sectionGroups.forEach((section) => {
-        const sectionData = raw[section.sectionName] || [];
-        sectionData.forEach((row: any) => {
-          section.questions.forEach((q) => {
-            if (q.question_type === 'file' && row[q.id] instanceof File) {
-              hasFileToUpload = true;
+    this.sectionGroups.forEach((section) => {
+      const formArray = this.getSectionFormArray(section.sectionName);
+      section.questions.forEach((question) => {
+        formArray.controls.forEach((rowGroup, rowIndex) => {
+          const control = (rowGroup as FormGroup).get(question.id.toString());
+          if (control?.invalid && control.touched) {
+            const label = `${question.question_label} (Row ${rowIndex + 1})`;
+            if (control.hasError('required')) {
+              errors.push(`${label} is required`);
+            } else if (control.hasError('minlength')) {
+              const minLength =
+                control.getError('minlength')?.requiredLength || 0;
+              errors.push(`${label} must be at least ${minLength} characters`);
+            } else if (control.hasError('maxlength')) {
+              const maxLength =
+                control.getError('maxlength')?.requiredLength || 0;
+              errors.push(`${label} cannot exceed ${maxLength} characters`);
+            } else if (control.hasError('pattern')) {
+              errors.push(
+                question.validation_rule?.errorMessage ||
+                  `${label} has invalid format`
+              );
+            } else if (
+              control.hasError('minLength') ||
+              control.hasError('maxLength')
+            ) {
+              const err =
+                control.getError('minLength') || control.getError('maxLength');
+              if (err?.requiredLength) {
+                errors.push(
+                  `${label} must be exactly ${err.requiredLength} digits`
+                );
+              } else {
+                errors.push(`${label} has invalid length`);
+              }
             }
-          });
+          }
         });
       });
-    }
+    });
 
-    if (hasFileToUpload) {
-      this.submitWithFiles(userId, raw);
-    } else {
-      this.submitAsJson(userId, raw);
-    }
+    return errors;
   }
+
+ onSubmit(): void {
+  this.serviceForm.markAllAsTouched();
+
+  const validationErrors = this.getFormValidationErrors();
+  if (validationErrors.length > 0) {
+    const message = 'Please fix the following:\n• ' + validationErrors.join('\n• ');
+    this.apiService.openSnackBar(message, 'error');
+    return;
+  }
+
+  const userId = this.apiService.getDecryptedUserId();
+  if (!userId) {
+    this.apiService.openSnackBar('User not authenticated.', 'error');
+    return;
+  }
+
+  const raw = this.serviceForm.getRawValue();
+  const preparedRaw = this.prepareRawDataForSubmission(raw);
+
+  this.submitWithFiles(userId, preparedRaw);
+}
 
   private getSubmissionEndpoint(): string {
     return this.applicationId !== null
@@ -694,133 +646,343 @@ export class ServiceApplicationComponent implements OnInit {
       : 'api/user/service-application-store';
   }
 
-  private submitAsJson(userId: string, raw: any): void {
-    const applicationData: { [key: string]: any } = {};
+private prepareRawDataForSubmission(raw: any): any {
+  const prepared = { ...raw };
 
-    // Process regular fields
-    Object.keys(raw).forEach((key) => {
-      if (this.sectionGroups.some((s) => s.sectionName === key)) return;
-
-      const question = this.questions.find((q) => q.id.toString() === key);
-      if (!question) return;
-
-      let value = raw[key];
-      if (question.question_type === 'date' && value instanceof Date) {
-        value = value.toISOString().split('T')[0];
+  Object.keys(prepared).forEach(key => {
+    if (this.sectionGroups.some(s => s.sectionName === key)) return;
+    const question = this.questions.find(q => q.id.toString() === key);
+    if (question?.question_type === 'file') {
+      const currentVal = prepared[key];
+      if (
+        currentVal instanceof File && 
+        (currentVal as any)._isFake && 
+        this.fileUrls[Number(key)]
+      ) {
+        prepared[key] = this.fileUrls[Number(key)];
       }
-      if (question.question_type === 'checkbox') {
-        value = Array.isArray(value) ? value.join(', ') : value;
-      }
+    }
+  });
 
+  this.sectionGroups.forEach(section => {
+    const sectionData = prepared[section.sectionName] || [];
+    sectionData.forEach((row : any) => {
+      section.questions.forEach(q => {
+        if (q.question_type === 'file') {
+          const currentVal = row[q.id];
+          if (
+            currentVal instanceof File && 
+            (currentVal as any)._isFake && 
+            this.fileUrls[q.id]
+          ) {
+            row[q.id] = this.fileUrls[q.id];
+          }
+        }
+      });
+    });
+  });
+
+  return prepared;
+}
+
+
+
+ private submitWithFiles(userId: string, raw: any): void {
+  const formData = new FormData();
+  formData.append('user_id', userId);
+  formData.append('service_id', this.serviceId.toString());
+
+  const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
+  if (actualAppId !== null) {
+    formData.append('id', actualAppId.toString());
+  }
+
+  Object.keys(raw).forEach((key) => {
+    if (this.sectionGroups.some((s) => s.sectionName === key)) return;
+
+    const question = this.questions.find((q) => q.id.toString() === key);
+    if (!question) return;
+
+    let value = raw[key];
+
+    if (question.question_type === 'date' && value instanceof Date) {
+      value = value.toISOString().split('T')[0];
+    }
+    if (question.question_type === 'checkbox') {
+      value = Array.isArray(value) ? value.join(', ') : value;
+    }
+
+    // ✅ File logic: 
+    // - If it's a real File → append as binary
+    // - If it's a string (URL) → append as string
+    // - If null/undefined → skip (optional field)
+    if (question.question_type === 'file') {
+      if (value instanceof File) {
+        formData.append(`application_data[${key}]`, value, value.name);
+      } else if (value != null) { // string URL
+        formData.append(`application_data[${key}]`, value);
+      }
+    } else {
+      // Non-file fields
       if (
         question.is_required === 'yes' ||
         (value !== null && value !== '' && value !== undefined)
       ) {
-        applicationData[key] = value;
+        formData.append(`application_data[${key}]`, value ?? '');
       }
-    });
+    }
+  });
 
-    // Add existing file URLs
-    Object.keys(this.existingFileUrls).forEach((idStr) => {
-      const questionId = Number(idStr);
-      const question = this.questions.find((q) => q.id === questionId);
-      if (!question) return;
+  // === Section fields ===
+  this.sectionGroups.forEach((section) => {
+    const sectionData = raw[section.sectionName] || [];
+    sectionData.forEach((row: any, rowIndex: number) => {
+      section.questions.forEach((q) => {
+        let value = row[q.id];
 
-      const currentVal = raw[questionId];
-      if (
-        !(currentVal instanceof File) &&
-        applicationData[questionId] === undefined
-      ) {
-        applicationData[questionId] = this.existingFileUrls[questionId];
-      }
-    });
-
-    // Process section fields
-    this.sectionGroups.forEach((section) => {
-      const sectionData = raw[section.sectionName] || [];
-      const validRows = sectionData.filter((row: any) =>
-        section.questions.some((q) => {
-          const val = row[q.id];
-          return val !== null && val !== '' && val !== undefined;
-        })
-      );
-
-      if (validRows.length > 0) {
-        const processedRows: any[] = [];
-        validRows.forEach((row: any) => {
-          const processedRow: any = {};
-          section.questions.forEach((q) => {
-            let value = row[q.id];
-            if (q.question_type === 'date' && value instanceof Date) {
-              value = value.toISOString().split('T')[0];
-            }
-            if (q.question_type === 'checkbox') {
-              value = Array.isArray(value) ? value.join(', ') : value;
-            }
-            if (
-              q.is_required === 'yes' ||
-              (value !== null && value !== '' && value !== undefined)
-            ) {
-              processedRow[q.id] = value;
-            }
-          });
-          if (Object.keys(processedRow).length > 0) {
-            processedRows.push(processedRow);
-          }
-        });
-        if (processedRows.length > 0) {
-          applicationData[section.sectionName] = processedRows;
+        if (q.question_type === 'date' && value instanceof Date) {
+          value = value.toISOString().split('T')[0];
         }
-      }
-    });
+        if (q.question_type === 'checkbox') {
+          value = Array.isArray(value) ? value.join(', ') : value;
+        }
 
-    const payload: any = {
-      user_id: Number(userId),
+        const fieldName = `application_data[${section.sectionName}][${rowIndex}][${q.id}]`;
+
+        if (q.question_type === 'file') {
+          if (value instanceof File) {
+            formData.append(fieldName, value, value.name);
+          } else if (value != null) {
+            formData.append(fieldName, value);
+          }
+        } else {
+          if (
+            q.is_required === 'yes' ||
+            (value !== null && value !== '' && value !== undefined)
+          ) {
+            formData.append(fieldName, value ?? '');
+          }
+        }
+      });
+    });
+  });
+
+  this.apiService
+    .getByConditions(formData, this.getSubmissionEndpoint())
+    .subscribe({
+      next: (res) => {
+        if (res?.status === 1) {
+          this.apiService.openSnackBar('Application saved successfully!', 'success');
+          this.router.navigate(['/dashboard/services']);
+        } else {
+          this.apiService.openSnackBar(res?.message || 'Submission failed.', 'error');
+        }
+      },
+      error: (err) => {
+        console.error('Submission error:', err);
+        this.apiService.openSnackBar(
+          err?.error?.message || 'Submission failed. Please try again.',
+          'error'
+        );
+      },
+    });
+}
+
+  downloadSample(sampleUrl: string): void {
+    if (!sampleUrl || sampleUrl.trim() === '') {
+      this.apiService.openSnackBar('No sample file available.', 'error');
+      return;
+    }
+    window.open(sampleUrl, '_blank');
+  }
+
+  // getDefaultFileUrl(questionId: number): string | null {
+  //   const question = this.questions.find((q) => q.id === questionId);
+  //   if (question?.default_value && !this.readonlyFields[questionId]) {
+  //   }
+
+  //   const currentValue = this.serviceForm.get(questionId.toString())?.value;
+  //   return typeof currentValue === 'string' ? currentValue : null;
+  // }
+
+  getDefaultFileUrl(questionId: number): string | null {
+    return this.fileUrls[questionId] || null;
+  }
+  private getFileMimeType(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    const mimeMap: { [key: string]: string } = {
+      pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      txt: 'text/plain',
+    };
+    return mimeMap[ext || ''] || 'application/octet-stream';
+  }
+
+  private loadExistingApplication(): void {
+    const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
+
+    if (actualAppId === null) return;
+
+    const payload = {
       service_id: this.serviceId,
-      application_data: applicationData,
+      application_id: actualAppId,
     };
 
-    if (this.applicationId !== null) {
-      payload.id = this.applicationId;
-    }
-
     this.apiService
-      .getByConditions(payload, this.getSubmissionEndpoint())
+      .getByConditions(
+        payload,
+        'api/user/get-details-user-service-applications'
+      )
       .subscribe({
-        next: (res) => {
-          if (res?.status === 1) {
-            this.apiService.openSnackBar(
-              'Application saved successfully!',
-              'success'
-            );
-            this.router.navigate(['/dashboard/services']);
-          } else {
-            this.apiService.openSnackBar(
-              res?.message || 'Submission failed.',
-              'error'
-            );
+        next: (res: any) => {
+          if (res?.status === 1 && res.data?.application_data) {
+            this.patchFormWithExistingData(res.data.application_data);
           }
         },
         error: (err) => {
-          console.error('Submission error:', err);
+          console.error('Failed to load existing application:', err);
           this.apiService.openSnackBar(
-            err?.error?.message || 'Submission failed. Please try again.',
+            'Could not load existing application data.',
             'error'
           );
         },
       });
   }
 
-  private submitWithFiles(userId: string, raw: any): void {
+  private patchFormWithExistingData(applicationData: any): void {
+    Object.keys(applicationData).forEach((key) => {
+      const value = applicationData[key];
+
+      if (this.sectionGroups.some((section) => section.sectionName === key)) {
+        if (Array.isArray(value) && value.length > 0) {
+          const section = this.sectionGroups.find((s) => s.sectionName === key);
+          if (section) {
+            while (section.formArray.length > 1) {
+              section.formArray.removeAt(0);
+            }
+
+            value.forEach((row: any, index: number) => {
+              if (index === 0) {
+                const rowGroup = section.formArray.at(0) as FormGroup;
+                section.questions.forEach((q) => {
+                  const rowValue = row[q.id] ?? '';
+                  rowGroup.get(q.id.toString())?.setValue(rowValue);
+                });
+              } else {
+                const newRow = this.createSectionRow(section.questions);
+                section.questions.forEach((q) => {
+                  const rowValue = row[q.id] ?? '';
+
+                  if (
+                    q.question_type === 'file' &&
+                    typeof rowValue === 'string'
+                  ) {
+                    this.fileUrls[q.id] = rowValue;
+
+                    const fileName = decodeURIComponent(
+                      rowValue.split('/').pop() || 'file.pdf'
+                    );
+                    const fakeFile = new File([], fileName, {
+                      type: this.getFileMimeType(fileName),
+                    });
+                    newRow.get(q.id.toString())?.setValue(fakeFile);
+                  } else {
+                    newRow.get(q.id.toString())?.setValue(rowValue);
+                  }
+                });
+                section.formArray.push(newRow);
+              }
+            });
+          }
+        }
+        return;
+      }
+
+      const question = this.questions.find((q) => q.id.toString() === key);
+      if (!question) return;
+
+      let formValue: any;
+
+      if (Array.isArray(value)) {
+        if (question.question_type === 'checkbox') {
+          formValue = value;
+        } else if (question.question_type === 'file') {
+          let fileUrl: string | null = null;
+
+          if (
+            Array.isArray(value) &&
+            value.length > 0 &&
+            typeof value[0] === 'string'
+          ) {
+            fileUrl = value[0];
+          } else if (typeof value === 'string') {
+            fileUrl = value;
+          }
+
+          if (fileUrl) {
+            this.fileUrls[question.id] = fileUrl;
+
+            const fileName = decodeURIComponent(
+              fileUrl.split('/').pop() || 'file.pdf'
+            );
+            formValue = new File([], fileName, {
+              type: this.getFileMimeType(fileName),
+            });
+          }
+        } else {
+          formValue = value.length > 0 ? value[0] : '';
+        }
+      } else if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        value === null
+      ) {
+        formValue = value;
+      } else {
+        formValue = '';
+      }
+
+      this.serviceForm.get(key)?.setValue(formValue);
+    });
+
+    this.cdr.detectChanges();
+  }
+
+  calFee(): void {
+    if (this.feeCalculating) return;
+
+    this.serviceForm.markAllAsTouched();
+
+    if (this.serviceForm.invalid) {
+      this.apiService.openSnackBar(
+        'Please fill in all required fields correctly.',
+        'error'
+      );
+      return;
+    }
+
+    const userId = this.apiService.getDecryptedUserId();
+    if (!userId) {
+      this.apiService.openSnackBar('User not authenticated.', 'error');
+      return;
+    }
+
+    this.feeCalculating = true;
+
+    const raw = this.serviceForm.getRawValue();
+    const preparedRaw = this.prepareRawDataForSubmission(raw);
     const formData = new FormData();
     formData.append('user_id', userId);
     formData.append('service_id', this.serviceId.toString());
 
-    if (this.applicationId !== null) {
-      formData.append('id', this.applicationId.toString());
-    }
-
-    Object.keys(raw).forEach((key) => {
+    Object.keys(preparedRaw).forEach((key) => {
       if (this.sectionGroups.some((s) => s.sectionName === key)) return;
       const question = this.questions.find((q) => q.id.toString() === key);
       if (!question) return;
@@ -880,220 +1042,35 @@ export class ServiceApplicationComponent implements OnInit {
     });
 
     this.apiService
-      .getByConditions(formData, this.getSubmissionEndpoint())
+      .getByConditions(formData, 'api/user/calculate-fee')
       .subscribe({
-        next: (res) => {
+        next: (res: any) => {
           if (res?.status === 1) {
+            this.calculatedFee = Number(res.data.final_fee);
+            this.visible = true;
             this.apiService.openSnackBar(
-              'Application saved successfully!',
+              'Fee calculated successfully!',
               'success'
             );
-            this.router.navigate(['/dashboard/services']);
           } else {
+            this.visible = false;
             this.apiService.openSnackBar(
-              res?.message || 'Submission failed.',
+              res?.message || 'Failed to calculate fee.',
               'error'
             );
           }
         },
         error: (err) => {
-          console.error('File submission error:', err);
+          console.error('Fee calculation error:', err);
+          this.visible = false;
           this.apiService.openSnackBar(
-            err?.error?.message || 'Submission failed. Please try again.',
+            err?.error?.message || 'Fee calculation failed. Please try again.',
             'error'
           );
         },
-      });
-  }
-
-  downloadSample(sampleUrl: string): void {
-    if (!sampleUrl || sampleUrl.trim() === '') {
-      this.apiService.openSnackBar('No sample file available.', 'error');
-      return;
-    }
-    window.open(sampleUrl, '_blank');
-  }
-
-  getDefaultFileUrl(questionId: number): string | null {
-    const question = this.questions.find((q) => q.id === questionId);
-    if (question?.default_value && !this.readonlyFields[questionId]) {
-    }
-
-    const currentValue = this.serviceForm.get(questionId.toString())?.value;
-    return typeof currentValue === 'string' ? currentValue : null;
-  }
-  private getFileMimeType(fileName: string): string {
-    const ext = fileName.split('.').pop()?.toLowerCase();
-    const mimeMap: { [key: string]: string } = {
-      pdf: 'application/pdf',
-      jpg: 'image/jpeg',
-      jpeg: 'image/jpeg',
-      png: 'image/png',
-      gif: 'image/gif',
-      doc: 'application/msword',
-      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      xls: 'application/vnd.ms-excel',
-      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      txt: 'text/plain',
-    };
-    return mimeMap[ext || ''] || 'application/octet-stream';
-  }
-
-  private loadExistingApplication(): void {
-    const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
-
-    if (actualAppId === null) return;
-
-    const payload = {
-      service_id: this.serviceId,
-      application_id: actualAppId,
-    };
-
-    this.apiService
-      .getByConditions(
-        payload,
-        'api/user/get-details-user-service-applications'
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1 && res.data?.application_data) {
-            this.patchFormWithExistingData(res.data.application_data);
-          }
-        },
-        error: (err) => {
-          console.error('Failed to load existing application:', err);
-          this.apiService.openSnackBar(
-            'Could not load existing application data.',
-            'error'
-          );
+        complete: () => {
+          this.feeCalculating = false;
         },
       });
   }
-  // private patchFormWithExistingData(applicationData: any): void {
-  //   Object.keys(applicationData).forEach((key) => {
-  //     if (Array.isArray(applicationData[key])) {
-  //       const question = this.questions.find((q) => q.id.toString() === key);
-  //       if (question) {
-  //         let value = applicationData[key];
-
-  //         if (question.question_type === 'checkbox') {
-  //         } else if (question.question_type === 'file') {
-  //           if (value.length > 0 && typeof value[0] === 'string') {
-  //             this.existingFileUrls[question.id] = value[0];
-  //             const fileName = decodeURIComponent(
-  //               value[0].split('/').pop() || 'file.pdf'
-  //             );
-  //             const fakeFile = new File([], fileName, {
-  //               type: this.getFileMimeType(fileName),
-  //             });
-  //             this.serviceForm.get(key)?.setValue(fakeFile);
-  //           }
-  //         } else {
-  //           value = value.length > 0 ? value[0] : '';
-  //           this.serviceForm.get(key)?.setValue(value);
-  //         }
-  //       }
-  //     } else if (
-  //       typeof applicationData[key] === 'object' &&
-  //       !Array.isArray(applicationData[key])
-  //     ) {
-  //     }
-  //   });
-
-  //   this.sectionGroups.forEach((section) => {
-  //     const sectionData = applicationData[section.sectionName];
-
-  //     if (Array.isArray(sectionData) && sectionData.length > 0) {
-  //       while (section.formArray.length > 1) {
-  //         section.formArray.removeAt(0);
-  //       }
-
-  //       sectionData.forEach((row: any, index: number) => {
-  //         if (index === 0) {
-  //           const rowGroup = section.formArray.at(0) as FormGroup;
-  //           section.questions.forEach((q) => {
-  //             const value = row[q.id] ?? '';
-  //             rowGroup.get(q.id.toString())?.setValue(value);
-  //           });
-  //         } else {
-  //           const newRow = this.createSectionRow(section.questions);
-  //           section.questions.forEach((q) => {
-  //             const value = row[q.id] ?? '';
-  //             newRow.get(q.id.toString())?.setValue(value);
-  //           });
-  //           section.formArray.push(newRow);
-  //         }
-  //       });
-  //     }
-  //   });
-
-  //   this.cdr.detectChanges();
-  // }
-
-  private patchFormWithExistingData(applicationData: any): void {
-  Object.keys(applicationData).forEach(key => {
-    const value = applicationData[key];
-    
-    // Handle section fields (objects/arrays of objects)
-    if (this.sectionGroups.some(section => section.sectionName === key)) {
-      if (Array.isArray(value) && value.length > 0) {
-        const section = this.sectionGroups.find(s => s.sectionName === key);
-        if (section) {
-          // Clear extra rows
-          while (section.formArray.length > 1) {
-            section.formArray.removeAt(0);
-          }
-          
-          // Patch rows
-          value.forEach((row: any, index: number) => {
-            if (index === 0) {
-              const rowGroup = section.formArray.at(0) as FormGroup;
-              section.questions.forEach(q => {
-                const rowValue = row[q.id] ?? '';
-                rowGroup.get(q.id.toString())?.setValue(rowValue);
-              });
-            } else {
-              const newRow = this.createSectionRow(section.questions);
-              section.questions.forEach(q => {
-                const rowValue = row[q.id] ?? '';
-                newRow.get(q.id.toString())?.setValue(rowValue);
-              });
-              section.formArray.push(newRow);
-            }
-          });
-        }
-      }
-      return;
-    }
-
-    const question = this.questions.find(q => q.id.toString() === key);
-    if (!question) return;
-
-    let formValue: any;
-
-    if (Array.isArray(value)) {
-      if (question.question_type === 'checkbox') {
-        formValue = value;
-      } else if (question.question_type === 'file') {
-        if (value.length > 0 && typeof value[0] === 'string') {
-          this.existingFileUrls[question.id] = value[0];
-          const fileName = decodeURIComponent(value[0].split('/').pop() || 'file.pdf');
-          formValue = new File([], fileName, { type: this.getFileMimeType(fileName) });
-        } else {
-          formValue = null;
-        }
-      } else {
-        formValue = value.length > 0 ? value[0] : '';
-      }
-    } else if (typeof value === 'string' || typeof value === 'number' || value === null) {
-      formValue = value;
-    } else {
-      formValue = '';
-    }
-
-    this.serviceForm.get(key)?.setValue(formValue);
-  });
-
-  this.cdr.detectChanges();
-}
 }

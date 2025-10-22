@@ -36,35 +36,35 @@ export class EligibilityComponent implements OnInit {
     this.loadSchemes();
   }
 
- loadSchemes(): void {
-  this.appiService
-    .getByConditions({}, 'api/user/incentive/scheme-list')
-    .subscribe({
-      next: (res: any) => {
-        if (res?.status === 1 && Array.isArray(res.data)) {
-          this.schemes = res.data.map((item: any) => ({
-            id: item.id,
-            name: item.title,
-          }));
+  loadSchemes(): void {
+    this.appiService
+      .getByConditions({}, 'api/user/incentive/scheme-list')
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status === 1 && Array.isArray(res.data)) {
+            this.schemes = res.data.map((item: any) => ({
+              id: item.id,
+              name: item.title,
+            }));
 
-          if (this.schemes.length > 0) {
-            this.selectedSchemeId = this.schemes[0].id;
-            if (this.selectedSchemeId !== null) {
-              this.loadEligibilityProforma(this.selectedSchemeId);
+            if (this.schemes.length > 0) {
+              this.selectedSchemeId = this.schemes[0].id;
+              if (this.selectedSchemeId !== null) {
+                this.loadEligibilityProforma(this.selectedSchemeId);
+              }
             }
+          } else {
+            this.schemes = [];
+            this.applications = [];
           }
-        } else {
+        },
+        error: (err: any) => {
+          this.appiService.openSnackBar('Failed to load schemes', 'Close');
           this.schemes = [];
           this.applications = [];
-        }
-      },
-      error: (err: any) => {
-        this.appiService.openSnackBar('Failed to load schemes', 'Close');
-        this.schemes = [];
-        this.applications = [];
-      },
-    });
-}
+        },
+      });
+  }
   onSchemeChange(schemeId: number | null): void {
     if (schemeId !== null) {
       this.selectedSchemeId = schemeId;
@@ -89,8 +89,7 @@ export class EligibilityComponent implements OnInit {
               certOrRejectedOn: item.certificate_issued_or_rejected_on || '_',
               status: item.workflow_status || '_',
               proforma_id: item.proforma_id,
-              // Optional: build dynamic link if needed later
-              link: '', 
+              link: '',
             }));
           } else {
             this.applications = [];
@@ -170,7 +169,25 @@ export class EligibilityComponent implements OnInit {
             label: 'Apply',
             color: 'primary',
             onClick: (row: any) => {
-              this.router.navigate(['/dashboard/eligibility/proforma-questionnaire-view', row.proforma_id, this.selectedSchemeId]);
+              const navigationCommands = [
+                '/dashboard/eligibility/proforma-questionnaire-view',
+                row.proforma_id,
+                this.selectedSchemeId,
+              ];
+
+              const navigationExtras: any = {};
+
+              if (
+                row.applicationId &&
+                row.applicationId !== '_' &&
+                row.applicationId !== null
+              ) {
+                navigationExtras.queryParams = {
+                  applicationId: row.applicationId,
+                };
+              }
+
+              this.router.navigate(navigationCommands, navigationExtras);
             },
           },
         ],

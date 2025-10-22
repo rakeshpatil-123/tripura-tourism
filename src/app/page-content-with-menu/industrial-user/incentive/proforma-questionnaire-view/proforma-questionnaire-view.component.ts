@@ -11,6 +11,15 @@ import { IlogiRadioComponent } from '../../../../customInputComponents/ilogi-rad
 import { IlogiInputDateComponent } from '../../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { CommonModule } from '@angular/common';
 
+
+interface FileMeta {
+  file_id: string;
+  path: string;
+  url: string;
+  name: string;
+  mime: string;
+  size: number;
+}
 interface Question {
   id: number;
   question_label: string;
@@ -22,11 +31,15 @@ interface Question {
   default_source_column: string | null;
   group_label: string | null;
   display_width: string;
+  display_order: number | null;
   upload_rule: any;
   validation_required: 'yes' | 'no';
   parsedOptions:
     | { id: string; name: string }[]
     | { value: string; name: string }[];
+
+  value: any;
+  files: FileMeta[];
 }
 
 @Component({
@@ -46,26 +59,30 @@ interface Question {
 })
 export class ProformaQuestionnaireViewComponent implements OnInit {
   proformaId: number | null = null;
+  applicationId: number | null = null;
   questionnaireData: Question[] = [];
   groupedQuestions: { [key: string]: Question[] } = {};
   proformaForm!: FormGroup;
   loading = false;
   error: string | null = null;
   readonlyFields: { [questionId: number]: boolean } = {};
-  resolvedFileUrls: { [id: number]: string } = {};
+  // resolvedFileUrls: { [id: number]: string } = {};
+  resolvedFileUrls: { [key: string]: string } = {};
   schemeId: number | null = null;
   constructor(
     private route: ActivatedRoute,
     private apiService: GenericService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) { this.proformaForm = this.fb.group({});}
+  ) {
+    this.proformaForm = this.fb.group({});
+  }
 
   ngOnInit(): void {
-    //  this.proformaForm = this.fb.group({});
     const proformaId = this.route.snapshot.paramMap.get('proformaId');
     const schemeId = this.route.snapshot.paramMap.get('schemeId');
-
+    const applicationId =
+      this.route.snapshot.queryParamMap.get('applicationId');
     if (proformaId !== null && !isNaN(Number(proformaId))) {
       this.proformaId = Number(proformaId);
     } else {
@@ -78,6 +95,9 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
     } else {
       this.error = 'Invalid scheme ID';
       return;
+    }
+    if (applicationId !== null && !isNaN(Number(applicationId))) {
+      this.applicationId = Number(applicationId);
     }
 
     this.fetchQuestionnaire(this.proformaId);
@@ -97,9 +117,63 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
     return userId ? Number(userId) : null;
   }
 
+  // private fetchQuestionnaire(proformaId: number): void {
+  //   this.loading = true;
+  //   const payload = { proforma_id: proformaId };
+
+  //   this.apiService
+  //     .getByConditions(
+  //       payload,
+  //       'api/user/incentive/proforma-questionnaire-view'
+  //     )
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         if (res?.status === 1 && Array.isArray(res.data.questions)) {
+  //           this.questionnaireData = res.data.questions.map((q: any) => {
+  //             let parsedOptions: any = [];
+
+  //             if (q.question_type === 'select') {
+  //               parsedOptions = this.parseOptionsForSelect(
+  //                 q.options || q.default_value
+  //               );
+  //             } else if (['radio', 'checkbox'].includes(q.question_type)) {
+  //               parsedOptions = this.parseOptionsForRadioCheckbox(
+  //                 q.options || q.default_value
+  //               );
+  //             } else if (q.question_type === 'switch') {
+  //               parsedOptions = [
+  //                 { value: 'yes', name: 'Yes' },
+  //                 { value: 'no', name: 'No' },
+  //               ];
+  //             }
+
+  //             return {
+  //               ...q,
+  //               parsedOptions,
+  //             };
+  //           });
+
+  //           this.groupQuestions();
+  //           this.buildFormGroup();
+  //           this.loadDefaultValues();
+  //         } else {
+  //           this.error = res?.message || 'Failed to load questionnaire';
+  //           this.loading = false;
+  //         }
+  //       },
+  //       error: () => {
+  //         this.loading = false;
+  //         this.error = 'Failed to load questionnaire';
+  //       },
+  //     });
+  // }
   private fetchQuestionnaire(proformaId: number): void {
     this.loading = true;
-    const payload = { proforma_id: proformaId };
+
+    const payload: any = { proforma_id: proformaId };
+    if (this.applicationId !== null) {
+      payload.application_id = this.applicationId;
+    }
 
     this.apiService
       .getByConditions(
@@ -109,32 +183,26 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data.questions)) {
-            this.questionnaireData = res.data.questions.map((q: any) => {
-              let parsedOptions: any = [];
+          this.questionnaireData = res.data.questions.map((q: any) => {
+  let parsedOptions: any = [];
 
-              if (q.question_type === 'select') {
-                parsedOptions = this.parseOptionsForSelect(
-                  q.options || q.default_value
-                );
-              } else if (['radio', 'checkbox'].includes(q.question_type)) {
-                parsedOptions = this.parseOptionsForRadioCheckbox(
-                  q.options || q.default_value
-                );
-              } else if (q.question_type === 'switch') {
-                parsedOptions = [
-                  { value: 'yes', name: 'Yes' },
-                  { value: 'no', name: 'No' },
-                ];
-              }
+  if (q.question_type === 'select') {
+    parsedOptions = this.parseOptionsForSelect(q.options || q.default_value);
+  } else if (['radio', 'checkbox'].includes(q.question_type)) {
+    parsedOptions = this.parseOptionsForRadioCheckbox(q.options || q.default_value);
+  } else if (q.question_type === 'switch') {
+    parsedOptions = [{ value: 'yes', name: 'Yes' }, { value: 'no', name: 'No' }];
+  }
 
-              return {
-                ...q,
-                parsedOptions,
-              };
-            });
+  return {
+    ...q,
+    parsedOptions,
+  };
+});
 
             this.groupQuestions();
             this.buildFormGroup();
+            this.patchSavedAnswers();
             this.loadDefaultValues();
           } else {
             this.error = res?.message || 'Failed to load questionnaire';
@@ -148,6 +216,64 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
       });
   }
 
+  private patchSavedAnswers(): void {
+    this.questionnaireData.forEach((q) => {
+      const control = this.proformaForm.get(q.id.toString());
+
+      // 🔹 Handle text, number, date, etc.
+      if (control && q.value !== null && q.value !== undefined) {
+        let valueToSet = q.value;
+
+        if (q.question_type === 'date') {
+          const parsed = new Date(valueToSet);
+          valueToSet = isNaN(parsed.getTime()) ? null : parsed;
+        } else if (
+          q.question_type === 'checkbox' &&
+          typeof valueToSet === 'string'
+        ) {
+          valueToSet = valueToSet.split(',').map((s: string) => s.trim());
+        } else if (q.question_type === 'switch') {
+          valueToSet =
+            (valueToSet || '').toString().toLowerCase() === 'yes'
+              ? 'yes'
+              : 'no';
+        }
+
+        control.setValue(valueToSet);
+      }
+
+      // 🔹 Handle single file
+      if (q.question_type === 'file' && !q.upload_rule?.max_files) {
+        if (Array.isArray(q.files) && q.files.length > 0) {
+          const fileUrl = q.files[0].url;
+          this.resolvedFileUrls[q.id] = fileUrl;
+          // Create fake File for UI (so file-upload shows preview)
+          const fileName = q.files[0].name;
+          const fakeFile = new File([], fileName, { type: q.files[0].mime });
+          this.proformaForm.get(q.id.toString())?.setValue(fakeFile);
+        }
+      }
+
+      // 🔹 Handle multi-file
+      if (q.question_type === 'file' && q.upload_rule?.max_files > 1) {
+        const maxFiles = q.upload_rule.max_files;
+        for (let i = 1; i <= maxFiles; i++) {
+          const fileControlName = `${q.id}_${i}`;
+          const fileControl = this.proformaForm.get(fileControlName);
+          if (fileControl && Array.isArray(q.files) && q.files[i - 1]) {
+            const fileUrl = q.files[i - 1].url;
+            this.resolvedFileUrls[fileControlName] = fileUrl;
+            const fileName = q.files[i - 1].name;
+            const fakeFile = new File([], fileName, {
+              type: q.files[i - 1].mime,
+            });
+            fileControl.setValue(fakeFile);
+          }
+        }
+      }
+    });
+  }
+
   private loadDefaultValues(): void {
     const userId = this.getUserId();
     if (!userId) {
@@ -156,7 +282,10 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
     }
 
     const questionsWithDefaults = this.questionnaireData.filter(
-      (q) => q.default_source_table && q.default_source_column
+      (q) =>
+        q.default_source_table &&
+        q.default_source_column &&
+        (q.value === null || q.value === undefined)
     );
 
     if (questionsWithDefaults.length === 0) {
@@ -454,8 +583,6 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
       form_answers_json: formAnswers,
       save_data: isDraft ? 1 : 0,
     };
-
-   
 
     return { payload, files };
   }
