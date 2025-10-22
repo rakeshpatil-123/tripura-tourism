@@ -35,12 +35,11 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Default Value</mat-label>
-        <input matInput formControlName="default_value" placeholder="Enter default value" />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Condition Label</mat-label>
-        <input matInput formControlName="condition_label" placeholder="Enter Condition Label" />
+        <mat-label>Is Required?</mat-label>
+        <mat-select formControlName="is_required">
+          <mat-option value="yes">Yes</mat-option>
+          <mat-option value="no">No</mat-option>
+        </mat-select>
       </mat-form-field>
     </div>
     <div class="form-row">
@@ -99,11 +98,8 @@
     </div>
     <div class="form-row">
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Is Required?</mat-label>
-        <mat-select formControlName="is_required">
-          <mat-option value="yes">Yes</mat-option>
-          <mat-option value="no">No</mat-option>
-        </mat-select>
+        <mat-label>Default Value</mat-label>
+        <input matInput formControlName="default_value" placeholder="Enter default value" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">

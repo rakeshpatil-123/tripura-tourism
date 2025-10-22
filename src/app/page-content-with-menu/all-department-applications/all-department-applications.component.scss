@@ -1,0 +1,82 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2vh;
+  padding: 1.5vh 1vw;
+  background: #f9fafb;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  .page-head {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  button {
+    background: linear-gradient(90deg, #1766d1, #155bb3);
+    color: #fff;
+    font-weight: 500;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.6em 1.4em;
+    transition: all 0.3s ease;
+
+    mat-icon {
+      font-size: 18px;
+    }
+
+    &:hover {
+      background: linear-gradient(90deg, #155bb3, #0e4aa1);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.filter-section {
+  margin-bottom: 2vh;
+
+  app-ilogi-select {
+    width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2vh;
+
+    .page-head {
+      font-size: 1.4rem;
+    }
+
+    button {
+      width: 100%;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+  }
+
+  .filter-section app-ilogi-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    .page-head {
+      font-size: 1.25rem;
+    }
+
+    button {
+      padding: 0.55em 1.2em;
+      font-size: 0.9rem;
+    }
+  }
+}

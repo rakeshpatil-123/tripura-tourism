@@ -39,6 +39,9 @@
           <div class="header-wrapper">User Name</div>
         </th>
         <th>
+          <div class="header-wrapper">Hierarchy Level</div>
+        </th>
+        <th>
           <div class="header-wrapper">District</div>
         </th>
         <th>
@@ -84,6 +87,9 @@
         </td>
         <td pTooltip="{{ user.user_name }}" tooltipPosition="right">
           {{ user.user_name || '----' }}
+        </td>
+        <td pTooltip="{{ user.hierarchy_level }}" tooltipPosition="right">
+          {{ user.hierarchy_level ? (user.hierarchy_level | titlecase) : '----' }}
         </td>
         <td pTooltip="{{ user.district_name }}" tooltipPosition="right">
           {{ user.district_name || '----' }}

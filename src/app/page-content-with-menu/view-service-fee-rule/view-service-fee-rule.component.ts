@@ -35,7 +35,6 @@ export class ViewServiceFeeRuleComponent implements OnInit, AfterViewInit {
     'question_id',
     'question_label',
     'condition_operator',
-    'condition_label',
     'condition_value_start',
     'condition_value_end',
     'fixed_fee',

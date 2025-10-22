@@ -29,7 +29,8 @@ import { finalize } from 'rxjs';
     FormsModule,
     TooltipModule,
     ToggleSwitchModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   templateUrl: './departmental-users.component.html',
   styleUrls: ['./departmental-users.component.scss']
@@ -70,6 +71,7 @@ export class DepartmentalUsersComponent implements OnInit {
             email_id: user.email_id,
             mobile_no: user.mobile_no,
             user_name: user.user_name,
+            hierarchy_level: user.hierarchy_level,
             district_name: user.district_name,
             subdivision_name: user.subdivision_name,
             ulb_name: user.ulb_name,

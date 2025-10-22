@@ -1,34 +1,56 @@
-<div style="margin-left: 113px !important;" class="renewal-container">
+<div class="renewal-container">
   <div class="dialog-header">
-    <h4>
-      <b>{{ data.mode === 'add' ? 'Add Renewal Fee Rule' : 'Edit Renewal Fee Rule' }}</b>
-    </h4>
+    <h4><b>{{ data.mode === 'add' ? 'Add Renewal Fee Rule' : 'Edit Renewal Fee Rule' }}</b></h4>
     <button mat-icon-button (click)="close()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
   <form [formGroup]="feeRuleForm" (ngSubmit)="saveFeeRule()">
-
-    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 20px !important;"
-      class="form-row">
+    <div class="form-row">
       <mat-form-field appearance="outline">
-        <mat-label>Renewal Cycle</mat-label>
-        <mat-select formControlName="renewal_cycle_id">
-          <mat-option *ngFor="let c of renewalCycles" [value]="c.id">
-            {{ c.renewal_title }}
+        <mat-label>Is Multi Conditional</mat-label>
+        <mat-select formControlName="multi_condition">
+          <mat-option value="no">No</mat-option>
+          <mat-option value="yes">Yes</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes'">
+        <mat-label>Pre-Set Condition Question</mat-label>
+        <mat-select formControlName="condition_label_question_id">
+          <mat-option *ngFor="let q of serviceQuestions" [value]="q.id">
+            {{ q.question_label || q.title || q.label || q.id }}
           </mat-option>
-          <mat-option *ngIf="!renewalCycles.length" [value]="null" disabled>
-            No more renewal cycles found. Please add a renewal cycle first.
+          <mat-option *ngIf="!data.service?.questions?.length" [value]="null" disabled>
+            No more questions found. Please add a question first.
           </mat-option>
         </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes'">
+        <mat-label>Pre Condition Operator</mat-label>
+        <mat-select formControlName="pre_condition_operator">
+          <mat-option value="<">&lt;</mat-option>
+          <mat-option value="<=">&lt;=</mat-option>
+          <mat-option value=">">&gt;</mat-option>
+          <mat-option value=">=">&gt;=</mat-option>
+          <mat-option value="=">=</mat-option>
+          <mat-option value="!=">!=</mat-option>
+          <mat-option value="between">Between</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes'">
+        <mat-label>Pre Condition Value</mat-label>
+        <input matInput formControlName="pre_condition_value" placeholder="e.g. 10" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Fee Type</mat-label>
         <mat-select formControlName="fee_type">
           <mat-option value="calculated">Calculated</mat-option>
-          <mat-option value="hardcoded">HardCoded</mat-option>
+          <mat-option value="hardcoded">Hardcoded</mat-option>
           <mat-option value="estimated">Estimated</mat-option>
         </mat-select>
       </mat-form-field>
@@ -45,9 +67,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-
-    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 20px !important;"
-      class="form-row">
+    <div class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Operator</mat-label>
         <mat-select formControlName="condition_operator">
@@ -55,7 +75,7 @@
           <mat-option value="<=">&lt;=</mat-option>
           <mat-option value=">">&gt;</mat-option>
           <mat-option value=">=">&gt;=</mat-option>
-          <mat-option value="between">between</mat-option>
+          <mat-option value="between">Between</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -69,14 +89,12 @@
         <input matInput formControlName="condition_value_end" />
       </mat-form-field>
 
+    </div>
+    <div class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Fixed Fee</mat-label>
         <input matInput type="number" formControlName="fixed_fee" />
       </mat-form-field>
-    </div>
-
-    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 20px !important;"
-      class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Fixed Calculated Fee</mat-label>
         <input matInput type="number" formControlName="fixed_calculated_fee" />
@@ -85,6 +103,18 @@
       <mat-form-field appearance="outline">
         <mat-label>Per Unit Fee</mat-label>
         <input matInput type="number" formControlName="per_unit_fee" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Renewal Cycle</mat-label>
+        <mat-select formControlName="renewal_cycle_id">
+          <mat-option *ngFor="let c of renewalCycles" [value]="c.id">
+            {{ c.renewal_title }}
+          </mat-option>
+          <mat-option *ngIf="!renewalCycles.length" [value]="null" disabled>
+            No renewal cycles found.
+          </mat-option>
+        </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -100,14 +130,11 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 20px !important;"
-      class="form-actions">
+    <div class="form-actions">
       <button mat-raised-button color="warn" type="button" (click)="close()">Cancel</button>
-      <button mat-raised-button color="primary" class="submit-btn" type="submit"
-        [disabled]="isSubmitting">
+      <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="isSubmitting">
         {{ isSubmitting ? 'Saving...' : (data.mode === 'add' ? 'Save Renewal Fee Rule' : 'Update Renewal Fee Rule') }}
       </button>
     </div>
-
   </form>
 </div>
