@@ -249,14 +249,14 @@ export class ServiceApplicationComponent implements OnInit {
         .getByConditions(payload, 'api/get-default-source')
         .subscribe({
           next: (res: any) => {
-           debugger; 
+            
 
             if (
               res &&
               (res.hasOwnProperty('value') || res.hasOwnProperty(columnKey))
             ) {
               this.defaultValue = res.value || res[columnKey];
-              debugger;
+              
             } else if (res?.status === 1 && res.data && res.data.length > 0) {
               this.defaultValue = res.data[0].value || res.data[0][columnKey];
             }
