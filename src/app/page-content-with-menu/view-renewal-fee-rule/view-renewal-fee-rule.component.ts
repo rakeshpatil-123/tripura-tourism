@@ -64,11 +64,11 @@ loadFeeRules(): void {
   }
   updateRule(rule: any): void {
     const dialogRef = this.dialog.open(AddRenewalFeeRuleComponent, {
-      width: '75%',
-      maxWidth: '75vw',
-      height: 'auto',
-      maxHeight: '90vh',
-      panelClass: 'center-dialog',
+      width: '90vw',
+      maxWidth: '1000px',
+      height: '90vh',
+      maxHeight: '95vh',
+      panelClass: 'responsive-dialog',
       data: { service: rule, mode: 'edit' },
     });
 

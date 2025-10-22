@@ -56,8 +56,12 @@ export class AddRenewalFeeRuleComponent implements OnInit {
         service_id: svc.service_id ?? svc.id,
         renewal_cycle_id: svc.renewal_cycle_id ?? '',
         fee_type: svc.fee_type ?? 'calculated',
+        multi_condition: svc.multi_condition ?? null,
+        pre_condition_operator: svc.pre_condition_operator ?? null,
+        pre_condition_value: svc.pre_condition_value ?? null,
         fixed_fee: svc.fixed_fee && svc.fixed_fee !== 'null' ? svc.fixed_fee : null,
         question_id: svc.question_id ?? null,
+        condition_label_question_id: svc.condition_label_question_id ?? null,
         condition_operator: svc.condition_operator ?? '',
         condition_value_start: svc.condition_value_start && svc.condition_value_start !== 'null' && svc.condition_value_start !== 'Invalid Date' ? svc.condition_value_start : null,
         condition_value_end: svc.condition_value_end && svc.condition_value_end !== 'null' && svc.condition_value_end !== 'Invalid Date' ? svc.condition_value_end : null,
@@ -74,8 +78,12 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       service_id: [this.data.service?.id || ''],
       renewal_cycle_id: [''],
       fee_type: ['calculated'],
+      multi_condition: [null],
+      pre_condition_operator: [null],
+      pre_condition_value: [null],
       fixed_fee: [null],
       question_id: [null],
+      condition_label_question_id: [null],
       condition_operator: [''],
       condition_value_start: [null],
       condition_value_end: [null],
@@ -119,6 +127,7 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       service_id: String(form.service_id),
       renewal_cycle_id: String(form.renewal_cycle_id),
       fee_type: form.fee_type,
+      multi_condition: form.multi_condition,
       fixed_fee: form.fixed_fee ? String(form.fixed_fee) : null,
       question_id: form.question_id ? String(form.question_id) : null,
       condition_operator: form.condition_operator,
@@ -129,6 +138,11 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       priority: String(form.priority ?? 1),
       status: Number(form.status) === 1 ? 1 : 0,
     };
+    if (this.feeRuleForm.get('multi_condition')?.value === 'yes') {
+      ruleObj.condition_label_question_id = Number(this.feeRuleForm.get('condition_label_question_id')?.value);
+      ruleObj.pre_condition_operator = this.feeRuleForm.get('pre_condition_operator')?.value;
+      ruleObj.pre_condition_value = this.feeRuleForm.get('pre_condition_value')?.value;
+    }
 
     if (this.data.mode === 'edit' && this.data.service?.id) {
       ruleObj.id = String(this.data.service.id);

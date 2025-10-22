@@ -1,120 +1,171 @@
 .renewal-container {
-  max-width: 900px;
-  margin: 40px !important;
-  padding: 20px;
-}
-
-.renewal-container h4 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 12px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 12px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-mat-form-field {
-  width: 100%;
-}
-
-.submit-btn {
-  background: linear-gradient(90deg, #1766d1, #155bb3);
-  color: #fff;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.renewal-container {
-  overflow: visible;
-}
-
-::ng-deep .mat-mdc-dialog-surface {
-  overflow: visible !important;
-}
-
-.renewal-container {
-  width: 100%;
-  max-width: 900px;
-  padding: 20px;
+  width: 90vw;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2vh 2vw;
+  border-radius: 1vh;
+  box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
 
   .dialog-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 2vh;
 
     h4 {
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 1.1rem;
       margin: 0;
+    }
+
+    button {
+      color: #444;
+      transform: scale(0.95);
     }
   }
 
   form {
     display: flex;
     flex-direction: column;
+    gap: 2vh;
 
     .form-row {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5vh 1.5vw;
+      align-items: center;
 
       mat-form-field {
-        flex: 1 1 200px;
+        width: 100%;
+        --mdc-outlined-text-field-container-height: 52px;
+        font-size: 0.95rem;
+
+        ::ng-deep .mat-mdc-form-field-infix {
+          padding: 0.7em 0 0.5em 0 !important;
+        }
+
+        ::ng-deep .mat-mdc-floating-label {
+          font-size: 0.9rem !important;
+        }
+
+        ::ng-deep .mat-mdc-select-value-text,
+        ::ng-deep .mat-mdc-input-element {
+          font-size: 0.95rem !important;
+        }
+
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+          font-size: 0.8rem;
+        }
       }
     }
 
     .form-actions {
       display: flex;
-      justify-content: flex-end;
-      gap: 16px;
-      margin-top: 24px;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5vh;
+      flex-wrap: wrap;
+      margin-top: 1.5vh;
+
+      button {
+        min-width: 180px;
+        padding: 0.9vh 2vw;
+        font-size: 0.95rem;
+        border-radius: 0.8vh;
+      }
+    }
+  }
+}
+
+.submit-btn {
+  background: linear-gradient(90deg, #1766d1, #155bb3);
+  color: #fff !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #155bb3, #0e4aa1);
+  }
+}
+
+::ng-deep .mat-mdc-dialog-surface {
+  border-radius: 1vh !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+@media (max-width: 1024px) {
+  .renewal-container {
+    width: 95vw;
+    padding: 2vh;
+  }
+
+  mat-form-field {
+    --mdc-outlined-text-field-container-height: 48px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .renewal-container {
+    width: 96vw;
+    padding: 2vh 3vw;
+
+    .dialog-header h4 {
+      font-size: 1rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
     }
 
     mat-form-field {
+      --mdc-outlined-text-field-container-height: 46px;
+      font-size: 0.9rem;
+    }
+
+    .form-actions button {
       width: 100%;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .renewal-container {
+    width: 98vw;
+    padding: 1.5vh 3vw;
+
+    .dialog-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1vh;
+
+      h4 {
+        font-size: 0.95rem;
+      }
+    }
+
+    form {
+      gap: 1.5vh;
+    }
+
+    mat-form-field {
+      --mdc-outlined-text-field-container-height: 42px;
+      font-size: 0.85rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+        font-size: 0.9rem;
+      }
     }
   }
 }

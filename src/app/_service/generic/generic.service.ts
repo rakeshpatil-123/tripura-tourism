@@ -1625,4 +1625,14 @@ getThirdPartyRedirect(url: string): Observable<string> {
       }
     );
   }
+  getAllDepartmentalApplicationExportExcel(): any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/export-service-applications`,
+      {},
+      {
+        headers: this.getHeaders(),
+        responseType: 'blob'
+      }
+    );
+  }
 }

@@ -19,10 +19,13 @@ import {
   TableColumn,
 } from '../../shared/component/table/table.component';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { MatIconModule } from "@angular/material/icon";
 
 @Component({
   selector: 'app-departmental-services',
-  imports: [DynamicTableComponent],
+  imports: [DynamicTableComponent, MatIconModule],
   templateUrl: './all-department-applications.component.html',
   styleUrl: './all-department-applications.component.scss',
   standalone: true,
@@ -34,7 +37,7 @@ export class AllDepartmentApplicationsComponent implements OnInit {
   isLoading: boolean = false;
   serviceColumns: TableColumn[] = [];
 
-  constructor(private apiService: GenericService, private router: Router) {}
+  constructor(private apiService: GenericService, private router: Router, private loaderService : LoaderService) {}
 
   ngOnInit(): void {
     // Get deptId from localStorage when component initializes
@@ -207,5 +210,51 @@ export class AllDepartmentApplicationsComponent implements OnInit {
       .replace(/([a-z])([A-Z])/g, '$1 $2')
       .replace(/^\w/, (c) => c.toUpperCase())
       .trim();
+  }
+  exportAllApplicationExportExcel() {
+    Swal.fire({
+      title: 'Do you want to export applications data?',
+      text: 'An Excel file will be downloaded to your system.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Export',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      background: '#fff',
+      heightAuto: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loaderService.showLoader();
+
+        this.apiService.getAllDepartmentalApplicationExportExcel().subscribe({
+          next: (res: Blob) => {
+            this.loaderService.hideLoader();
+
+            if (res && res.size > 0) {
+              const blob = new Blob([res], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'applications_data_export.xlsx';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+
+              Swal.fire('Exported!', 'Your Excel file has been downloaded successfully.', 'success');
+            } else {
+              Swal.fire('No Data', 'No records available for export.', 'info');
+            }
+          },
+          error: (err: any) => {
+            this.loaderService.hideLoader();
+            Swal.fire('Error', 'Failed to export data. Please try again.', err);
+          },
+        });
+      }
+    });
   }
 }

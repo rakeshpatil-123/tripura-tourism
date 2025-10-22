@@ -120,11 +120,25 @@ export class RegistrationComponent implements OnInit {
   }
   ngOnChanges(changes: any): void {
     if (changes['editData'] && this.editData && this.editMode) {
-      setTimeout(() => this.prefillEditData(), 300);
+      if (this.sourcePage === 'departmental-users') {
+        if (!this.departments || this.departments.length === 0) {
+          this.getAllDepartmentList();
+          const interval = setInterval(() => {
+            if (this.departments.length > 0) {
+              clearInterval(interval);
+              this.prefillEditData();
+            }
+          }, 200);
+        } else {
+          this.prefillEditData();
+        }
+      } else {
+        this.prefillEditData();
+      }
     }
   }
-  prefillEditData(): void {
 
+  prefillEditData(): void {
     const data = this.editData;
     if (!data) return;
 
@@ -147,15 +161,69 @@ export class RegistrationComponent implements OnInit {
     };
 
     this.registrationForm.patchValue(prefill);
+    const districtExists = this.districts.some(d => d.id === prefill.district_id);
+    if (!districtExists && prefill.district_id) {
+      this.districts.push({
+        id: prefill.district_id,
+        name: data.district || `District ${prefill.district_id}`
+      });
+    }
     if (prefill.district_id) {
       this.loadSubdivisions(prefill.district_id);
+      const subInterval = setInterval(() => {
+        if (this.subdivisions.length > 0) {
+          clearInterval(subInterval);
+
+          const subExists = this.subdivisions.some(s => s.id === prefill.subdivision_id);
+          if (!subExists && prefill.subdivision_id) {
+            this.subdivisions.push({
+              id: prefill.subdivision_id,
+              name: data.subdivision || `Subdivision ${prefill.subdivision_id}`
+            });
+          }
+          this.registrationForm.patchValue({ subdivision_id: prefill.subdivision_id });
+          this.loadUlbs(prefill.subdivision_id);
+          const ulbInterval = setInterval(() => {
+            if (this.ulbs.length > 0) {
+              clearInterval(ulbInterval);
+
+              const ulbExists = this.ulbs.some(u => u.id === prefill.ulb_id);
+              if (!ulbExists && prefill.ulb_id) {
+                this.ulbs.push({
+                  id: prefill.ulb_id,
+                  name: data.ulb || `ULB ${prefill.ulb_id}`
+                });
+              }
+              this.registrationForm.patchValue({ ulb_id: prefill.ulb_id });
+              this.loadWards(prefill.ulb_id);
+              const wardInterval = setInterval(() => {
+                if (this.wards.length > 0) {
+                  clearInterval(wardInterval);
+
+                  const wardExists = this.wards.some(w => w.id === prefill.ward_id);
+                  if (!wardExists && prefill.ward_id) {
+                    this.wards.push({
+                      id: prefill.ward_id,
+                      name: data.ward || `Ward ${prefill.ward_id}`
+                    });
+                  }
+
+                  this.registrationForm.patchValue({ ward_id: prefill.ward_id });
+                }
+              }, 300);
+            }
+          }, 300);
+        }
+      }, 300);
     }
-    setTimeout(() => {
-      if (prefill.subdivision_id) this.loadUlbs(prefill.subdivision_id);
-    }, 300);
-    setTimeout(() => {
-      if (prefill.ulb_id) this.loadWards(prefill.ulb_id);
-    }, 600);
+    const departmentExists = this.departments.some(dep => String(dep.id) === String(prefill.department_id));
+    if (!departmentExists && prefill.department_id) {
+      this.departments.push({
+        id: prefill.department_id,
+        name: data.department_name || `Department ${prefill.department_id}`
+      });
+    }
+    setTimeout(() => this.registrationForm.patchValue(prefill), 1000);
   }
 
   setupCascadingDropdowns(): void {
@@ -383,7 +451,10 @@ export class RegistrationComponent implements OnInit {
    this.genericService.getByConditions({}, 'api/department-get-all-departments').subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
-          this.departments = res.data;
+          this.departments = res.data.map((d: any) => ({
+            id: String(d.id ?? d.department_id),
+            name: d.name ?? d.department_name ?? 'Unnamed Department'
+          }));
         } else {
           this.departments = [];
         }
