@@ -1,3 +1,4 @@
+<div class="dialog-wrapper" [@dialogAnimation] *ngIf="!isClosing">
 <h2 class="header-service">
   <mat-icon class="service-icon">work_outline</mat-icon>
   {{ this.data.service?.name || this.data.row.service.name }}
@@ -17,7 +18,10 @@
     <ng-container *ngFor="let step of steps.controls; let i = index" [formGroupName]="i">
       <mat-card class="step-card mat-elevation-z3 fade-in-up">
         <div class="step-header">
-          <h3><mat-icon>layers</mat-icon> Step {{ i + 1 }}</h3>
+          <h3><mat-icon>layers</mat-icon> Step {{ i + 1 }} <span *ngIf="mode === 'edit' && data?.row?.step_number">
+            (Currently Editing Step #{{ data.row.step_number }})
+          </span>
+          </h3>
           <button mat-icon-button color="warn" class="close-btn" (click)="removeStep(i)" *ngIf="steps.length > 1">
             <mat-icon>delete_forever</mat-icon>
           </button>
@@ -62,13 +66,12 @@
     </ng-container>
   </div>
   <mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-stroked-button color="accent" *ngIf="mode === 'add'" (click)="addStep()" class="add-step-btn">
+    <button mat-stroked-button color="accent" *ngIf="mode === 'add'" [disabled]="loading" (click)="addStep()" class="add-step-btn">
       <mat-icon>add_circle</mat-icon>
       Add Step
     </button>
-    <button mat-flat-button color="accent" class="submit-btn" (click)="submit()">
-      <!-- {{ mode === 'add' ? 'Save Flow' : 'Update Flow' }}
-      <mat-progress-spinner *ngIf="loading" diameter="20" mode="indeterminate"></mat-progress-spinner> -->
+    <button mat-flat-button color="accent" class="submit-btn" [disabled]="loading" (click)="submit()">
+      {{ mode === 'add' ? 'Save Flow' : 'Update Flow' }}
     </button>
   </mat-dialog-actions>
 </div>

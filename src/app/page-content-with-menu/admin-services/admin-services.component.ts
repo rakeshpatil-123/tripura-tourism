@@ -422,11 +422,11 @@ deleteService(service: Service): void {
   }
   addOrEditApprovalFlow(service: Service, mode: 'add' | 'edit'): void {
     const dialogRef = this.dialog.open(AddApprovalFlowComponent, {
-      width: '85%',
-      maxWidth: '1000px',
+      width: '85vw',
+      maxWidth: '700px',
       height: 'auto',
-      maxHeight: '90vh',
-      panelClass: 'approval-flow-dialog',
+      maxHeight: '85vh',
+      panelClass: ['approval-flow-dialog','dialog-slide-in'],
       data: { service, mode },
       autoFocus: false,
       disableClose: true
@@ -440,11 +440,11 @@ deleteService(service: Service): void {
   }
   viewApprovalFlow(service: Service): void {
     this.dialog.open(ViewApprovalFlowDialogComponent, {
-      width: '80vw',
-      maxWidth: '900px',
-      height: '80vh',
-      maxHeight: '700px',
-      panelClass: 'full-screen-dialog',
+      width: '90vw',
+      maxWidth: '1000px',
+      height: '85vh',
+      maxHeight: '800px',
+      panelClass: 'custom-approval-dialog',
       data: { service },
     });
   }

@@ -489,8 +489,8 @@ getThirdPartyRedirect(url: string): Observable<string> {
 
   removeSessionData(): void {
     localStorage.clear();
+    sessionStorage.clear();
     this.setLoginStatus(false);
-    window.location.href = '/';
   }
 
   removeSessionAndReturn(error: any): boolean {
@@ -502,13 +502,88 @@ getThirdPartyRedirect(url: string): Observable<string> {
 
   logoutUser(): void {
     this.getByConditions({}, 'api/user/logout').subscribe({
-      next: () => this.removeSessionData(),
+      next: (res: any) => {
+        Swal.fire({
+          title: 'Logging Out...',
+          html: `<strong>${res.message || 'You have been successfully logged out.'}</strong>`,
+          timer: 2500,
+          timerProgressBar: true,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+          },
+          background: '#f0f4f8',
+          color: '#1e293b',
+          iconColor: '#10b981',
+          icon: 'success'
+        }).then(() => {
+          this.removeSessionData();
+          this.router.navigate(['/']);
+        });
+      },
       error: (error) => {
         console.error(error);
-        // if (error.status === 403) {
-        this.removeSessionData();
-        // }
+        Swal.fire({
+          title: 'Logging Out...',
+          html: `<strong>Something went wrong. Logging you out automatically.</strong>`,
+          timer: 3000,
+          timerProgressBar: true,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+          },
+          background: '#fff7ed',
+          color: '#b45309',
+          iconColor: '#f59e0b',
+          icon: 'warning'
+        }).then(() => {
+          this.removeSessionData();
+          this.router.navigate(['/']);
+        });
+      }
+    });
+  }
+
+  autoLogout(): void {
+    localStorage.clear();
+    sessionStorage.clear();
+    this.setLoginStatus(false);
+    Swal.fire({
+      title: 'Session Expired!',
+      html: `<strong>Your session has expired due to inactivity.<br>Please login again to continue.</strong>`,
+      icon: 'warning',
+      iconColor: '#f59e0b',
+      background: '#fff7ed',
+      color: '#b45309',
+      timer: 3500,
+      timerProgressBar: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
       },
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp animate__faster'
+      }
+    }).then(() => {
+      this.router.navigate(['/page/login']);
     });
   }
 

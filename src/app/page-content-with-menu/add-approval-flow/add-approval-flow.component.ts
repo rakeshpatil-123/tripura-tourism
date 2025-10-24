@@ -9,11 +9,24 @@ import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { LoaderService } from '../../_service/loader/loader.service';
-
+import { finalize } from 'rxjs';
+import Swal from 'sweetalert2'; 
+import { animate, style, transition, trigger } from '@angular/animations';
 @Component({
   selector: 'app-add-approval-flow',
   templateUrl: './add-approval-flow.component.html',
   styleUrls: ['./add-approval-flow.component.scss'],
+  animations: [
+    trigger('dialogAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-30px) scale(0.95)' }),
+        animate('350ms ease-out', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(30px) scale(0.9)' }))
+      ])
+    ])
+  ],
   standalone: true,
   imports: [MatInputModule, MatIconModule, MatCardModule, ReactiveFormsModule, MatSelectModule, CommonModule, MatDialogModule, MatProgressSpinnerModule],
 })
@@ -23,6 +36,7 @@ export class AddApprovalFlowComponent implements OnInit {
   hierarchyLevels = ['block', 'subdivision1', 'subdivision2', 'subdivision3', 'district1', 'district2', 'district3', 'state1', 'state2', 'state3'];
   mode!: 'add' | 'edit';
   departments: { id: number; name: string }[] = [];
+  isClosing = false;
   loading = false;
   constructor(
     private fb: FormBuilder,
@@ -78,6 +92,7 @@ export class AddApprovalFlowComponent implements OnInit {
       return;
     }
     this.loading = true;
+    this.loaderService.showLoader();
     const payload = {
       flows: this.steps.value.map((step: any) => ({
         service_id: Number(this.approvalFlowForm.value.service_id),
@@ -89,13 +104,13 @@ export class AddApprovalFlowComponent implements OnInit {
     };
 
     if (this.mode === 'add') {
-      this.genericService.addApprovalFlow(payload).subscribe({
+      this.genericService.addApprovalFlow(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
         next: (res: any) => this.handleResponse(res, 'Approval flow added successfully!'),
         error: (err) => this.handleError(err)
       });
     } else if (this.mode === 'edit') {
       payload.flows[0].id = this.data.row.id;
-      this.genericService.updateApprovalFlow(payload).subscribe({
+      this.genericService.updateApprovalFlow(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
         next: (res: any) => this.handleResponse(res, 'Approval flow updated successfully!'),
         error: (err) => this.handleError(err)
       });
@@ -103,12 +118,26 @@ export class AddApprovalFlowComponent implements OnInit {
   }
 
   private handleResponse(res: any, successMessage: string) {
+    this.loading = false;
     if (res.status === 1) {
-      this.genericService.openSnackBar(res.message || successMessage, 'Close');
+      this.dialogRef.close(true);
+      if (this.mode === 'add') {
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Approval Flow Added!',
+            text: res.message || successMessage,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3f51b5',
+            timer: 2500,
+            timerProgressBar: true,
+          });
+        }, 200);
+      }
       this.approvalFlowForm.reset();
       this.steps.clear();
       this.addStep();
-      this.dialogRef.close(true);
     } else {
       this.genericService.openSnackBar(res.message || 'Operation failed', 'Close');
     }
@@ -126,11 +155,17 @@ export class AddApprovalFlowComponent implements OnInit {
         .join('\n');
       message = errorMessages || message;
     }
-    this.genericService.openSnackBar(message, 'Close');
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: message,
+      confirmButtonColor: '#d33',
+    });
   }
 
   loadDepartments(): void {
-    this.genericService.getAllDepartmentNames().subscribe({
+    this.loaderService.showLoader();
+    this.genericService.getAllDepartmentNames().pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status) {
           this.departments = res.data;
@@ -142,6 +177,7 @@ export class AddApprovalFlowComponent implements OnInit {
     });
   }
   closeDialog(): void {
-    this.dialogRef.close();
+    this.isClosing = true;
+    setTimeout(() => this.dialogRef.close(), 300);
   }
 }

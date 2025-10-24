@@ -4,8 +4,7 @@
     <button class="close-btn" (click)="closeDialog()">✕</button>
   </div>
   <div *ngIf="data.mode !== 'view'" class="editor-section">
-    <label class="editor-label">Certificate Template</label>
-    <p-editor [(ngModel)]="formTemplate" [modules]="editorModules" [readonly]="false" class="custom-editor">
+  <label class="editor-label">{{ data.mode === 'edit' ? 'Update Certificate Template' : 'Add Certificate Template' }}</label> <p-editor [(ngModel)]="formTemplate" [modules]="editorModules" [readonly]="false" class="custom-editor">
     </p-editor>
   </div>
   <div *ngIf="data.mode === 'view'" class="preview-section">

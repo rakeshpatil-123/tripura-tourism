@@ -5,6 +5,8 @@ import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/
 import { GenericService } from '../../../_service/generic/generic.service';
 import { Router } from '@angular/router';
 import { MatIconModule } from "@angular/material/icon";
+import { LoaderService } from '../../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -32,6 +34,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private genericService: GenericService,
+    private loaderService : LoaderService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -70,8 +73,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.loginForm.valid) {
       const payload = this.loginForm.value;
-
-      this.genericService.loginUser(payload).subscribe({
+      this.loaderService.showLoader();
+      this.genericService.loginUser(payload).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
         next: (response) => {
           if (response?.token) {
             localStorage.setItem('token', response.token);
@@ -100,11 +103,15 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           this.captchaValid = false;
           this.generateCaptcha();
         },
-        error: () => {
+        error: (err) => {
           this.genericService.openSnackBar(
             'Login failed. Please check your credentials.',
             'Error'
           );
+          if (err.status === 401 || err.status === 400) {
+            this.loginForm.get('user_name')?.setErrors({ invalid: true });
+            this.loginForm.get('password')?.setErrors({ invalid: true });
+          }
         },
       });
     } else {
@@ -183,6 +190,16 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   checkCaptcha(): void {
     const input = this.loginForm.get('captchaInput')?.value || '';
-    this.captchaValid = input.toLowerCase() === this.captchaCode.toLowerCase();
+    if (input.length === this.length) {
+      if (input === this.captchaCode) {
+        this.captchaValid = true;
+        this.loginForm.get('captchaInput')?.setErrors(null);
+      } else {
+        this.captchaValid = false;
+        this.loginForm.get('captchaInput')?.setErrors({ invalidCaptcha: true });
+      }
+    } else {
+      this.loginForm.get('captchaInput')?.setErrors(null);
+    }
   }
 }
