@@ -42,7 +42,7 @@ export class IncentiveQuestionsComponent implements OnInit {
   private genericService = inject(GenericService);
   private loaderService = inject(LoaderService);
   private fb = inject(FormBuilder);
-
+  readonlyFieldError: string | null = null;
   schemeId!: string;
   proformaId!: string;
   schemeTitle: string = '';
@@ -501,5 +501,19 @@ export class IncentiveQuestionsComponent implements OnInit {
     const pdfUrl = URL.createObjectURL(blob);
     window.open(pdfUrl, '_blank');
     setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
+  }
+  onReadonlyFieldFocus(field: string) {
+    if (field === 'claim_percentage' && this.questionForm.get('claim_per_unit')?.value) {
+      this.readonlyFieldError = 'claim_percentage';
+    } else if (field === 'claim_per_unit' && this.questionForm.get('claim_percentage')?.value) {
+      this.readonlyFieldError = 'claim_per_unit';
+    } else {
+      this.readonlyFieldError = null;
+    }
+    if (this.readonlyFieldError) {
+      setTimeout(() => {
+        this.readonlyFieldError = null;
+      }, 3000);
+    }
   }
 }

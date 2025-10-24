@@ -1,0 +1,44 @@
+<div class="page-header"><h1 class="page-head">Incentive Applications</h1></div>
+
+<app-dynamic-table [data]="applications" [columns]="incentiveApplications" [pageSize]="10" [showPagination]="true" [searchable]="true"></app-dynamic-table>
+<div *ngIf="statusModal.visible" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">{{ statusModal.title }}</h3>
+    <form [formGroup]="remarkForm" (ngSubmit)="onSubmitStatus()">
+      <div class="form-group extra-payment" *ngIf="statusModal.action === 'raise_extra_payment'">
+        <app-ilogi-input formControlName="extraAmount" fieldLabel="Extra Payment Amount" [mandatory]="true"
+          placeholder="Enter extra payment amount" inputType="number">
+        </app-ilogi-input>
+        <small class="text-danger"
+          *ngIf="remarkForm.get('extraAmount')?.invalid && remarkForm.get('extraAmount')?.touched">
+          Extra Payment Amount is required.
+        </small>
+      </div>
+      <div class="form-group">
+        <app-ilogi-input formControlName="remarks" label="Remarks" [mandatory]="true"
+          placeholder="Enter remarks (min 5 characters)">
+        </app-ilogi-input>
+        <small class="text-danger" *ngIf="remarkForm.get('remarks')?.invalid && remarkForm.get('remarks')?.touched">
+          Remarks are required and must be at least 5 characters.
+        </small>
+      </div>
+      <div class="form-group">
+        <app-ilogi-file-upload formControlName="attachment" [mandatory]="false" placeholder="Upload supporting document"
+          accept=".png,.jpg,.jpeg,.pdf">
+        </app-ilogi-file-upload>
+      </div>
+      <div class="modal-actions">
+        <button *ngIf="isCertificatePreview && statusModal.action === 'approved'" type="button" mat-raised-button
+          (click)="previewCertificate()" class="btn preview-btn">
+          Preview Certificate
+        </button>
+        <button type="button" (click)="closeModal()" class="btn cancel-btn">
+          Cancel
+        </button>
+        <button type="submit" [disabled]="remarkForm.invalid" class="btn confirm-btn">
+          Confirm
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

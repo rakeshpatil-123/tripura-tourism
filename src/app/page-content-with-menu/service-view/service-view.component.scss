@@ -212,3 +212,15 @@
     background-color: #157347;
   }
 }
+.mb-10 {
+  margin-right: 80px;
+}
+
+.mat-mdc-raised-button:not(:disabled) {
+  color: #1e3a8a !important;
+  background-color: white !important;
+}
+
+.mat-mdc-raised-button:not(:disabled) :hover {
+  background-color: rgb(172, 166, 166) !important;
+}

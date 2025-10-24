@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { PageContentWithMenuComponent } from './page-content-with-menu.component';
 import { authGuard } from '../guards/guards/auth.guard';
 import { ProformaListComponent } from './proforma-list/proforma-list.component';
+import { IncentiveApplicationsComponent } from './incentive-applications/incentive-applications.component';
 
 export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
   {
@@ -255,6 +256,13 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           ),
         canActivate: [authGuard],
         data: { roles: ['admin', 'department'] }
+      },
+      {
+        path: 'incentive-applications',
+        loadComponent: () =>
+          import('./incentive-applications/incentive-applications.component').then((m) => m.IncentiveApplicationsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department'] }
       },
       {
         path: 'business-user',

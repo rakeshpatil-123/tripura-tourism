@@ -100,6 +100,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       roles: ['admin', 'department'],
     },
     {
+      id: 'Incentive Applications',
+      title: 'Incentive Applications',
+      icon: 'military_tech',
+      route: '/dashboard/incentive-applications',
+      roles: ['department'],
+    },
+    {
       id: 'BusinessUser',
       title: 'Business User',
       icon: 'supervisor_account',
