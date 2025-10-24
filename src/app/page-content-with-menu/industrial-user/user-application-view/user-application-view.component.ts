@@ -5,6 +5,18 @@ import { GenericService } from '../../../_service/generic/generic.service';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 
+
+interface HistoryData {
+  id: number;
+  step_number: number;
+  status: string;
+  remarks: string | null;
+  status_file: string | null; 
+  action_taken_at: string;
+  action_taken_by: number;
+}
+
+
 interface ApplicationDetail {
   application_date: string;
   status: string;
@@ -29,6 +41,8 @@ interface ApplicationDetail {
   payment_time?: string | null;
   GRN_number?: string | null;
   NOC_penalty_amount?: string | null;
+  history_data?: HistoryData | null;
+
 }
 
 @Component({
@@ -44,6 +58,7 @@ export class UserApplicationViewComponent implements OnInit {
   application: ApplicationDetail | null = null;
   isLoading: boolean = false;
   error: string | null = null;
+  
 
   fieldLabelMap: Record<string, string> = {
     '17': 'Applicant Name',
@@ -63,6 +78,7 @@ export class UserApplicationViewComponent implements OnInit {
   ngOnInit(): void {
     this.loadRouteParams();
   }
+  
 
   loadRouteParams(): void {
     const serviceIdParam = this.route.snapshot.paramMap.get('serviceId');
@@ -78,54 +94,7 @@ export class UserApplicationViewComponent implements OnInit {
     }
   }
 
-  // fetchApplicationDetails(): void {
-  //   this.isLoading = true;
-  //   this.error = null;
-
-  //   const payload = {
-  //     service_id: this.serviceId,
-  //     application_id: this.appId,
-  //   };
-
-  //   this.apiService
-  //     .getByConditions(
-  //       payload,
-  //       'api/user/get-details-user-service-applications'
-  //     )
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         this.isLoading = false;
-  //         if (
-  //           res?.status === 1 &&
-  //           Array.isArray(res.data) &&
-  //           res.data.length > 0
-  //         ) {
-  //           const appData = res.data[0];
-
-  //           this.application = {
-  //             ...appData,
-  //             application_data_structured: Array.isArray(res.application_data)
-  //               ? res.application_data.map((item: any) => ({
-  //                   id: item.id,
-  //                   question: item.question,
-  //                   answer: item.answer || '—',
-  //                 }))
-  //               : [],
-  //             extra_payment: appData.extra_payment || '0',
-  //             total_fee: appData.total_fee || '0',
-  //           };
-  //         } else {
-  //           this.error = res?.message || 'No application details found.';
-  //         }
-  //       },
-  //       error: (err) => {
-  //         this.isLoading = false;
-  //         this.error = 'Failed to load application. Please try again later.';
-  //         console.error('API Error:', err);
-  //       },
-  //     });
-  // }
-
+ 
   fetchApplicationDetails(): void {
   this.isLoading = true;
   this.error = null;
@@ -162,6 +131,7 @@ export class UserApplicationViewComponent implements OnInit {
               : [],
             extra_payment: appData.extra_payment || '0',
             total_fee: appData.total_fee || '0',
+             history_data: res.history_data || null,
           };
         } else {
           this.error = res?.message || 'No application details found.';
@@ -173,6 +143,22 @@ export class UserApplicationViewComponent implements OnInit {
         console.error('API Error:', err);
       },
     });
+}
+
+getFileNameFromUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  try {
+    const urlWithoutParams = url.split('?')[0];
+    return decodeURIComponent(urlWithoutParams.substring(urlWithoutParams.lastIndexOf('/') + 1)) || 'document.pdf';
+  } catch {
+    return 'document.pdf';
+  }
+}
+
+previewFile(url: string): void {
+  if (url) {
+    window.open(url, '_blank');
+  }
 }
 
   getLabel(key: string): string {
@@ -235,24 +221,18 @@ export class UserApplicationViewComponent implements OnInit {
   formatAnswerForDisplay(answer: any): string {
   if (!answer) return '—';
 
-  // Case 1: It's a string (likely a file URL)
   if (typeof answer === 'string') {
-    // Check if it looks like a URL (has http or .pdf, etc.)
     if (answer.startsWith('http') || answer.includes('uploads/')) {
-      // Extract filename from URL or path
-      const url = new URL(answer, 'http://dummy.base'); // dummy base to avoid error if relative
+      const url = new URL(answer, 'http://dummy.base'); 
       return url.pathname.split('/').pop() || answer;
     }
     return answer;
   }
 
-  // Case 2: It's an array (like TestSection)
   if (Array.isArray(answer)) {
-    // Flatten array of objects into comma-separated values
     const flatValues: string[] = [];
     for (const item of answer) {
       if (typeof item === 'object' && item !== null) {
-        // Push all values (ignore keys like "616", "617")
         flatValues.push(...Object.values(item).map(v => String(v)));
       } else {
         flatValues.push(String(item));
@@ -261,12 +241,10 @@ export class UserApplicationViewComponent implements OnInit {
     return flatValues.join(', ');
   }
 
-  // Case 3: It's a plain object (unlikely based on your data, but safe)
   if (typeof answer === 'object') {
     return Object.values(answer).join(', ');
   }
 
-  // Fallback
   return String(answer);
 }
 }

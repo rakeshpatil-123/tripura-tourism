@@ -1,9 +1,9 @@
 <div class="ilogi-file-upload" [class.disabled]="disabled">
 
   <!-- Display Mode -->
-<div *ngIf="selectedFileName; else uploadMode" class="file-display">
-  <span class="filename" [title]="selectedFileName">
-    {{ selectedFileName }}
+<div *ngIf="selectedFile; else uploadMode" class="file-display">
+  <span class="filename" [title]="selectedFile.name">
+    {{ selectedFile.name }}
   </span>
 
   <button
@@ -28,6 +28,7 @@
     ✕
   </button>
 </div>
+
 
 
   <!-- Upload Mode -->
