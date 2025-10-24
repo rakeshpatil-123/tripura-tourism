@@ -56,9 +56,9 @@
         <span [ngClass]="getStatusBadgeClass(application?.status || '')">
           {{ (application?.status || '—') | titlecase }}
         </span>
-        <div class="remarks" *ngIf="application?.remarks">
+        <!-- <div class="remarks" *ngIf="application?.remarks">
           <strong>Remarks:</strong> {{ application?.remarks || '—' }}
-        </div>
+        </div> -->
       </div>
     </section>
 
@@ -136,5 +136,40 @@
         </div>
       </div>
     </section>
+
+<section class="section" *ngIf="application?.history_data?.status_file">
+  <h2>Remarks</h2>
+  <div class="grid">
+    <div class="field">
+      <label>Status Document</label>
+      <div class="file-display">
+        <span>{{ getFileNameFromUrl(application?.history_data?.status_file) }}</span>
+        <button 
+          type="button" 
+          class="btn-view btn-success btn-sm" 
+          (click)="previewFile(application?.history_data?.status_file!)">
+          View
+        </button>
+      </div>
+    </div>
+
+    <div class="field" *ngIf="application?.history_data?.remarks">
+      <label>Remarks</label>
+      <span>{{ application?.history_data?.remarks }}</span>
+    </div>
+
+    <div class="field">
+      <label>Action Taken At</label>
+      <span>{{ formatDate(application?.history_data?.action_taken_at) }}</span>
+    </div>
+
+    <div class="field">
+      <label>Status</label>
+      <span [ngClass]="getStatusBadgeClass(application?.history_data?.status || '')">
+        {{ (application?.history_data?.status || '') | titlecase }}
+      </span>
+    </div>
+  </div>
+</section>
   </div>
 </div>

@@ -27,7 +27,7 @@ export class EligibilityComponent implements OnInit {
   schemes: SelectOption[] = [];
   selectedSchemeId: number | null = null;
   applications: any[] = [];
-  columns: any[] = []; // Keep as `any[]` to match your table structure
+  columns: any[] = []; 
 
   constructor(private appiService: GenericService, private router: Router) {}
 
@@ -46,7 +46,7 @@ export class EligibilityComponent implements OnInit {
               id: item.id,
               name: item.title,
             }));
-
+            
             if (this.schemes.length > 0) {
               this.selectedSchemeId = this.schemes[0].id;
               if (this.selectedSchemeId !== null) {

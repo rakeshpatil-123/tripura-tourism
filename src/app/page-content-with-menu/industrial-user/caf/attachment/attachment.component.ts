@@ -19,14 +19,14 @@ import { MatIcon } from '@angular/material/icon';
     IlogiRadioComponent,
     IlogiFileUploadComponent,
     IlogiInputDateComponent,
-    MatIcon
+    MatIcon,
   ],
   templateUrl: './attachment.component.html',
   styleUrls: ['./attachment.component.scss'],
 })
 export class AttachmentComponent implements OnInit {
+  // Keep these for [fileUrl] binding in template
   selfCertificationUrl: string | null = null;
-  existingFileUrls: { [key: string]: string } = {};
   selfCertificateFormat3AUrl: string | null = null;
   treeRegistrationCertificateUrl: string | null = null;
   ownerPanPdfUrl: string | null = null;
@@ -40,6 +40,7 @@ export class AttachmentComponent implements OnInit {
   detailProjectReportUrl: string | null = null;
   propertyTaxClearanceCertificateUrl: string | null = null;
   additionalDocUrl: string | null = null;
+
   @Input() submitted = false;
 
   form: FormGroup;
@@ -55,10 +56,12 @@ export class AttachmentComponent implements OnInit {
     { value: 'YES', name: 'Yes' },
     { value: 'NO', name: 'No' },
   ];
+
   additionalDoc = {
     name: 'Additional Document',
     file: null as File | null,
   };
+
   constructor(
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
@@ -121,120 +124,106 @@ export class AttachmentComponent implements OnInit {
                   : null,
             });
 
-            const fieldMappings: {
-              controlName: string;
-              urlKey: keyof typeof data;
-              urlProp: keyof AttachmentComponent;
-            }[] = [
+            const fieldMappings = [
               {
                 controlName: 'selfCertification',
                 urlKey: 'general_self_certification_form',
-                urlProp: 'selfCertificationUrl',
               },
               {
                 controlName: 'self_certificate_format_3A',
                 urlKey: 'self_certificate_format_3A',
-                urlProp: 'selfCertificateFormat3AUrl',
               },
               {
                 controlName: 'tree_registration_certificate',
                 urlKey: 'tree_registration_certificate',
-                urlProp: 'treeRegistrationCertificateUrl',
               },
-              {
-                controlName: 'owner_pan_pdf',
-                urlKey: 'owner_pan_pdf',
-                urlProp: 'ownerPanPdfUrl',
-              },
-              {
-                controlName: 'owner_aadhar_pdf',
-                urlKey: 'owner_aadhar_pdf',
-                urlProp: 'ownerAadharPdfUrl',
-              },
-              {
-                controlName: 'udyog_aadhar',
-                urlKey: 'udyog_aadhar',
-                urlProp: 'udyogAadharUrl',
-              },
+              { controlName: 'owner_pan_pdf', urlKey: 'owner_pan_pdf' },
+              { controlName: 'owner_aadhar_pdf', urlKey: 'owner_aadhar_pdf' },
+              { controlName: 'udyog_aadhar', urlKey: 'udyog_aadhar' },
               {
                 controlName: 'gst_certificate_pdf',
                 urlKey: 'gst_certificate_pdf',
-                urlProp: 'gstCertificatePdfUrl',
               },
               {
                 controlName: 'combinedBuilding',
                 urlKey: 'combined_plan_document',
-                urlProp: 'combinedBuildingUrl',
               },
               {
                 controlName: 'landRegistrationDeed',
                 urlKey: 'unit_land_details_pdf',
-                urlProp: 'landRegistrationDeedUrl',
               },
               {
                 controlName: 'partnershipDetails',
                 urlKey: 'unit_registaration_details_pdf',
-                urlProp: 'partnershipDetailsUrl',
               },
               {
                 controlName: 'processFlowChart',
                 urlKey: 'unit_process_flow_chart_diagram_or_write_up_pdf',
-                urlProp: 'processFlowChartUrl',
               },
               {
                 controlName: 'detailProjectReport',
                 urlKey: 'detailed_project_report_pdf',
-                urlProp: 'detailProjectReportUrl',
               },
               {
                 controlName: 'propertyTaxClearanceCertificate',
                 urlKey: 'unit_property_tax_clearance_certificate_pdf',
-                urlProp: 'propertyTaxClearanceCertificateUrl',
               },
             ];
 
-            fieldMappings.forEach(({ controlName, urlKey, urlProp }) => {
+            const urlPropertyMap = {
+              selfCertification: 'selfCertificationUrl',
+              self_certificate_format_3A: 'selfCertificateFormat3AUrl',
+              tree_registration_certificate: 'treeRegistrationCertificateUrl',
+              owner_pan_pdf: 'ownerPanPdfUrl',
+              owner_aadhar_pdf: 'ownerAadharPdfUrl',
+              udyog_aadhar: 'udyogAadharUrl',
+              gst_certificate_pdf: 'gstCertificatePdfUrl',
+              combinedBuilding: 'combinedBuildingUrl',
+              landRegistrationDeed: 'landRegistrationDeedUrl',
+              partnershipDetails: 'partnershipDetailsUrl',
+              processFlowChart: 'processFlowChartUrl',
+              detailProjectReport: 'detailProjectReportUrl',
+              propertyTaxClearanceCertificate:
+                'propertyTaxClearanceCertificateUrl',
+            } as const;
+
+            fieldMappings.forEach(({ controlName, urlKey }) => {
               const url = data[urlKey];
               if (url) {
-                (this[urlProp] as string) = url;
-                 this.existingFileUrls[controlName] = url;
-
-                const fileName = decodeURIComponent(
-                  url.split('/').pop() || 'file.pdf'
-                );
-                const file = new File([], fileName, {
-                  type: 'application/pdf',
-                });
-                this.form.get(controlName)?.setValue(file);
+                const urlProp =
+                  urlPropertyMap[controlName as keyof typeof urlPropertyMap];
+                if (urlProp) {
+                  this[urlProp] = url;
+                  const fileName = decodeURIComponent(
+                    url.split('/').pop() || 'file.pdf'
+                  );
+                  const fakeFile = new File([], fileName, {
+                    type: 'application/pdf',
+                  });
+                  (fakeFile as any)._isFake = true; 
+                  this.form.get(controlName)?.setValue(fakeFile);
+                }
               }
             });
 
-            if (data.other_supporting_docuement1_pdf) {
-              const url = data.other_supporting_docuement1_pdf;
-              this.additionalDocUrl = url; 
-
-              const fileName = decodeURIComponent(
-                url.split('/').pop() || 'additional-document.pdf'
-              );
-              const placeholderFile = new File([], fileName, {
-                type: 'application/pdf',
-              });
-
-              this.additionalDoc.file = placeholderFile;
-
-              fetch(url)
-                .then((res) => res.blob())
-                .then((blob) => {
-                  const file = new File([blob], fileName, { type: blob.type });
-                  this.additionalDoc.file = file;
-                  this.cdr.markForCheck();
-                })
-                .catch(() => this.cdr.markForCheck());
-            }
+          if (data.other_supporting_docuement1_pdf) {
+  const url = data.other_supporting_docuement1_pdf;
+  this.additionalDocUrl = url;
+  const fileName = decodeURIComponent(url.split('/').pop() || 'additional-document.pdf');
+  const fakeFile = new File([], fileName, { type: 'application/pdf' });
+  (fakeFile as any)._isFake = true;
+  this.additionalDoc.file = fakeFile;
+  this.form.get('otherSupportingDoc')?.setValue(fakeFile);
+}
           }
         },
         error: () => {},
       });
+  }
+
+  onFileSelected(fieldName: string, file: File): void {
+    this.form.get(fieldName)?.setValue(file);
+    this.cdr.markForCheck();
   }
 
   removeFile(fieldName: string): void {
@@ -251,10 +240,9 @@ export class AttachmentComponent implements OnInit {
     const flag = deletableFields[fieldName];
     if (flag) {
       this.filesToDelete.add(flag);
-      // console.log('Marked for deletion:', flag); 
     }
 
-    this.form.get(fieldName)?.reset();
+    this.form.get(fieldName)?.setValue(null);
     this.cdr.markForCheck();
   }
 
@@ -270,69 +258,65 @@ export class AttachmentComponent implements OnInit {
     formData.append('do_you_have_trees_in_the_land_for_industry', raw.haveTree);
     formData.append('type_of_tree', raw.typeOfTree || '');
 
-    if (raw.selfCertification)
-      formData.append('general_self_certification_form', raw.selfCertification);
-    if (raw.self_certificate_format_3A)
-      formData.append(
-        'self_certificate_format_3A',
-        raw.self_certificate_format_3A
-      );
-    if (raw.tree_registration_certificate)
-      formData.append(
-        'tree_registration_certificate',
-        raw.tree_registration_certificate
-      );
+  const appendFile = (formKey: string, apiParam: string, urlProp: string) => {
+  const value = raw[formKey];
+  const existingUrl = (this as any)[urlProp]; // e.g., this.selfCertificationUrl
 
-    if (raw.owner_pan_pdf) formData.append('owner_pan_pdf', raw.owner_pan_pdf);
+  if (value instanceof File) {
+    if ((value as any)._isFake && existingUrl) {
+      // Fake file → send original URL string
+      formData.append(apiParam, existingUrl);
+    } else {
+      // Real file → send binary
+      formData.append(apiParam, value);
+    }
+  } else if (typeof value === 'string') {
+    // Fallback: send string (shouldn't happen with above fix)
+    formData.append(apiParam, value);
+  }
+};
+
+    appendFile('selfCertification', 'general_self_certification_form', 'selfCertificationUrl');
+    appendFile('self_certificate_format_3A', 'self_certificate_format_3A', 'selfCertificateFormat3AUrl');
+    appendFile(
+      'tree_registration_certificate',
+      'tree_registration_certificate', 'treeRegistrationCertificateUrl'
+    );
+    appendFile('owner_pan_pdf', 'owner_pan_pdf', 'ownerPanPdfUrl');
+    appendFile('owner_aadhar_pdf', 'owner_aadhar_pdf', 'ownerAadharPdfUrl');
+    appendFile('udyog_aadhar', 'udyog_aadhar', 'udyogAadharUrl');
+    appendFile('gst_certificate_pdf', 'gst_certificate_pdf', 'gstCertificatePdfUrl');
+    appendFile('combinedBuilding', 'combined_plan_document', 'combinedBuildingUrl');
+    appendFile('landRegistrationDeed', 'unit_land_details_pdf', 'landRegistrationDeedUrl');
+    appendFile('partnershipDetails', 'unit_registaration_details_pdf', 'partnershipDetailsUrl');
+    appendFile(
+      'processFlowChart',
+      'unit_process_flow_chart_diagram_or_write_up_pdf', 'processFlowChartUrl'
+    );
+    appendFile('detailProjectReport', 'detailed_project_report_pdf', 'detailProjectReportUrl');
+    appendFile(
+      'propertyTaxClearanceCertificate',
+      'unit_property_tax_clearance_certificate_pdf', 'propertyTaxClearanceCertificateUrl'
+    );
+
     formData.append('owner_pan_number', raw.owner_pan_number || '');
-
-    if (raw.owner_aadhar_pdf) {
-      formData.append('owner_aadhar_pdf', raw.owner_aadhar_pdf);
-      if (raw.owner_aadhar_number)
-        formData.append('owner_aadhar_number', raw.owner_aadhar_number);
+    if (raw.owner_aadhar_number)
+      formData.append('owner_aadhar_number', raw.owner_aadhar_number);
+    if (raw.udyog_aadhar_number)
+      formData.append('udyog_aadhar_number', raw.udyog_aadhar_number);
+    if (raw.gst_number) formData.append('gst_number', raw.gst_number);
+    if (raw.udyog_aadhar_registration_date) {
+      formData.append(
+        'udyog_aadhar_registration_date',
+        this.formatDate(raw.udyog_aadhar_registration_date)
+      );
     }
 
-    if (raw.udyog_aadhar) {
-      formData.append('udyog_aadhar', raw.udyog_aadhar);
-      if (raw.udyog_aadhar_number)
-        formData.append('udyog_aadhar_number', raw.udyog_aadhar_number);
-      if (raw.udyog_aadhar_registration_date)
-        formData.append(
-          'udyog_aadhar_registration_date',
-          this.formatDate(raw.udyog_aadhar_registration_date)
-        );
-    }
-
-    if (raw.gst_certificate_pdf) {
-      formData.append('gst_certificate_pdf', raw.gst_certificate_pdf);
-      if (raw.gst_number) formData.append('gst_number', raw.gst_number);
-    }
-
-    // === UNIT ===
-    if (raw.combinedBuilding)
-      formData.append('combined_plan_document', raw.combinedBuilding);
-    if (raw.landRegistrationDeed)
-      formData.append('unit_land_details_pdf', raw.landRegistrationDeed);
-    if (raw.partnershipDetails)
-      formData.append('unit_registaration_details_pdf', raw.partnershipDetails);
-    if (raw.processFlowChart)
-      formData.append(
-        'unit_process_flow_chart_diagram_or_write_up_pdf',
-        raw.processFlowChart
-      );
-    if (raw.detailProjectReport)
-      formData.append('detailed_project_report_pdf', raw.detailProjectReport);
-    if (raw.propertyTaxClearanceCertificate)
-      formData.append(
-        'unit_property_tax_clearance_certificate_pdf',
-        raw.propertyTaxClearanceCertificate
-      );
-
-    if (this.additionalDoc.file instanceof File) {
-      formData.append(
-        'other_supporting_docuement1_pdf',
-        this.additionalDoc.file
-      );
+    const additionalValue = raw.otherSupportingDoc;
+    if (additionalValue instanceof File) {
+      formData.append('other_supporting_docuement1_pdf', additionalValue);
+    } else if (typeof additionalValue === 'string') {
+      formData.append('other_supporting_docuement1_pdf', additionalValue);
     }
 
     this.filesToDelete.forEach((flag) => {
@@ -388,18 +372,15 @@ export class AttachmentComponent implements OnInit {
         },
         error: (err: any) => {
           console.error('API Error:', err);
-
           const errorResponse = err?.error;
           if (errorResponse?.errors) {
             const allErrors: string[] = [];
-
             Object.keys(errorResponse.errors).forEach((key) => {
               const fieldErrors = errorResponse.errors[key];
               if (Array.isArray(fieldErrors)) {
                 allErrors.push(...fieldErrors);
               }
             });
-
             allErrors.forEach((msg, index) => {
               setTimeout(() => {
                 this.apiService.openSnackBar(msg, 'error');
@@ -417,15 +398,17 @@ export class AttachmentComponent implements OnInit {
 
   onAdditionalDocSelected(file: File): void {
     this.additionalDoc.file = file;
+    this.form.get('otherSupportingDoc')?.setValue(file);
     this.cdr.markForCheck();
   }
 
   removeAdditionalDoc(): void {
     this.additionalDoc.file = null;
-    this.form.get('otherSupportingDoc')?.reset();
+    this.form.get('otherSupportingDoc')?.setValue(null);
     this.cdr.markForCheck();
   }
 
+  // Unused but kept for now
   addAdditionalDocument(): void {
     const name = this.form.get('additionalDocumentName')?.value?.trim();
     const file = this.form.get('additionalDocument')?.value;
@@ -447,8 +430,21 @@ export class AttachmentComponent implements OnInit {
   }
 
   previewFile(url: string): void {
-  if (url) {
-    window.open(url, '_blank');
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
-}
+  getFileNameFromUrl(url: string | null): string {
+    if (!url) return '';
+
+    try {
+      const urlWithoutParams = url.split('?')[0];
+      const fileName = urlWithoutParams.substring(
+        urlWithoutParams.lastIndexOf('/') + 1
+      );
+      return decodeURIComponent(fileName) || 'file.pdf';
+    } catch {
+      return 'file.pdf';
+    }
+  }
 }

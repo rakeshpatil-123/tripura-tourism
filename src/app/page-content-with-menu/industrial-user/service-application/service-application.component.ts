@@ -164,9 +164,9 @@ export class ServiceApplicationComponent implements OnInit {
             this.buildForm();
             this.loadDefaultValues();
 
-            // if (this.applicationId !== null || this.appId2 !== null) {
-            //   this.loadExistingApplication();
-            // }
+            if (this.applicationId !== null || this.appId2 !== null) {
+              this.loadExistingApplication();
+            }
           } else {
             this.apiService.openSnackBar('No form data found.', 'error');
           }
@@ -905,172 +905,151 @@ private prepareRawDataForSubmission(raw: any): any {
         return;
       }
 
-      const question = this.questions.find((q) => q.id.toString() === key);
-      if (!question) return;
+     const question = this.questions.find((q) => q.id.toString() === key);
+if (!question) return;
 
-      let formValue: any;
-
-      if (Array.isArray(value)) {
-        if (question.question_type === 'checkbox') {
-          formValue = value;
-        } else if (question.question_type === 'file') {
-          let fileUrl: string | null = null;
-
-          if (
-            Array.isArray(value) &&
-            value.length > 0 &&
-            typeof value[0] === 'string'
-          ) {
-            fileUrl = value[0];
-          } else if (typeof value === 'string') {
-            fileUrl = value;
-          }
-
-          if (fileUrl) {
-            this.fileUrls[question.id] = fileUrl;
-
-            const fileName = decodeURIComponent(
-              fileUrl.split('/').pop() || 'file.pdf'
-            );
-            formValue = new File([], fileName, {
-              type: this.getFileMimeType(fileName),
-            });
-          }
-        } else {
-          formValue = value.length > 0 ? value[0] : '';
-        }
-      } else if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        value === null
-      ) {
-        formValue = value;
-      } else {
-        formValue = '';
-      }
-
-      this.serviceForm.get(key)?.setValue(formValue);
+if (question.question_type === 'file' && typeof value === 'string') {
+  this.fileUrls[question.id] = value;
+  const fileName = decodeURIComponent(value.split('/').pop() || 'file.pdf');
+  const fakeFile = new File([], fileName, {
+    type: this.getFileMimeType(fileName),
+  });
+  (fakeFile as any)._isFake = true;
+  this.serviceForm.get(key)?.setValue(fakeFile);
+} else {
+  let formValue: any;
+  if (Array.isArray(value)) {
+    if (question.question_type === 'checkbox') {
+      formValue = value;
+    } else {
+      formValue = value.length > 0 ? value[0] : '';
+    }
+  } else if (typeof value === 'string' || typeof value === 'number' || value === null) {
+    formValue = value;
+  } else {
+    formValue = '';
+  }
+  this.serviceForm.get(key)?.setValue(formValue);
+}
     });
 
     this.cdr.detectChanges();
   }
 
   calFee(): void {
-    if (this.feeCalculating) return;
+  if (this.feeCalculating) return;
 
-    this.serviceForm.markAllAsTouched();
+  this.serviceForm.markAllAsTouched();
 
-    if (this.serviceForm.invalid) {
-      this.apiService.openSnackBar(
-        'Please fill in all required fields correctly.',
-        'error'
-      );
-      return;
-    }
-
-    const userId = this.apiService.getDecryptedUserId();
-    if (!userId) {
-      this.apiService.openSnackBar('User not authenticated.', 'error');
-      return;
-    }
-
-    this.feeCalculating = true;
-
-    const raw = this.serviceForm.getRawValue();
-    const preparedRaw = this.prepareRawDataForSubmission(raw);
-    const formData = new FormData();
-    formData.append('user_id', userId);
-    formData.append('service_id', this.serviceId.toString());
-
-    Object.keys(preparedRaw).forEach((key) => {
-      if (this.sectionGroups.some((s) => s.sectionName === key)) return;
-      const question = this.questions.find((q) => q.id.toString() === key);
-      if (!question) return;
-
-      let value = raw[key];
-      if (question.question_type === 'date' && value instanceof Date) {
-        value = value.toISOString().split('T')[0];
-      }
-      if (question.question_type === 'checkbox') {
-        value = Array.isArray(value) ? value.join(', ') : value;
-      }
-
-      if (
-        question.is_required === 'yes' ||
-        (value !== null && value !== '' && value !== undefined)
-      ) {
-        if (question.question_type === 'file' && value instanceof File) {
-          formData.append(`application_data[${key}]`, value, value.name);
-        } else {
-          formData.append(`application_data[${key}]`, value ?? '');
-        }
-      }
-    });
-
-    this.sectionGroups.forEach((section) => {
-      const sectionData = raw[section.sectionName] || [];
-      const validRows = sectionData.filter((row: any) =>
-        section.questions.some((q) => {
-          const val = row[q.id];
-          return val !== null && val !== '' && val !== undefined;
-        })
-      );
-
-      validRows.forEach((row: any, rowIndex: number) => {
-        section.questions.forEach((q) => {
-          let value = row[q.id];
-          if (q.question_type === 'date' && value instanceof Date) {
-            value = value.toISOString().split('T')[0];
-          }
-          if (q.question_type === 'checkbox') {
-            value = Array.isArray(value) ? value.join(', ') : value;
-          }
-
-          if (
-            q.is_required === 'yes' ||
-            (value !== null && value !== '' && value !== undefined)
-          ) {
-            const fieldName = `application_data[${section.sectionName}][${rowIndex}][${q.id}]`;
-            if (q.question_type === 'file' && value instanceof File) {
-              formData.append(fieldName, value, value.name);
-            } else {
-              formData.append(fieldName, value ?? '');
-            }
-          }
-        });
-      });
-    });
-
-    this.apiService
-      .getByConditions(formData, 'api/user/calculate-fee')
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1) {
-            this.calculatedFee = Number(res.data.final_fee);
-            this.visible = true;
-            this.apiService.openSnackBar(
-              'Fee calculated successfully!',
-              'success'
-            );
-          } else {
-            this.visible = false;
-            this.apiService.openSnackBar(
-              res?.message || 'Failed to calculate fee.',
-              'error'
-            );
-          }
-        },
-        error: (err) => {
-          console.error('Fee calculation error:', err);
-          this.visible = false;
-          this.apiService.openSnackBar(
-            err?.error?.message || 'Fee calculation failed. Please try again.',
-            'error'
-          );
-        },
-        complete: () => {
-          this.feeCalculating = false;
-        },
-      });
+  if (this.serviceForm.invalid) {
+    this.apiService.openSnackBar(
+      'Please fill in all required fields correctly.',
+      'error'
+    );
+    return;
   }
+
+  const userId = this.apiService.getDecryptedUserId();
+  if (!userId) {
+    this.apiService.openSnackBar('User not authenticated.', 'error');
+    return;
+  }
+
+  this.feeCalculating = true;
+
+  const raw = this.serviceForm.getRawValue();
+  const preparedRaw = this.prepareRawDataForSubmission(raw); 
+
+  const formData = new FormData();
+  formData.append('user_id', userId);
+  formData.append('service_id', this.serviceId.toString());
+
+  Object.keys(preparedRaw).forEach((key) => {
+    if (this.sectionGroups.some((s) => s.sectionName === key)) return;
+    const question = this.questions.find((q) => q.id.toString() === key);
+    if (!question) return;
+
+    let value = preparedRaw[key]; 
+
+    if (question.question_type === 'date' && value instanceof Date) {
+      value = value.toISOString().split('T')[0];
+    }
+    if (question.question_type === 'checkbox') {
+      value = Array.isArray(value) ? value.join(', ') : value;
+    }
+
+    if (
+      question.is_required === 'yes' ||
+      (value !== null && value !== '' && value !== undefined)
+    ) {
+    
+      if (question.question_type === 'file' && value instanceof File) {
+        formData.append(`application_data[${key}]`, value, value.name);
+      } else {
+        formData.append(`application_data[${key}]`, value ?? '');
+      }
+    }
+  });
+
+  this.sectionGroups.forEach((section) => {
+    const sectionData = preparedRaw[section.sectionName] || []; 
+    const validRows = sectionData.filter((row: any) =>
+      section.questions.some((q) => {
+        const val = row[q.id];
+        return val !== null && val !== '' && val !== undefined;
+      })
+    );
+
+    validRows.forEach((row: any, rowIndex: number) => {
+      section.questions.forEach((q) => {
+        let value = row[q.id]; 
+
+        if (q.question_type === 'date' && value instanceof Date) {
+          value = value.toISOString().split('T')[0];
+        }
+        if (q.question_type === 'checkbox') {
+          value = Array.isArray(value) ? value.join(', ') : value;
+        }
+
+        if (
+          q.is_required === 'yes' ||
+          (value !== null && value !== '' && value !== undefined)
+        ) {
+          const fieldName = `application_data[${section.sectionName}][${rowIndex}][${q.id}]`;
+          if (q.question_type === 'file' && value instanceof File) {
+            formData.append(fieldName, value, value.name);
+          } else {
+            formData.append(fieldName, value ?? '');
+          }
+        }
+      });
+    });
+  });
+
+  this.apiService
+    .getByConditions(formData, 'api/user/calculate-fee')
+    .subscribe({
+      next: (res: any) => {
+        if (res?.status === 1) {
+          this.calculatedFee = Number(res.data.final_fee);
+          this.visible = true;
+          this.apiService.openSnackBar('Fee calculated successfully!', 'success');
+        } else {
+          this.visible = false;
+          this.apiService.openSnackBar(res?.message || 'Failed to calculate fee.', 'error');
+        }
+      },
+      error: (err) => {
+        console.error('Fee calculation error:', err);
+        this.visible = false;
+        this.apiService.openSnackBar(
+          err?.error?.message || 'Fee calculation failed. Please try again.',
+          'error'
+        );
+      },
+      complete: () => {
+        this.feeCalculating = false;
+      },
+    });
+}
 }
