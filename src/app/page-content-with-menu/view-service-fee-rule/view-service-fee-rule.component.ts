@@ -30,9 +30,9 @@ import { ServiceFeeRuleDialogComponent } from '../service-fee-rule-dialog/servic
 })
 export class ViewServiceFeeRuleComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
+    'sr_no',
     'id',
     'fee_type',
-    'question_id',
     'question_label',
     'condition_operator',
     'condition_value_start',
@@ -107,10 +107,8 @@ export class ViewServiceFeeRuleComponent implements OnInit, AfterViewInit {
             updated_at: this.datePipe.transform(r.updated_at, 'short'),
           }));
           this.dataSource._updateChangeSubscription();
-          setTimeout(() => {
             this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
-          });
         } else {
           this.dataSource.data = [];
         }

@@ -1,12 +1,13 @@
 .approval-flow-container {
-  max-width: 1100px;
-  margin: auto;
+  max-width: 1000px;
+  margin: 30px auto;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  padding: 20px;
-  border-radius: 10px;
-  background-color: #f9fafb;
+  gap: 20px;
+  padding: 25px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .approval-flow-header {
@@ -16,37 +17,36 @@
 
   h2 {
     margin: 0;
-    font-size: 26px;
-    font-weight: 600;
-    color: #1e3a8a;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e40af;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 
     mat-icon {
-      font-size: 28px;
+      font-size: 30px;
       color: #2563eb;
     }
   }
 }
 
 .animated-close-btn {
-  color: #e72929;
-  border: none;
+  color: #ef4444;
   background: transparent;
+  border: none;
   cursor: pointer;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
     color: #b91c1c;
-    transform: scale(1.08);
+    transform: scale(1.1);
   }
 
   &:active {
-    transform: scale(0.92);
+    transform: scale(0.95);
   }
 }
-
 
 .filter-field {
   width: 100%;
@@ -54,33 +54,44 @@
   mat-icon {
     color: #2563eb;
   }
+
+  input {
+    padding: 8px 10px;
+  }
 }
 
 .table-container {
-  background-color: #fff;
+  background: #fff;
   padding: 20px;
   border-radius: 10px;
-  overflow-x: auto;
+  overflow: hidden;
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
 
   table {
     width: 100%;
-    min-width: 650px;
+    min-width: 700px;
     border-spacing: 0;
 
     th.mat-header-cell {
-      background-color: #3949ab;
-      color: #ffffff;
+      background-color: #1e3a8a;
+      color: #fff;
       font-weight: 600;
       font-size: 14px;
+      text-align: left;
+      padding: 12px 15px;
     }
 
     td.mat-cell {
       font-size: 14px;
-      color: #333;
+      color: #1f2937;
+      padding: 12px 15px;
     }
 
     .fade-in-row {
-      animation: fadeIn 0.4s ease-out;
+      animation: fadeIn 0.35s ease-in;
     }
   }
 
@@ -90,42 +101,54 @@
 }
 
 .actions-header {
-  text-align: center !important;
+  text-align: center;
 }
 
 .action-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 9px;
-  height: 100%;
+  margin-top: 15px;
+  padding-bottom: 8px;
+  gap: 10px;
 }
 
 .icon-btn {
-  background: none;
+  background: #f3f4f6;
+  color: #1f2937;
   border: none;
   cursor: pointer;
-  color: #374151;
   font-size: 20px;
-  padding: 4px;
+  padding: 6px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, transform 0.2s ease;
-  border-radius: 50%;
-}
+  transition: all 0.2s ease;
 
-.icon-btn:hover {
-  transform: scale(1.1);
-}
+  &:hover {
+    transform: scale(1.15);
+  }
 
-.icon-btn.edit:hover {
-  color: #059669;
-}
+  &.edit {
+    color: #059669;
+    background: #d1fae5;
 
-.icon-btn.delete:hover {
-  color: #dc2626;
+    &:hover {
+      background: #10b981;
+      color: #ffffff;
+    }
+  }
+
+  &.delete {
+    color: #dc2626;
+    background: #fee2e2;
+
+    &:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+  }
 }
 
 .no-data {
@@ -138,8 +161,8 @@
   color: #6b7280;
 
   mat-icon {
-    font-size: 48px;
-    margin-bottom: 10px;
+    font-size: 50px;
+    margin-bottom: 12px;
     color: #9ca3af;
   }
 
@@ -165,17 +188,46 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .approval-flow-container {
+    padding: 20px;
+  }
+
+  .approval-flow-header h2 {
+    font-size: 20px;
+  }
+
+  table {
+    min-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .approval-flow-container {
     padding: 15px;
+  }
 
-    .approval-flow-header h2 {
-      font-size: 22px;
-    }
+  .approval-flow-header h2 {
+    font-size: 18px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 
-    .table-container {
-      padding: 15px;
-    }
+  .filter-field {
+    margin-bottom: 10px;
+  }
+
+  .table-container {
+    padding: 15px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  .icon-btn {
+    font-size: 18px;
+    padding: 4px;
   }
 }
 
@@ -183,4 +235,80 @@
   font-weight: 999;
   color: #000000;
   font-size: 0.875rem;
+}
+
+::ng-deep .custom-approval-dialog .mat-dialog-container {
+  animation: fadeInScale 0.3s ease-out;
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.approval-flow-dialog .mat-dialog-container {
+  border-radius: 16px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  animation: fadeSlideIn 0.4s ease-in-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  transition: all 0.3s ease-in-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dialog-slide-in .mat-dialog-container.ng-animating {
+  animation: fadeSlideOut 0.25s ease-in-out;
+}
+
+@keyframes fadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.97);
+  }
+}
+
+.cdk-overlay-backdrop {
+  animation: backdropFadeIn 0.3s ease-in-out;
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .approval-flow-dialog .mat-dialog-container {
+    width: 95vw !important;
+    max-width: none !important;
+    border-radius: 10px !important;
+  }
 }

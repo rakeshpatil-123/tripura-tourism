@@ -8,6 +8,9 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { AddRenewalFeeRuleComponent } from '../add-renewal-fee-rule/add-renewal-fee-rule.component';
 import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
 import { MatSort } from '@angular/material/sort';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-view-renewal-fee-rule',
@@ -34,6 +37,7 @@ export class ViewRenewalFeeRuleComponent implements OnInit {
   constructor(
     private genericService: GenericService,
     private snackBar: MatSnackBar,
+    private loaderService: LoaderService,
     private dialogRef: MatDialogRef<ViewRenewalFeeRuleComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { service: any },
     private dialog: MatDialog
@@ -51,7 +55,8 @@ export class ViewRenewalFeeRuleComponent implements OnInit {
 
 
 loadFeeRules(): void {
-    this.genericService.getRenewalFeeRule(this.data.service.id).subscribe({
+  this.loaderService.showLoader();
+    this.genericService.getRenewalFeeRule(this.data.service.id).pipe(finalize(()=>this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         this.dataSource.data = res.data || [];
         this.dataSource.paginator = this.paginator;
@@ -63,34 +68,160 @@ loadFeeRules(): void {
     });
   }
   updateRule(rule: any): void {
-    const dialogRef = this.dialog.open(AddRenewalFeeRuleComponent, {
+    const serviceData = this.data.service;
+    this.loaderService.showLoader();
+    this.dialogRef.close();
+    setTimeout(() => {
+      this.loaderService.hideLoader();
+      const editDialogRef = this.dialog.open(AddRenewalFeeRuleComponent, {
       width: '90vw',
       maxWidth: '1000px',
       height: '90vh',
       maxHeight: '95vh',
-      panelClass: 'responsive-dialog',
+      panelClass: ['responsive-dialog', 'dialog-slide-in'],
       data: { service: rule, mode: 'edit' },
+      disableClose: true,
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '300ms',
+      autoFocus: true,
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'updated') {
-        this.loadFeeRules();
-      }
-    });
+      editDialogRef.afterClosed().subscribe((result) => {
+        if (result === 'updated') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Fee Rule Updated!',
+            html: `<strong>The renewal fee rule has been updated successfully.</strong>`,
+            timer: 1800,
+            timerProgressBar: true,
+            background: '#f0fdf4',
+            color: '#065f46',
+            iconColor: '#16a34a',
+            showConfirmButton: false,
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown animate__faster',
+            },
+            hideClass: {
+              popup: 'animate__animated animate__fadeOutUp animate__faster',
+            },
+          }).then(() => {
+            setTimeout(() => {
+              this.dialog.open(ViewRenewalFeeRuleComponent, {
+                width: '100vw',
+                height: '100vh',
+                maxWidth: '100vw',
+                maxHeight: '100vh',
+                panelClass: 'full-screen-dialog',
+                data: { service: serviceData },
+                disableClose: false,
+                autoFocus: false,
+                enterAnimationDuration: '300ms',
+                exitAnimationDuration: '300ms',
+              });
+            }, 300);
+          });
+        }
+      });
+    }, 300);
   }
 
 
   deleteRule(id: number): void {
-    if (!confirm('Are you sure you want to delete this rule?')) return;
+    const serviceData = this.data.service;
+    this.dialogRef.close();
 
-    this.genericService.deleteRenewalFeeRule(id).subscribe({
-      next: () => {
-        this.snackBar.open('Rule deleted successfully', 'Close', { duration: 3000 });
-        this.loadFeeRules();
-      },
-      error: () => {
-        this.snackBar.open('Failed to delete rule', 'Close', { duration: 3000 });
-      },
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action will permanently delete the rule!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete it!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+      focusCancel: true,
+      background: '#fff7ed',
+      color: '#78350f',
+      iconColor: '#f97316',
+      showClass: { popup: 'animate__animated animate__zoomIn animate__faster' },
+      hideClass: { popup: 'animate__animated animate__zoomOut animate__faster' },
+      confirmButtonColor: '#f97316',
+      cancelButtonColor: '#9ca3af',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loaderService.showLoader();
+
+        this.genericService.deleteRenewalFeeRule(id)
+          .pipe(finalize(() => this.loaderService.hideLoader()))
+          .subscribe({
+            next: () => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Deleted!',
+                text: 'The rule has been successfully deleted.',
+                timer: 1800,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                background: '#ecfdf5',
+                color: '#065f46',
+                iconColor: '#10b981',
+                showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+                hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' }
+              }).then(() => {
+                setTimeout(() => {
+                  this.dialog.open(ViewRenewalFeeRuleComponent, {
+                    width: '100vw',
+                    height: '100vh',
+                    maxWidth: '100vw',
+                    maxHeight: '100vh',
+                    panelClass: 'full-screen-dialog',
+                    data: { service: serviceData },
+                    disableClose: true
+                  });
+                }, 200);
+              });
+            },
+            error: () => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Failed!',
+                text: 'Unable to delete the rule. Please try again.',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                background: '#fef2f2',
+                color: '#991b1b',
+                iconColor: '#dc2626',
+                showClass: { popup: 'animate__animated animate__shakeX animate__faster' },
+                hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' }
+              }).then(() => {
+                setTimeout(() => {
+                  this.dialog.open(ViewRenewalFeeRuleComponent, {
+                    width: '100vw',
+                    height: '100vh',
+                    maxWidth: '100vw',
+                    maxHeight: '100vh',
+                    panelClass: 'full-screen-dialog',
+                    data: { service: serviceData },
+                    disableClose: true
+                  });
+                }, 200);
+              });
+            }
+          });
+      } else {
+        setTimeout(() => {
+          this.dialog.open(ViewRenewalFeeRuleComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog',
+            data: { service: serviceData },
+            disableClose: true
+          });
+        }, 200);
+      }
     });
   }
 

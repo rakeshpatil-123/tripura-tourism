@@ -10,6 +10,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs/operators';
 import { GenericService } from '../../_service/generic/generic.service';
+import { LoaderService } from '../../_service/loader/loader.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-renewal-fee-rule',
@@ -42,6 +44,7 @@ export class AddRenewalFeeRuleComponent implements OnInit {
     private fb: FormBuilder,
     private genericService: GenericService,
     private dialogRef: MatDialogRef<AddRenewalFeeRuleComponent>,
+    private loaderService: LoaderService,
     @Inject(MAT_DIALOG_DATA) public data: { service: any; mode: 'add' | 'edit' }
   ) { }
 
@@ -95,12 +98,13 @@ export class AddRenewalFeeRuleComponent implements OnInit {
   }
 
   loadRenewalCycles(): void {
+    this.loaderService.showLoader();
     const sid = this.data.mode === 'edit' ? this.data.service?.service_id : this.data.service?.id;
     if (!sid) return;
     this.loading = true;
     this.genericService
       .getRenewalCycle(sid)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(finalize(() => { (this.loading = false); this.loaderService.hideLoader() }))
       .subscribe({
         next: (res: any) => {
           if (res?.status) this.renewalCycles = Array.isArray(res.data) ? res.data : [{ id: 1, name: 'Annual Renewal' }, { id: 2, name: '3-Year Renewal' }];
@@ -117,10 +121,8 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       },
     });
   }
-
   saveFeeRule(): void {
     this.serverError = null;
-
     this.isSubmitting = true;
     const form = this.feeRuleForm.value;
     const ruleObj: any = {
@@ -138,7 +140,7 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       priority: String(form.priority ?? 1),
       status: Number(form.status) === 1 ? 1 : 0,
     };
-    if (this.feeRuleForm.get('multi_condition')?.value === 'yes') {
+    if (form.multi_condition === 'yes') {
       ruleObj.condition_label_question_id = Number(this.feeRuleForm.get('condition_label_question_id')?.value);
       ruleObj.pre_condition_operator = this.feeRuleForm.get('pre_condition_operator')?.value;
       ruleObj.pre_condition_value = this.feeRuleForm.get('pre_condition_value')?.value;
@@ -149,29 +151,66 @@ export class AddRenewalFeeRuleComponent implements OnInit {
     }
 
     const payload = { rules: [ruleObj] };
-    if (this.data.mode === 'edit') {
-      payload.rules[0].id = this.data.service.id;
-    }
     const api$ =
       this.data.mode === 'edit'
         ? this.genericService.updateRenewalFeeRule(payload)
         : this.genericService.addRenewalFeeRule(payload);
+    this.loaderService.showLoader();
 
-    api$.pipe(finalize(() => (this.isSubmitting = false))).subscribe({
+    api$.pipe(finalize(() => {
+      this.isSubmitting = false;
+      this.loaderService.hideLoader();
+    })
+    ).subscribe({
       next: (res: any) => {
         if (res?.success || res?.status === 1) {
-          this.genericService.openSnackBar(res.message || 'Fee rule saved successfully', 'Success');
           this.dialogRef.close(this.data.mode === 'add' ? 'created' : 'updated');
+          if (this.data.mode === 'add') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Created Successfully!',
+              html: `<strong>${res.message || 'Fee rule has been successfully created.'
+                }</strong>`,
+              timer: 2000,
+              showConfirmButton: false,
+              background: '#f0fdf4',
+              color: '#065f46',
+              iconColor: '#16a34a',
+              showClass: {
+                popup: 'animate__animated animate__fadeInDown animate__faster',
+              },
+              hideClass: {
+                popup: 'animate__animated animate__fadeOutUp animate__faster',
+              },
+            });
+          }
         } else {
-          this.genericService.openSnackBar(res?.message || 'Failed to save fee rule', 'Error');
-          this.serverError = res?.message || 'Failed to save fee rule';
+          this.showError(res?.message || 'Unable to save fee rule.');
         }
       },
       error: (err) => {
-        this.genericService.openSnackBar('Something went wrong while saving', 'Error');
-        this.serverError = err?.error?.message || err?.message || 'Something went wrong while saving';
+        this.showError(err?.error?.message || err?.message || 'Something went wrong.');
       },
     });
+  }
+  private showError(msg: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: 'Failed!',
+      html: `<strong>${msg}</strong>`,
+      timer: 2500,
+      showConfirmButton: false,
+      background: '#fef2f2',
+      color: '#991b1b',
+      iconColor: '#dc2626',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster',
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp animate__faster',
+      },
+    });
+    this.serverError = msg;
   }
 
   close() {

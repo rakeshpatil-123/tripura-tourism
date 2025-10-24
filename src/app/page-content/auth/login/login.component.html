@@ -25,10 +25,16 @@
         <app-ilogi-input fieldId="user_name" fieldLabel="User Name" [mandatory]="true" formControlName="user_name"
           type="text" placeholder="Enter your user name">
         </app-ilogi-input>
+        <small class="error-text" *ngIf="loginForm.get('user_name')?.hasError('invalid')">
+          Invalid username.
+        </small>
 
         <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password" type="password"
           placeholder="Enter your password">
         </app-ilogi-input>
+        <small class="error-text" *ngIf="loginForm.get('password')?.hasError('invalid')">
+          Invalid password.
+        </small>
         <div class="captcha-wrapper">
           <canvas #captchaCanvas width="140" height="50" (click)="reloadCaptcha()" class="captcha-canvas"></canvas>
           <button type="button" class="reload-btn" (click)="reloadCaptcha()" aria-label="Reload CAPTCHA">
@@ -42,6 +48,9 @@
         <app-ilogi-input fieldId="captcha_input" fieldLabel="Enter CAPTCHA" [mandatory]="true" formControlName="captchaInput"
           type="text" placeholder="Enter the characters you see above" (input)="checkCaptcha()">
         </app-ilogi-input>
+        <small class="error-text" *ngIf="loginForm.get('captchaInput')?.hasError('invalidCaptcha')">
+          Invalid CAPTCHA entered. Please try again.
+        </small>
 
         <button type="submit" class="btn-submit" [disabled]="!loginForm.valid || !captchaValid">Login</button>
         
