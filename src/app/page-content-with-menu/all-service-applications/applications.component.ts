@@ -197,7 +197,6 @@ export class ApplicationsComponent implements OnInit {
 
   generateColumns(data: any[]): TableColumn[] {
     if (!Array.isArray(data) || data.length === 0) return [];
-
     const firstItem = data[0];
     const columns: TableColumn[] = [];
 
@@ -218,6 +217,7 @@ export class ApplicationsComponent implements OnInit {
     type: 'link', 
     linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
   },
+      application_number: {type: 'text', label: 'Application Number', width: '190px'},
       service_name: { label: 'Service', width: '180px' },
       applicant_name: { label: 'Applicant Name', width: '180px' },
       applicant_email: { label: 'Email', width: '200px' },

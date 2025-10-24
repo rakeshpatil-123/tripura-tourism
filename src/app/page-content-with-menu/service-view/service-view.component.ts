@@ -12,6 +12,7 @@ import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilo
 import { MatIcon } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { IlogiFileUploadComponent } from '../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
+import { MatButton } from '@angular/material/button';
 
 interface StatusActionModal {
   visible: boolean;
@@ -22,7 +23,7 @@ interface StatusActionModal {
 
 @Component({
   selector: 'app-service-view',
-  imports: [CommonModule, DynamicTableComponent, IlogiInputComponent, ReactiveFormsModule, MatIcon, IlogiFileUploadComponent],
+  imports: [CommonModule, DynamicTableComponent, IlogiInputComponent, ReactiveFormsModule, MatIcon, IlogiFileUploadComponent, MatButton],
   templateUrl: './service-view.component.html',
   styleUrl: './service-view.component.scss',
   standalone: true,
@@ -30,6 +31,8 @@ interface StatusActionModal {
 export class ServiceViewComponent implements OnInit {
   applicationId: number | null = null;
   applicationData: any = null;
+  isCertificatePreview: any = null;
+  sampleFilePreview : any = null;
   isLoading: boolean = false;
   isFinalApproval: string = '';
 
@@ -95,6 +98,10 @@ export class ServiceViewComponent implements OnInit {
 
           if (res?.status === 1 && res.data) {
             this.applicationData = res.data;
+            this.isCertificatePreview = res.data.just_before_final_step;
+            if (res?.data?.history_data?.status_file) {
+              this.sampleFilePreview = res?.data?.history_data?.status_file || null;
+            }
             this.isFinalApproval = res.data.status;
             console.log('Application Data:', this.applicationData.application_data);
 
@@ -146,7 +153,7 @@ export class ServiceViewComponent implements OnInit {
     if (!obj.hasOwnProperty(key)) continue;
 
     // Skip workflow, application_data, applied_fee, approved_fee
-    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id'].includes(key)) {
+    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id', 'just_before_final_step', 'history_data'].includes(key)) {
       continue;
     }
 
@@ -165,7 +172,7 @@ export class ServiceViewComponent implements OnInit {
           });
         } else {
           flatEntries.push({
-            key: displayKey,
+            key: displayKey,  
             value: String(value),
           });
         }
@@ -422,4 +429,36 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
       }
     });
   }
+  previewCertificate(): void {
+    this.apiService.getByConditions({}, `api/department/preview-certificate/${this.applicationId}`).subscribe({
+      next: (res: any) => {
+        if (res?.pdf_url) {
+          window.open(res.pdf_url, '_blank');
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'PDF URL not found. Please try again.',
+            confirmButtonText: 'OK'
+          });
+        }
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Download Failed',
+          text: 'Something went wrong while fetching the certificate.',
+          confirmButtonText: 'Retry'
+        });
+      }
+    });
+  }
+  previewSampleFile(): void {
+    if (this.sampleFilePreview) {
+      window.open(this.sampleFilePreview, '_blank');
+    } else {
+      Swal.fire('Error', 'No sample file available to preview.', 'error');
+    }
+  }
+
 }

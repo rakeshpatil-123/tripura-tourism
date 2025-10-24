@@ -24,6 +24,11 @@
         <button (click)="downloadCertificate()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate
           <mat-icon>picture_as_pdf</mat-icon>
         </button>
+        @if (sampleFilePreview) {
+        <button mat-raised-button color="primary" class="submit-btn" (click)="previewSampleFile()">
+          Preview Sample File
+        </button>
+        }
       </div>
     </div>
     <app-dynamic-table [data]="workflowData" [columns]="workflowColumns" [showPagination]="true" [pageSize]="5"
@@ -79,8 +84,8 @@
           Remarks are required and must be at least 5 characters.
         </small>
         }
-
         <div class="modal-actions mt-3">
+          <button class="mb-10" *ngIf="isCertificatePreview && statusModal.action === 'approved'" mat-raised-button (click)="previewCertificate()">Preview Certificate</button>
           <button type="button" (click)="closeModal()" class="btn btn-secondary me-2">
             Cancel
           </button>

@@ -58,7 +58,7 @@
             <option *ngFor="let type of CLAIM_TYPES" [value]="type.value">{{ type.label }}</option>
           </select>
         </div>
-        <div [formGroup]="proformaForm" class="card flex justify-center w-full">
+        <div *ngIf="proformaForm.get('proforma_type')?.value === 'claim'" [formGroup]="proformaForm" class="card flex justify-center w-full">
           <label class="w-full font-medium mb-1 block">Depends On Proformas</label>
           <p-multiselect [options]="proformaOptions" formControlName="depends_on_proforma_ids" optionLabel="name"
             optionValue="code" placeholder="Select Depends On Proformas" [maxSelectedLabels]="3" [showClear]="true"

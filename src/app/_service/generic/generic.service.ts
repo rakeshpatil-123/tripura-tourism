@@ -1502,7 +1502,8 @@ getThirdPartyRedirect(url: string): Observable<string> {
       {
         department_id: deptId,
         page: page,
-      }
+      },
+     { headers: this.getHeaders() }
     );
   }
 
@@ -1709,5 +1710,15 @@ getThirdPartyRedirect(url: string): Observable<string> {
         responseType: 'blob'
       }
     );
+  }
+  getAllIncentiveApplications() : any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/incentive/applications`,{}, {headers: this.getHeaders()}
+    )
+  }
+  changeIncentiveStatus(payload: any) : any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/incentive/update-application-status`,payload, {headers: this.getHeaders()}
+    )
   }
 }

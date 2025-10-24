@@ -139,29 +139,37 @@
         <div class="form-group">
           <label>Claim Per Unit</label>
           <input pInputText type="number" formControlName="claim_per_unit" placeholder="e.g., 100"
-            (click)="onClaimFieldClick()" [readonly]="!questionForm.get('is_claim')?.value"
-            [style.cursor]="questionForm.get('is_claim')?.value ? 'text' : 'pointer'"
-            [class.disabled-field]="!questionForm.get('is_claim')?.value" />
-          <small class="text-red-500" *ngIf="showClaimHint">
+            (click)="onReadonlyFieldFocus('claim_per_unit')"
+            [readonly]="!questionForm.get('is_claim')?.value || questionForm.get('claim_percentage')?.value"
+            [style.cursor]="(!questionForm.get('is_claim')?.value || questionForm.get('claim_percentage')?.value) ? 'not-allowed' : 'text'"
+            [class.disabled-field]="!questionForm.get('is_claim')?.value || questionForm.get('claim_percentage')?.value" />
+          <small class="text-red-500" *ngIf="!questionForm.get('is_claim')?.value">
             Turn on 'Is Claim?' to enter value.
           </small>
           <small class="text-red-500"
             *ngIf="questionForm.get('is_claim')?.value && !questionForm.get('claim_per_unit')?.valid">
             Enter a valid claim amount.
           </small>
+          <small class="text-red-500" *ngIf="readonlyFieldError === 'claim_per_unit'">
+            You can enter either Claim Per Unit or Claim Percentage, not both.
+          </small>
         </div>
         <div class="form-group">
           <label>Claim Percentage (%)</label>
           <input pInputText type="number" formControlName="claim_percentage" placeholder="e.g., 25"
-            (click)="onClaimFieldClick()" [readonly]="!questionForm.get('is_claim')?.value"
-            [style.cursor]="questionForm.get('is_claim')?.value ? 'text' : 'pointer'"
-            [class.disabled-field]="!questionForm.get('is_claim')?.value" />
-          <small class="text-red-500" *ngIf="showClaimHint">
+            (click)="onReadonlyFieldFocus('claim_percentage')" (focus)="onReadonlyFieldFocus('claim_percentage')"
+            [readonly]="!questionForm.get('is_claim')?.value || questionForm.get('claim_per_unit')?.value"
+            [style.cursor]="(!questionForm.get('is_claim')?.value || questionForm.get('claim_per_unit')?.value) ? 'not-allowed' : 'text'"
+            [class.disabled-field]="!questionForm.get('is_claim')?.value || questionForm.get('claim_per_unit')?.value" />
+          <small class="text-red-500" *ngIf="!questionForm.get('is_claim')?.value">
             Turn on 'Is Claim?' to enter value.
           </small>
           <small class="text-red-500"
             *ngIf="questionForm.get('is_claim')?.value && (questionForm.get('claim_percentage')?.value < 0 || questionForm.get('claim_percentage')?.value > 100)">
             Must be between 0 and 100.
+          </small>
+          <small class="text-red-500" *ngIf="readonlyFieldError === 'claim_percentage'">
+            You can enter either Claim Per Unit or Claim Percentage, not both.
           </small>
         </div>
       </div>
