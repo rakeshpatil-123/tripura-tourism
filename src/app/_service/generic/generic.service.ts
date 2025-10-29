@@ -564,7 +564,7 @@ getThirdPartyRedirect(url: string): Observable<string> {
     this.setLoginStatus(false);
     Swal.fire({
       title: 'Session Expired!',
-      html: `<strong>Your session has expired due to inactivity.<br>Please login again to continue.</strong>`,
+      html: `<strong>Your session has ended. Please log in again to continue.</strong>`,
       icon: 'warning',
       iconColor: '#f59e0b',
       background: '#fff7ed',
@@ -1719,6 +1719,11 @@ getThirdPartyRedirect(url: string): Observable<string> {
   changeIncentiveStatus(payload: any) : any {
     return this.http.post(
       `${this.baseUrl}/api/department/incentive/update-application-status`,payload, {headers: this.getHeaders()}
+    )
+  }
+  getViewDetailsOfIncentive(applicationId: any): any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/incentive/application-details`, { application_id: applicationId }, { headers: this.getHeaders() }
     )
   }
 }

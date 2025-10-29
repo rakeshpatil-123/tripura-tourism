@@ -1,0 +1,224 @@
+<div class="page-wrap" [class.loaded]="loaded">
+  <header class="page-header">
+    <div class="header-left">
+      <h1 class="title">
+        <mat-icon class="icon">visibility</mat-icon>
+        <span>Application Details</span>
+      </h1>
+      <p class="subtitle" *ngIf="details?.application_no">
+        Application #{{ details.application_no }} •
+        <span class="status" [attr.data-status]="details.workflow_status">{{ getReadableStatus(details?.workflow_status)
+          }}</span>
+      </p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-back" (click)="goBack()" aria-label="Back to list">
+        <mat-icon>arrow_back</mat-icon>
+        <span class="btn-text">Back</span>
+      </button>
+    </div>
+  </header>
+  <div *ngIf="isLoading" class="skeleton-grid" aria-hidden="true">
+    <div class="skeleton card-skel"></div>
+    <div class="skeleton card-skel"></div>
+    <div class="skeleton wide-skel"></div>
+  </div>
+  <main *ngIf="details" class="content-grid" role="main" aria-live="polite">
+    <section class="card card--fade" style="grid-column: 1 / -1;">
+      <div class="card-head">
+        <h2>Basic Information</h2>
+        <span class="chip">{{ details?.application_type || '—' }}</span>
+      </div>
+
+      <dl class="info-grid">
+        <div>
+          <dt>Application No</dt>
+          <dd>{{ details.application_no || '-' }}</dd>
+        </div>
+        <div>
+          <dt>Applicant</dt>
+          <dd>{{ details.applicant_name || '-' }}</dd>
+        </div>
+        <div>
+          <dt>Scheme</dt>
+          <dd>{{ details.scheme || '-' }}</dd>
+        </div>
+        <div>
+          <dt>Proforma</dt>
+          <dd>{{ details.proforma || '-' }}</dd>
+        </div>
+        <div>
+          <dt>Claim Type</dt>
+          <dd>{{ (details.claim_type | titlecase) }}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>
+            <span class="muted">{{ getReadableStatus(details?.workflow_status) }}</span>
+          </dd>
+        </div>
+        <div class="full">
+          <dt>Submitted At</dt>
+          <dd>{{ details.submitted_at ? (details.submitted_at | date: 'medium') : '-' }}</dd>
+        </div>
+      </dl>
+    </section>
+    <section class="card card--fade" style="grid-column: 1 / -1;">
+      <div class="card-head">
+        <h2>Subsidy Report</h2>
+        <div class="report-summary" aria-hidden="false">
+          <div><small>Total Claimed</small><strong>{{ details?.subsidy_report?.totals?.claimed ?? '-' }}</strong></div>
+          <div><small>Total Approved</small><strong>{{ details?.subsidy_report?.totals?.approved ?? '-' }}</strong>
+          </div>
+          <div><small>Disbursed</small><strong>{{ details?.subsidy_report?.totals?.disbursed ?? '-' }}</strong></div>
+        </div>
+      </div>
+      <form [formGroup]="approvedForm" class="table-wrap" role="table" aria-label="Subsidy items">
+        <table class="fancy-table" role="presentation">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Basis</th>
+              <th>Base Value</th>
+              <th>Percentage</th>
+              <th>Claimed</th>
+              <th>Approved</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of subsidyItems">
+              <td data-label="Label">{{ item.label || '-' }}</td>
+              <td data-label="Basis">{{ item.basis === 'per_unit' ? 'Per Unit' : item.basis === 'percentage' ?
+                'Percentage' : (item.basis | titlecase) || '-' }}</td>
+              <td data-label="Base Value">{{ item.base_value ?? '-' }}</td>
+              <td data-label="Percentage">{{ item.percentage ? (item.percentage + '%') : '-' }}</td>
+              <td data-label="Claimed">{{ numberOrDash(item.claimed) }}</td>
+              <td>
+                <input type="number" class="editable-input" [formControlName]="item.question_id"
+                  placeholder="Enter approved amount" />
+              </td>
+              <td data-label="Status">
+                <span class="status" [attr.data-status]="item.status">{{ getReadableStatus(item?.status) }}</span>
+              </td>
+            </tr>
+
+            <tr *ngIf="(subsidyItems?.length || 0) === 0">
+              <td colspan="7" class="empty">No subsidy items available</td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+      <div class="review-section" [formGroup]="statusForm">
+        <div class="review-card animate-fade-up">
+          <h3 class="review-title">
+            Review & Status Update
+            <span class="status-badge" [ngClass]="getStatusClass(details?.workflow_status)"
+              *ngIf="details?.workflow_status">
+              {{ formatStatus(details?.workflow_status) }}
+            </span>
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="status" class="form-label">Change Status</label>
+              <select id="status" class="status-dropdown" formControlName="new_status" [disabled]="!can_update_status">
+                <option value="" disabled>Select new status</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="sent_back">Sent Back</option>
+              </select>
+              <div *ngIf="statusForm.get('new_status')?.touched && statusForm.get('new_status')?.invalid" class="error">
+                Please select a status.
+              </div>
+            </div>
+            <div class="form-group flex-grow" style="align-self: flex-end;">
+
+              <app-ilogi-input formControlName="remarks" fieldLabel="Remark" [mandatory]="true"
+                placeholder="Enter remark">
+              </app-ilogi-input>
+
+              <span class="error" *ngIf="statusForm.get('remarks')?.touched" [ngStyle]="{
+                    'min-height': '18px',
+                    'margin-top': '6px',
+                    'font-size': '0.85rem',
+                    'line-height': '1.2',
+                    'color': statusForm.get('remarks')?.invalid ? '#e63946' : 'transparent',
+                    'transition': 'color 0.3s ease'
+                  }">
+                {{ statusForm.get('remarks')?.invalid ? 'Remarks are required.' : ' ' }}
+              </span>
+            </div>
+            <div class="form-group">
+              <app-ilogi-file-upload formControlName="review_file" [fileUrl]="fileUrl"
+                [name]="statusForm.get('review_file')?.value?.name" accept=".png,.jpg,.jpeg,.pdf"
+                label="Upload Review File (Optional)">
+              </app-ilogi-file-upload>
+            </div>
+            <div class="form-group">
+              <button type="button" class="submit-btn" (click)="submitReview()" [disabled]="isSubmitting">{{
+                isSubmitting ? 'Submitting...' : 'Submit' }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <section class="card card--fade form-answers-section" style="grid-column: 1 / -1;">
+      <div class="card-head">
+        <h2>Form Answers</h2>
+        <p class="muted">Here are the applicant’s submitted responses and uploaded documents.</p>
+      </div>
+
+      <div class="answers-container" *ngIf="formAnswers && formAnswers.length; else noAnswers">
+        <div *ngFor="let item of formAnswers" class="answer-card animate-fade-in">
+          <div class="question-header">
+            <mat-icon class="question-icon">help_outline</mat-icon>
+            <h3 class="question-text">{{ item.label || ('Question ' + item.id) }}</h3>
+          </div>
+
+          <div class="answer-body">
+            <p class="answer-value" *ngIf="item.answer; else noValue">{{ item.answer }}</p>
+            <ng-template #noValue>
+              <p class="answer-empty">No answer provided.</p>
+            </ng-template>
+
+            <div class="file-section" *ngIf="item.files?.length">
+              <h4 class="file-heading">Attached Files:</h4>
+              <div class="file-list">
+                <div *ngFor="let f of item.files" class="file-card" [ngClass]="getFileType(f.mime)">
+                  <ng-container [ngSwitch]="getFileType(f.mime)">
+                    <div *ngSwitchCase="'image'" class="file-image">
+                      <img [src]="f.url" [alt]="f.name" />
+                      <div class="overlay">
+                        <a [href]="f.url" target="_blank" rel="noopener">View Image</a>
+                      </div>
+                    </div>
+                    <div *ngSwitchCase="'pdf'" class="file-pdf">
+                      <mat-icon>picture_as_pdf</mat-icon>
+                      <a [href]="f.url" target="_blank" rel="noopener">{{ f.name }}</a>
+                    </div>
+                    <div *ngSwitchDefault class="file-other">
+                      <mat-icon>insert_drive_file</mat-icon>
+                      <a [href]="f.url" target="_blank" rel="noopener">{{ f.name }}</a>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noAnswers>
+        <p class="empty">No form answers found.</p>
+      </ng-template>
+    </section>
+  </main>
+
+  <div *ngIf="!details && !isLoading" class="empty-state" role="status">
+    <mat-icon class="empty-icon">hourglass_empty</mat-icon>
+    <p>No application details found.</p>
+    <button class="btn-primary" (click)="goBack()">Return</button>
+  </div>
+</div>

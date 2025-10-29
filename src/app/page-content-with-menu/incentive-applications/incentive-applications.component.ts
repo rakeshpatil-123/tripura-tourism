@@ -8,6 +8,8 @@ import { IlogiFileUploadComponent } from "../../customInputComponents/ilogi-file
 import { IlogiInputComponent } from "../../customInputComponents/ilogi-input/ilogi-input.component";
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from "@angular/material/icon";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-incentive-applications',
@@ -16,9 +18,8 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     DynamicTableComponent,
     ReactiveFormsModule,
-    IlogiInputComponent,
-    IlogiFileUploadComponent
-  ],
+    MatIconModule
+],
   templateUrl: './incentive-applications.component.html',
   styleUrl: './incentive-applications.component.scss'
 })
@@ -27,7 +28,7 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
   incentiveApplications: TableColumn[] = [];
   applications: any[] = [];
   subscriptions: Subscription;
-  currentUserRole: 'DA' | 'GM' = 'DA';
+  currentUserRole: 'DA' | 'GM' | 'SLC' = 'DA';
   remarkForm!: FormGroup;
   statusModal = {
     visible: false,
@@ -42,13 +43,17 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private genericService: GenericService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {
     this.subscriptions = new Subscription();
   }
 
   ngOnInit(): void {
     this.initForm();
+    const designation = localStorage.getItem('designation') || '';
+    this.currentUserRole = this.mapDesignationToRole(designation);
+
     const incentiveApplicationSubs = this.getAllIncentiveApplications();
     this.subscriptions.add(incentiveApplicationSubs);
   }
@@ -56,10 +61,18 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
   private initForm(): void {
     this.remarkForm = this.fb.group({
       remarks: ['', [Validators.required, Validators.minLength(5)]],
-      extraAmount: [null],
-      attachment: [null]
+      claimed_amount: [null],
+      approved_amount: [null],
+      remarkForm: [null],
     });
   }
+  private mapDesignationToRole(designation: string): 'DA' | 'GM' | 'SLC' {
+    if (designation.includes('Dealing Assistant')) return 'DA';
+    if (designation.includes('General Manager')) return 'GM';
+    if (designation.includes('State Level Committee')) return 'SLC';
+    return 'DA';
+  }
+
 
   getAllIncentiveApplications(): void {
     this.loaderService.showLoader();
@@ -87,62 +100,74 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
           { key: 'workflow_status', label: 'Workflow Status', type: 'text' },
           { key: 'submitted_at', label: 'Submitted At', type: 'text' },
           {
-            key: 'actions',
-            label: 'Actions',
-            type: 'action',
-            width: '220px',
-            actions: [
-              {
-                label: 'Approve',
-                color: 'success',
-                visible: (row: any) => row.workflow_status === 'Pending',
-                onClick: (row: any) => this.openStatusModal('approved', 'Approve Application', row)
-              },
-              {
-                label: 'Send Back',
-                color: 'warn',
-                visible: (row: any) => row.workflow_status === 'Pending',
-                onClick: (row: any) => this.openStatusModal('send_back', 'Send Back Application', row)
-              },
-              {
-                label: 'Reject',
-                color: 'danger',
-                visible: (row: any) => row.workflow_status === 'Pending',
-                onClick: (row: any) => this.openStatusModal('rejected', 'Reject Application', row)
-              },
-              // {
-              //   label: 'Raise Extra Payment',
-              //   icon: 'attach_money',
-              //   color: 'primary',
-              //   visible: (row: any) => row.workflow_status === 'Pending',
-              //   onClick: (row: any) => this.openStatusModal('raise_extra_payment', 'Raise Extra Payment', row)
-              // }
-            ]
-          }
+            key: 'view',
+            label: 'View',
+            type: 'icon',
+            icon: 'visibility',
+            onClick: (row: any) => this.router.navigate(
+              ['/dashboard/incentive-applications', row.application_id]
+            )
+          },
+          // {
+          //   key: 'actions',
+          //   label: 'Actions',
+          //   type: 'action',
+          //   width: '220px',
+          //   actions: [
+          //     {
+          //       label: 'Approve',
+          //       color: 'success',
+          //       visible: (row: any) => row.workflow_status?.toLowerCase().includes('pending') || row.workflow_status?.toLowerCase().includes('submitted'),
+          //       onClick: (row: any) => this.openStatusModal('approved', 'Approve Application', row)
+          //     },
+          //     {
+          //       label: 'Send Back',
+          //       color: 'warn',
+          //       visible: (row: any) => row.workflow_status?.toLowerCase().includes('pending') || row.workflow_status?.toLowerCase().includes('submitted'),
+          //       onClick: (row: any) => this.openStatusModal('send_back', 'Send Back Application', row)
+          //     },
+          //     {
+          //       label: 'Reject',
+          //       color: 'danger',
+          //       visible: (row: any) => row.workflow_status?.toLowerCase().includes('pending') || row.workflow_status?.toLowerCase().includes('submitted'),
+          //       onClick: (row: any) => this.openStatusModal('rejected', 'Reject Application', row)
+          //     },
+          //     // {
+          //     //   label: 'Raise Extra Payment',
+          //     //   icon: 'attach_money',
+          //     //   color: 'primary',
+          //     //   visible: (row: any) => row.workflow_status === 'Pending',
+          //     //   onClick: (row: any) => this.openStatusModal('claimed_amount', 'Raise Extra Payment', row)
+          //     // }
+          //   ]
+          // }
         ];
 
         this.cdr.detectChanges();
       });
   }
 
-  /** Open modal */
   openStatusModal(
-    action: 'approved' | 'send_back' | 'rejected' | 'raise_extra_payment',
+    action: 'approved' | 'send_back' | 'rejected' | 'claimed_amount',
     title: string,
     row?: any
   ): void {
     this.statusModal.visible = true;
     this.statusModal.title = title;
     this.statusModal.action = action;
-    this.statusModal.applicationId = row?.application_id || 0;
+    this.statusModal.applicationId = row?.application_id;
     this.remarkForm.reset();
 
-    if (action === 'raise_extra_payment') {
-      this.remarkForm.get('extraAmount')?.setValidators([Validators.required, Validators.min(1)]);
+    if (action === 'approved') {
+      this.remarkForm.get('claimed_amount')?.setValidators([Validators.required, Validators.min(1)]);
+      this.remarkForm.get('approved_amount')?.setValidators([Validators.required, Validators.min(1)]);
     } else {
-      this.remarkForm.get('extraAmount')?.clearValidators();
+      this.remarkForm.get('claimed_amount')?.clearValidators();
+      this.remarkForm.get('approved_amount')?.clearValidators();
     }
-    this.remarkForm.get('extraAmount')?.updateValueAndValidity();
+    this.remarkForm.get('claimed_amount')?.updateValueAndValidity();
+    this.remarkForm.get('approved_amount')?.updateValueAndValidity();
+
 
     this.cdr.detectChanges();
   }
@@ -150,7 +175,7 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
   closeModal(): void {
     this.statusModal.visible = false;
     this.remarkForm.reset();
-    this.remarkForm.get('attachment')?.setValue(null);
+    this.remarkForm.get('approved_amount')?.setValue(null);
     this.cdr.detectChanges();
   }
 
@@ -160,7 +185,7 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const { remarks, extraAmount, attachment } = this.remarkForm.value;
+    const { remarks, claimed_amount, approved_amount, attachment } = this.remarkForm.value;
     const { applicationId, action } = this.statusModal;
     const displayAction = action.replace('_', ' ').toUpperCase();
 
@@ -172,7 +197,8 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
       new_status: workflowStatus,
       workflow_status: workflowStatus,
       remarks: remarks,
-      extra_payment: extraAmount || null
+      claimed_amount: claimed_amount || null,
+      approved_amount: approved_amount || null,
     };
 
     this.loaderService.showLoader();
@@ -201,7 +227,7 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getWorkflowStatus(userRole: 'DA' | 'GM', action: string): string {
+  private getWorkflowStatus(userRole: 'DA' | 'GM' | 'SLC', action: string): string {
     const statusMap: any = {
       DA: {
         approved: 'approved_by_da',
@@ -212,6 +238,11 @@ export class IncentiveApplicationsComponent implements OnInit, OnDestroy {
         approved: 'approved_by_gm',
         rejected: 'rejected_by_gm',
         send_back: 'sent_back_by_gm',
+      },
+      SLC: {
+        approved: 'approved_by_slc',
+        rejected: 'rejected_by_slc',
+        send_back: 'sent_back_by_slc',
       }
     };
     return statusMap[userRole]?.[action] || action;

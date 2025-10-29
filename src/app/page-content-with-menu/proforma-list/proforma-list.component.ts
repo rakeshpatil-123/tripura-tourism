@@ -141,10 +141,12 @@ export class ProformaListComponent implements OnInit {
             statusLabel: p.status === 1 ? 'Active' : 'Inactive',
             statusColor: p.status === 1 ? 'green' : 'red'
           }));
-          this.proformaOptions = res.data.map((p: any) => ({
-            name: p.title,
-            code: p.id
-          }));
+          this.proformaOptions = res.data
+            .filter((p: any) => p.proforma_type === 'eligibility')
+            .map((p: any) => ({
+              name: p.title,
+              code: p.id
+            }));
         } else {
           this.proformas = [];
           this.proformaOptions = [];

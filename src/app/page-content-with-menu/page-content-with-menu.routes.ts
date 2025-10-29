@@ -265,6 +265,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department'] }
       },
       {
+        path: 'incentive-applications/:id',
+        loadComponent: () =>
+          import(
+            './incentive-application-details/incentive-application-details.component'
+          ).then((m) => m.IncentiveApplicationDetailsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department'] },
+      },
+      {
         path: 'business-user',
         loadComponent: () =>
           import('./business-users/business-users.component').then(
