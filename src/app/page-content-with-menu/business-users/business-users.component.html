@@ -18,6 +18,7 @@
       class="p-datatable-gridlines p-mb-4 animated-table">
       <ng-template pTemplate="header">
         <tr class="header-bg-color">
+          <th>No.</th>
           <th *ngFor="let col of columns" [ngClass]="{
               'col-ward': col.field === 'ward',
               'col-ulb': col.field === 'ulb',
@@ -31,9 +32,10 @@
           </th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-user>
+      <ng-template pTemplate="body" let-user let-rowIndex="rowIndex">
         <tr class="table-row-animate">
-          <td *ngFor="let col of columns" [ngClass]="{
+          <td>{{ rowIndex + 1 }}</td>
+          <td *ngFor="let col of columns; let rowIndex = index" [ngClass]="{
               'col-ward nowrap': col.field === 'ward',
               'col-ulb nowrap': col.field === 'ulb',
               'col-address wrap': col.field === 'address',

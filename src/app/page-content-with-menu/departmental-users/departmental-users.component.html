@@ -21,6 +21,9 @@
     <ng-template pTemplate="header">
       <tr class="header-bg-color">
         <th>
+          <div class="header-wrapper">Serial No.</div>
+        </th>
+        <th>
           <div class="header-wrapper">ID</div>
         </th>
         <th>
@@ -57,6 +60,9 @@
           <div class="header-wrapper">Department</div>
         </th>
         <th>
+          <div class="header-wrapper">Is Inspector</div>
+        </th>
+        <th>
           <div class="header-wrapper">Status</div>
         </th>
         <th>
@@ -72,6 +78,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-user let-rowIndex="rowIndex">
       <tr [ngClass]="'table-row-animate'">
+        <td>{{ rowIndex+1 }}</td>
         <td>{{ user.id || '----' }}</td>
         <td pTooltip="{{ user.name_of_enterprise }}" tooltipPosition="right">
           {{ user.name_of_enterprise || '----' }}
@@ -105,6 +112,9 @@
         </td>
         <td pTooltip="{{ user.department_name }}" tooltipPosition="right">
           {{ user.department_name || '----' }}
+        </td>
+        <td pTooltip="{{ user.inspector }}" tooltipPosition="right">
+          {{ user.inspector || '----' }}
         </td>
         <td>
           <form [formGroup]="userForms[user.id]">

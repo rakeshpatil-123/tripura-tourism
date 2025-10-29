@@ -80,6 +80,7 @@ export class DepartmentalUsersComponent implements OnInit {
             registered_enterprise_address: user.registered_enterprise_address,
             registered_enterprise_city: user.registered_enterprise_city,
             department_name: user.department_name,
+            inspector: user.inspector,
             department_id: user.department_id,
             status: user.status,
             created_by: user.created_by,

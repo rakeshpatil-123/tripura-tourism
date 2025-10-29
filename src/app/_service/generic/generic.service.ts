@@ -18,11 +18,11 @@ import Swal from 'sweetalert2';
 })
 export class GenericService {
   // API URLs (same as provided)
-  static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud'; 
-  static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static DEV_BACKEND_URL = 'http://192.168.1.12:8000';
+  static QA_BACKEND_URL = 'http://192.168.1.12:8000'; 
+  static UAT_BACKEND_URL = 'http://192.168.1.12:8000';
+  static CERTIN_BACKEND_URL = 'http://192.168.1.12:8000';
+  static PRODUCTION_BACKEND_URL = 'http://192.168.1.12:8000';
 
   public static BACKEND_URL(): string {
     console.log(window.location.origin);
@@ -564,7 +564,7 @@ getThirdPartyRedirect(url: string): Observable<string> {
     this.setLoginStatus(false);
     Swal.fire({
       title: 'Session Expired!',
-      html: `<strong>Your session has expired due to inactivity.<br>Please login again to continue.</strong>`,
+      html: `<strong>Your session has ended. Please log in again to continue.</strong>`,
       icon: 'warning',
       iconColor: '#f59e0b',
       background: '#fff7ed',
@@ -1719,6 +1719,11 @@ getThirdPartyRedirect(url: string): Observable<string> {
   changeIncentiveStatus(payload: any) : any {
     return this.http.post(
       `${this.baseUrl}/api/department/incentive/update-application-status`,payload, {headers: this.getHeaders()}
+    )
+  }
+  getViewDetailsOfIncentive(applicationId: any): any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/incentive/application-details`, { application_id: applicationId }, { headers: this.getHeaders() }
     )
   }
 }

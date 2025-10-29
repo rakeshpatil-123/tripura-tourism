@@ -25,7 +25,7 @@ import { finalize } from 'rxjs';
 })
 export class HolidaysComponent implements OnInit, AfterViewInit {
   holidays: any[] = [];
-  displayedColumns: string[] = ['id', 'description', 'holiday_date', 'actions'];
+  displayedColumns: string[] = ['sr_no', 'id', 'description', 'holiday_date', 'actions'];
   dataSource: MatTableDataSource<any> = new MatTableDataSource<any>([]);
   holidayForm!: FormGroup;
   isEditMode = false;

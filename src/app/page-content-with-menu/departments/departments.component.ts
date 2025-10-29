@@ -24,7 +24,7 @@ import { finalize } from 'rxjs';
 })
 export class DepartmentsComponent implements OnInit {
   departments: any[] = [];
-  displayedColumns: string[] = ['id', 'name', 'details', 'actions'];
+  displayedColumns: string[] = ['sr_no', 'id', 'name', 'details', 'actions'];
   dataSource = new MatTableDataSource<any>();
   departmentForm!: FormGroup;
   isEditMode = false;
@@ -115,7 +115,7 @@ export class DepartmentsComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.loaderService.showLoader();
-        this.genericService.deleteDepartment(dept.id).pipe(finalize(()=>this.loaderService.showLoader())).subscribe({
+        this.genericService.deleteDepartment(dept.id).pipe(finalize(() => this.loaderService.showLoader())).subscribe({
           next: () => {
             Swal.fire(
               'Deleted!',
@@ -132,6 +132,4 @@ export class DepartmentsComponent implements OnInit {
     }
   });
   }
-
-
 }

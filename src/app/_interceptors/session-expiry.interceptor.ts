@@ -7,13 +7,16 @@ import { GenericService } from '../_service/generic/generic.service';
 @Injectable()
 export class SessionExpiryInterceptor implements HttpInterceptor {
 
-  constructor(private genericService: GenericService) { }
+  constructor(private genericService: GenericService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 || error.error?.message === 'Session expired due to inactivity') {
-          this.genericService.autoLogout();
+        const message = error?.error?.message || error?.message;
+        if (error.status === 401 && message && message !== 'Invalid credentials') {
+          if (message === 'Unauthenticated.' || message === 'Session expired due to inactivity') {
+            this.genericService.autoLogout();
+          }
         }
         return throwError(() => error);
       })

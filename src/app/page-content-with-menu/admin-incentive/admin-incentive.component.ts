@@ -116,6 +116,7 @@ export class AdminIncentiveComponent implements OnInit {
   }
 
   schemeColumns: TableColumn[] = [
+    {key: 'sr_no', label: 'S.No', type: 'number'},
     { key: 'id', label: 'ID', type: 'number', sortable: true },
     { key: 'title', label: 'Scheme Title', type: 'text', sortable: true },
     { key: 'period', label: 'Period', type: 'text' },
@@ -283,9 +284,10 @@ export class AdminIncentiveComponent implements OnInit {
     this.genericService.getIncentivesScheme().pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
-          this.workflowData = res.data.map((r: any) => ({
+          this.workflowData = res.data.map((r: any, index: number) => ({
+            sr_no: index+1,
             id: r.id,
-            title: r.title,
+            title: r.title, 
             period: `${r.policy_start_date?.slice(0, 10)} → ${r.policy_end_date?.slice(0, 10)}`,
             proformaCount: r.proformas_count ?? 0,
             createdOn: r.created_at?.slice(0, 10),
