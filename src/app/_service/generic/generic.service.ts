@@ -18,11 +18,11 @@ import Swal from 'sweetalert2';
 })
 export class GenericService {
   // API URLs (same as provided)
-  static DEV_BACKEND_URL = 'http://192.168.1.12:8000';
-  static QA_BACKEND_URL = 'http://192.168.1.12:8000'; 
-  static UAT_BACKEND_URL = 'http://192.168.1.12:8000';
-  static CERTIN_BACKEND_URL = 'http://192.168.1.12:8000';
-  static PRODUCTION_BACKEND_URL = 'http://192.168.1.12:8000';
+  static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud'; 
+  static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
 
   public static BACKEND_URL(): string {
     console.log(window.location.origin);
