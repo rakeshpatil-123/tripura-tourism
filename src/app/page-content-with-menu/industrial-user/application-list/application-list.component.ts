@@ -22,7 +22,7 @@ interface ApplicationDataItem {
   id: number;
   applicationNumber: string;
   applicationDate: string;
- applicationDateRaw: Date | null;
+  applicationDateRaw: Date | null;
   applicationFor: string;
   departmentName: string;
   departmentId: string;
@@ -56,7 +56,7 @@ export class ApplicationSearchPageComponent implements OnInit {
   ApplicationData: ApplicationDataItem[] = [];
   filteredData: ApplicationDataItem[] = [];
   ApplicationColumns: TableColumn[] = [];
-
+  error: string = '';
   fromDate: string = '';
   department: string = '';
   applicationType: string = '';
@@ -71,10 +71,28 @@ export class ApplicationSearchPageComponent implements OnInit {
     { id: 'OTHER', name: 'Other' },
     { id: 'SPECIAL', name: 'Special' },
   ];
-  private serviceMap: Record<number, { name: string; dept: string; type: string; code: string }> = {
-    1: { name: 'Electrical NOC', dept: 'Electrical Inspectorate', type: 'CFO', code: 'CFO-EI1' },
-    14: { name: 'Factory License', dept: 'Labour Department', type: 'CFE', code: 'CFE-LB1' },
-    21: { name: 'MSME Registration', dept: 'Industries Dept', type: 'OTHER', code: 'OTH-MS1' },
+  private serviceMap: Record<
+    number,
+    { name: string; dept: string; type: string; code: string }
+  > = {
+    1: {
+      name: 'Electrical NOC',
+      dept: 'Electrical Inspectorate',
+      type: 'CFO',
+      code: 'CFO-EI1',
+    },
+    14: {
+      name: 'Factory License',
+      dept: 'Labour Department',
+      type: 'CFE',
+      code: 'CFE-LB1',
+    },
+    21: {
+      name: 'MSME Registration',
+      dept: 'Industries Dept',
+      type: 'OTHER',
+      code: 'OTH-MS1',
+    },
   };
 
   loading = false;
@@ -86,7 +104,7 @@ export class ApplicationSearchPageComponent implements OnInit {
     private apiService: GenericService,
     private dialog: MatDialog,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.defineColumns();
@@ -99,15 +117,26 @@ export class ApplicationSearchPageComponent implements OnInit {
     this.apiService.getAllDepartmentNames().subscribe({
       next: (res: any) => {
         this.loadingDepartments = false;
-        const list = (res?.data && Array.isArray(res.data)) ? res.data : (res?.data?.departments || []);
+        const list =
+          res?.data && Array.isArray(res.data)
+            ? res.data
+            : res?.data?.departments || [];
         if (Array.isArray(list) && list.length) {
           const opts = list.map((d: any) => {
             return {
-              id: d.id ? String(d.id) : (d.department_code || d.name || ''),
-              name: d.name || d.department_name || d.department || (d.name_of_enterprise || '')
+              id: d.id ? String(d.id) : d.department_code || d.name || '',
+              name:
+                d.name ||
+                d.department_name ||
+                d.department ||
+                d.name_of_enterprise ||
+                '',
             };
           });
-          this.departmentOptions = [{ id: '', name: 'All Departments' }, ...opts];
+          this.departmentOptions = [
+            { id: '', name: 'All Departments' },
+            ...opts,
+          ];
         } else {
           this.departmentOptions = [{ id: '', name: 'All Departments' }];
         }
@@ -126,12 +155,19 @@ export class ApplicationSearchPageComponent implements OnInit {
     const user_id = localStorage.getItem('userId') || '';
 
     this.apiService
-      .getByConditions({ user_id }, 'api/user/get-all-user-service-applications')
+      .getByConditions(
+        { user_id },
+        'api/user/get-all-user-service-applications'
+      )
       .subscribe({
         next: (res: any) => {
           this.loading = false;
           if (res?.status === 1 && res?.data) {
-            const rawData = Array.isArray(res.data.application) ? res.data.application : (Array.isArray(res.data) ? res.data : (res?.data?.application || []));
+            const rawData = Array.isArray(res.data.application)
+              ? res.data.application
+              : Array.isArray(res.data)
+              ? res.data
+              : res?.data?.application || [];
             if (!rawData || rawData.length === 0) {
               this.ApplicationData = [];
               this.filteredData = [];
@@ -139,8 +175,11 @@ export class ApplicationSearchPageComponent implements OnInit {
             }
 
             this.ApplicationData = rawData.map((app: any) => {
-              const rawDateStr = app.application_date || app.applicationDate || '';
-              const rawDateObj: Date | null = rawDateStr ? new Date(rawDateStr) : null;
+              const rawDateStr =
+                app.application_date || app.applicationDate || '';
+              const rawDateObj: Date | null = rawDateStr
+                ? new Date(rawDateStr)
+                : null;
 
               const serviceName =
                 app.service_title_or_description ||
@@ -150,15 +189,21 @@ export class ApplicationSearchPageComponent implements OnInit {
               const deptName =
                 app.department_name ||
                 this.serviceMap[app.service_id]?.dept ||
-                (app.department || 'Unknown Department');
+                app.department ||
+                'Unknown Department';
 
-              const appTypeRaw =
-                (app.application_type || this.serviceMap[app.service_id]?.type || '').toString();
+              const appTypeRaw = (
+                app.application_type ||
+                this.serviceMap[app.service_id]?.type ||
+                ''
+              ).toString();
               const appType = appTypeRaw ? appTypeRaw.toUpperCase() : '';
 
               return {
                 id: app.application_id || app.id || 0,
-                applicationNumber: app.application_number || `${app.application_id || app.id || 0}`,
+                applicationNumber:
+                  app.application_number ||
+                  `${app.application_id || app.id || 0}`,
                 applicationDate: rawDateObj ? this.formatDate(rawDateObj) : '',
                 applicationDateRaw: rawDateObj,
                 applicationFor: serviceName,
@@ -167,10 +212,15 @@ export class ApplicationSearchPageComponent implements OnInit {
                 applicationType: appType,
                 status: app.status || app.latest_workflow_status || '',
                 renewalDate: app.renewal_date || 'NA',
-                payment_status: this.toTitleCase(app.payment_status || 'pending'),
+                payment_status: this.toTitleCase(
+                  app.payment_status || 'pending'
+                ),
                 nocDetailsId: String(app.application_id || app.id || 0),
                 noc_master_id: String(app.service_id || app.noc_master_id || 0),
-                nocMasterId: this.serviceMap[app.service_id]?.code || (app.nocMasterId || ''),
+                nocMasterId:
+                  this.serviceMap[app.service_id]?.code ||
+                  app.nocMasterId ||
+                  '',
                 service_id: app.service_id || 0,
                 _raw: app,
               } as ApplicationDataItem;
@@ -195,21 +245,21 @@ export class ApplicationSearchPageComponent implements OnInit {
       {
         key: 'applicationNumber',
         label: 'Application No.',
-        type: 'link',
-        linkHref: (row: ApplicationDataItem) => {
-          if (row.applicationType?.toLowerCase() === 'cfo') {
-            return `#/cfo/electrical-inspectorate/${row.nocDetailsId}?mode=view`;
-          } else if (row.applicationType?.toLowerCase() === 'other') {
-            if (row.nocMasterId === 'OTH-ED1') {
-              return `#/other-services/view-power-LT/${row.noc_master_id}/${row.nocDetailsId}`;
-            } else if (row.nocMasterId === 'OTH-ED0') {
-              return `#/other-services/view-power-temporary/${row.noc_master_id}/${row.nocDetailsId}`;
-            }
-          }
-          return '#';
-        },
-        linkText: (row: ApplicationDataItem) => row.applicationNumber || '',
-        class: 'input-large-custom',
+        type: 'text',
+        // linkHref: (row: ApplicationDataItem) => {
+        //   if (row.applicationType?.toLowerCase() === 'cfo') {
+        //     return `#/cfo/electrical-inspectorate/${row.nocDetailsId}?mode=view`;
+        //   } else if (row.applicationType?.toLowerCase() === 'other') {
+        //     if (row.nocMasterId === 'OTH-ED1') {
+        //       return `#/other-services/view-power-LT/${row.noc_master_id}/${row.nocDetailsId}`;
+        //     } else if (row.nocMasterId === 'OTH-ED0') {
+        //       return `#/other-services/view-power-temporary/${row.noc_master_id}/${row.nocDetailsId}`;
+        //     }
+        //   }
+        //   return '#';
+        // },
+        // linkText: (row: ApplicationDataItem) => row.applicationNumber || '',
+        // class: 'input-large-custom',
       },
       {
         key: 'applicationDate',
@@ -238,10 +288,12 @@ export class ApplicationSearchPageComponent implements OnInit {
         format: (value: string) => this.toTitleCase(value),
         cellClass: (value: string) => {
           const v = (value || '').toString().toLowerCase();
-          if (v === 'send_back' || v === 'send back' || v === 'sendback') return 'status-send-back';
+          if (v === 'send_back' || v === 'send back' || v === 'sendback')
+            return 'status-send-back';
           if (v === 'approved') return 'status-approved';
           if (v === 'submitted') return 'status-submitted';
-          if (v === 'extra_payment' || v === 'extra payment') return 'status-extra-payment';
+          if (v === 'extra_payment' || v === 'extra payment')
+            return 'status-extra-payment';
           if (v === 'rejected') return 'status-rejected';
           return 'status-default';
         },
@@ -270,7 +322,7 @@ export class ApplicationSearchPageComponent implements OnInit {
           },
         ],
         class: 'text-center',
-      }
+      },
 
       // {
       //   key: 'dueDate',
@@ -321,12 +373,17 @@ export class ApplicationSearchPageComponent implements OnInit {
     const d = typeof date === 'string' ? new Date(date) : date;
     if (!(d instanceof Date) || isNaN(d.getTime())) return '';
 
-    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}/${d.getFullYear()}`;
   }
   toTitleCase(str?: string): string {
     if (!str) return '';
     const s = str.replace(/_/g, ' ').toLowerCase();
-    return s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1));
+    return s.replace(
+      /\w\S*/g,
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1)
+    );
   }
 
   handleModifyNavigation(row: ApplicationDataItem): void {
@@ -365,8 +422,9 @@ export class ApplicationSearchPageComponent implements OnInit {
     if (this.fromDate) {
       const parsedFrom = this.parseInputDate(this.fromDate);
       if (parsedFrom) {
-        result = result.filter((row) =>
-          row.applicationDateRaw && row.applicationDateRaw >= parsedFrom
+        result = result.filter(
+          (row) =>
+            row.applicationDateRaw && row.applicationDateRaw >= parsedFrom
         );
       }
     }
@@ -374,7 +432,11 @@ export class ApplicationSearchPageComponent implements OnInit {
       result = result.filter((row) => row.departmentId === this.department);
     }
     if (this.applicationType) {
-      result = result.filter((row) => row.applicationType?.toLowerCase() === this.applicationType.toLowerCase());
+      result = result.filter(
+        (row) =>
+          row.applicationType?.toLowerCase() ===
+          this.applicationType.toLowerCase()
+      );
     }
 
     this.filteredData = result;
@@ -409,23 +471,25 @@ export class ApplicationSearchPageComponent implements OnInit {
     const baseUrl = 'http://swaagatstaging.tripura.cloud/';
     this.apiService.downloadUserServiceCertificate(appId).subscribe({
       next: (res: any) => {
-        if (res?.download_url) {
+        if (res.status === 1 && res?.download_url) {
           const openPdf = baseUrl + res.download_url;
           window.open(openPdf, '_blank');
         } else {
+          this.error = res?.message || 'PDF file not found for this application.';
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'PDF URL not found. Please try again.',
+            text: this.error || 'PDF file not found for this application.',
             confirmButtonText: 'OK',
           });
         }
       },
-      error: () => {
+      error: (err: any) => {
         Swal.fire({
           icon: 'error',
           title: 'Download Failed',
-          text: 'Something went wrong while fetching the certificate.',
+          text:
+             this.error|| 'PDF file not found for this application.',
           confirmButtonText: 'Retry',
         });
       },
