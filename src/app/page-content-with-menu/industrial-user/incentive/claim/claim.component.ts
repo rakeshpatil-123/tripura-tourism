@@ -15,67 +15,22 @@ import { Router } from '@angular/router';
   templateUrl: './claim.component.html',
   styleUrls: ['./claim.component.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    DynamicTableComponent,
-    // IlogiSelectComponent,
-    FormsModule,
-    CommonModule,
-  ],
+  imports: [CommonModule, DynamicTableComponent, FormsModule, CommonModule],
 })
 export class ClaimComponent implements OnInit {
   schemes: SelectOption[] = [];
   selectedSchemeId: number | null = null;
   applications: any[] = [];
-  columns: any[] = []; 
+  columns: any[] = [];
 
   constructor(private appiService: GenericService, private router: Router) {}
 
   ngOnInit(): void {
     this.defineColumns();
-    this.loadEligibilityProforma()
-    // this.loadSchemes();
+    this.loadEligibilityProforma();
   }
 
-  // loadSchemes(): void {
-  //   this.appiService
-  //     .getByConditions({}, 'api/user/incentive/scheme-list')
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         if (res?.status === 1 && Array.isArray(res.data)) {
-  //           this.schemes = res.data.map((item: any) => ({
-  //             id: item.id,
-  //             name: item.title,
-  //           }));
-            
-  //           if (this.schemes.length > 0) {
-  //             this.selectedSchemeId = this.schemes[0].id;
-  //             if (this.selectedSchemeId !== null) {
-  //               this.loadEligibilityProforma(this.selectedSchemeId);
-  //             }
-  //           }
-  //         } else {
-  //           this.schemes = [];
-  //           this.applications = [];
-  //         }
-  //       },
-  //       error: (err: any) => {
-  //         this.appiService.openSnackBar('Failed to load schemes', 'Close');
-  //         this.schemes = [];
-  //         this.applications = [];
-  //       },
-  //     });
-  // }
-  // onSchemeChange(schemeId: number | null): void {
-  //   if (schemeId !== null) {
-  //     this.selectedSchemeId = schemeId;
-  //     // this.loadEligibilityProforma(schemeId);
-  //   }
-  // }
-
   loadEligibilityProforma(): void {
-    // const payload = { scheme_id: schemeId };
-
     this.appiService
       .getByConditions({}, 'api/user/incentive/claim-proforma-list')
       .subscribe({
@@ -84,13 +39,18 @@ export class ClaimComponent implements OnInit {
             this.applications = res.data.map((item: any, index: number) => ({
               slNo: index + 1,
               applicationCode: item.application_code || '—',
-              applicationType: item.application_type || '—',
-              applicationId: item.application_id || '_',
+              title: item.application_type || '—',
+              applicationNo: item.application_no || '—',
+              // claimType: item.claim_type || '_',
+              // maxClaimCount: item.max_claim_count || '_',
+              description: item.proforma_details || '_',
+              status: item.workflow_status || 'Not Applied',
               appliedOn: item.applied_on || '_',
-              certOrRejectedOn: item.certificate_issued_or_rejected_on || '_',
-              status: item.workflow_status || '_',
-              proforma_id: item.proforma_id,
-              link: '',
+              approvedOn: item.approved_on || '_',
+              ProformaId: item.proforma_id || '_',
+              schemeId: item.scheme_id || '_',
+              applicationId: item.application_id || '_',
+              isEdit: item.is_editable || false,
             }));
           } else {
             this.applications = [];
@@ -119,21 +79,33 @@ export class ClaimComponent implements OnInit {
         width: '80px',
       },
       {
-        key: 'applicationCode',
-        label: 'Application Code',
-        type: 'text',
-        width: '150px',
-      },
-      {
-        key: 'applicationType',
-        label: 'Application Type',
+        key: 'title',
+        label: 'Proforma Title',
         type: 'text',
         width: '200px',
         class: 'wrap-text',
       },
+      // {
+      //   key: 'proformaType',
+      //   label: 'Proforma Type',
+      //   type: 'text',
+      //   width: '150px',
+      // },
+      // {
+      //   key: 'claimType',
+      //   label: 'Claim Type',
+      //   type: 'text',
+      //   width: '120px',
+      // },
+      // {
+      //   key: 'maxClaimCount',
+      //   label: 'Max Claim Count',
+      //   type: 'text',
+      //   width: '150px',
+      // },
       {
-        key: 'applicationId',
-        label: 'Application ID',
+        key: 'description',
+        label: 'Description',
         type: 'text',
         width: '150px',
       },
@@ -141,11 +113,11 @@ export class ClaimComponent implements OnInit {
         key: 'appliedOn',
         label: 'Applied On',
         type: 'text',
-        width: '120px',
+        width: '150px',
       },
       {
-        key: 'certOrRejectedOn',
-        label: 'Certificate Issued / Rejected On',
+        key: 'approvedOn',
+        label: 'Approved On',
         type: 'text',
         width: '150px',
       },
@@ -154,11 +126,19 @@ export class ClaimComponent implements OnInit {
         label: 'Status',
         type: 'text',
         width: '180px',
-        cellClass: (value: string) => {
-          if (value?.includes('Rejected')) return 'status-rejected';
-          if (value?.includes('Approved')) return 'status-approved';
-          return '';
-        },
+     
+      },
+      {
+        key: 'applicationNo',
+        label: 'Application No',
+        type: 'text',
+        width: '150px',
+      },
+      {
+        key: 'applicationCode',
+        label: 'Application Code',
+        type: 'text',
+        width: '150px',
       },
       {
         key: 'actions',
@@ -169,26 +149,58 @@ export class ClaimComponent implements OnInit {
           {
             label: 'Apply',
             color: 'primary',
+            visible: (row: any) => row.isEdit === true ,
             onClick: (row: any) => {
+              console.log(row.proformaType);
+
               const navigationCommands = [
-                '/dashboard/eligibility/proforma-questionnaire-view',
-                row.proforma_id,
-                this.selectedSchemeId,
+                '/dashboard/proforma-questionnaire-view',
+                row.ProformaId,
+                row.schemeId,
               ];
 
-              const navigationExtras: any = {};
+              const queryParams: any = {
+                proforma_type: "claim",
+              };
 
               if (
                 row.applicationId &&
                 row.applicationId !== '_' &&
                 row.applicationId !== null
               ) {
-                navigationExtras.queryParams = {
-                  applicationId: row.applicationId,
-                };
+                queryParams.applicationId = row.applicationId;
               }
 
-              this.router.navigate(navigationCommands, navigationExtras);
+              this.router.navigate(navigationCommands, { queryParams });
+            },
+          },
+          {
+            label: 'View',
+            visible: (row: any) => row.isEdit === false ,
+
+            color: 'primary',
+            onClick: (row: any) => {
+              console.log(row.proformaType);
+
+              const navigationCommands = [
+                '/dashboard/proforma-questionnaire-view',
+                row.ProformaId,
+                row.schemeId,
+              ];
+
+              const queryParams: any = {
+                proforma_type: row.proformaType,
+              };
+
+              if (
+                row.applicationId &&
+                row.applicationId !== '_' &&
+                row.applicationId !== null
+              ) {
+                queryParams.applicationId = row.applicationId;
+              }
+
+              this.router.navigate(navigationCommands, { queryParams });
             },
           },
         ],

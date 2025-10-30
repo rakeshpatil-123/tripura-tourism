@@ -11,7 +11,6 @@ import { IlogiRadioComponent } from '../../../../customInputComponents/ilogi-rad
 import { IlogiInputDateComponent } from '../../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { CommonModule } from '@angular/common';
 
-
 interface FileMeta {
   file_id: string;
   path: string;
@@ -19,6 +18,13 @@ interface FileMeta {
   name: string;
   mime: string;
   size: number;
+}
+interface Application {
+  application_id: number;
+  application_no: string;
+  workflow_status: string;
+  application_type: string;
+  is_editable: boolean;
 }
 interface Question {
   id: number;
@@ -59,7 +65,10 @@ interface Question {
 })
 export class ProformaQuestionnaireViewComponent implements OnInit {
   proformaId: number | null = null;
+  fileNames: { [key: string]: string } = {};
+  appData:  Application | null = null; ;
   applicationId: number | null = null;
+  app_Type: string | null = null;
   questionnaireData: Question[] = [];
   groupedQuestions: { [key: string]: Question[] } = {};
   proformaForm!: FormGroup;
@@ -79,8 +88,12 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
+console.log('Resolved URLs:', this.resolvedFileUrls);
     const proformaId = this.route.snapshot.paramMap.get('proformaId');
     const schemeId = this.route.snapshot.paramMap.get('schemeId');
+    const appType = this.route.snapshot.queryParamMap.get('proforma_type');
+    console.log(appType, "App type");
+    
     const applicationId =
       this.route.snapshot.queryParamMap.get('applicationId');
     if (proformaId !== null && !isNaN(Number(proformaId))) {
@@ -89,6 +102,11 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
       this.error = 'Invalid proforma ID';
       return;
     }
+    if( appType !== null) {
+      this.app_Type = appType;
+      
+    }
+    // console.log(appType, "agaya");
 
     if (schemeId !== null && !isNaN(Number(schemeId))) {
       this.schemeId = Number(schemeId);
@@ -102,71 +120,12 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
 
     this.fetchQuestionnaire(this.proformaId);
   }
-  // private loadProformaId(): void {
-  //   const id = this.route.snapshot.paramMap.get('proformaId');
-  //   if (id !== null && !isNaN(Number(id))) {
-  //     this.proformaId = Number(id);
-  //     this.fetchQuestionnaire(this.proformaId);
-  //   } else {
-  //     this.error = 'Invalid proforma ID';
-  //   }
-  // }
 
   private getUserId(): number | null {
     const userId = localStorage.getItem('userId');
     return userId ? Number(userId) : null;
   }
 
-  // private fetchQuestionnaire(proformaId: number): void {
-  //   this.loading = true;
-  //   const payload = { proforma_id: proformaId };
-
-  //   this.apiService
-  //     .getByConditions(
-  //       payload,
-  //       'api/user/incentive/proforma-questionnaire-view'
-  //     )
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         if (res?.status === 1 && Array.isArray(res.data.questions)) {
-  //           this.questionnaireData = res.data.questions.map((q: any) => {
-  //             let parsedOptions: any = [];
-
-  //             if (q.question_type === 'select') {
-  //               parsedOptions = this.parseOptionsForSelect(
-  //                 q.options || q.default_value
-  //               );
-  //             } else if (['radio', 'checkbox'].includes(q.question_type)) {
-  //               parsedOptions = this.parseOptionsForRadioCheckbox(
-  //                 q.options || q.default_value
-  //               );
-  //             } else if (q.question_type === 'switch') {
-  //               parsedOptions = [
-  //                 { value: 'yes', name: 'Yes' },
-  //                 { value: 'no', name: 'No' },
-  //               ];
-  //             }
-
-  //             return {
-  //               ...q,
-  //               parsedOptions,
-  //             };
-  //           });
-
-  //           this.groupQuestions();
-  //           this.buildFormGroup();
-  //           this.loadDefaultValues();
-  //         } else {
-  //           this.error = res?.message || 'Failed to load questionnaire';
-  //           this.loading = false;
-  //         }
-  //       },
-  //       error: () => {
-  //         this.loading = false;
-  //         this.error = 'Failed to load questionnaire';
-  //       },
-  //     });
-  // }
   private fetchQuestionnaire(proformaId: number): void {
     this.loading = true;
 
@@ -183,22 +142,32 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data.questions)) {
-          this.questionnaireData = res.data.questions.map((q: any) => {
-  let parsedOptions: any = [];
+            this.appData = res.data.application ;
+            console.log(this.appData?.is_editable, "application data");
+            
+            this.questionnaireData = res.data.questions.map((q: any) => {
+              let parsedOptions: any = [];
 
-  if (q.question_type === 'select') {
-    parsedOptions = this.parseOptionsForSelect(q.options || q.default_value);
-  } else if (['radio', 'checkbox'].includes(q.question_type)) {
-    parsedOptions = this.parseOptionsForRadioCheckbox(q.options || q.default_value);
-  } else if (q.question_type === 'switch') {
-    parsedOptions = [{ value: 'yes', name: 'Yes' }, { value: 'no', name: 'No' }];
-  }
+              if (q.question_type === 'select') {
+                parsedOptions = this.parseOptionsForSelect(
+                  q.options || q.default_value
+                );
+              } else if (['radio', 'checkbox'].includes(q.question_type)) {
+                parsedOptions = this.parseOptionsForRadioCheckbox(
+                  q.options || q.default_value
+                );
+              } else if (q.question_type === 'switch') {
+                parsedOptions = [
+                  { value: 'yes', name: 'Yes' },
+                  { value: 'no', name: 'No' },
+                ];
+              }
 
-  return {
-    ...q,
-    parsedOptions,
-  };
-});
+              return {
+                ...q,
+                parsedOptions,
+              };
+            });
 
             this.groupQuestions();
             this.buildFormGroup();
@@ -220,7 +189,6 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
     this.questionnaireData.forEach((q) => {
       const control = this.proformaForm.get(q.id.toString());
 
-      // 🔹 Handle text, number, date, etc.
       if (control && q.value !== null && q.value !== undefined) {
         let valueToSet = q.value;
 
@@ -242,19 +210,19 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
         control.setValue(valueToSet);
       }
 
-      // 🔹 Handle single file
       if (q.question_type === 'file' && !q.upload_rule?.max_files) {
         if (Array.isArray(q.files) && q.files.length > 0) {
           const fileUrl = q.files[0].url;
+          const fileName =
+            q.files[0].name || this.extractFileNameFromUrl(fileUrl);
+
           this.resolvedFileUrls[q.id] = fileUrl;
-          // Create fake File for UI (so file-upload shows preview)
-          const fileName = q.files[0].name;
+
           const fakeFile = new File([], fileName, { type: q.files[0].mime });
           this.proformaForm.get(q.id.toString())?.setValue(fakeFile);
         }
       }
 
-      // 🔹 Handle multi-file
       if (q.question_type === 'file' && q.upload_rule?.max_files > 1) {
         const maxFiles = q.upload_rule.max_files;
         for (let i = 1; i <= maxFiles; i++) {
@@ -262,12 +230,15 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
           const fileControl = this.proformaForm.get(fileControlName);
           if (fileControl && Array.isArray(q.files) && q.files[i - 1]) {
             const fileUrl = q.files[i - 1].url;
+            const fileName =
+              q.files[i - 1].name || this.extractFileNameFromUrl(fileUrl);
+
             this.resolvedFileUrls[fileControlName] = fileUrl;
-            const fileName = q.files[i - 1].name;
+
             const fakeFile = new File([], fileName, {
               type: q.files[i - 1].mime,
             });
-            fileControl.setValue(fakeFile);
+            this.proformaForm.get(fileControlName)?.setValue(fakeFile);
           }
         }
       }
@@ -318,7 +289,14 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
               this.readonlyFields[q.id] = true;
 
               if (q.question_type === 'file') {
-                this.resolvedFileUrls[q.id] = res.value;
+                const url = res.value;
+                this.resolvedFileUrls[q.id] = url;
+
+                const fileName = this.extractFileNameFromUrl(url);
+                const fakeFile = new File([], fileName, {
+                  type: this.getFileMimeType(fileName),
+                });
+                control.setValue(fakeFile);
               }
             }
           }
@@ -333,6 +311,30 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
       this.cdr.detectChanges();
     });
   }
+  private extractFileNameFromUrl(url: string): string {
+  try {
+    return decodeURIComponent(url.split('?')[0].split('/').pop() || 'file');
+  } catch {
+    return 'file';
+  }
+}
+
+private getFileMimeType(fileName: string): string {
+  const ext = fileName.split('.').pop()?.toLowerCase();
+  const mimeMap: { [key: string]: string } = {
+    pdf: 'application/pdf',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    txt: 'text/plain',
+  };
+  return mimeMap[ext || ''] || 'application/octet-stream';
+}
 
   private parseOptionsForRadioCheckbox(
     optionsStr: string | null
@@ -510,10 +512,12 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
 
   getInputType(
     questionType: string
-  ): 'text' | 'number' | 'email' | 'textarea' | 'password' {
+  ): 'text' | 'number' | 'email' | 'textarea' | 'password' | 'tel' {
     switch (questionType) {
       case 'number':
         return 'number';
+         case 'tel': 
+      return 'tel';
       case 'email':
         return 'email';
       case 'textarea':
@@ -537,53 +541,70 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
     return index;
   }
 
-  private preparePayload(isDraft: boolean = false): {
-    payload: any;
-    files: { [questionId: number]: File[] };
-  } {
-    const formAnswers: { [key: string]: { value: any } } = {};
-    const files: { [questionId: number]: File[] } = {};
+private preparePayload(isDraft: boolean = false): {
+  payload: any;
+  files: { [questionId: number]: File[] };
+} {
+  const formAnswers: { [key: string]: { value: any } } = {};
+  const files: { [questionId: number]: File[] } = {};
 
-    const rawValues = this.proformaForm.getRawValue();
+  const rawValues = this.proformaForm.getRawValue();
 
-    this.questionnaireData.forEach((q) => {
-      if (q.question_type === 'file' && q.upload_rule?.max_files > 1) {
-        const fileArray: File[] = [];
-        for (let i = 1; i <= q.upload_rule.max_files; i++) {
-          const controlValue = rawValues[`${q.id}_${i}`];
-          if (controlValue instanceof File) {
-            fileArray.push(controlValue);
-          }
-        }
-        if (fileArray.length > 0) {
-          files[q.id] = fileArray;
-        }
-      } else if (q.question_type === 'file') {
-        const controlValue = rawValues[q.id];
-        if (controlValue instanceof File) {
-          files[q.id] = [controlValue];
-        }
-      } else {
-        let value = rawValues[q.id];
+  this.questionnaireData.forEach((q) => {
+    if (q.question_type === 'file' && q.upload_rule?.max_files > 1) {
+      const urlArray: string[] = [];
+      const fileArray: File[] = [];
 
-        if (q.question_type === 'date' && value instanceof Date) {
-          value = value.toISOString().split('T')[0];
-        } else if (q.question_type === 'checkbox' && Array.isArray(value)) {
-          value = value.join(', ');
-        }
+      for (let i = 1; i <= q.upload_rule.max_files; i++) {
+        const controlValue = rawValues[`${q.id}_${i}`];
+        const fileKey = `${q.id}_${i}`;
 
-        formAnswers[q.id] = { value: value || '' };
+        if (controlValue instanceof File && controlValue.size > 0) {
+          fileArray.push(controlValue);
+        }
+        else if (this.resolvedFileUrls[fileKey]) {
+          urlArray.push(this.resolvedFileUrls[fileKey]);
+        }
       }
-    });
 
-    const payload: any = {
-      scheme_id: this.schemeId,
-      proforma_id: this.proformaId,
-      application_type: 'eligibility',
-      form_answers_json: formAnswers,
-      save_data: isDraft ? 1 : 0,
-    };
+      if (urlArray.length > 0) {
+        formAnswers[q.id] = { value: urlArray };
+      }
 
-    return { payload, files };
-  }
+      if (fileArray.length > 0) {
+        files[q.id] = fileArray;
+      }
+    }
+    else if (q.question_type === 'file') {
+      const controlValue = rawValues[q.id];
+
+      if (controlValue instanceof File && controlValue.size > 0) {
+        files[q.id] = [controlValue];
+      } else if (this.resolvedFileUrls[q.id]) {
+        formAnswers[q.id] = { value: this.resolvedFileUrls[q.id] };
+      }
+    }
+    else {
+      let value = rawValues[q.id];
+      if (q.question_type === 'date' && value instanceof Date) {
+        value = value.toISOString().split('T')[0];
+      } else if (q.question_type === 'checkbox' && Array.isArray(value)) {
+        value = value.join(', ');
+      }
+      formAnswers[q.id] = { value: value || '' };
+    }
+  });
+
+  const application_type = this.app_Type || 'eligibility';
+
+  const payload: any = {
+    scheme_id: this.schemeId,
+    proforma_id: this.proformaId,
+    application_type: application_type,
+    form_answers_json: formAnswers,
+    save_data: isDraft ? 1 : 0,
+  };
+
+  return { payload, files };
+}
 }

@@ -99,10 +99,19 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department', 'individual'] }
       },
       {
-        path: 'eligibility/proforma-questionnaire-view/:proformaId/:schemeId',
+        path: 'proforma-questionnaire-view/:proformaId/:schemeId',
         loadComponent: () =>
           import('./industrial-user/incentive/proforma-questionnaire-view/proforma-questionnaire-view.component').then(
             (m) => m.ProformaQuestionnaireViewComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual'] }
+      },
+      {
+        path: 'workflow-history/:applicationId',
+        loadComponent: () =>
+          import('./industrial-user/incentive/workflow-history/workflow-history.component').then(
+            (m) => m.WorkflowHistoryComponent
           ),
         canActivate: [authGuard],
         data: { roles: ['department', 'individual'] }

@@ -66,6 +66,8 @@ export class EligibilityComponent implements OnInit {
       });
   }
   onSchemeChange(schemeId: number | null): void {
+    // console.log(schemeId, "scheme id");
+    
     if (schemeId !== null) {
       this.selectedSchemeId = schemeId;
       this.loadEligibilityProforma(schemeId);
@@ -82,12 +84,14 @@ export class EligibilityComponent implements OnInit {
           if (res?.status === 1 && Array.isArray(res.data)) {
             this.applications = res.data.map((item: any, index: number) => ({
               slNo: index + 1,
-              applicationCode: item.application_code || '—',
+              applicationNumber: item.application_no || '—',
               applicationType: item.application_type || '—',
               applicationId: item.application_id || '_',
               appliedOn: item.applied_on || '_',
               certOrRejectedOn: item.certificate_issued_or_rejected_on || '_',
-              status: item.workflow_status || '_',
+              status: item.workflow_status || 'Not Applied',
+              applicationCode: item.application_code || '_',
+              isEdit: item.is_editable || false,
               proforma_id: item.proforma_id,
               link: '',
             }));
@@ -118,35 +122,17 @@ export class EligibilityComponent implements OnInit {
         width: '80px',
       },
       {
-        key: 'applicationCode',
-        label: 'Application Code',
-        type: 'text',
-        width: '150px',
-      },
-      {
         key: 'applicationType',
-        label: 'Application Type',
+        label: 'Proforma Name',
         type: 'text',
         width: '200px',
         class: 'wrap-text',
-      },
-      {
-        key: 'applicationId',
-        label: 'Application ID',
-        type: 'text',
-        width: '150px',
       },
       {
         key: 'appliedOn',
         label: 'Applied On',
         type: 'text',
         width: '120px',
-      },
-      {
-        key: 'certOrRejectedOn',
-        label: 'Certificate Issued / Rejected On',
-        type: 'text',
-        width: '150px',
       },
       {
         key: 'status',
@@ -160,6 +146,30 @@ export class EligibilityComponent implements OnInit {
         },
       },
       {
+        key: 'certOrRejectedOn',
+        label: 'Certificate Issued / Rejected On',
+        type: 'text',
+        width: '150px',
+      },
+      {
+        key: 'applicationNumber',
+        label: 'Application Number',
+        type: 'text',
+        width: '150px',
+      },
+      {
+        key: 'applicationCode',
+        label: 'Application Code',
+        type: 'text',
+        width: '150px',
+      },
+      {
+        key: 'applicationId',
+        label: 'Application ID',
+        type: 'text',
+        width: '150px',
+      },
+      {
         key: 'actions',
         label: 'Action',
         type: 'action',
@@ -167,10 +177,11 @@ export class EligibilityComponent implements OnInit {
         actions: [
           {
             label: 'Apply',
+            visible: (row: any) => row.isEdit === true,
             color: 'primary',
             onClick: (row: any) => {
               const navigationCommands = [
-                '/dashboard/eligibility/proforma-questionnaire-view',
+                '/dashboard/proforma-questionnaire-view',
                 row.proforma_id,
                 this.selectedSchemeId,
               ];
@@ -190,6 +201,38 @@ export class EligibilityComponent implements OnInit {
               this.router.navigate(navigationCommands, navigationExtras);
             },
           },
+          {
+            label: 'View',
+            visible: (row: any) => row.isEdit === false,
+            color: 'primary',
+            onClick: (row: any) => {
+              const navigationCommands = [
+                '/dashboard/proforma-questionnaire-view',
+                row.proforma_id,
+                this.selectedSchemeId,
+              ];
+
+              const navigationExtras: any = {};
+
+              if (
+                row.applicationId &&
+                row.applicationId !== '_' &&
+                row.applicationId !== null
+              ) {
+                navigationExtras.queryParams = {
+                  applicationId: row.applicationId,
+                };
+              }
+
+              this.router.navigate(navigationCommands, navigationExtras);
+            },
+          },
+          {
+            label: 'History',
+            visible: (row: any) => row.applicationId && row.applicationId !== '_' && row.applicationId !== null,
+            color: 'accent',
+             onClick: (row: any) => {this.router.navigate(['/dashboard/workflow-history', row.applicationId]);}
+          }
         ],
       },
     ];

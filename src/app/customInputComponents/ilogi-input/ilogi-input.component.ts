@@ -30,7 +30,7 @@ import { MatIcon } from '@angular/material/icon';
     FloatLabelModule,
     BlockCopyPasteDirective,
     FontAwesomeModule,
-    MatIcon
+    MatIcon,
   ],
   templateUrl: './ilogi-input.component.html',
   styleUrls: ['./ilogi-input.component.scss'],
@@ -50,7 +50,8 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
   @Input() pipe: string = '';
   @Input() fieldExactVal: string | number | undefined;
   @Input() errorMessages: { [key: string]: string } = {};
-  @Input() type: 'text' | 'number' | 'email' | 'textarea' | 'password' = 'text'; 
+  @Input() type: 'text' | 'number' | 'tel' | 'email' | 'textarea' | 'password' =
+    'text';
   @Input() placeholder = '';
   @Input() mandatory = false;
   @Input() appBlockCopyPaste = false;
@@ -104,9 +105,12 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
     if (this.type === 'number') {
       value = value === '' ? null : parseFloat(value);
     }
+    else if (this.type === 'tel') {
+    value = value.replace(/\D/g, '');
+  }
 
-    this.value = value; 
-    this.onChange(this.value); 
+    this.value = value;
+    this.onChange(this.value);
     this.onTouched();
   }
 
@@ -137,11 +141,13 @@ export class IlogiInputComponent implements OnInit, ControlValueAccessor {
     if (this.type === 'password') {
       return this.passwordVisible ? 'text' : 'password';
     }
+    if (this.type === 'tel') {
+      return 'number';
+    }
     return this.type;
   }
 
-  // Add this getter for debugging
-get debugInfo(): string {
-  return `Type: ${this.type}, Password Visible: ${this.passwordVisible}, Input Type: ${this.inputType}`;
-}
+  get debugInfo(): string {
+    return `Type: ${this.type}, Password Visible: ${this.passwordVisible}, Input Type: ${this.inputType}`;
+  }
 }

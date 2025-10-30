@@ -14,7 +14,7 @@
   </div>
 
   <div class="application-card" *ngIf="application && !isLoading">
-  
+
     <section class="section">
       <div class="app-header">
         <h2 class="app-title">Application Information</h2>
@@ -56,9 +56,7 @@
         <span [ngClass]="getStatusBadgeClass(application?.status || '')">
           {{ (application?.status || '—') | titlecase }}
         </span>
-        <!-- <div class="remarks" *ngIf="application?.remarks">
-          <strong>Remarks:</strong> {{ application?.remarks || '—' }}
-        </div> -->
+
       </div>
     </section>
 
@@ -66,8 +64,20 @@
       <h2> Applicant Information</h2>
       <div class="grid">
         <div class="field" *ngFor="let qa of application.application_data_structured">
+          @if(!qa.answer.includes('http')) {
           <label>{{ qa.question }}</label>
           <span>{{ formatAnswerForDisplay(qa.answer) }}</span>
+          }
+          @if(qa.answer.includes('http')) {
+          <div class="file-display">
+          <label>{{ qa.question }}</label>
+
+            <span>{{ getFileNameFromUrl(qa.answer) }}</span>
+            <button type="button" class="btn-view btn-success btn-sm" (click)="previewFile(qa.answer)">
+              View
+            </button>
+          </div>
+          }
         </div>
       </div>
     </section>
@@ -137,39 +147,37 @@
       </div>
     </section>
 
-<section class="section" *ngIf="application?.history_data?.status_file">
-  <h2>Remarks</h2>
-  <div class="grid">
-    <div class="field">
-      <label>Status Document</label>
-      <div class="file-display">
-        <span>{{ getFileNameFromUrl(application?.history_data?.status_file) }}</span>
-        <button 
-          type="button" 
-          class="btn-view btn-success btn-sm" 
-          (click)="previewFile(application?.history_data?.status_file!)">
-          View
-        </button>
+    <section class="section" *ngIf="application?.history_data?.status_file">
+      <h2>Remarks</h2>
+      <div class="grid">
+        <div class="field">
+          <label>Document Status </label>
+          <div class="file-display">
+            <span>{{ getFileNameFromUrl(application?.history_data?.status_file) }}</span>
+            <button type="button" class="btn-view btn-success btn-sm"
+              (click)="previewFile(application?.history_data?.status_file!)">
+              View
+            </button>
+          </div>
+        </div>
+
+        <div class="field" *ngIf="application?.history_data?.remarks">
+          <label>Remarks</label>
+          <span>{{ application?.history_data?.remarks }}</span>
+        </div>
+
+        <div class="field">
+          <label>Action Taken At</label>
+          <span>{{ formatDate(application?.history_data?.action_taken_at) }}</span>
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <span [ngClass]="getStatusBadgeClass(application?.history_data?.status || '')">
+            {{ (application?.history_data?.status || '') | titlecase }}
+          </span>
+        </div>
       </div>
-    </div>
-
-    <div class="field" *ngIf="application?.history_data?.remarks">
-      <label>Remarks</label>
-      <span>{{ application?.history_data?.remarks }}</span>
-    </div>
-
-    <div class="field">
-      <label>Action Taken At</label>
-      <span>{{ formatDate(application?.history_data?.action_taken_at) }}</span>
-    </div>
-
-    <div class="field">
-      <label>Status</label>
-      <span [ngClass]="getStatusBadgeClass(application?.history_data?.status || '')">
-        {{ (application?.history_data?.status || '') | titlecase }}
-      </span>
-    </div>
-  </div>
-</section>
+    </section>
   </div>
 </div>
