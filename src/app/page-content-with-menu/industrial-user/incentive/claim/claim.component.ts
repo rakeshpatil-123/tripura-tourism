@@ -51,6 +51,7 @@ export class ClaimComponent implements OnInit {
               schemeId: item.scheme_id || '_',
               applicationId: item.application_id || '_',
               isEdit: item.is_editable || false,
+              isReapply: item.can_reapply || false,
             }));
           } else {
             this.applications = [];
@@ -147,6 +148,33 @@ export class ClaimComponent implements OnInit {
         width: '120px',
         actions: [
           {
+            label: 'Re Apply',
+            color: 'primary',
+            visible: (row: any) => row.isReapply === true ,
+            onClick: (row: any) => {
+
+              const navigationCommands = [
+                '/dashboard/proforma-questionnaire-view',
+                row.ProformaId,
+                row.schemeId,
+              ];
+
+              const queryParams: any = {
+                proforma_type: "claim",
+              };
+
+              // if (
+              //   row.applicationId &&
+              //   row.applicationId !== '_' &&
+              //   row.applicationId !== null
+              // ) {
+              //   queryParams.applicationId = row.applicationId;
+              // }
+
+              this.router.navigate(navigationCommands, { queryParams });
+            },
+          },
+          {
             label: 'Apply',
             color: 'primary',
             visible: (row: any) => row.isEdit === true ,
@@ -203,6 +231,12 @@ export class ClaimComponent implements OnInit {
               this.router.navigate(navigationCommands, { queryParams });
             },
           },
+           {
+            label: 'History',
+            visible: (row: any) => row.applicationId && row.applicationId !== '_' && row.applicationId !== null,
+            color: 'accent',
+             onClick: (row: any) => {this.router.navigate(['/dashboard/workflow-history', row.applicationId]);}
+          }
         ],
       },
     ];
