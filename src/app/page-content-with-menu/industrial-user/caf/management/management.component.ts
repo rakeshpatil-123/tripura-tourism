@@ -132,10 +132,14 @@ export class ManagementComponent implements OnInit, OnDestroy {
       chiefAdministrativeHead: this.fb.array([]),
     });
   }
-
   private createDummyFileFromUrl(url: string, fallbackName: string): File {
     const fileName = decodeURIComponent(url.split('/').pop() || fallbackName);
-    return new File([], fileName, { type: 'application/octet-stream' });
+    const fakeFile = new File([], fileName, {
+      type: 'application/octet-stream',
+    });
+    (fakeFile as any)._isFake = true;
+    (fakeFile as any)._originalUrl = url;
+    return fakeFile;
   }
 
   ngOnInit(): void {
@@ -365,12 +369,21 @@ export class ManagementComponent implements OnInit, OnDestroy {
       raw.ownerDetailsIsWomenEntrepreneur || 'NO'
     );
     formData.append('owner_details_is_minority', raw.ownerDetailsIsMinority);
+    const appendFile = (formValue: any, paramName: string) => {
+      if (formValue instanceof File) {
+        if ((formValue as any)._isFake) {
+          formData.append(paramName, (formValue as any)._originalUrl);
+        } else {
+          formData.append(paramName, formValue, formValue.name);
+        }
+      } else if (typeof formValue === 'string') {
+        formData.append(paramName, formValue);
+      }
+    };
 
-    if (raw.ownerDetailsPhoto) {
-      formData.append('owner_details_photo', raw.ownerDetailsPhoto);
-    }
+  appendFile(raw.ownerDetailsPhoto, 'owner_details_photo');
+  appendFile(raw.managerDetailsPhoto, 'manager_details_photo');
 
-    // Manager Details
     formData.append('manager_details_name', raw.managerDetailsName);
     formData.append(
       'manager_details_fathers_name',
@@ -392,29 +405,14 @@ export class ManagementComponent implements OnInit, OnDestroy {
       this.formatDate(raw.managerDetailsDob)
     );
 
-    if (raw.managerDetailsPhoto) {
-      formData.append('manager_details_photo', raw.managerDetailsPhoto);
-    }
+   
 
     // Signature Files
-    if (raw.signatureAuthorizationOfOwner) {
-      formData.append(
-        'signature_authorization_of_owner',
-        raw.signatureAuthorizationOfOwner
-      );
-    }
-    if (raw.factoryOccupiersSignature) {
-      formData.append(
-        'factory_occupiers_signature',
-        raw.factoryOccupiersSignature
-      );
-    }
-    if (raw.factoryManagersSignature) {
-      formData.append(
-        'factory_managers_signature',
-        raw.factoryManagersSignature
-      );
-    }
+ appendFile(raw.signatureAuthorizationOfOwner, 'signature_authorization_of_owner');
+  appendFile(raw.factoryOccupiersSignature, 'factory_occupiers_signature');
+  appendFile(raw.factoryManagersSignature, 'factory_managers_signature');
+
+
 
     // Partner Details
     raw.partnerDetails.forEach((p: any, i: number) => {
@@ -443,10 +441,8 @@ export class ManagementComponent implements OnInit, OnDestroy {
         `partner_details[${i}][date_of_joining]`,
         this.formatDate(p.dateOfJoining)
       );
-      if (p.idProof)
-        formData.append(`partner_details[${i}][id_proof_doc]`, p.idProof);
-      if (p.signature)
-        formData.append(`partner_details[${i}][signature_image]`, p.signature);
+   if (p.idProof) appendFile(p.idProof, `partner_details[${i}][id_proof_doc]`);
+    if (p.signature) appendFile(p.signature, `partner_details[${i}][signature_image]`);
     });
 
     // Board of Directors
@@ -505,10 +501,8 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.submitForm(payload, false);
   }
 
-
- 
-   submitForm(payload: FormData, isDraft: boolean): void {
-     console.log('Submitting form with payload:', payload);
+  submitForm(payload: FormData, isDraft: boolean): void {
+    console.log('Submitting form with payload:', payload);
 
     this.apiService
       .getByConditions(payload, 'api/caf/management-details-store')
@@ -593,12 +587,12 @@ export class ManagementComponent implements OnInit, OnDestroy {
   }
 
   onPartnerFileRemoved(index: number, fieldName: string): void {
-  const partnerGroup = this.partnerDetails.at(index) as FormGroup;
-  if (partnerGroup) {
-    // Clear the form control
-    partnerGroup.get(fieldName)?.reset();
+    const partnerGroup = this.partnerDetails.at(index) as FormGroup;
+    if (partnerGroup) {
+      // Clear the form control
+      partnerGroup.get(fieldName)?.reset();
+    }
   }
-}
   addDirector(data?: any): void {
     this.boardOfDirectors.push(
       this.fb.group({
@@ -636,57 +630,57 @@ export class ManagementComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-removeFile(fieldName: string): void {
-  const control = this.form.get(fieldName);
-  if (!control) return;
+  removeFile(fieldName: string): void {
+    const control = this.form.get(fieldName);
+    if (!control) return;
 
-  // ✅ Clear preview
-  if (fieldName === 'ownerDetailsPhoto') {
-    this.ownerPhotoPreview = null;
-  } else if (fieldName === 'managerDetailsPhoto') {
-    this.managerPhotoPreview = null;
-  } else if (fieldName === 'signatureAuthorizationOfOwner') {
-    this.signatureOwnerPreview = null;
-  } else if (fieldName === 'factoryOccupiersSignature') {
-    this.signatureOccupierPreview = null;
-  } else if (fieldName === 'factoryManagersSignature') {
-    this.signatureManagerPreview = null;
-  }
-
-  // ✅ Reset form control
-  control.reset();
-
-  // ✅ ONLY for owner or manager photo → send full form + deletion flag
-  if (fieldName === 'ownerDetailsPhoto' || fieldName === 'managerDetailsPhoto') {
-    // ✅ Build full form data (like saveAsDraft)
-    const formData = this.buildFormData(true); // ← isDraft = true → adds save_data=1
-
-    // ✅ Override photo field to null (since we're removing it)
     if (fieldName === 'ownerDetailsPhoto') {
-      formData.set('owner_details_photo', ''); // or null — test what backend accepts
-      formData.append('remove_owner_details_photo', 'delete');
+      this.ownerPhotoPreview = null;
     } else if (fieldName === 'managerDetailsPhoto') {
-      formData.set('manager_details_photo', '');
-      formData.append('remove_manager_details_photo', 'delete');
+      this.managerPhotoPreview = null;
+    } else if (fieldName === 'signatureAuthorizationOfOwner') {
+      this.signatureOwnerPreview = null;
+    } else if (fieldName === 'factoryOccupiersSignature') {
+      this.signatureOccupierPreview = null;
+    } else if (fieldName === 'factoryManagersSignature') {
+      this.signatureManagerPreview = null;
     }
 
-    // ✅ Call API
-    this.apiService
-      .getByConditions(formData, 'api/caf/management-details-store')
-      .subscribe({
-        next: (res) => {
-          console.log(`${fieldName} removed successfully`, res);
-          this.apiService.openSnackBar('File removed successfully', 'success');
-        },
-        error: (err) => {
-          console.error(`Error removing ${fieldName}:`, err);
-          this.apiService.openSnackBar('Failed to remove file', 'error');
-        },
-      });
-  }
+    control.reset();
 
-  this.cdr.markForCheck();
-}
+    if (
+      fieldName === 'ownerDetailsPhoto' ||
+      fieldName === 'managerDetailsPhoto'
+    ) {
+      const formData = this.buildFormData(true);
+
+      if (fieldName === 'ownerDetailsPhoto') {
+        formData.set('owner_details_photo', '');
+        formData.append('remove_owner_details_photo', 'delete');
+      } else if (fieldName === 'managerDetailsPhoto') {
+        formData.set('manager_details_photo', '');
+        formData.append('remove_manager_details_photo', 'delete');
+      }
+
+      this.apiService
+        .getByConditions(formData, 'api/caf/management-details-store')
+        .subscribe({
+          next: (res) => {
+            console.log(`${fieldName} removed successfully`, res);
+            this.apiService.openSnackBar(
+              'File removed successfully',
+              'success'
+            );
+          },
+          error: (err) => {
+            console.error(`Error removing ${fieldName}:`, err);
+            this.apiService.openSnackBar('Failed to remove file', 'error');
+          },
+        });
+    }
+
+    this.cdr.markForCheck();
+  }
 
   getImageUrl(photo: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(photo);

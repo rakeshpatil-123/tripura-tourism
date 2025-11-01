@@ -452,24 +452,12 @@ td .badge-unknown {
   min-height: 40px;
 }
 
-// .badge {
-//   display: inline-block;
-//   padding: 0.25em 0.6em;
-//   font-size: 0.85em;
-//   font-weight: 600;
-//   border-radius: 12px;
-//   text-transform: uppercase;
-//   letter-spacing: 0.5px;
-// }
 
 .badge-success {
   background-color: #d1f7e3;
   color: #0a7a3d;
 }
-// .badge-warning {
-//   background-color: #fff4d6;
-//   color: #926500;
-// }
+
 .badge-danger {
   background-color: #ffe5e5;
   color: #c62828;
@@ -479,7 +467,6 @@ td .badge-unknown {
   color: #0d47a1;
 }
 
-// Make action/status cells look better
 .text-center,
 .status,
 .payment {
@@ -551,13 +538,17 @@ td .badge-unknown {
   text-align: start!important;
 }
 
+::ng-deep  .table-controls[_ngcontent-ng-c1441840084]{
+  padding: 0 0 0 0 !important;
+  margin: 10px 16px 0 0!important;
+}
+
 .disabled-menu {
   opacity: 0.8;
   cursor: not-allowed;
-  pointer-events: auto; /* Keep tooltip and focus */
+  pointer-events: auto; 
 }
 
-/* Optional: Prevent hover effect when disabled */
 .disabled-menu:hover {
   background-color: transparent !important;
 }

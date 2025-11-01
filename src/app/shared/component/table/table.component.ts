@@ -14,7 +14,7 @@ import {
   ComponentFactoryResolver,
   Injector,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -76,7 +76,7 @@ export interface TableRowAction {
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatMenuModule, MatButtonModule, IlogiSelectComponent, MatIcon],
+  imports: [CommonModule, FormsModule, MatMenuModule, MatButtonModule, IlogiSelectComponent, MatIcon, ReactiveFormsModule],
 })
 export class DynamicTableComponent implements OnChanges {
   @Input() data: any[] = [];

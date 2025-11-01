@@ -17,11 +17,21 @@
             <app-ilogi-input
               *ngIf="['text','number','email','tel','textarea','password','url'].includes(q.question_type)"
               [formControlName]="q.id" [fieldLabel]="q.question_label" [placeholder]="q.question_label"
-              [mandatory]="q.is_required === 'yes'" [type]="getInputType(q.question_type)"
-              >
+              [mandatory]="q.is_required === 'yes'" [type]="getInputType(q.question_type)">
             </app-ilogi-input>
-
-            <!-- File Upload --> 
+            <div
+              *ngIf="app_Type === 'claim' && q.question_type === 'number' && q.is_claim === 'yes' && (q.claim_percentage !== null || q.claim_per_unit !== null)"
+              class="mt-1 ms-2 text-muted small">
+              <div *ngIf="q.claim_percentage !== null">
+                <strong class="color-green">Subsidy:</strong> &nbsp; <strong>₹{{ (claimCalculations[q.id] || 0) | number
+                  }}</strong>
+              </div>
+              <div *ngIf="q.claim_per_unit !== null">
+                <strong class="color-green">Subsidy:</strong> &nbsp; <strong>₹{{ (claimCalculations[q.id] || 0) | number
+                  }}</strong>
+              </div>
+            </div>
+            <!-- File Upload -->
             <ng-container *ngIf="q.question_type === 'file'">
               <p>{{q.question_label}}</p>
               <ng-container *ngIf="q.upload_rule?.max_files > 1; else singleFile">
@@ -33,8 +43,7 @@
                   </app-ilogi-file-upload> -->
                   <app-ilogi-file-upload [formControlName]="getMultiFileControlName(q.id, i)"
                     [maxFileSize]="(q.upload_rule?.max_size_mb || 5) * 1024 * 1024"
-                    [fileUrl]="getFullFileUrl(resolvedFileUrls[getMultiFileControlName(q.id, i)])"
-                    >
+                    [fileUrl]="getFullFileUrl(resolvedFileUrls[getMultiFileControlName(q.id, i)])">
                   </app-ilogi-file-upload>
                 </div>
               </ng-container>
@@ -43,8 +52,7 @@
                 <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
                   [accept]="q.upload_rule?.mimes?.join(',') || '*'"
                   [maxFileSize]="(q.upload_rule?.max_size_mb || 5) * 1024 * 1024"
-                  [fileUrl]=" getFullFileUrl(getFileUrl(q.id)) "
-                  >
+                  [fileUrl]=" getFullFileUrl(getFileUrl(q.id)) ">
                 </app-ilogi-file-upload>
               </ng-template>
             </ng-container>
@@ -52,13 +60,13 @@
             <!-- Select -->
             <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
               [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
-              [selectOptions]="getSelectOptions(q)" placeholder="Select..." >
+              [selectOptions]="getSelectOptions(q)" placeholder="Select...">
             </app-ilogi-select>
 
             <!-- Radio -->
             <app-ilogi-radio *ngIf="q.question_type === 'radio' && getRadioOptions(q).length > 0"
               [formControlName]="q.id" [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
-              [radioOptions]="getRadioOptions(q)" >
+              [radioOptions]="getRadioOptions(q)">
             </app-ilogi-radio>
 
             <!-- Checkbox -->
@@ -70,7 +78,7 @@
             <!-- Date -->
             <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
               [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" placeholder="DD-MM-YYYY"
-              [submitted]="proformaForm.touched" >
+              [submitted]="proformaForm.touched">
             </app-ilogi-input-date>
 
             <!-- Switch -->
@@ -78,24 +86,32 @@
               [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" [radioOptions]="[
                 { value: 'yes', name: 'Yes' },
                 { value: 'no', name: 'No' }
-              ]" >
+              ]">
             </app-ilogi-radio>
 
           </div>
         </div>
       </div>
-      @if(appData?.is_editable === true || appData === null && questionnaireData.length > 0) {
+      <div class="d-flex justify-content-between align-items-center">
 
-      <div class="m-4">
-        <button type="button" class="btn btn-secondary me-2" (click)="onSaveAsDraft()"
-          [disabled]="proformaForm.invalid">
-          Save as Draft
-        </button>
-        <button type="button" class="btn btn-success" (click)="onSubmit()" [disabled]="proformaForm.invalid">
-          Submit
-        </button>
+        @if(app_Type === 'claim' && totalClaimAmount > 0) {
+        <div class="alert alert-info ">
+          <strong>Total Claim Amount:</strong> ₹{{ totalClaimAmount | number }}
+        </div>
+        }
+        @if(appData?.is_editable === true || appData === null && questionnaireData.length > 0) {
+
+        <div class="mt-2">
+          <button type="button" class="btn btn-secondary me-2" (click)="onSaveAsDraft()"
+            [disabled]="proformaForm.invalid">
+            Save as Draft
+          </button>
+          <button type="button" class="btn btn-success" (click)="onSubmit()" [disabled]="proformaForm.invalid">
+            Submit
+          </button>
+        </div>
+        }
       </div>
-      }
     </form>
   </ng-template>
 

@@ -1,6 +1,6 @@
 // proforma-questionnaire-view.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { GenericService } from '../../../../_service/generic/generic.service';
 import { IlogiSelectComponent } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
@@ -43,6 +43,9 @@ interface Question {
   parsedOptions:
     | { id: string; name: string }[]
     | { value: string; name: string }[];
+  is_claim: 'yes' | 'no';
+  claim_percentage: number | null;
+  claim_per_unit: number | null;
 
   value: any;
   files: FileMeta[];
@@ -64,9 +67,11 @@ interface Question {
   ],
 })
 export class ProformaQuestionnaireViewComponent implements OnInit {
+  claimCalculations: { [questionId: number]: number } = {};
+  totalClaimAmount: number = 0;
   proformaId: number | null = null;
   fileNames: { [key: string]: string } = {};
-  appData:  Application | null = null; ;
+  appData: Application | null = null;
   applicationId: number | null = null;
   app_Type: string | null = null;
   questionnaireData: Question[] = [];
@@ -82,18 +87,19 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
     private route: ActivatedRoute,
     private apiService: GenericService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {
     this.proformaForm = this.fb.group({});
   }
 
   ngOnInit(): void {
-console.log('Resolved URLs:', this.resolvedFileUrls);
+    console.log('Resolved URLs:', this.resolvedFileUrls);
     const proformaId = this.route.snapshot.paramMap.get('proformaId');
     const schemeId = this.route.snapshot.paramMap.get('schemeId');
     const appType = this.route.snapshot.queryParamMap.get('proforma_type');
-    console.log(appType, "App type");
-    
+    console.log(appType, 'App type');
+
     const applicationId =
       this.route.snapshot.queryParamMap.get('applicationId');
     if (proformaId !== null && !isNaN(Number(proformaId))) {
@@ -102,9 +108,8 @@ console.log('Resolved URLs:', this.resolvedFileUrls);
       this.error = 'Invalid proforma ID';
       return;
     }
-    if( appType !== null) {
+    if (appType !== null) {
       this.app_Type = appType;
-      
     }
     // console.log(appType, "agaya");
 
@@ -142,9 +147,9 @@ console.log('Resolved URLs:', this.resolvedFileUrls);
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data.questions)) {
-            this.appData = res.data.application ;
-            console.log(this.appData?.is_editable, "application data");
-            
+            this.appData = res.data.application;
+            console.log(this.appData?.is_editable, 'application data');
+
             this.questionnaireData = res.data.questions.map((q: any) => {
               let parsedOptions: any = [];
 
@@ -312,29 +317,29 @@ console.log('Resolved URLs:', this.resolvedFileUrls);
     });
   }
   private extractFileNameFromUrl(url: string): string {
-  try {
-    return decodeURIComponent(url.split('?')[0].split('/').pop() || 'file');
-  } catch {
-    return 'file';
+    try {
+      return decodeURIComponent(url.split('?')[0].split('/').pop() || 'file');
+    } catch {
+      return 'file';
+    }
   }
-}
 
-private getFileMimeType(fileName: string): string {
-  const ext = fileName.split('.').pop()?.toLowerCase();
-  const mimeMap: { [key: string]: string } = {
-    pdf: 'application/pdf',
-    jpg: 'image/jpeg',
-    jpeg: 'image/jpeg',
-    png: 'image/png',
-    gif: 'image/gif',
-    doc: 'application/msword',
-    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    xls: 'application/vnd.ms-excel',
-    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    txt: 'text/plain',
-  };
-  return mimeMap[ext || ''] || 'application/octet-stream';
-}
+  private getFileMimeType(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    const mimeMap: { [key: string]: string } = {
+      pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      txt: 'text/plain',
+    };
+    return mimeMap[ext || ''] || 'application/octet-stream';
+  }
 
   private parseOptionsForRadioCheckbox(
     optionsStr: string | null
@@ -416,6 +421,46 @@ private getFileMimeType(fileName: string): string {
     });
 
     this.proformaForm = this.fb.group(group);
+
+    if (this.app_Type === 'claim') {
+      this.questionnaireData.forEach((q) => {
+        if (
+          q.question_type === 'number' &&
+          q.is_claim === 'yes' &&
+          (q.claim_percentage !== null || q.claim_per_unit !== null)
+        ) {
+          const control = this.proformaForm.get(q.id.toString());
+          if (control) {
+            control.valueChanges.subscribe((val) => {
+              this.updateClaimCalculation(q, val);
+            });
+          }
+        }
+      });
+    }
+  }
+
+  private updateClaimCalculation(question: Question, inputValue: any): void {
+    let amount = 0;
+
+    const numValue = parseFloat(inputValue);
+    if (!isNaN(numValue) && numValue > 0) {
+      if (question.claim_percentage !== null) {
+        amount = numValue * (question.claim_percentage / 100);
+      } else if (question.claim_per_unit !== null) {
+        amount = numValue * question.claim_per_unit;
+      }
+    }
+
+    this.claimCalculations[question.id] = amount;
+    this.recalculateTotalClaim();
+  }
+
+  private recalculateTotalClaim(): void {
+    this.totalClaimAmount = Object.values(this.claimCalculations).reduce(
+      (sum, val) => sum + val,
+      0
+    );
   }
 
   private groupQuestions(): void {
@@ -478,6 +523,11 @@ private getFileMimeType(fileName: string): string {
               res.message || 'Application saved successfully!',
               'success'
             );
+            if (this.app_Type === 'claim') {
+              window.location.href = 'dashboard/claim';
+            } else {
+              window.location.href = 'dashboard/eligibility';
+            }
           } else {
             this.apiService.openSnackBar(
               res?.message || 'Operation failed.',
@@ -493,6 +543,11 @@ private getFileMimeType(fileName: string): string {
   }
 
   onSubmit(): void {
+    const missingField = this.getMissingRequiredField();
+    if (missingField) {
+      this.apiService.openSnackBar(`Please fill: ${missingField}`, 'error');
+      return;
+    }
     if (this.proformaForm.invalid || this.schemeId === null) {
       this.apiService.openSnackBar('Please fill all required fields.', 'error');
       return;
@@ -510,14 +565,75 @@ private getFileMimeType(fileName: string): string {
     this.sendApplication(payload, files);
   }
 
+  private getMissingRequiredField(): string | null {
+    const rawValues = this.proformaForm.getRawValue();
+
+    for (const q of this.questionnaireData) {
+      if (q.is_required !== 'yes') continue;
+
+      let value: any;
+
+      if (q.question_type === 'file') {
+        if (q.upload_rule?.max_files > 1) {
+          let hasFile = false;
+          for (let i = 1; i <= q.upload_rule.max_files; i++) {
+            const controlName = `${q.id}_${i}`;
+            if (
+              (rawValues[controlName] instanceof File &&
+                rawValues[controlName].size > 0) ||
+              this.resolvedFileUrls[controlName]
+            ) {
+              hasFile = true;
+              break;
+            }
+          }
+          if (!hasFile) {
+            return q.question_label;
+          }
+        } else {
+          const controlValue = rawValues[q.id];
+          if (
+            !(controlValue instanceof File && controlValue.size > 0) &&
+            !this.resolvedFileUrls[q.id]
+          ) {
+            return q.question_label;
+          }
+        }
+      } else {
+        value = rawValues[q.id];
+
+        if (q.question_type === 'checkbox') {
+          if (!Array.isArray(value) || value.length === 0) {
+            return q.question_label;
+          }
+        } else if (q.question_type === 'switch') {
+          if (value !== 'yes' && value !== 'no') {
+            return q.question_label;
+          }
+        } else {
+          if (
+            value === null ||
+            value === undefined ||
+            value === '' ||
+            (typeof value === 'string' && value.trim() === '')
+          ) {
+            return q.question_label;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   getInputType(
     questionType: string
   ): 'text' | 'number' | 'email' | 'textarea' | 'password' | 'tel' {
     switch (questionType) {
       case 'number':
         return 'number';
-         case 'tel': 
-      return 'tel';
+      case 'tel':
+        return 'tel';
       case 'email':
         return 'email';
       case 'textarea':
@@ -541,70 +657,71 @@ private getFileMimeType(fileName: string): string {
     return index;
   }
 
-private preparePayload(isDraft: boolean = false): {
-  payload: any;
-  files: { [questionId: number]: File[] };
-} {
-  const formAnswers: { [key: string]: { value: any } } = {};
-  const files: { [questionId: number]: File[] } = {};
+  private preparePayload(isDraft: boolean = false): {
+    payload: any;
+    files: { [questionId: number]: File[] };
+  } {
+    const formAnswers: { [key: string]: { value: any } } = {};
+    const files: { [questionId: number]: File[] } = {};
 
-  const rawValues = this.proformaForm.getRawValue();
+    const rawValues = this.proformaForm.getRawValue();
 
-  this.questionnaireData.forEach((q) => {
-    if (q.question_type === 'file' && q.upload_rule?.max_files > 1) {
-      const urlArray: string[] = [];
-      const fileArray: File[] = [];
+    this.questionnaireData.forEach((q) => {
+      if (q.question_type === 'file' && q.upload_rule?.max_files > 1) {
+        const urlArray: string[] = [];
+        const fileArray: File[] = [];
 
-      for (let i = 1; i <= q.upload_rule.max_files; i++) {
-        const controlValue = rawValues[`${q.id}_${i}`];
-        const fileKey = `${q.id}_${i}`;
+        for (let i = 1; i <= q.upload_rule.max_files; i++) {
+          const controlValue = rawValues[`${q.id}_${i}`];
+          const fileKey = `${q.id}_${i}`;
+
+          if (controlValue instanceof File && controlValue.size > 0) {
+            fileArray.push(controlValue);
+          } else if (this.resolvedFileUrls[fileKey]) {
+            urlArray.push(this.resolvedFileUrls[fileKey]);
+          }
+        }
+
+        if (urlArray.length > 0) {
+          formAnswers[q.id] = { value: urlArray };
+        }
+
+        if (fileArray.length > 0) {
+          files[q.id] = fileArray;
+        }
+      } else if (q.question_type === 'file') {
+        const controlValue = rawValues[q.id];
 
         if (controlValue instanceof File && controlValue.size > 0) {
-          fileArray.push(controlValue);
+          files[q.id] = [controlValue];
+        } else if (this.resolvedFileUrls[q.id]) {
+          formAnswers[q.id] = { value: this.resolvedFileUrls[q.id] };
         }
-        else if (this.resolvedFileUrls[fileKey]) {
-          urlArray.push(this.resolvedFileUrls[fileKey]);
+      } else {
+        let value = rawValues[q.id];
+        if (q.question_type === 'date' && value instanceof Date) {
+          value = value.toISOString().split('T')[0];
+        } else if (q.question_type === 'checkbox' && Array.isArray(value)) {
+          value = value.join(', ');
         }
+        formAnswers[q.id] = { value: value || '' };
       }
+    });
 
-      if (urlArray.length > 0) {
-        formAnswers[q.id] = { value: urlArray };
-      }
+    const application_type = this.app_Type || 'eligibility';
 
-      if (fileArray.length > 0) {
-        files[q.id] = fileArray;
-      }
+    const payload: any = {
+      scheme_id: this.schemeId,
+      proforma_id: this.proformaId,
+      application_type: application_type,
+      form_answers_json: formAnswers,
+      save_data: isDraft ? 1 : 0,
+    };
+
+    if (this.applicationId !== null) {
+      payload.application_id = this.applicationId;
     }
-    else if (q.question_type === 'file') {
-      const controlValue = rawValues[q.id];
 
-      if (controlValue instanceof File && controlValue.size > 0) {
-        files[q.id] = [controlValue];
-      } else if (this.resolvedFileUrls[q.id]) {
-        formAnswers[q.id] = { value: this.resolvedFileUrls[q.id] };
-      }
-    }
-    else {
-      let value = rawValues[q.id];
-      if (q.question_type === 'date' && value instanceof Date) {
-        value = value.toISOString().split('T')[0];
-      } else if (q.question_type === 'checkbox' && Array.isArray(value)) {
-        value = value.join(', ');
-      }
-      formAnswers[q.id] = { value: value || '' };
-    }
-  });
-
-  const application_type = this.app_Type || 'eligibility';
-
-  const payload: any = {
-    scheme_id: this.schemeId,
-    proforma_id: this.proformaId,
-    application_type: application_type,
-    form_answers_json: formAnswers,
-    save_data: isDraft ? 1 : 0,
-  };
-
-  return { payload, files };
-}
+    return { payload, files };
+  }
 }
