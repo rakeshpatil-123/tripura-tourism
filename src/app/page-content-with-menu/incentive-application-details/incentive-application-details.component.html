@@ -124,9 +124,9 @@
               <label for="status" class="form-label">Change Status</label>
               <select id="status" class="status-dropdown" formControlName="new_status" [disabled]="!can_update_status">
                 <option value="" disabled>Select new status</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="sent_back">Sent Back</option>
+                <option value="approved">Approve</option>
+                <option value="rejected">Reject</option>
+                <option value="sent_back">Send Back</option>
               </select>
               <div *ngIf="statusForm.get('new_status')?.touched && statusForm.get('new_status')?.invalid" class="error">
                 Please select a status.

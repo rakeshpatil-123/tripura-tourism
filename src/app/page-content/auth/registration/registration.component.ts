@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiSelectComponent, SelectOption } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { Router } from '@angular/router';
 import { GenericService } from '../../../_service/generic/generic.service';
+import { IlogiRadioComponent } from '../../../customInputComponents/ilogi-radio/ilogi-radio.component';
 
 interface District {
   district_code: string;
@@ -25,7 +26,6 @@ interface Ward {
   gp_vc_ward_lgd_code: string;
   name_of_gp_vc_or_ward: string;
 }
-
 @Component({
   selector: 'app-registration',
   standalone: true,
@@ -33,12 +33,13 @@ interface Ward {
     CommonModule,
     ReactiveFormsModule,
     IlogiInputComponent,
-    IlogiSelectComponent
-  ],
+    IlogiSelectComponent,
+    IlogiRadioComponent
+],
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.scss']
 })
-export class RegistrationComponent implements OnInit {
+export class RegistrationComponent implements OnInit, OnChanges {
   @Input() sourcePage: string | null = null;
   @Output() registrationSuccess = new EventEmitter<void>();
   @Input() editMode: boolean = false;
@@ -106,12 +107,13 @@ export class RegistrationComponent implements OnInit {
     this.getAllDepartmentList();
     if (this.sourcePage === 'departmental-users') {
       this.registrationForm.patchValue({ user_type: 'department' });
+      this.registrationForm.addControl('inspector', this.fb.control([]));
       this.registrationForm.addControl('hierarchy_level', this.fb.control('', []));
       this.registrationForm.addControl('department_id', this.fb.control('', []));
       this.registrationForm.addControl('designation', this.fb.control('', []));
     } else {
       this.registrationForm.patchValue({ user_type: 'individual' });
-      ['hierarchy_level', 'department_id', 'designation'].forEach(ctrl => {
+      ['hierarchy_level', 'inspector', 'department_id', 'designation'].forEach(ctrl => {
         if (this.registrationForm.contains(ctrl)) {
           this.registrationForm.removeControl(ctrl);
         }
@@ -141,7 +143,6 @@ export class RegistrationComponent implements OnInit {
   prefillEditData(): void {
     const data = this.editData;
     if (!data) return;
-
     const prefill = {
       name_of_enterprise: data.name_of_enterprise || '',
       authorized_person_name: data.authorized_person_name || '',
@@ -157,7 +158,8 @@ export class RegistrationComponent implements OnInit {
       subdivision_id: String(data.subdivision_code) || '',
       ulb_id: String(data.ulb_code) || '',
       ward_id: String(data.ward_code) || '',
-      user_type: data.user_type || 'department'
+      user_type: data.user_type || 'department',
+      inspector: data.inspector === 'yes' ? '1' : '0'
     };
 
     this.registrationForm.patchValue(prefill);
@@ -366,6 +368,13 @@ export class RegistrationComponent implements OnInit {
   onSubmit(): void {
     if (this.registrationForm.valid) {
       const { confirmPassword, ...payload } = this.registrationForm.value;
+      if (payload.hasOwnProperty('inspector')) {
+        if (payload.inspector === '1' || payload.inspector === 1) {
+          payload.inspector = 'yes';
+        } else if (payload.inspector === '0' || payload.inspector === 0) {
+          payload.inspector = 'no';
+        }
+      }
       const hierarchyFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
       hierarchyFields.forEach((field) => {
         const base = field.replace('_id', '');
@@ -378,6 +387,7 @@ export class RegistrationComponent implements OnInit {
         delete payload.department_id;
         delete payload.designation;
         delete payload.hierarchy_level;
+        delete payload.inspector;
       }
       if (this.editMode && this.editData?.user_id) {
         const payloadWithId = { ...payload, id: this.editData.user_id };
@@ -483,5 +493,11 @@ export class RegistrationComponent implements OnInit {
       return ['district', 'subdivision', 'block'].includes(field);
     }
     return false;
+  }
+  getRadioOptions() {
+    return [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' }
+    ];
   }
 }

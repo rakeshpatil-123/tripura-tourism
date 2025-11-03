@@ -1,0 +1,8 @@
+<div class="inspection-container fade-in">
+  <h1 class="page-head">Departmental Inspection Requests</h1>
+  <app-dynamic-table [data]="inspections" [columns]="inspectionColumns" [pageSize]="10" [showPagination]="true"
+    [searchable]="true"></app-dynamic-table>
+  <div *ngIf="!inspections?.length" class="no-data">
+    <p>No inspection requests found for this department.</p>
+  </div>
+</div>

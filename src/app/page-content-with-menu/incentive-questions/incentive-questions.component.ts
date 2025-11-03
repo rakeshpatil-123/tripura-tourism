@@ -71,7 +71,7 @@ export class IncentiveQuestionsComponent implements OnInit {
     is_claim: [false],
     claim_per_unit: ['', [Validators.min(0)]],
     claim_percentage: ['', [Validators.min(0), Validators.max(100)]],
-    mimes: ['jpg'],
+    mimes: [''],
     max_size_mb: [5],
     multiple: [false],
     min_files: [1],
@@ -182,8 +182,17 @@ export class IncentiveQuestionsComponent implements OnInit {
         default_source_table: data.default_source_table || null,
         is_claim: data.is_claim === 'yes' || data.is_claim === true,
         claim_per_unit: data.claim_per_unit || null,
-        claim_percentage: data.claim_percentage || null
+        claim_percentage: data.claim_percentage || null,
       });
+      if (data.upload_rule) {
+        this.questionForm.patchValue({
+          mimes: data.upload_rule.mimes?.join(',') || '',
+          max_size_mb: data.upload_rule.max_size_mb || 5,
+          multiple: data.upload_rule.multiple || false,
+          min_files: data.upload_rule.min_files || 1,
+          max_files: data.upload_rule.max_files || 1
+        });
+      }
       if (data.default_source_table) {
         this.onTableChange(data.default_source_table);
         setTimeout(() => {
@@ -234,7 +243,6 @@ export class IncentiveQuestionsComponent implements OnInit {
     }
 
     const fv = this.questionForm.value;
-
     const questionnaire: any = {
       proforma_id: this.proformaId,
       question_label: fv.label,
@@ -259,9 +267,12 @@ export class IncentiveQuestionsComponent implements OnInit {
         mimes: fv.mimes?.split(',') || this.getDefaultMimes(fv.type).split(','),
         max_size_mb: fv.max_size_mb || this.getDefaultMaxSize(fv.type),
         multiple: fv.multiple || false,
-        min_files: fv.type === 'file' ? 0 : (fv.min_files || 1),
-        max_files: fv.type === 'file' ? 5 : (fv.max_files || 1)
+        min_files: (fv.min_files || 1),
+        max_files: (fv.max_files || 1)
       };
+      if (fv.multiple) {
+        this.checked = fv.multiple;
+      }
     }
     if (this.isEditMode && this.editingQuestionId) {
       questionnaire.id = this.editingQuestionId;
@@ -333,7 +344,7 @@ export class IncentiveQuestionsComponent implements OnInit {
   }
   getDefaultMimes(type: string): string {
     switch (type) {
-      case 'file': return 'pdf,doc,docx';
+      case 'file': return 'pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,png,jpeg,mp4,mkv,mp3,wav, txt,csv,zip,rar,gif,bmp,svg,tiff,webp,odt,ods,odp,rtf';
       case 'image': return 'jpg,png,jpeg';
       case 'video': return 'mp4,mkv';
       case 'audio': return 'mp3,wav';
@@ -343,10 +354,10 @@ export class IncentiveQuestionsComponent implements OnInit {
 
   getDefaultMaxSize(type: string): number {
     switch (type) {
-      case 'file': return 10;
+      case 'file': return 5;
       case 'image': return 5;
-      case 'video': return 50;
-      case 'audio': return 10;
+      case 'video': return 5;
+      case 'audio': return 5;
       default: return 5;
     }
   }
