@@ -54,15 +54,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           canActivate: [authGuard],
           data: { roles: ['individual'] }
       },
-      // {
-      //   path: 'inspection-view/:inspectionId',
-      //   loadComponent: () =>
-      //     import('./industrial-user/inspection-view/inspection-view.component').then(
-      //       (m) => m.InspectionViewComponent
-      //     ),
-      //     canActivate: [authGuard],
-      //     data: { roles: ['individual'] }
-      // },
+      {
+        path: 'inspection-view/:inspectionId',
+        loadComponent: () =>
+          import('./industrial-user/inspection-view/inspection-view.component').then(
+            (m) => m.InspectionViewComponent
+          ),
+          canActivate: [authGuard],
+          data: { roles: ['individual'] }
+      },
       {
         path: 'appeal-list',
         loadComponent: () =>
