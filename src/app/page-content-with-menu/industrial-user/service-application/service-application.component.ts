@@ -365,7 +365,7 @@ export class ServiceApplicationComponent implements OnInit {
         if (
           rule.pattern &&
           rule.pattern.trim() !== '' &&
-          !['radio', 'select', 'file', 'checkbox'].includes(q.question_type)
+          !['radio', 'select', 'file', 'checkbox', 'date'].includes(q.question_type)
         ) {
           try {
             validators.push(Validators.pattern(new RegExp(rule.pattern)));
@@ -456,7 +456,7 @@ export class ServiceApplicationComponent implements OnInit {
         if (
           rule.pattern &&
           rule.pattern.trim() !== '' &&
-          !['radio', 'select', 'file', 'checkbox'].includes(q.question_type)
+          !['radio', 'select', 'file', 'checkbox', 'date'].includes(q.question_type)
         ) {
           try {
             validators.push(Validators.pattern(new RegExp(rule.pattern)));
@@ -712,10 +712,7 @@ private prepareRawDataForSubmission(raw: any): any {
       value = Array.isArray(value) ? value.join(', ') : value;
     }
 
-    // ✅ File logic: 
-    // - If it's a real File → append as binary
-    // - If it's a string (URL) → append as string
-    // - If null/undefined → skip (optional field)
+   
     if (question.question_type === 'file') {
       if (value instanceof File) {
         formData.append(`application_data[${key}]`, value, value.name);
@@ -941,13 +938,14 @@ if (question.question_type === 'file' && typeof value === 'string') {
 
   this.serviceForm.markAllAsTouched();
 
-  // if (this.serviceForm.invalid) {
-  //   this.apiService.openSnackBar(
-  //     'Please fill in all required fields correctly.',
-  //     'error'
-  //   );
-  //   return;
-  // }
+  const validationErrors = this.getFormValidationErrors();
+  if (validationErrors.length > 0) {
+    const message = 'Please fix the following:\n• ' + validationErrors.join('\n• ');
+    this.apiService.openSnackBar(message, 'error');
+    return;
+  }
+
+
 
   const userId = this.apiService.getDecryptedUserId();
   if (!userId) {
