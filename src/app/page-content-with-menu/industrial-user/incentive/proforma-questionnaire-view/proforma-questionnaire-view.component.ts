@@ -392,7 +392,6 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
           group[`${q.id}_${i}`] = [null];
         }
       }
-      // Handle all other question types (including single file)
       else {
         let value: any;
 
@@ -412,7 +411,6 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
           // Single file
           value = null;
         } else {
-          // text, number, email, select, radio, textarea, password, url, etc.
           value = q.default_value || '';
         }
 
@@ -535,10 +533,38 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
             );
           }
         },
-        error: (err) => {
-          console.error('Submission error:', err);
-          this.apiService.openSnackBar('Failed to save application.', 'error');
-        },
+       error: (err) => {
+  console.error('Submission error:', err);
+
+  if (
+    err?.error?.errors &&
+    typeof err.error.errors === 'object' &&
+    !Array.isArray(err.error.errors)
+  ) {
+    const errorEntries = Object.entries(err.error.errors); 
+
+    if (errorEntries.length > 0) {
+      const [errorKey, rawMessages] = errorEntries[0];
+
+      let message = 'Invalid file format.';
+      if (Array.isArray(rawMessages) && rawMessages.length > 0) {
+        message = String(rawMessages[0]); 
+      }
+
+      const match = errorKey.match(/^files\.(\d+)\.\d+$/);
+      if (match) {
+        const questionId = Number(match[1]);
+        const question = this.questionnaireData.find(q => q.id === questionId);
+        const label = question?.question_label || 'This file field';
+
+        this.apiService.openSnackBar(`Invalid file for ${label}: ${message}`, 'error');
+        return;
+      }
+    }
+  }
+
+  this.apiService.openSnackBar('Failed to save application.', 'error');
+}
       });
   }
 
