@@ -1726,4 +1726,19 @@ getThirdPartyRedirect(url: string): Observable<string> {
       `${this.baseUrl}/api/department/incentive/application-details`, { application_id: applicationId }, { headers: this.getHeaders() }
     )
   }
+  getAllInspectorList(deptId: any): any {
+    return this.http.post(
+      `${this.baseUrl}/api/inspectors-by-department`, { department_id: deptId }, { headers: this.getHeaders() }
+    )
+  }
+  getUnitsList(): any {
+    return this.http.post(
+      `${this.baseUrl}/api/unit-list`, {}, { headers: this.getHeaders() }
+    )
+  }
+  getUnitDetails(unitId: number): any {
+    return this.http.post(
+      `${this.baseUrl}/api/get-unit-details`, { id: unitId }, { headers: this.getHeaders() }
+    )
+  }
 }

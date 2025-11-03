@@ -66,10 +66,10 @@ export class IncentiveApplicationDetailsComponent implements OnInit {
       const parts = this.fileUrl.split('/');
       fileName = parts[parts.length - 1];
     }
-
+    const pendingStatus = (existingStatus === "approved_by_da" && this.currentUserRole === 'General Manager') || (existingStatus === "approved_by_gm" && this.currentUserRole === 'State Level Committee');
     const mappedStatus = this.mapAction(existingStatus);
     this.statusForm = this.fb.group({
-      new_status: [mappedStatus || '', Validators.required],
+      new_status: [pendingStatus ? '' : mappedStatus || '', Validators.required],
       remarks: [existingRemarks || '', [Validators.required]],
       review_file: [this.fileUrl ? { name: fileName, url: this.fileUrl } : null],
     });
@@ -93,8 +93,9 @@ export class IncentiveApplicationDetailsComponent implements OnInit {
     payload.append('remarks', this.statusForm.value.remarks || '');
 
     const file = this.statusForm.value.review_file;
-    if (file) payload.append('review_file', file);
-
+    if (file instanceof File && file.type === 'application/pdf') {
+      payload.append('review_file', file);
+    } 
     this.subsidyItems.forEach((item: any) => {
       const value = this.approvedForm.value[item.question_id];
       if (value !== null && value !== '' && !isNaN(value)) {
@@ -139,7 +140,7 @@ export class IncentiveApplicationDetailsComponent implements OnInit {
     if (!status) return '';
     if (status.includes('approved')) return 'approved';
     if (status.includes('rejected')) return 'rejected';
-    if (status.includes('sent_back')) return 'send_back';
+    if (status.includes('sent_back')) return 'sent_back';
     return status;
   }
 

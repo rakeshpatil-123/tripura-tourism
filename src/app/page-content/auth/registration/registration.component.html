@@ -42,6 +42,8 @@
           <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" [mandatory]="true"
             formControlName="hierarchy_level" [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
           </app-ilogi-select>
+          <app-ilogi-radio formControlName="inspector" fieldLabel="Is Inspector">
+          </app-ilogi-radio>
           <app-ilogi-select class="mb-10" fieldId="department_id" fieldLabel="Department" [mandatory]="true" formControlName="department_id"
             [selectOptions]="departments" placeholder="Select department">
           </app-ilogi-select>

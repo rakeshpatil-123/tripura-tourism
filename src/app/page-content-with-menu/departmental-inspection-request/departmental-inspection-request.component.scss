@@ -1,0 +1,87 @@
+.inspection-container {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .page-head {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #003c5b;
+    margin-bottom: 1rem;
+  }
+
+  .no-data {
+    text-align: center;
+    font-size: 1rem;
+    color: #888;
+    margin-top: 1.5rem;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+button.success {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #43a047;
+  }
+}
+
+button.danger {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e53935;
+  }
+}
+
+::ng-deep .swal2-popup.swal2-rounded {
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+::ng-deep .swal2-confirm-btn {
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 0.5rem;
+}
+
+::ng-deep .swal2-cancel-btn {
+  font-weight: 500;
+  padding: 0.6rem 1.5rem;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  ::ng-deep .swal2-popup {
+    width: 90% !important;
+  }
+}

@@ -1,0 +1,69 @@
+<div @slideFadeIn class="dialog-wrapper">
+  <div class="container">
+    <h2 class="page-title">Create Joint Inspection</h2>
+    <form [formGroup]="deptJointInspectionForm" class="inspection-form">
+      <div class="section">
+        <h3 class="section-title">Unit Details</h3>
+        <div class="grid-container">
+          <app-ilogi-select fieldId="unitName" fieldLabel="Unit Name" [mandatory]="true" formControlName="unitName"
+            [selectOptions]="unitOptions" placeholder="Select unit name">
+          </app-ilogi-select>
+
+          <app-ilogi-input fieldId="unitAddress" [readonly]="true" fieldLabel="Unit Address"
+            formControlName="unitAddress" placeholder="Enter unit address">
+          </app-ilogi-input>
+
+          <app-ilogi-input fieldId="unitDistrict" fieldLabel="Unit District" formControlName="unitDistrict"
+            [readonly]="true" placeholder="Enter unit district">
+          </app-ilogi-input>
+
+          <app-ilogi-input fieldId="unitSubDivision" fieldLabel="Unit Sub-Division" [readonly]="true"
+            formControlName="unitSubDivision" placeholder="Enter sub-division">
+          </app-ilogi-input>
+
+          <app-ilogi-select fieldId="riskCategory" fieldLabel="Risk Category" formControlName="riskCategory"
+            [selectOptions]="riskCategories" placeholder="Select risk category">
+          </app-ilogi-select>
+        </div>
+      </div>
+      <div class="section">
+        <h3 class="section-title">Upcoming Inspection Details</h3>
+        <app-dynamic-table [data]="upcomingInspections" [columns]="inspectionColumns" [pageSize]="5"
+          [showPagination]="false" [searchable]="false">
+        </app-dynamic-table>
+      </div>
+      <div class="section">
+        <h3 class="section-title">Inspection Details</h3>
+        <div class="grid-container">
+          <app-ilogi-input-date fieldId="proposedDate" fieldLabel="Proposed Date" formControlName="proposedDate"
+            placeholder="DD/MM/YYYY">
+          </app-ilogi-input-date>
+          <app-ilogi-select fieldId="department" fieldLabel="Departments" [mandatory]="true"
+            formControlName="department" [selectOptions]="departmentsOptions" placeholder="Select department">
+          </app-ilogi-select>
+
+          <app-ilogi-select fieldId="inspectionType" fieldLabel="Inspection Type" [mandatory]="true"
+            formControlName="inspectionType" [selectOptions]="inspectionTypeOptions"
+            placeholder="Select inspection type">
+          </app-ilogi-select>
+          <app-ilogi-select fieldId="inspectionFor" fieldLabel="Inspection For" [mandatory]="true"
+            formControlName="inspectionFor" [selectOptions]="inspectionForOptions" placeholder="Select inspection for">
+          </app-ilogi-select>
+
+          <app-ilogi-input fieldId="remarks" fieldLabel="Remarks" type="textarea" formControlName="remarks"
+            placeholder="Enter remarks (if any)">
+          </app-ilogi-input>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button type="button" class="btn cancel" (click)="onCancel()"
+          (click)="router.navigate(['/dashboard/departmental-inspection'])">
+          Cancel
+        </button>
+        <button type="submit" class="btn submit" (click)="onSubmit()">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

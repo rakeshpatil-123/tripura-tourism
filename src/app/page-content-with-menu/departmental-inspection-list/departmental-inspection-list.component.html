@@ -1,0 +1,16 @@
+<div class="inspection-list-wrapper" [@fadeIn]>
+  <div class="header-section">
+    <h2>Approved Departmental Inspections</h2>
+    <p class="subtext">View, download, or manage approved inspection records.</p>
+  </div>
+  <div class="table-section" *ngIf="!loading; else loaderTpl">
+    <app-dynamic-table [data]="approvedInspections" [columns]="inspectionColumns" [pageSize]="10"
+      [showPagination]="true" [searchable]="true"></app-dynamic-table>
+  </div>
+  <ng-template #loaderTpl>
+    <div class="loading-overlay">
+      <mat-icon class="spin">autorenew</mat-icon>
+      <span>Loading inspections... need to move</span>
+    </div>
+  </ng-template>
+</div>

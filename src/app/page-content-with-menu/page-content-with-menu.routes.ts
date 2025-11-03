@@ -283,6 +283,42 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department'] }
       },
       {
+        path: 'departmental-inspection',
+        loadComponent: () =>
+          import('./departmental-inspection/departmental-inspection.component').then(
+            (m) => m.DepartmentalInspectionComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department'] },
+      },
+      {
+        path: 'create-inspection',
+        loadComponent: () =>
+          import('./add-departmental-inspection/add-departmental-inspection.component').then(
+            (m) => m.AddDepartmentalInspectionComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department'] },
+      },
+      {
+        path: 'departmental-inspection-list',
+        loadComponent: () =>
+          import('./departmental-inspection-list/departmental-inspection-list.component').then(
+            (m) => m.DepartmentalInspectionListComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department'] },
+      },
+      {
+        path: 'departmental-inspection-request',
+        loadComponent: () =>
+          import('./departmental-inspection-request/departmental-inspection-request.component').then(
+            (m) => m.DepartmentalInspectionRequestComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department'] },
+      },
+      {
         path: 'incentive-applications/:id',
         loadComponent: () =>
           import(

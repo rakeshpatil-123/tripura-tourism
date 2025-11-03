@@ -1,0 +1,45 @@
+<div @dialogAnim>
+  <div class="inspection-container">
+    <h1 class="page-head">Departmental Inspection</h1>
+    <mat-card appearance="outlined" class="inspection-card">
+      <mat-card-content>
+        <div class="filter-section">
+          <div class="filter-row">
+            <app-ilogi-input-date fieldId="dateFrom" fieldLabel="Date From"
+              [formControl]="dateFrom"></app-ilogi-input-date>
+
+            <app-ilogi-input-date fieldId="dateTo" fieldLabel="Date To" [formControl]="dateTo"></app-ilogi-input-date>
+
+            <app-ilogi-select fieldId="industryName" fieldLabel="Industry Name" [selectOptions]="industryOptions"
+              [formControl]="industryName" [placeholder]="'Select Industry'"></app-ilogi-select>
+
+            <div style="display: flex; gap: 20px;">
+              <button mat-raised-button class="submit-btn" (click)="createDepartmentalInspection()">
+                <mat-icon>add_circle</mat-icon>
+                Create Departmental Inspection
+              </button>
+
+              <button mat-raised-button class="submit-btn" (click)="createJointInspection()">
+                <mat-icon>add_circle</mat-icon>
+                Create Joint Inspection
+              </button>
+            </div>
+          </div>
+        </div>
+        <mat-tab-group dynamicHeight animationDuration="300ms" [(selectedIndex)]="selectedIndex"
+          (selectedTabChange)="onTabChange($event)" class="inspection-tab-group">
+          <mat-tab label="Inspection List">
+            <div class="tab-content-wrapper">
+              <app-departmental-inspection-list *ngIf="selectedIndex === 0"></app-departmental-inspection-list>
+            </div>
+          </mat-tab>
+          <mat-tab label="Inspection Request">
+            <div class="tab-content-wrapper">
+              <app-departmental-inspection-request *ngIf="selectedIndex === 1"></app-departmental-inspection-request>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
