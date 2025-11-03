@@ -941,13 +941,13 @@ if (question.question_type === 'file' && typeof value === 'string') {
 
   this.serviceForm.markAllAsTouched();
 
-  if (this.serviceForm.invalid) {
-    this.apiService.openSnackBar(
-      'Please fill in all required fields correctly.',
-      'error'
-    );
-    return;
-  }
+  // if (this.serviceForm.invalid) {
+  //   this.apiService.openSnackBar(
+  //     'Please fill in all required fields correctly.',
+  //     'error'
+  //   );
+  //   return;
+  // }
 
   const userId = this.apiService.getDecryptedUserId();
   if (!userId) {
