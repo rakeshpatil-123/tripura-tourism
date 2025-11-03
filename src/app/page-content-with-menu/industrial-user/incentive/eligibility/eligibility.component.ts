@@ -27,7 +27,7 @@ export class EligibilityComponent implements OnInit {
   schemes: SelectOption[] = [];
   selectedSchemeId: number | null = null;
   applications: any[] = [];
-  columns: any[] = []; 
+  columns: any[] = [];
 
   constructor(private appiService: GenericService, private router: Router) {}
 
@@ -46,7 +46,7 @@ export class EligibilityComponent implements OnInit {
               id: item.id,
               name: item.title,
             }));
-            
+
             if (this.schemes.length > 0) {
               this.selectedSchemeId = this.schemes[0].id;
               if (this.selectedSchemeId !== null) {
@@ -59,7 +59,10 @@ export class EligibilityComponent implements OnInit {
           }
         },
         error: (err: any) => {
-          this.appiService.openSnackBar('Failed to load schemes', 'Close');
+          const errorMsg =
+            err?.error?.message ||
+            'Failed to load schemes, Check your Commissioning date in Caf';
+          this.appiService.openSnackBar(errorMsg, 'Close');
           this.schemes = [];
           this.applications = [];
         },
@@ -67,7 +70,7 @@ export class EligibilityComponent implements OnInit {
   }
   onSchemeChange(schemeId: number | null): void {
     // console.log(schemeId, "scheme id");
-    
+
     if (schemeId !== null) {
       this.selectedSchemeId = schemeId;
       this.loadEligibilityProforma(schemeId);
@@ -229,10 +232,18 @@ export class EligibilityComponent implements OnInit {
           },
           {
             label: 'History',
-            visible: (row: any) => row.applicationId && row.applicationId !== '_' && row.applicationId !== null,
+            visible: (row: any) =>
+              row.applicationId &&
+              row.applicationId !== '_' &&
+              row.applicationId !== null,
             color: 'accent',
-             onClick: (row: any) => {this.router.navigate(['/dashboard/workflow-history', row.applicationId]);}
-          }
+            onClick: (row: any) => {
+              this.router.navigate([
+                '/dashboard/workflow-history',
+                row.applicationId,
+              ]);
+            },
+          },
         ],
       },
     ];
