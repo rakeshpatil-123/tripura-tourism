@@ -75,7 +75,7 @@ export class IlogiInputDateComponent
   //   'Future dates are not allowed. Please select a date within the allowed range.';
   @Input() pastDateErrorMessage: string =
     'Date must be within the allowed range. Please select a more recent date.';
-  @Input() allowFutureDates: boolean = false;
+  @Input() allowFutureDates: boolean = true;
   @Input() futureMonthsRange: number = 0;
 
   // Output for blur event

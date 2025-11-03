@@ -299,6 +299,9 @@ export class InspectionComponent implements OnInit {
   }
 
   submitInspectionRequest(): void {
+      console.log('Form valid?', this.inspectionForm.valid);
+  console.log('Proposed date value:', this.inspectionForm.get('proposed_date')?.value);
+  console.log('Form errors:', this.inspectionForm.get('proposed_date')?.errors);
     if (this.inspectionForm.invalid) {
       this.inspectionForm.markAllAsTouched();
       return;
