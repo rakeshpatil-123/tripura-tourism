@@ -10,7 +10,7 @@
 
   <ng-container *ngIf="!readonly">
     <div class="date-input-container">
-      <input matInput [matDatepicker]="picker" [value]="value" (dateChange)="onDateChange($event.value)"
+      <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [value]="value" (dateChange)="onDateChange($event.value)"
         [placeholder]="placeholder" [id]="fieldId" (click)="picker.open()" (mouseenter)="showErrorOnFieldHover()"
         (mouseleave)="hideErrorOnFieldHoverOut()" (blur)="onBlur($event)" class="form-control date-input" [ngClass]="{
           'is-invalid': (submitted && errors) || dateRangeError

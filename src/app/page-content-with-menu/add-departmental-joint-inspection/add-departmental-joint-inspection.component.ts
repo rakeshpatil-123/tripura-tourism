@@ -12,6 +12,7 @@ import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilo
 import { trigger, transition, style, animate } from '@angular/animations';
 import { IlogiInputDateComponent } from '../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import Swal from 'sweetalert2';
+import { MatIconModule } from "@angular/material/icon";
 @Component({
   selector: 'app-add-departmental-joint-inspection',
   templateUrl: './add-departmental-joint-inspection.component.html',
@@ -22,8 +23,9 @@ import Swal from 'sweetalert2';
     DynamicTableComponent,
     IlogiSelectComponent,
     IlogiInputDateComponent,
-    IlogiInputComponent
-  ],
+    IlogiInputComponent,
+    MatIconModule
+],
   animations: [
     trigger('slideFadeIn', [
       transition(':enter', [
@@ -194,7 +196,6 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
       department: formValue.department,
     };
 
-    // ✅ Show loader before API call
     this.loaderService.showLoader();
 
     this.genericService
@@ -390,7 +391,7 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
     this.genericService.viewHolidays({}).pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
-          this.holidays = res.data;
+          this.holidays = res.data.map((holiday: any) => holiday.holiday_date);
         } else {
           this.holidays = [];
         }
@@ -402,7 +403,15 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
     });
   }
 
-
+  viewOrganization(): void {
+    if (true) {
+      this.dialogRef.close();
+      const userId = 96;
+      this.router.navigate([`dashboard/user-caf-view/${userId}`]);
+    } else {
+      this.genericService.openSnackBar('User ID not found.', 'Close');
+    }
+  }
   onCancel(): void {
     this.dialogRef.close('cancelled');
   }

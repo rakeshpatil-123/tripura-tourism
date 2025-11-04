@@ -3,21 +3,25 @@
     <h2 class="page-title">Create Joint Inspection</h2>
     <form [formGroup]="deptJointInspectionForm" class="inspection-form">
       <div class="section">
-        <h3 class="section-title">Unit Details</h3>
+        <div class="section-view">
+          <h3 class="section-title">Unit Details</h3>
+          <button mat-button class="btn btn-success" (click)="viewOrganization()">View Organization</button>
+        </div>
+
         <div class="grid-container">
           <app-ilogi-select fieldId="unitName" fieldLabel="Unit Name" [mandatory]="true" formControlName="unitName"
             [selectOptions]="unitOptions" placeholder="Select unit name">
           </app-ilogi-select>
 
-          <app-ilogi-input fieldId="unitAddress" [readonly]="true" fieldLabel="Unit Address"
+          <app-ilogi-input fieldId="unitAddress" class="mt-20" [readonly]="true" fieldLabel="Unit Address"
             formControlName="unitAddress" placeholder="Enter unit address">
           </app-ilogi-input>
 
-          <app-ilogi-input fieldId="unitDistrict" fieldLabel="Unit District" formControlName="unitDistrict"
+          <app-ilogi-input fieldId="unitDistrict" class="mt-20" fieldLabel="Unit District" formControlName="unitDistrict"
             [readonly]="true" placeholder="Enter unit district">
           </app-ilogi-input>
 
-          <app-ilogi-input fieldId="unitSubDivision" fieldLabel="Unit Sub-Division" [readonly]="true"
+          <app-ilogi-input fieldId="unitSubDivision" class="mt-20" fieldLabel="Unit Sub-Division" [readonly]="true"
             formControlName="unitSubDivision" placeholder="Enter sub-division">
           </app-ilogi-input>
 
@@ -35,10 +39,10 @@
       <div class="section">
         <h3 class="section-title">Inspection Details</h3>
         <div class="grid-container">
-          <app-ilogi-input-date fieldId="proposedDate" fieldLabel="Proposed Date" formControlName="proposedDate"
+          <app-ilogi-input-date fieldId="proposedDate" [disabledDates]="holidays" class="mt-5" fieldLabel="Proposed Date" formControlName="proposedDate"
             placeholder="DD/MM/YYYY">
           </app-ilogi-input-date>
-          <app-ilogi-select fieldId="department" fieldLabel="Departments" [mandatory]="true"
+          <app-ilogi-select fieldId="department" [multiple]="true" [errorMessages]="{ required: 'department field is required'}" fieldLabel="Departments" [mandatory]="true"
             formControlName="department" [selectOptions]="departmentsOptions" placeholder="Select department">
           </app-ilogi-select>
 

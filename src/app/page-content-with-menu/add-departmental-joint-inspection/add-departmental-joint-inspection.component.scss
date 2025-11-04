@@ -25,7 +25,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #37474f;
-  margin-bottom: 1rem;
+  // margin-bottom: 1rem;
 }
 
 .grid-container {
@@ -174,4 +174,16 @@
   border-radius: 12px !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25) !important;
   padding: 1.5rem !important;
+}
+.mt-20 {
+  margin-top: 24px !important;
+}
+
+.mt-5 {
+  margin-top: 6px !important;
+}
+.section-view {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

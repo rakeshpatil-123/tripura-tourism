@@ -55,7 +55,14 @@ export class IlogiSelectComponent
   @Input() readonly = false;
   @Input() selectOptions: SelectOption[] = [{ id: '', name: 'Select' }];
   @Input() errors: { [key: string]: any } | null = null;
-
+  @Input() multiple: boolean = false;
+  @Input('multi') set multiAttr(val: any) {
+    if (val === '' || val === true || val === 'true') {
+      this.multiple = true;
+    } else if (val === false || val === 'false') {
+      this.multiple = false;
+    }
+  }
   @Output() change = new EventEmitter<{ value: any }>();
   @Output() blur = new EventEmitter<void>();
 

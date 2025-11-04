@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,11 +24,12 @@ import { DynamicTableComponent } from "../../shared/component/table/table.compon
     ]),
   ],
 })
-export class DepartmentalInspectionListComponent implements OnInit {
+export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
   approvedInspections: any[] = [];
   inspectionColumns: any[] = [];
+  filteredInspections: any[] = [];
   loading = false;
-
+  @Input() filters: any = {};
   constructor(
     private genericService: GenericService,
     private loaderService: LoaderService,
@@ -38,6 +39,29 @@ export class DepartmentalInspectionListComponent implements OnInit {
   ngOnInit(): void {
     this.defineColumns();
     this.getApprovedInspections();
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['filters'] && !changes['filters'].firstChange) {
+      this.applyFilterLogic();
+    }
+  }
+  applyFilterLogic(): void {
+    const { dateFrom, dateTo, industryName } = this.filters || {};
+
+    this.filteredInspections = this.approvedInspections.filter((inspection) => {
+      const date = new Date(inspection.proposed_date);
+      const from = dateFrom ? new Date(dateFrom) : null;
+      const to = dateTo ? new Date(dateTo) : null;
+      const industryMatch = industryName
+        ? inspection.industry_name.toLowerCase().includes(industryName.toLowerCase())
+        : true;
+
+      const dateMatch =
+        (!from || date >= from) &&
+        (!to || date <= to);
+
+      return industryMatch && dateMatch;
+    });
   }
 
   defineColumns(): void {
@@ -100,6 +124,7 @@ export class DepartmentalInspectionListComponent implements OnInit {
             }));
           } else {
             this.approvedInspections = [];
+            this.filteredInspections = [];
           }
         },
         error: (err) => {

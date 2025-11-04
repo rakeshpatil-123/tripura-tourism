@@ -69,7 +69,7 @@ export class IlogiInputDateComponent
   @Input() mandatory = false;
   @Input() readonly = false;
   @Input() errors: { [key: string]: any } | null = null;
-
+  @Input() disabledDates: string[] = [];
   @Input() monthsRange: number = 6;
   // @Input() futureDateErrorMessage: string =
   //   'Future dates are not allowed. Please select a date within the allowed range.';
@@ -181,6 +181,30 @@ export class IlogiInputDateComponent
     this.isDisabled = isDisabled;
     this.cdr.detectChanges();
   }
+  private formatToLocalYMD(date: Date): string {
+    const y = date.getFullYear();
+    const m = ('0' + (date.getMonth() + 1)).slice(-2);
+    const d = ('0' + date.getDate()).slice(-2);
+    return `${y}-${m}-${d}`;
+  }
+
+  dateFilter = (d: Date | null): boolean => {
+    if (!d) return false;
+
+    const date = new Date(d);
+    const today = new Date();
+    const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const currentYear = todayLocal.getFullYear();
+    const formatted = this.formatToLocalYMD(date);
+    const isDisabled = this.disabledDates?.includes(formatted);
+
+    const isCurrentYear = date.getFullYear() === currentYear;
+
+    const isPastDate = date < todayLocal;
+
+    return !isDisabled && isCurrentYear && !isPastDate;
+  };
 
   // Handle date changes from date picker
 onDateChange(value: Date | null): void {
