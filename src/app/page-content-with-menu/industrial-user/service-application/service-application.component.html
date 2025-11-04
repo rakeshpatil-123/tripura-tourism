@@ -13,7 +13,8 @@
         <h5 class="mb-2 info-head">{{ group }}</h5>
         <hr>
         <div class="row">
-          <div *ngFor="let q of groupedQuestions[group]" class="mb-3" [style.width]="q.display_width || '100%'">
+          <ng-container *ngFor="let q of groupedQuestions[group]">
+          <div class="mb-3" [style.width]="q.display_width || '100%'" *ngIf="isQuestionVisible(q.id)">
             <!-- Text / Number / Email / Textarea -->
             <app-ilogi-input *ngIf="
                 q.question_type === 'text' ||
@@ -58,6 +59,7 @@
               [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
               [checkboxOptions]="q.parsedOptions || []"></app-ilogi-checkbox>
           </div>
+          </ng-container>
         </div>
       </div>
 
@@ -71,7 +73,10 @@
               <table class="table table-bordered grid-table">
                 <thead>
                   <tr>
-                    <th style="width: 70px;">SL No</th>
+                    <div class="fixed-wid">
+
+                      <th >SL No</th>
+                    </div>
                     <ng-container *ngFor="let q of section.questions">
                       <th>{{ q.question_label }}
                         <span *ngIf="q.is_required === 'yes'" class="text-danger">*</span>
@@ -85,7 +90,7 @@
                     [formGroupName]="i">
                     <td>{{ i + 1 }}</td>
                     <ng-container *ngFor="let q of section.questions">
-                      <td>
+                      <td *ngIf="isQuestionVisible(q.id, section.sectionName, i)">
                         <!-- Text / Number / Email / Textarea -->
                         <app-ilogi-input *ngIf="
                             q.question_type === 'text' ||
