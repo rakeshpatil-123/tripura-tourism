@@ -124,6 +124,20 @@ export class ProformaListComponent implements OnInit {
     this.schemeId = this.route.snapshot.paramMap.get('schemeId')!;
     this.schemeTitle = history.state.schemeTitle || 'Proformas';
     this.loadProformas();
+    this.proformaForm.get('proforma_type')?.valueChanges.subscribe(type => {
+      if (type === 'claim') {
+        this.proformaForm.get('claim_type')?.setValidators([Validators.required]);
+        this.proformaForm.get('depends_on_proforma_ids')?.setValidators([Validators.required]);
+        this.proformaForm.get('max_claim_count')?.setValidators([Validators.required, Validators.min(1)]);
+      } else {
+        this.proformaForm.get('claim_type')?.clearValidators();
+        this.proformaForm.get('depends_on_proforma_ids')?.clearValidators();
+        this.proformaForm.get('max_claim_count')?.clearValidators();
+      }
+      this.proformaForm.get('claim_type')?.updateValueAndValidity();
+      this.proformaForm.get('depends_on_proforma_ids')?.updateValueAndValidity();
+      this.proformaForm.get('max_claim_count')?.updateValueAndValidity();
+    });
   }
 
 

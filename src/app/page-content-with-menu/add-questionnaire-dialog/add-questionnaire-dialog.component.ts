@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
@@ -88,7 +88,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     public data: { service: any; mode: 'add' | 'edit'; questionnaire: any },
     private genericService: GenericService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdRef: ChangeDetectorRef 
   ) {
     this.questionnaireForm = this.fb.group({
       id: [null],
@@ -96,6 +97,9 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       question_label: ['', Validators.required],
       question_type: ['text', Validators.required],
       is_required: ['no'],
+      depends_on: [null],
+      operator: [null],
+      value: [null],
       options: [null],
       default_value: [null],
       is_section: [null],
@@ -118,7 +122,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         ],
         pattern: [''],
         errorMessage: [''],
-        mimes: [['jpg', 'jpeg', 'png', 'pdf']],
+        mimes: [['jpg', 'jpeg', 'png', 'pdf', 'docx', 'xls', 'xlsx', 'csv', 'txt',]],
         max_size_mb: [3],
       })
     });
@@ -127,47 +131,107 @@ export class AddQuestionnaireDialogComponent implements OnInit {
   ngOnInit(): void {
     this.getSectionList();
     this.filteredSections = [...this.sections];
-    if (this.data?.questionnaire) {
-      this.questionnaireForm.patchValue(this.data.questionnaire);
-      const q = { ...this.data.questionnaire };
-      if (q.status === 1 || q.status === true) q.status = '1';
-      else if (q.status === 0 || q.status === false) q.status = '0';
-      else q.status = '1';
-      this.questionnaireForm.patchValue(q);
-      if (this.data.questionnaire.sample_format) {
-        this.selectedFile = null;
+
+    const serviceId = this.data?.service?.id ?? this.data?.questionnaire?.service_id;
+
+    if (serviceId) {
+      this.loadQuestions(serviceId);
+    }
+
+    if (this.data.mode === 'edit' && this.data.questionnaire) {
+      const q = this.data.questionnaire;
+      this.questionnaireForm.patchValue({
+        ...q,
+        status: q.status === 1 || q.status === true ? '1' : '0',
+        validation_required: q.validation_required ?? 'no',
+        is_required: q.is_required ?? 'no',
+        display_order: q.display_order ?? 1,
+        display_width: q.display_width ?? '50%',
+        group_label: q.group_label ?? '',
+        section_name: q.section_name ?? '',
+      });
+      if (q.display_rule) {
+        this.questionnaireForm.patchValue({
+          operator: q.display_rule.operator || '',
+          value: q.display_rule.value || null,
+        });
       }
-      if (this.data.questionnaire.default_source_table) {
-        this.onTableChange(this.data.questionnaire.default_source_table);
-      }
-      if (this.data?.questionnaire?.validation_rule) {
-        const rule = this.data.questionnaire.validation_rule;
+      if (q.validation_rule) {
+        const rule = q.validation_rule;
         let mimesArray: string[] = [];
         if (Array.isArray(rule.mimes)) {
           mimesArray = rule.mimes;
         } else if (typeof rule.mimes === 'string') {
           try {
             const parsed = JSON.parse(rule.mimes);
-            if (Array.isArray(parsed)) mimesArray = parsed;
-            else mimesArray = rule.mimes.split(',').map((m: any) => m.trim()).filter(Boolean);
+            mimesArray = Array.isArray(parsed)
+              ? parsed
+              : rule.mimes.split(',').map((m: any) => m.trim()).filter(Boolean);
           } catch {
             mimesArray = rule.mimes.split(',').map((m: any) => m.trim()).filter(Boolean);
           }
         }
         this.validationRule.patchValue({
           mimes: mimesArray,
-          max_size_mb: rule.max_size_mb || 3
+          max_size_mb: rule.max_size_mb || 3,
         });
-      }      
-    } else {
-      this.genericService
-        .getServiceQuestionnaires(this.data.service.id)
-        .subscribe((res: any) => {
-          if (res.status === 1 && res.data?.length) {
-            this.apiQuestions = res.data;
-          }
-        });
+      }
+
+      if (q.sample_format) {
+        this.selectedFile = null;
+      }
+
+      if (q.default_source_table) {
+        this.onTableChange(q.default_source_table);
+      }
     }
+  }
+
+  loadQuestions(serviceId: number): void {
+    this.genericService.getServiceQuestionnaires(serviceId).subscribe({
+      next: (res: any) => {
+        if (res.status === 1 && Array.isArray(res.data) && res.data.length) {
+          const currentId = this.data?.questionnaire?.id;
+          this.apiQuestions = currentId
+            ? res.data.filter((q: any) => q.id !== currentId)
+            : res.data;
+        } else {
+          this.apiQuestions = [];
+        }
+        this.cdRef.detectChanges();
+
+        if (this.data.mode === 'edit' && this.data.questionnaire?.display_rule?.depends_on) {
+          const dependsOnId = this.data.questionnaire.display_rule.depends_on;
+          const exists = this.apiQuestions.some(
+            q => String(q.id) === String(dependsOnId)
+          );
+
+          setTimeout(() => {
+            if (exists) {
+              this.questionnaireForm.patchValue({
+                depends_on: dependsOnId,
+              });
+            } else {
+            }
+            this.cdRef.detectChanges();
+          }, 50);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load questions', err);
+        this.apiQuestions = [];
+      },
+    });
+  }
+
+  compareQuestions = (o1: any, o2: any): boolean => {
+    if (o1 == null && o2 == null) return true;
+    if (o1 == null || o2 == null) return false;
+
+    const id1 = (typeof o1 === 'object' && 'id' in o1) ? (o1 as any).id : o1;
+    const id2 = (typeof o2 === 'object' && 'id' in o2) ? (o2 as any).id : o2;
+
+    return String(id1) === String(id2);
   }
 
   submit() {
@@ -190,6 +254,11 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     formData.append('questionnaires[0][question_label]', formValue.question_label);
     formData.append('questionnaires[0][question_type]', formValue.question_type);
     formData.append('questionnaires[0][is_required]', formValue.is_required);
+    if (formValue.depends_on || formValue.value || formValue.operator) {
+      formData.append('questionnaires[0][display_rule][depends_on]', formValue.depends_on || '');
+      formData.append('questionnaires[0][display_rule][operator]', formValue.operator || '');
+      formData.append('questionnaires[0][display_rule][value]', formValue.value || '');
+    }
     formData.append('questionnaires[0][validation_required]', formValue.validation_required);
     formData.append('questionnaires[0][options]', formValue.options || '');
     formData.append('questionnaires[0][default_source_table]', formValue.default_source_table || '');

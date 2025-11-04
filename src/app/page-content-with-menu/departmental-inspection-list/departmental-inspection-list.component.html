@@ -4,6 +4,7 @@
     <p class="subtext">View, download, or manage approved inspection records.</p>
   </div>
   <div class="table-section" *ngIf="!loading; else loaderTpl">
+    <!-- need to change the data -->
     <app-dynamic-table [data]="approvedInspections" [columns]="inspectionColumns" [pageSize]="10"
       [showPagination]="true" [searchable]="true"></app-dynamic-table>
   </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from "@angular/material/card";
 import { Router } from '@angular/router';
@@ -15,11 +15,13 @@ import Swal from 'sweetalert2';
   templateUrl: './departmental-inspection-request.component.html',
   styleUrls: ['./departmental-inspection-request.component.scss']
 })
-export class DepartmentalInspectionRequestComponent implements OnInit {
+export class DepartmentalInspectionRequestComponent implements OnInit, OnChanges {
   deptId: any;
   inspectorId: any;
   inspections: any[] = [];
+  filteredInspections: any[] = [];
   inspectors: any[] = []
+  @Input() filters: any = {};
   inspectionColumns: any[] = [];
   holidays: any[] = [];
   constructor(
@@ -98,6 +100,7 @@ export class DepartmentalInspectionRequestComponent implements OnInit {
             }));
           } else {
             this.inspections = [];
+            this.filteredInspections = [];
           }
         },
         error: (err) => {
@@ -261,6 +264,31 @@ export class DepartmentalInspectionRequestComponent implements OnInit {
   //     }
   //   });
   // }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['filters'] && !changes['filters'].firstChange) {
+      this.applyFilterLogic();
+    }
+  }
+  applyFilterLogic(): void {
+    const { dateFrom, dateTo, industryName } = this.filters || {};
+
+    this.filteredInspections = this.inspections.filter((inspection) => {
+      const date = new Date(inspection.proposed_date);
+      const from = dateFrom ? new Date(dateFrom) : null;
+      const to = dateTo ? new Date(dateTo) : null;
+      const industryMatch = industryName
+        ? inspection.industry_name.toLowerCase().includes(industryName.toLowerCase())
+        : true;
+
+      const dateMatch =
+        (!from || date >= from) &&
+        (!to || date <= to);
+
+      return industryMatch && dateMatch;
+    });
+  }
+
   updateInspectionStatus(row: any, status: string): void {
     const actionText = status === 'approved' ? 'Approve' : 'Reject';
 

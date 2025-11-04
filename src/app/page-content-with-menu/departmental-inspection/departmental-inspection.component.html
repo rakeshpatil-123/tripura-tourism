@@ -30,12 +30,12 @@
           (selectedTabChange)="onTabChange($event)" class="inspection-tab-group">
           <mat-tab label="Inspection List">
             <div class="tab-content-wrapper">
-              <app-departmental-inspection-list *ngIf="selectedIndex === 0"></app-departmental-inspection-list>
+              <app-departmental-inspection-list [filters]="appliedFilters" *ngIf="selectedIndex === 0"></app-departmental-inspection-list>
             </div>
           </mat-tab>
           <mat-tab label="Inspection Request">
             <div class="tab-content-wrapper">
-              <app-departmental-inspection-request *ngIf="selectedIndex === 1"></app-departmental-inspection-request>
+              <app-departmental-inspection-request [filters]="appliedFilters" *ngIf="selectedIndex === 1"></app-departmental-inspection-request>
             </div>
           </mat-tab>
         </mat-tab-group>

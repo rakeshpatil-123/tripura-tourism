@@ -3,21 +3,22 @@
     <h2 class="page-title">Create Departmental Inspection</h2>
     <form [formGroup]="deptInspectionForm" class="inspection-form">
       <div class="section">
+        <button mat-button class="btn btn-success" (click)="viewOrganization()">View Organization</button>
         <h3 class="section-title">Unit Details</h3>
         <div class="grid-container">
           <app-ilogi-select fieldId="unitName" fieldLabel="Unit Name" [mandatory]="true" formControlName="unitName"
             [selectOptions]="unitOptions" placeholder="Select unit name">
           </app-ilogi-select>
 
-          <app-ilogi-input fieldId="unitAddress" fieldLabel="Unit Address" formControlName="unitAddress"
+          <app-ilogi-input fieldId="unitAddress" class="mt-20" fieldLabel="Unit Address" formControlName="unitAddress"
             [readonly]="true" placeholder="Enter unit address">
           </app-ilogi-input>
 
-          <app-ilogi-input fieldId="unitDistrict" fieldLabel="Unit District" [readonly]="true"
+          <app-ilogi-input fieldId="unitDistrict" class="mt-20" fieldLabel="Unit District" [readonly]="true"
             formControlName="unitDistrict" placeholder="Enter unit district">
           </app-ilogi-input>
 
-          <app-ilogi-input fieldId="unitSubDivision" fieldLabel="Unit Sub-Division" [readonly]="true"
+          <app-ilogi-input fieldId="unitSubDivision" class="mt-20" fieldLabel="Unit Sub-Division" [readonly]="true"
             formControlName="unitSubDivision" placeholder="Enter sub-division">
           </app-ilogi-input>
 
@@ -35,7 +36,7 @@
       <div class="section">
         <h3 class="section-title">Inspection Details</h3>
         <div class="grid-container">
-          <app-ilogi-input-date fieldId="inspectionDate" fieldLabel="Inspection Date" formControlName="inspectionDate"
+          <app-ilogi-input-date fieldId="inspectionDate" class="mt-2" fieldLabel="Inspection Date" formControlName="inspectionDate"
             placeholder="DD/MM/YYYY">
           </app-ilogi-input-date>
 

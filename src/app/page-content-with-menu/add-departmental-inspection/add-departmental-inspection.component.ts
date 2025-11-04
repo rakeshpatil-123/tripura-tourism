@@ -68,13 +68,15 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
     { name: 'Surprise', id: 'Surprise' },
     { name: 'Against Complain', id: 'Against Complain' },
     { name: 'On Request', id: 'On Request' },
-    { name: 'Against Incident', id: 'Against Incident' },
+    { name: 'Regular', id: 'Regular' },
+    { name: 'CFO', id: 'CFO' },
+    { name: 'CFO', id: 'CFO' },
   ];
 
   upcomingInspections = [
     { date: '2025-11-05', department: 'Labour', type: 'Surprise' },
-    { date: '2025-11-10', department: 'Fire', type: 'Regular' },
-    { date: '2025-11-15', department: 'Health', type: 'Follow-up' }
+    { date: '2025-11-10', department: 'I&C', type: 'Regular' },
+    { date: '2025-11-15', department: 'Co-operative', type: 'Follow-up' }
   ];
 
   inspectionColumns = [
@@ -386,7 +388,15 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
     });
   }
 
-
+  viewOrganization(): void {
+    if (true) {
+      this.dialogRef.close();
+      const userId = 96;
+      this.router.navigate([`dashboard/user-caf-view/${userId}`]);
+    } else {
+      this.genericService.openSnackBar('User ID not found.', 'Close');
+    }
+  }
   onCancel(): void {
     this.dialogRef.close('cancelled');
   }

@@ -66,9 +66,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         'admin',
         'individual',
         'department',
-        'user',
-        'moderator',
-        'guest',
+        'inspector',
       ],
     },
     {

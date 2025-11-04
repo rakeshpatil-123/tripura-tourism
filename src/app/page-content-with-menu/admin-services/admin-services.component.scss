@@ -408,3 +408,7 @@
     border-radius: 10px !important;
   }
 }
+.mdc-switch__track::after {
+  transform: translateX(-100%) !important;
+  background: #003c5b !important;
+}

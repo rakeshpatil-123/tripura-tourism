@@ -57,6 +57,10 @@
             <option [value]="null">--Select--</option>
             <option *ngFor="let type of CLAIM_TYPES" [value]="type.value">{{ type.label }}</option>
           </select>
+          <small class="error-message"
+            *ngIf="proformaForm.get('claim_type')?.invalid && (proformaForm.get('claim_type')?.touched || proformaForm.get('claim_type')?.dirty)">
+            Claim Type is required
+          </small>
         </div>
         <div *ngIf="proformaForm.get('proforma_type')?.value === 'claim'" [formGroup]="proformaForm" class="card flex justify-center w-full">
           <label class="w-full font-medium mb-1 block">Depends On Proformas</label>
@@ -64,14 +68,21 @@
             optionValue="code" placeholder="Select Depends On Proformas" [maxSelectedLabels]="3" [showClear]="true"
             [filter]="true" [display]="'chip'" class="w-full md:w-80">
           </p-multiselect>
+          <small class="error-message"
+            *ngIf="proformaForm.get('depends_on_proforma_ids')?.invalid && (proformaForm.get('depends_on_proforma_ids')?.touched || proformaForm.get('depends_on_proforma_ids')?.dirty)">
+            Depends On Proformas is required
+          </small>
         </div>
-        
         <div *ngIf="proformaForm.get('proforma_type')?.value === 'claim'" class="form-group">
           <label>Max Claim Count</label>
           <input pInputText formControlName="max_claim_count" type="number" placeholder="Enter max claim count" />
           <small class="error-message"
-            *ngIf="proformaForm.get('max_claim_count')?.invalid && (proformaForm.get('max_claim_count')?.touched || proformaForm.get('max_claim_count')?.dirty)">
-            max claim count must be a positive number
+            *ngIf="proformaForm.get('max_claim_count')?.hasError('required') && (proformaForm.get('max_claim_count')?.touched || proformaForm.get('max_claim_count')?.dirty)">
+            Max Claim Count is required
+          </small>
+          <small class="error-message"
+            *ngIf="proformaForm.get('max_claim_count')?.hasError('min') && (proformaForm.get('max_claim_count')?.touched || proformaForm.get('max_claim_count')?.dirty)">
+            Max Claim Count must be a positive number
           </small>
         </div>
 

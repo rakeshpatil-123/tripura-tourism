@@ -158,6 +158,38 @@
         </mat-select>
       </mat-form-field>
     </div>
+    <div class="validation-section">
+      <h3>Display Rule</h3>
+      <div class="form-row validation-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Condition Question</mat-label>
+          <mat-select [compareWith]="compareQuestions" formControlName="depends_on">
+            <mat-option [value]="null">(None)</mat-option>
+            <mat-option *ngFor="let q of apiQuestions" [value]="q.id">
+              {{ q.question_label || q.title || q.label || ('Q' + q.id) }}
+            </mat-option>
+            <mat-option *ngIf="!apiQuestions?.length" disabled>
+              No questions available. Please add a question first.
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Condition Operator</mat-label>
+          <mat-select formControlName="operator">
+            <mat-option [value]="null">(None)</mat-option>
+            <mat-option value="<">&lt;</mat-option>
+            <mat-option value="<=">&lt;=</mat-option>
+            <mat-option value=">">&gt;</mat-option>
+            <mat-option value=">=">&gt;=</mat-option>
+            <mat-option value="=">=</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Condition Value</mat-label>
+          <input matInput formControlName="value" placeholder="Enter your Value" />
+        </mat-form-field>
+      </div>
+    </div>
   <div formGroupName="validation_rule" class="validation-section">
     <h3>Validation Rule</h3>
       <div class="form-row upload-rule-section" *ngIf="questionnaireForm.get('question_type')?.value === 'file'">

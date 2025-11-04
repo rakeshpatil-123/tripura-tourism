@@ -59,7 +59,7 @@ export class DepartmentalInspectionComponent implements OnInit {
   dateFrom = new FormControl('');
   dateTo = new FormControl('');
   industryName = new FormControl('');
-
+  appliedFilters: any = {};
   industryOptions: any[] = [];
 
   constructor(private router: Router, private route: ActivatedRoute, public dialog: MatDialog, private genericService: GenericService) { }
@@ -152,12 +152,6 @@ export class DepartmentalInspectionComponent implements OnInit {
     });
   }
 
-  resetFilters(): void {
-    this.dateFrom.reset('');
-    this.dateTo.reset('');
-    this.industryName.reset('');
-    alert('Filters have been reset.');
-  }
   applyFilters(): void {
     const filters = {
       dateFrom: this.dateFrom.value,
@@ -166,12 +160,16 @@ export class DepartmentalInspectionComponent implements OnInit {
     };
 
     if (!filters.dateFrom && !filters.dateTo && !filters.industryName) {
-      alert(' Please select at least one filter before applying.');
+      alert('Please select at least one filter before applying.');
       return;
     }
 
-    alert(
-      `Filters applied:\n\nFrom: ${filters.dateFrom || '-'}\nTo: ${filters.dateTo || '-'}\nIndustry: ${filters.industryName || '-'}`
-    );
+    this.appliedFilters = { ...filters };
+  }
+  resetFilters(): void {
+    this.dateFrom.reset('');
+    this.dateTo.reset('');
+    this.industryName.reset('');
+    this.appliedFilters = {};
   }
 }
