@@ -42,13 +42,14 @@ interface Department {
   ],
 })
 export class InspectionComponent implements OnInit {
-  @ViewChild('dateFromPicker') dateFromPicker!: any;
-  @ViewChild('dateToPicker') dateToPicker!: any;
-  @ViewChild('deptPicker') deptPicker!: any;
+  @ViewChild('dateFromPicker') dateFromPicker!: IlogiInputDateComponent;
+  @ViewChild('dateToPicker') dateToPicker!: IlogiInputDateComponent;
   @ViewChild('inspectionRequestDialog')
   inspectionRequestDialog!: TemplateRef<any>;
+  selectedDepartmentId: number | null = null;
   inspectionListData: any[] = [];
   inspectionRequestListData: any[] = [];
+  fullInspectionRequestListData: any[] = [];
   showDeleteModal = false;
   itemToDelete: any = null;
   isEditing = false;
@@ -57,7 +58,8 @@ export class InspectionComponent implements OnInit {
   filterDateFrom: Date | null = null;
   filterDateTo: Date | null = null;
   filterDepartmentId: number | null = null;
-
+  fullInspectionListData: any[] = [];
+  
   inspectionColumns: any[] = [
     { key: 'inspection_id', label: 'Inspection ID', type: 'text' },
     { key: 'inspection_date', label: 'Inspection Date', type: 'text' },
@@ -72,6 +74,7 @@ export class InspectionComponent implements OnInit {
     { key: 'request_id', label: 'Request ID', type: 'text' },
     { key: 'proposed_inspection_date', label: 'Proposed Date', type: 'text' },
     { key: 'inspection_type', label: 'Type', type: 'text' },
+    { key: 'department_name', label: 'Department', type: 'text' },
     { key: 'industry_name', label: 'Industry', type: 'text' },
     { key: 'inspector', label: 'Inspector', type: 'text' },
     { key: 'status', label: 'Status', type: 'text' },
@@ -238,52 +241,86 @@ export class InspectionComponent implements OnInit {
       });
   }
 
-  loadInspectionLists(): void {
-    this.genericService
-      .getByConditions(
-        {},
-        'api/inspection/date-confirmed-inspections-list-per-user'
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1 && Array.isArray(res.data)) {
-            this.fullInspectionRequestList = res.data;
-            this.inspectionRequestListData = [...res.data];
-          } else {
-            this.fullInspectionRequestList = [];
-            this.inspectionRequestListData = [];
-          }
-        },
-        error: (err) => {
-          console.error('Failed to load inspection list:', err);
-          this.inspectionListData = [];
-          this.genericService.openSnackBar(
-            'Failed to load inspection list',
-            'error'
-          );
-        },
-      });
+ 
 
-    this.genericService
-      .getByConditions({}, 'api/inspection/inspection-list')
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1 && Array.isArray(res.data)) {
-            this.inspectionRequestListData = res.data;
-          } else {
-            this.inspectionRequestListData = [];
-          }
-        },
-        error: (err) => {
-          console.error('Failed to load inspection requests:', err);
-          this.inspectionRequestListData = [];
-          this.genericService.openSnackBar(
-            'Failed to load inspection requests',
-            'error'
-          );
-        },
-      });
-  }
+  // loadInspectionLists(): void {
+  //   this.genericService
+  //     .getByConditions(
+  //       {},
+  //       'api/inspection/date-confirmed-inspections-list-per-user'
+  //     )
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         this.inspectionListData =
+  //           res?.status === 1 && Array.isArray(res.data) ? res.data : [];
+  //       },
+  //       error: (err) => {
+  //         console.error('Failed to load confirmed inspections:', err);
+  //         this.inspectionListData = [];
+  //         this.genericService.openSnackBar(
+  //           'Failed to load inspection list',
+  //           'error'
+  //         );
+  //       },
+  //     });
+
+  //   this.genericService
+  //     .getByConditions({}, 'api/inspection/inspection-list')
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         const data =
+  //           res?.status === 1 && Array.isArray(res.data) ? res.data : [];
+  //         this.fullInspectionRequestListData = [...data];
+  //         this.inspectionRequestListData = [...data];
+  //       },
+  //       error: (err) => {
+  //         console.error('Failed to load inspection requests:', err);
+  //         this.inspectionRequestListData = [];
+  //         this.fullInspectionRequestListData = [];
+  //         this.genericService.openSnackBar(
+  //           'Failed to load inspection requests',
+  //           'error'
+  //         );
+  //       },
+  //     });
+  // }
+
+loadInspectionLists(): void {
+  this.genericService
+    .getByConditions(
+      {},
+      'api/inspection/date-confirmed-inspections-list-per-user'
+    )
+    .subscribe({
+      next: (res: any) => {
+        const data = res?.status === 1 && Array.isArray(res.data) ? res.data : [];
+        this.fullInspectionListData = [...data];       
+        this.inspectionListData = [...data];           
+      },
+      error: (err) => {
+        console.error('Failed to load confirmed inspections:', err);
+        this.fullInspectionListData = [];
+        this.inspectionListData = [];
+        this.genericService.openSnackBar('Failed to load inspection list', 'error');
+      },
+    });
+
+  this.genericService
+    .getByConditions({}, 'api/inspection/inspection-list')
+    .subscribe({
+      next: (res: any) => {
+        const data = res?.status === 1 && Array.isArray(res.data) ? res.data : [];
+        this.fullInspectionRequestListData = [...data]; 
+        this.inspectionRequestListData = [...data];      
+      },
+      error: (err) => {
+        console.error('Failed to load inspection requests:', err);
+        this.fullInspectionRequestListData = [];
+        this.inspectionRequestListData = [];
+        this.genericService.openSnackBar('Failed to load inspection requests', 'error');
+      },
+    });
+}
 
   requestInspection(): void {
     this.isEditing = false;
@@ -299,9 +336,15 @@ export class InspectionComponent implements OnInit {
   }
 
   submitInspectionRequest(): void {
-      console.log('Form valid?', this.inspectionForm.valid);
-  console.log('Proposed date value:', this.inspectionForm.get('proposed_date')?.value);
-  console.log('Form errors:', this.inspectionForm.get('proposed_date')?.errors);
+    console.log('Form valid?', this.inspectionForm.valid);
+    console.log(
+      'Proposed date value:',
+      this.inspectionForm.get('proposed_date')?.value
+    );
+    console.log(
+      'Form errors:',
+      this.inspectionForm.get('proposed_date')?.errors
+    );
     if (this.inspectionForm.invalid) {
       this.inspectionForm.markAllAsTouched();
       return;
@@ -381,68 +424,124 @@ export class InspectionComponent implements OnInit {
     }
   }
 
- applyFilters(): void {
-  const dateFrom = this.dateFromPicker?.value;      // Should be Date or null
-  const dateTo = this.dateToPicker?.value;          // Should be Date or null
-  const deptId = this.deptPicker?.selectedValue;    // Should be number or null
+  // applyFilters(): void {
+  //   const dateFrom = this.dateFromPicker?.value;
+  //   const dateTo = this.dateToPicker?.value;
+  //   const deptId = this.selectedDepartmentId;
 
-  let filtered = this.fullInspectionRequestList;
+  //   console.log('Filters:', { dateFrom, dateTo, deptId });
 
-  // Filter by department
+  //   let filtered = [...this.fullInspectionRequestListData];
+
+  //   if (deptId !== null && deptId !== undefined) {
+  //     filtered = filtered.filter((item) => item.department_id === deptId);
+  //   }
+
+  //   if (dateFrom || dateTo) {
+  //     filtered = filtered.filter((item) => {
+  //       const itemDateStr = item.proposed_inspection_date;
+  //       if (!itemDateStr) return false;
+
+  //       const itemDate = new Date(itemDateStr);
+  //       itemDate.setUTCHours(0, 0, 0, 0);
+
+  //       if (dateFrom) {
+  //         const from = new Date(dateFrom);
+  //         from.setUTCHours(0, 0, 0, 0);
+  //         if (itemDate < from) return false;
+  //       }
+
+  //       if (dateTo) {
+  //         const to = new Date(dateTo);
+  //         to.setUTCHours(0, 0, 0, 0);
+  //         if (itemDate > to) return false;
+  //       }
+
+  //       return true;
+  //     });
+  //   }
+
+  //   this.inspectionRequestListData = filtered;
+  // }
+
+  applyFilters(): void {
+  const dateFrom = this.dateFromPicker?.value;      
+  const dateTo = this.dateToPicker?.value;          
+  const deptId = this.selectedDepartmentId; 
+
+  console.log('Applying filters to both tabs:', { deptId, dateFrom, dateTo });
+
+  let filteredTab1 = [...this.fullInspectionListData];
+  
   if (deptId !== null && deptId !== undefined) {
-    filtered = filtered.filter(item => item.department_id === deptId);
+    filteredTab1 = filteredTab1.filter(item => item.department_id === deptId);
   }
 
-  // Filter by date
   if (dateFrom || dateTo) {
-    filtered = filtered.filter(item => {
-      const itemDateStr = item.proposed_inspection_date;
-      if (!itemDateStr) return false;
+    filteredTab1 = filteredTab1.filter(item => {
+      const dateStr = item.inspection_date; 
+      if (!dateStr) return false;
 
-      const itemDate = new Date(itemDateStr);
+      const itemDate = new Date(dateStr);
       itemDate.setUTCHours(0, 0, 0, 0);
 
-      let matches = true;
-
       if (dateFrom) {
-        const fromDate = new Date(dateFrom);
-        fromDate.setUTCHours(0, 0, 0, 0);
-        matches = matches && itemDate >= fromDate;
+        const from = new Date(dateFrom);
+        from.setUTCHours(0, 0, 0, 0);
+        if (itemDate < from) return false;
       }
 
       if (dateTo) {
-        const toDate = new Date(dateTo);
-        toDate.setUTCHours(0, 0, 0, 0);
-        matches = matches && itemDate <= toDate;
+        const to = new Date(dateTo);
+        to.setUTCHours(0, 0, 0, 0);
+        if (itemDate > to) return false;
       }
 
-      return matches;
+      return true;
     });
   }
 
-  this.inspectionRequestListData = filtered;
+  let filteredTab2 = [...this.fullInspectionRequestListData];
+
+  if (deptId !== null && deptId !== undefined) {
+    filteredTab2 = filteredTab2.filter(item => item.department_id === deptId);
+  }
+
+  if (dateFrom || dateTo) {
+    filteredTab2 = filteredTab2.filter(item => {
+      const dateStr = item.proposed_inspection_date;
+      if (!dateStr) return false;
+
+      const itemDate = new Date(dateStr);
+      itemDate.setUTCHours(0, 0, 0, 0);
+
+      if (dateFrom) {
+        const from = new Date(dateFrom);
+        from.setUTCHours(0, 0, 0, 0);
+        if (itemDate < from) return false;
+      }
+
+      if (dateTo) {
+        const to = new Date(dateTo);
+        to.setUTCHours(0, 0, 0, 0);
+        if (itemDate > to) return false;
+      }
+
+      return true;
+    });
+  }
+
+  this.inspectionListData = filteredTab1;          
+  this.inspectionRequestListData = filteredTab2;    
 }
 
 resetFilters(): void {
-  if (this.dateFromPicker && typeof this.dateFromPicker.clear === 'function') {
-    this.dateFromPicker.clear();
-  } else if (this.dateFromPicker) {
-    this.dateFromPicker.value = null;
-  }
+  if (this.dateFromPicker) this.dateFromPicker.value = null;
+  if (this.dateToPicker) this.dateToPicker.value = null;
+  this.selectedDepartmentId = null;
 
-  if (this.dateToPicker && typeof this.dateToPicker.clear === 'function') {
-    this.dateToPicker.clear();
-  } else if (this.dateToPicker) {
-    this.dateToPicker.value = null;
-  }
-
-  if (this.deptPicker && typeof this.deptPicker.clear === 'function') {
-    this.deptPicker.clear();
-  } else if (this.deptPicker) {
-    this.deptPicker.selectedValue = null;
-  }
-
-  this.inspectionRequestListData = [...this.fullInspectionRequestList];
+  this.inspectionListData = [...this.fullInspectionListData];
+  this.inspectionRequestListData = [...this.fullInspectionRequestListData];
 }
 
   onDateFromChange(date: Date | null): void {
@@ -450,10 +549,10 @@ resetFilters(): void {
   }
 
   onDateToChange(date: Date | null): void {
+    console.log('Date to selected:', date);
     this.filterDateTo = date;
   }
-
   onDepartmentChange(deptId: number | null): void {
-    this.filterDepartmentId = deptId;
+    this.selectedDepartmentId = deptId;
   }
 }

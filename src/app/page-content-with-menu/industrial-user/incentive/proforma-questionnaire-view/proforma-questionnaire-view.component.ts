@@ -677,7 +677,7 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
 
   getMultiFileControlName(questionId: number, index: number): string {
     return `${questionId}_${index}`;
-  }
+  } 
 
   trackByIndex(index: number): number {
     return index;

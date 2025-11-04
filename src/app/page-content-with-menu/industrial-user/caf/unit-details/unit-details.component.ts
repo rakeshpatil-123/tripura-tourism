@@ -297,7 +297,9 @@ loadingSubdivisions = false;
 }
 
 onDistrictChange(district: string): void {
-  this.form.get('subDivision')?.reset(); // reset subdivision when district changes
+  console.log(district, 'batao');
+  
+  this.form.get('subDivision')?.reset();
   this.subDivisionOptions = [];
   if (!district) return;
 
