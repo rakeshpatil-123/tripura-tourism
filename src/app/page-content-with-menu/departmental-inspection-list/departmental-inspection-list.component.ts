@@ -42,7 +42,7 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['filters'] && !changes['filters'].firstChange) {
-      this.applyFilterLogic();
+      this.getApprovedInspections();
     }
   }
   applyFilterLogic(): void {
@@ -64,82 +64,149 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
     });
   }
 
-  defineColumns(): void {
-    this.inspectionColumns = [
-      { key: 'sno', label: 'S.No', type: 'number', width: '70px' },
-      { key: 'request_id', label: 'Request ID', type: 'text' },
-      { key: 'proposed_date', label: 'Proposed Inspection Date', type: 'text' },
-      { key: 'inspection_type', label: 'Inspection Type', type: 'text' },
-      { key: 'industry_name', label: 'Industry Name', type: 'text' },
-      { key: 'inspector', label: 'Inspector', type: 'text' },
-      { key: 'status', label: 'Status', type: 'badge' },
-      {
-        key: 'actions',
-        label: 'Actions',
-        type: 'action',
-        width: '200px',
-        actions: [
-          // {
-          //   label: 'View',
-          //   color: 'primary',
-          //   onClick: (row: any) => this.viewInspection(row),
-          // },
-          {
-            label: 'Download Report',
-            color: 'accent',
-            visible: (row: any) => row.report_file_url || 1,
-            // visible: (row: any) => !!row.report_file_url,
-            onClick: (row: any) => this.downloadReport(row),
-          },
-          // {
-          //   label: 'Delete',
-          //   color: 'warn',
-          //   onClick: (row: any) => this.deleteInspection(row),
-          // },
-        ],
-      },
-    ];
+  defineColumns(dataSample?: any): void {
+    const hiddenKeys = ['id', 'reason', 'updated_at', 'remarks'];
+
+    if (dataSample) {
+      this.inspectionColumns = Object.keys(dataSample)
+        .filter(
+          (key) =>
+            !hiddenKeys.includes(key) &&
+            dataSample[key] !== null &&
+            dataSample[key] !== ''
+        )
+        .map((key) => ({
+          key,
+          label: this.formatLabel(key),
+          type: key === 'status' ? 'badge' : 'text',
+        }));
+    } else {
+      this.inspectionColumns = [
+        { key: 'sno', label: 'S.No', type: 'number', width: '70px' },
+        { key: 'inspection_id', label: 'Inspection ID', type: 'text' },
+        { key: 'inspection_date', label: 'Date of Inspection', type: 'text' },
+        { key: 'department_name', label: 'Department Name', type: 'text' },
+        { key: 'inspection_type', label: 'Inspection Type', type: 'text' },
+        { key: 'industry_name', label: 'Industry Name', type: 'text' },
+        { key: 'inspector', label: 'Inspector', type: 'text' },
+        { key: 'status', label: 'Status', type: 'badge' },
+      ];
+    }
+    this.inspectionColumns.push({
+      key: 'actions',
+      label: 'Actions',
+      type: 'action',
+      width: '200px',
+      actions: [
+        {
+          label: 'Download Report',
+          color: 'accent',
+          // visible: (row: any) => !!row.report_file_url,
+          visible: (row: any) => !row.report_file_url,
+          onClick: (row: any) => this.downloadReport(row),
+        },
+      ],
+    });
   }
 
 
-  getApprovedInspections(): void {
-    this.loading = true;
-    this.loaderService.showLoader();
+  // getApprovedInspections(): void {
+  //   this.loading = true;
+  //   this.loaderService.showLoader();
 
-    this.genericService
-      .getByConditions({}, 'api/department/approved-inspections-list')
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1 && Array.isArray(res.data)) {
-            this.approvedInspections = res.data.map((item: any, index: number) => ({
-              sno: index + 1,
-              id: item.id,
-              request_id: item.request_id ?? 'N/A',
-              proposed_date: item.proposed_date ?? 'N/A',
-              inspection_type: item.inspection_type ?? 'N/A',
-              industry_name: item.industry_name ?? 'N/A',
-              inspector: item.inspector ?? 'N/A',
-              status: this.toTitleCase(item.status) ?? 'Pending',
-              report_file_url: item.report_file_url ?? null,
-            }));
-          } else {
-            this.approvedInspections = [];
-            this.filteredInspections = [];
-          }
-        },
-        error: (err) => {
-          const errorMessage =
-            err?.error?.message ||
-            err?.message || 'Something went wrong while fetching inspection list.';
-          this.genericService.openSnackBar?.(errorMessage, 'error');
-        },
+  //   this.genericService
+  //     .getByConditions({}, 'api/department/approved-inspections-list')
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         if (res?.status === 1 && Array.isArray(res.data) && res.data.length > 0) {
+  //           this.approvedInspections = res.data.map((item: any, index: number) => ({
+  //             sno: index + 1,
+  //             ...item,
+  //           }));
+  //           this.defineColumns(this.approvedInspections[0]);
 
-        complete: () => {
-          this.loading = false;
-          this.loaderService.hideLoader();
-        },
-      });
+  //         } else {
+  //           this.approvedInspections = [];
+  //           this.inspectionColumns = [];
+  //         }
+  //       },
+  //       error: (err) => {
+  //         const errorMessage =
+  //           err?.error?.message ||
+  //           err?.message || 'Something went wrong while fetching inspection list.';
+  //         this.genericService.openSnackBar?.(errorMessage, 'error');
+  //       },
+  //       complete: () => {
+  //         this.loading = false;
+  //         this.loaderService.hideLoader();
+  //       },
+  //     });
+  // }
+ getApprovedInspections(): void {
+  this.loading = true;
+  this.loaderService.showLoader();
+
+  const { dateFrom, dateTo, industryName } = this.filters || {};
+  let url = 'api/department/approved-inspections-list';
+
+  const params: string[] = [];
+
+  // 🟢 Format the dates properly as YYYY-MM-DD
+  const formatDate = (date: any): string | null => {
+    if (!date) return null;
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return null;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const formattedFrom = formatDate(dateFrom);
+  const formattedTo = formatDate(dateTo);
+
+  if (industryName) params.push(`industry_name=${encodeURIComponent(industryName)}`);
+  if (formattedFrom) params.push(`from_date=${encodeURIComponent(formattedFrom)}`);
+  if (formattedTo) params.push(`to_date=${encodeURIComponent(formattedTo)}`);
+
+  if (params.length > 0) {
+    url += '?' + params.join('&');
   }
+
+  this.genericService.getByConditions({}, url).subscribe({
+    next: (res: any) => {
+      if (res?.status === 1 && Array.isArray(res.data) && res.data.length > 0) {
+        this.approvedInspections = res.data.map((item: any, index: number) => ({
+          sno: index + 1,
+          ...item,
+        }));
+        this.defineColumns(this.approvedInspections[0]);
+      } else {
+        this.approvedInspections = [];
+        this.inspectionColumns = [];
+      }
+    },
+    error: (err) => {
+      const errorMessage =
+        err?.error?.message ||
+        err?.message || 'Something went wrong while fetching inspection list.';
+      this.genericService.openSnackBar?.(errorMessage, 'error');
+    },
+    complete: () => {
+      this.loading = false;
+      this.loaderService.hideLoader();
+    },
+  });
+}
+
+
+  private formatLabel(key: string): string {
+    return key
+      .replace(/_/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
 
   viewInspection(row: any): void {
     this.genericService.openSnackBar?.(`Viewing ${row.request_id}`, 'info');

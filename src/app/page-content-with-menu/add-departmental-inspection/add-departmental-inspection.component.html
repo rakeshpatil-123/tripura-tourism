@@ -3,8 +3,10 @@
     <h2 class="page-title">Create Departmental Inspection</h2>
     <form [formGroup]="deptInspectionForm" class="inspection-form">
       <div class="section">
-        <button mat-button class="btn btn-success" (click)="viewOrganization()">View Organization</button>
-        <h3 class="section-title">Unit Details</h3>
+        <div class="section-view">
+          <h3 class="section-title">Unit Details</h3>
+          <button mat-button class="btn btn-success" *ngIf="unitUserId" (click)="viewOrganization()">View Organization</button>
+          </div>
         <div class="grid-container">
           <app-ilogi-select fieldId="unitName" fieldLabel="Unit Name" [mandatory]="true" formControlName="unitName"
             [selectOptions]="unitOptions" placeholder="Select unit name">
@@ -22,9 +24,9 @@
             formControlName="unitSubDivision" placeholder="Enter sub-division">
           </app-ilogi-input>
 
-          <app-ilogi-select fieldId="riskCategory" fieldLabel="Risk Category" formControlName="riskCategory"
-            [selectOptions]="riskCategories" placeholder="Select risk category">
-          </app-ilogi-select>
+          <app-ilogi-input fieldId="riskCategory" class="mt-20" fieldLabel="Risk Category" [readonly]="true"
+            formControlName="riskCategory" placeholder="Enter risk category">
+          </app-ilogi-input>
         </div>
       </div>
       <div class="section">
@@ -36,14 +38,16 @@
       <div class="section">
         <h3 class="section-title">Inspection Details</h3>
         <div class="grid-container">
-          <app-ilogi-input-date fieldId="inspectionDate" class="mt-2" fieldLabel="Inspection Date" formControlName="inspectionDate"
-            placeholder="DD/MM/YYYY">
-          </app-ilogi-input-date>
-
+       
           <app-ilogi-select fieldId="inspectionType" fieldLabel="Inspection Type" [mandatory]="true"
             formControlName="inspectionType" [selectOptions]="inspectionTypeOptions"
-            placeholder="Select inspection type">
+            placeholder="Select inspection type" [enableSearch]="true">
           </app-ilogi-select>
+          <!-- Inspection Date with visible border (same as Proposed Date style) -->
+          <app-ilogi-input-date fieldId="inspectionDate" [disabledDates]="holidays" class="mt-5" fieldLabel="Inspection Date"
+            formControlName="inspectionDate" placeholder="DD/MM/YYYY">
+          </app-ilogi-input-date>
+
 
           <app-ilogi-select fieldId="inspector" fieldLabel="Inspector" [mandatory]="true" formControlName="inspector"
             [selectOptions]="inspectors" placeholder="Select inspector">

@@ -127,7 +127,7 @@ export class UserProfileComponent implements OnInit {
 
       this.profileForm.patchValue({
         enterpriseName: profile.name_of_enterprise,
-        firstName: first || '',
+        firstName: profile.authorized_person_name || '',
         lastName: last.join(' ') || '',
         email: profile.email_id,
         phone: profile.mobile_no,

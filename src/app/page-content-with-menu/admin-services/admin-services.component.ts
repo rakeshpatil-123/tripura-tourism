@@ -395,21 +395,24 @@ deleteService(service: Service): void {
     });
   }
   addOrEditRenewalFeeRule(service: Service, mode: 'add' | 'edit'): void {
-    const dialogRef = this.dialog.open(AddRenewalFeeRuleComponent, {
-      width: '75%',
-      maxWidth: '75vw',
-      height: 'auto',
-      maxHeight: '90vh',
-      panelClass: 'center-dialog',
-      data: { service, mode },
-    });
+  const dialogRef = this.dialog.open(AddRenewalFeeRuleComponent, {
+    width: '85vw',
+    maxWidth: '1000px',
+    height: 'auto',
+    maxHeight: '90vh',
+    enterAnimationDuration: '300ms',
+    exitAnimationDuration: '250ms',
+    panelClass: ['renewal-dialog', 'center-dialog'],
+    data: { service, mode },
+    autoFocus: false,
+  });
+  dialogRef.afterClosed().subscribe((result) => {
+    if (result === 'created' || result === 'updated') {
+      this.loadServices();
+    }
+  });
+}
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result === 'created' || result === 'updated') {
-        this.loadServices();
-      }
-    });
-  }
   viewRenewalFeeRule(service: Service): void {
     this.dialog.open(ViewRenewalFeeRuleComponent, {
       width: '100vw',

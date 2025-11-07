@@ -27,7 +27,7 @@
       class="w-100 select-form-field"
       [ngClass]="{ 'is-invalid': submitted && errors }"
     >
-      <p-select
+      <!-- <p-select
         [inputId]="fieldId"
         [options]="selectOptions"
         optionLabel="name"
@@ -50,6 +50,25 @@
               option.name.length > 70
                 ? option.name.substring(0, 70) + "..."
                 : option.name
+            }}
+          </span>
+        </ng-template>
+      </p-select> -->
+      <p-select [inputId]="fieldId" [options]="filteredOptions" optionLabel="name" [(ngModel)]="value" optionValue="id"
+        [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false" (onShow)="onDropdownShow()"
+        (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()" (onBlur)="onBlur()"
+        [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
+        styleClass="w-full">
+        <ng-template pTemplate="header" *ngIf="enableSearch">
+          <input #searchInput type="text" class="p-inputtext p-component w-full p-2 text-sm w-200" placeholder="Search..."
+            [(ngModel)]="searchTerm" (ngModelChange)="onSearch($event)" style="background-color: #fff; color: #000;" />
+        </ng-template>
+        <ng-template let-option pTemplate="item">
+          <span [title]="option.name">
+            {{
+            option.name.length > 70
+            ? option.name.substring(0, 70) + '...'
+            : option.name
             }}
           </span>
         </ng-template>

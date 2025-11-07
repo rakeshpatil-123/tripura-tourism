@@ -62,6 +62,8 @@ export class AddRenewalFeeRuleComponent implements OnInit {
         multi_condition: svc.multi_condition ?? null,
         pre_condition_operator: svc.pre_condition_operator ?? null,
         pre_condition_value: svc.pre_condition_value ?? null,
+        pre_start_value: svc.pre_start_value ?? null,
+        pre_end_value: svc.pre_end_value ?? null,
         fixed_fee: svc.fixed_fee && svc.fixed_fee !== 'null' ? svc.fixed_fee : null,
         minimum_fee: svc.minimum_fee && svc.minimum_fee !== 'null' ? svc.minimum_fee : null,
         question_id: svc.question_id ?? null,
@@ -84,7 +86,8 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       fee_type: ['calculated'],
       multi_condition: [null],
       pre_condition_operator: [null],
-      pre_condition_value: [null],
+      pre_start_value: [null],
+      pre_end_value: [null],
       fixed_fee: [null],
       minimum_fee: [null],
       question_id: [null],
@@ -147,6 +150,8 @@ export class AddRenewalFeeRuleComponent implements OnInit {
       ruleObj.condition_label_question_id = Number(this.feeRuleForm.get('condition_label_question_id')?.value);
       ruleObj.pre_condition_operator = this.feeRuleForm.get('pre_condition_operator')?.value;
       ruleObj.pre_condition_value = this.feeRuleForm.get('pre_condition_value')?.value;
+      ruleObj.pre_start_value = this.feeRuleForm.get('pre_start_value')?.value;
+      ruleObj.pre_end_value = this.feeRuleForm.get('pre_end_value')?.value;
     }
 
     if (this.data.mode === 'edit' && this.data.service?.id) {

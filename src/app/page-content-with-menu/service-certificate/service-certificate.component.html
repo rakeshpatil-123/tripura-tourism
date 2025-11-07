@@ -1,25 +1,18 @@
 <div class="certificate-wrapper">
   <div class="header">
     <h2 class="service-title">{{ serviceName }}</h2>
-    <button class="close-btn" (click)="closeDialog()">✕</button>
+    <button type="button" class="close-btn" (click)="closeDialog()">✕</button>
   </div>
-  <div *ngIf="data.mode !== 'view'" class="editor-section">
-  <label class="editor-label">{{ data.mode === 'edit' ? 'Update Certificate Template' : 'Add Certificate Template' }}</label> <p-editor [(ngModel)]="formTemplate" [modules]="editorModules" [readonly]="false" class="custom-editor">
-    </p-editor>
+  <div class="editor-section">
+  <label class="editor-label">Edit Certificate Template</label> <ckeditor #editor [editor]="Editor" [(ngModel)]="formTemplate" [config]="config" (ready)="onReady($event)"
+      (change)="onChange($event)"></ckeditor>
   </div>
-  <div *ngIf="data.mode === 'view'" class="preview-section">
-    <div class="preview-content" [innerHTML]="formTemplate"></div>
+  <div class="footer">
+    <button pButton type="button" class="p-button-outlined" (click)="previewTemplate()">Preview</button>
+    <button pButton type="button" class="p-button-secondary" (click)="downloadTemplate()">Download</button>
+    <button pButton type="button" class="p-button-success" (click)="saveTemplate()">Save Template</button>
   </div>
 
-  <div class="footer" *ngIf="data.mode !== 'view'">
-    <button pButton type="button" label="Preview" class="p-button-outlined p-button-info"
-      (click)="previewTemplate()">
-    </button>
-
-    <button pButton type="button" label="Download" class="p-button-secondary" (click)="downloadTemplate()">
-    </button>
-
-    <button pButton type="button" [label]="data?.mode === 'edit' ? 'Update Template' : 'Save Template'" class="p-button-success" (click)="saveTemplate()">
-    </button>
-  </div>
+  <h3>Preview:</h3>
+  <div class="preview ck-content" [innerHTML]="formTemplate"></div>
 </div>

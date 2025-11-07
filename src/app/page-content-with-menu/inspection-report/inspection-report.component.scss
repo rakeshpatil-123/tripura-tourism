@@ -1,0 +1,219 @@
+/* Root container and global rules */
+* {
+  box-sizing: border-box;
+  color: black;
+}
+
+html, body {
+  background: white;
+  color: black;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  padding: 16px;
+  background: white;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 100%;
+}
+
+/* Header */
+h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+/* Layout panels */
+.panels {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.left-panel {
+  flex: 1 1 600px;
+  min-width: 340px;
+}
+
+.right-panel {
+  flex: 0 0 400px;
+  min-width: 300px;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border: 1px solid black;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: none;
+
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    border-bottom: 1px solid black;
+    padding-bottom: 4px;
+  }
+
+  button {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+
+    &:hover {
+      background: black;
+      color: white;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 0.9rem;
+    background: white;
+    color: black;
+  }
+}
+
+/* Form rows */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+/* Margins input group */
+.margin-inputs {
+  display: flex;
+  gap: 6px;
+
+  input {
+    width: 50px;
+  }
+}
+
+/* Fields section */
+.fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    label {
+      flex: 1;
+    }
+  }
+
+  p {
+    font-weight: bold;
+    margin-top: 12px;
+  }
+
+  small {
+    font-size: 12px;
+  }
+}
+
+/* Tables section */
+.table-config {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  button {
+    align-self: flex-start;
+  }
+}
+
+/* Signature area */
+.signature-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  .sig-canvas {
+    border: 1px solid black;
+    width: 320px;
+    height: 120px;
+    touch-action: none;
+    background: white;
+  }
+
+  .sig-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Actions */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Preview panel */
+.preview {
+  pre {
+    max-height: 600px;
+    overflow: auto;
+    white-space: pre-wrap;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 8px;
+    border-radius: 4px;
+  }
+}
+
+/* Responsive tweaks */
+@media (max-width: 960px) {
+  .panels {
+    flex-direction: column;
+  }
+
+  .right-panel {
+    width: 100%;
+  }
+}

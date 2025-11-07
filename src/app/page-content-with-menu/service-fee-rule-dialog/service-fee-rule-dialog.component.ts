@@ -63,6 +63,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       condition_value_start: [null],
       multi_condition: ['no'],
       pre_condition_value: [null], 
+      pre_start_value: [null], 
+      pre_end_value: [null], 
       condition_value_end: [null],
       fixed_fee: [null],
       calculated_fee: [null],
@@ -88,6 +90,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
           condition_value_start: values.condition_value_start,
           multi_condition: values.multi_condition,
           pre_condition_value: values.pre_condition_value,
+          pre_start_value: values.pre_start_value,
+          pre_end_value: values.pre_end_value,
           condition_value_end: values.condition_value_end,
           fixed_fee: values.fixed_fee,
           calculated_fee: values.calculated_fee,
@@ -115,6 +119,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
         condition_value_start: r.condition_value_start !== '-' ? r.condition_value_start : null,
         multi_condition: r.multi_condition !== '-' ? r.multi_condition : null,
         pre_condition_value: r.pre_condition_value !== '-' ? r.pre_condition_value : null,
+        pre_start_value: r.pre_start_value !== '-' ? r.pre_start_value : null,
+        pre_end_value: r.pre_end_value !== '-' ? r.pre_end_value : null,
         condition_value_end: r.condition_value_end !== '-' ? r.condition_value_end : null,
         fixed_fee: r.fixed_fee && r.fixed_fee !== '-' ? r.fixed_fee : null,
         calculated_fee: r.calculated_fee && r.calculated_fee !== '-' ? r.calculated_fee : null,
@@ -144,18 +150,26 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   private toggleMultiConditionFields(value: string): void {
     const preOp = this.feeRuleForm.get('pre_condition_operator');
     const preVal = this.feeRuleForm.get('pre_condition_value');
+    const preStartVal = this.feeRuleForm.get('pre_start_value');
+    const preEndVal = this.feeRuleForm.get('pre_end_value');
     const condLabel = this.feeRuleForm.get('condition_label_question_id');
 
     if (value === 'yes') {
       preOp?.enable();
       preVal?.enable();
+      preStartVal?.enable();
+      preEndVal?.enable();
       condLabel?.enable();
     } else {
       preOp?.reset();
       preVal?.reset();
+      preStartVal?.reset();
+      preEndVal?.reset();
       condLabel?.reset();
       preOp?.disable();
       preVal?.disable();
+      preStartVal?.disable();
+      preEndVal?.disable();
       condLabel?.disable();
     }
   }
@@ -167,15 +181,17 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     const condStart = this.feeRuleForm.get('condition_value_start');
     const isMulti = this.feeRuleForm.get('multi_condition');
     const condValue = this.feeRuleForm.get('pre_condition_value');
+    const condStartValue = this.feeRuleForm.get('pre_start_value');
+    const condEndValue = this.feeRuleForm.get('pre_end_value');
     const condEnd = this.feeRuleForm.get('condition_value_end');
     const calcFee = this.feeRuleForm.get('calculated_fee');
     const minFee = this.feeRuleForm.get('minimum_fee');
     const fixedCalcFee = this.feeRuleForm.get('fixed_calculated_fee');
     const perUnitFee = this.feeRuleForm.get('per_unit_fee');
 
-    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, calcFee, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
+    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, condStartValue, condEndValue, calcFee, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
 
-    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, calcFee, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
+    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, condStartValue, condEndValue, calcFee, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
   }
 
   submit() {
@@ -212,6 +228,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     if (raw.multi_condition === 'yes') {
       payloadRule.pre_condition_operator = raw.pre_condition_operator || null;
       payloadRule.pre_condition_value = raw.pre_condition_value || null;
+      payloadRule.pre_start_value = raw.pre_start_value || null;
+      payloadRule.pre_end_value = raw.pre_end_value || null;
       payloadRule.condition_label_question_id = raw.condition_label_question_id ? Number(raw.condition_label_question_id) : null;
     }
 
@@ -232,6 +250,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
               condition_value_start: null,
               multi_condition: null,
               pre_condition_value: null,
+              pre_start_value: null,
+              pre_end_value: null,
               condition_value_end: null,
               fixed_fee: null,
               calculated_fee: null,
@@ -311,6 +331,8 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     }
     patchValues.pre_condition_operator = rule.pre_condition_operator ?? null;
     patchValues.pre_condition_value = rule.pre_condition_value ?? null;
+    patchValues.pre_start_value = rule.pre_start_value ?? null;
+    patchValues.pre_end_value = rule.pre_end_value ?? null;
 
     this.feeRuleForm.patchValue(patchValues, { emitEvent: false });
   }

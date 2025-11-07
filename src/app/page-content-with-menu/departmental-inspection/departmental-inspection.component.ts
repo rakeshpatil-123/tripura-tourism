@@ -17,6 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddDepartmentalInspectionComponent } from '../add-departmental-inspection/add-departmental-inspection.component';
 import { AddDepartmentalJointInspectionComponent } from '../add-departmental-joint-inspection/add-departmental-joint-inspection.component';
 import { GenericService } from '../../_service/generic/generic.service';
+import { InspectionReportComponent } from '../inspection-report/inspection-report.component';
 
 @Component({
   selector: 'app-departmental-inspection',
@@ -88,8 +89,9 @@ export class DepartmentalInspectionComponent implements OnInit {
       next: (response: any) => {
         if (response.status === 1 && Array.isArray(response.data)) {
           this.industryOptions = response.data.map((unit: any) => ({
-            id: String(unit.id),
+            id: String(unit.unit_name),
             name: unit.unit_name || 'Unnamed Unit',
+            value: unit.unit_name
           }));
         } else {
           this.industryOptions = [];
@@ -131,6 +133,28 @@ export class DepartmentalInspectionComponent implements OnInit {
       industryName: this.industryName.value,
     };
     const dialogRef = this.dialog.open(AddDepartmentalJointInspectionComponent, {
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      enterAnimationDuration: '400ms',
+      exitAnimationDuration: '400ms',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'submitted') {
+        console.log('Inspection form successfully submitted!');
+      } else {
+        console.log('Dialog closed without submission.');
+      }
+    });
+  }
+  createInspectionReport(): void {
+    const dialogRef = this.dialog.open(InspectionReportComponent, {
       width: '100vw',
       height: '100vh',
       maxWidth: '100vw',

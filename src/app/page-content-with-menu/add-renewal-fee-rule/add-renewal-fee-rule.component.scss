@@ -2,6 +2,7 @@
   width: 90vw;
   max-width: 1000px;
   margin: 0 auto;
+  margin-top: 30px !important;
   background: #fff;
   padding: 2vh 2vw;
   border-radius: 1vh;
@@ -27,6 +28,28 @@
     }
   }
 
+  .dialog-body {
+    max-height: 75vh;
+    padding-top: 15px;
+    overflow-y: auto;
+    padding-right: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dialog-body::-webkit-scrollbar {
+    width: 10px;
+  }
+  .dialog-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .dialog-body::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.15);
+    border-radius: 8px;
+  }
+  .dialog-body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+  }
+
   form {
     display: flex;
     flex-direction: column;
@@ -37,6 +60,10 @@
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1.5vh 1.5vw;
       align-items: center;
+
+      .full {
+        grid-column: 1 / -1;
+      }
 
       mat-form-field {
         width: 100%;
@@ -101,6 +128,7 @@
 @media (max-width: 1024px) {
   .renewal-container {
     width: 95vw;
+    margin-top: 40px !important;
     padding: 2vh;
   }
 

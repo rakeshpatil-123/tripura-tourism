@@ -30,6 +30,8 @@
           <mat-option value="radio">Radio</mat-option>
           <mat-option value="checkbox">Checkbox</mat-option>
           <mat-option value="date">Date</mat-option>
+          <mat-option value="date_mmdd">Date(mmdd)</mat-option>
+          <mat-option value="date_yyyymmdd">Date(yyyymmdd)</mat-option>
           <!-- <mat-option value="button">Button</mat-option> -->
         </mat-select>
       </mat-form-field>
@@ -182,11 +184,21 @@
             <mat-option value=">">&gt;</mat-option>
             <mat-option value=">=">&gt;=</mat-option>
             <mat-option value="=">=</mat-option>
+            <mat-option value="!=">!=</mat-option>
+            <mat-option value="between">Between</mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field *ngIf="questionnaireForm.get('question_type')?.value !== 'date_mmdd' && questionnaireForm.get('question_type')?.value !== 'date_yyyymmdd'" appearance="outline">
           <mat-label>Condition Value</mat-label>
-          <input matInput formControlName="value" placeholder="Enter your Value" />
+          <input matInput formControlName="value"placeholder="Enter your Value" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Start Value</mat-label>
+          <input matInput formControlName="start_value" placeholder="Enter your Value" />
+        </mat-form-field>
+        <mat-form-field *ngIf="questionnaireForm.get('question_type')?.value === 'date_dd_mm'" appearance="outline">
+          <mat-label>End Value</mat-label>
+          <input matInput formControlName="end_value" placeholder="Enter your Value" />
         </mat-form-field>
       </div>
     </div>
