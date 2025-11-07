@@ -16,7 +16,7 @@
             <!-- Text / Number / Email / Tel / Textarea / Password / URL -->
             <app-ilogi-input
               *ngIf="['text','number','email','tel','textarea','password','url'].includes(q.question_type)"
-              [formControlName]="q.id" [fieldLabel]="q.question_label" [placeholder]="q.question_label"
+              [formControlName]="q.id" [fieldLabel]="q.question_label" 
               [mandatory]="q.is_required === 'yes'" [type]="getInputType(q.question_type)">
             </app-ilogi-input>
             <div

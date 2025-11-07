@@ -48,47 +48,72 @@ border-bottom: 3px solid #fda00f;
 }
 
 
-.table-container {
-  width: 100%;
+.table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  width: 100%;
+  margin-bottom: 1rem;
+}
 
-  .grid-table {
-    width: 100%;
-    min-width: 1200px;
-    border-collapse: collapse;
-    table-layout: auto; 
-    white-space: normal; 
-
-    th,
-    td {
-      padding: 0.75rem;
-      text-align: left;
-      vertical-align: middle;
-      white-space: normal; 
-      word-break: break-word; 
-    }
-
-    app-ilogi-input,
-    app-ilogi-input-date,
-    app-ilogi-file-upload,
-    app-ilogi-radio,
-    app-ilogi-select,
-    app-ilogi-checkbox {
-      display: block;
-      width: 100%;
-    }
-
-    th {
-      white-space: normal !important; 
-      word-break: keep-all;
-    }
-
-    th, td {
-      min-width: 200px;
-      max-width: 250px; 
+.grid-table {
+  min-width: 100%;
+  white-space: nowrap;
+  border-collapse: collapse;
+  
+  th,
+  td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+    
+    &.no-wrap {
+      white-space: nowrap;
+      min-width: 150px; 
     }
   }
+  
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+  
+  app-ilogi-input,
+  app-ilogi-select,
+  app-ilogi-radio,
+  app-ilogi-checkbox,
+  app-ilogi-file-upload,
+  app-ilogi-input-date {
+    width: 100%;
+    min-width: 150px;
+    display: block;
+    
+    ::ng-deep .input-field,
+    ::ng-deep input,
+    ::ng-deep select,
+    ::ng-deep textarea {
+      width: 100% !important;
+      min-width: 120px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
 
- 
+.btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .grid-table th.no-wrap,
+  .grid-table td.no-wrap {
+    min-width: 120px;
+    font-size: 0.85rem;
+  }
+  
+  .grid-table app-ilogi-input ::ng-deep input,
+  .grid-table app-ilogi-select ::ng-deep select {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
 }

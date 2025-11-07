@@ -242,3 +242,16 @@
     box-shadow: 0 22px 46px rgba(2, 6, 23, 0.06);
     transition: transform 200ms ease, box-shadow 200ms ease;
 }
+
+.filter-row{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+
+    h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+    }
+}

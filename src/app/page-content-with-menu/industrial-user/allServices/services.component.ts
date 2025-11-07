@@ -25,32 +25,7 @@ export class ServicesComponent {
     this.allServices();
   }
 
-  // allServices(): void {
-  //   this.apiService.getByConditions({}, 'api/fetch-all-services').subscribe({
-  //     next: (response: any) => {
-  //       if (response?.status === 1 && Array.isArray(response.data)) {
-  //         this.ApplicationData = [...response.data];
-
-  //         const nocTypes = [
-  //           ...new Set(response.data.map((item: any) => item.noc_type)),
-  //         ] as string[];
-  //         this.filterOptions = nocTypes.map((type) => ({
-  //           id: type,
-  //           name: type,
-  //         }));
-
-  //         this.filterOptions.unshift({ id: null, name: 'All NOC Types' });
-
-  //         this.createColumns(response.data);
-  //       } else {
-  //         console.warn('Invalid data format or empty response');
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching services:', error);
-  //     },
-  //   });
-  // }
+  
   allServices(): void {
   this.apiService.getByConditions({}, 'api/fetch-all-services').subscribe({
     next: (response: any) => {

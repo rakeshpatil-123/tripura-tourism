@@ -750,4 +750,11 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
 
     return { payload, files };
   }
+
+  stripHtmlTags(html: string): string {
+  if (!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+}
 }
