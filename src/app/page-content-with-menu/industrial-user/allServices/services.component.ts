@@ -196,7 +196,7 @@ export class ServicesComponent {
       application_status: row.application_status,
     };
 
-    if (row.application_id != null) {
+    if (row.application_id !== null && row.allow_repeat_application === 'no') {
       queryParams.appid2 = row.application_id;
     }
 
