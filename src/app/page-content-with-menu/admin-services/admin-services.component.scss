@@ -412,3 +412,95 @@
   transform: translateX(-100%) !important;
   background: #003c5b !important;
 }
+/* ===============================
+   Dialog animation and layout
+   =============================== */
+
+.center-dialog {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* smooth entrance & exit animations for the whole dialog */
+.renewal-dialog .mat-mdc-dialog-surface {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2) !important;
+  animation: dialogIn 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: center top;
+}
+
+.cdk-overlay-pane.renewal-dialog {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* backdrop fade animation */
+.cdk-overlay-backdrop {
+  background-color: rgba(0, 0, 0, 0.35);
+  animation: backdropFadeIn 300ms ease forwards;
+}
+
+/* Animate the dialog when it closes (reverse) */
+.cdk-overlay-pane.renewal-dialog.ng-animating {
+  animation: dialogOut 250ms ease forwards;
+}
+
+/* ===============================
+   Keyframes for open/close/backdrop
+   =============================== */
+@keyframes dialogIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dialogOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+@keyframes backdropFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ===============================
+   Responsive tuning
+   =============================== */
+@media (max-width: 1024px) {
+  .renewal-dialog .mat-mdc-dialog-surface {
+    width: 90vw !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .renewal-dialog .mat-mdc-dialog-surface {
+    width: 96vw !important;
+    border-radius: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .renewal-dialog .mat-mdc-dialog-surface {
+    width: 98vw !important;
+    max-height: 94vh !important;
+    border-radius: 8px !important;
+  }
+}

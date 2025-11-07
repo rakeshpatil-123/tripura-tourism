@@ -44,6 +44,7 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
   deptId: any;
   selectedDates: string[] = [];
   holidays: any[] = [];
+  unitUserId: number | null = null; 
   riskCategories = [
     { id: 'low', name: 'Low', },
     { id: 'medium', name: 'Medium', },
@@ -194,6 +195,7 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
       unit_sub_division: formValue.unitSubDivision,
       risk_category: formValue.riskCategory,
       department: formValue.department,
+      department_type: 'joint'
     };
 
     this.loaderService.showLoader();
@@ -233,10 +235,9 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
                 timer: 2000,
                 timerProgressBar: true,
               }).then(() => {
-                // ✅ 3. Navigate after success popup
                 this.router.navigate(['/dashboard/departmental-inspection']);
               });
-            }, 400); // delay ensures dialog is fully closed before showing alert
+            }, 400);
           } else {
             Swal.fire({
               title: 'Submission Failed',
@@ -371,6 +372,7 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
         next: (response: any) => {
           if (response.status === 1 && response.data) {
             const unit = response.data;
+            this.unitUserId = unit.user_id;
             this.deptJointInspectionForm.patchValue({
               unitAddress: unit.unit_address || '',
               unitDistrict: unit.unit_location_district || '',
@@ -404,10 +406,9 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
   }
 
   viewOrganization(): void {
-    if (true) {
+    if (this.unitUserId) {
       this.dialogRef.close();
-      const userId = 96;
-      this.router.navigate([`dashboard/user-caf-view/${userId}`]);
+      this.router.navigate([`dashboard/user-caf-view/${this.unitUserId}`]);
     } else {
       this.genericService.openSnackBar('User ID not found.', 'Close');
     }

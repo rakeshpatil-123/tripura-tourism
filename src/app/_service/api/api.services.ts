@@ -22,5 +22,8 @@ export class ApiService {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/page/login`, data);
   }
 
+  getInspection(id: string | number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/inspection/${id}`);
+  }
 
 }

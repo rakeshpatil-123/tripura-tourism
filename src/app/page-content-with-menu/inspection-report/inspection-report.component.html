@@ -1,0 +1,175 @@
+<div class="container">
+  <h1>Inspection PDF Designer & Generator</h1>
+
+  <div class="panels">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <!-- SECTION 1 -->
+      <section class="card">
+        <h2>1. Layout & Style</h2>
+        <form>
+          <div class="row">
+            <label>
+              Page Size:
+              <select formControlName="pageSize">
+                <option>A4</option>
+                <option>LETTER</option>
+              </select>
+            </label>
+
+            <label>
+              Orientation:
+              <select formControlName="pageOrientation">
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Margins (L T R B):
+              <div class="margin-inputs">
+                <input type="number" formControlName="marginLeft" placeholder="L" />
+                <input type="number" formControlName="marginTop" placeholder="T" />
+                <input type="number" formControlName="marginRight" placeholder="R" />
+                <input type="number" formControlName="marginBottom" placeholder="B" />
+              </div>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Font family:
+              <input type="text" formControlName="fontFamily" placeholder="Roboto (default)" />
+            </label>
+            <label>
+              Title font size:
+              <input type="number" formControlName="titleFontSize" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Field label size:
+              <input type="number" formControlName="fieldLabelFontSize" />
+            </label>
+            <label>
+              Field value size:
+              <input type="number" formControlName="fieldValueFontSize" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              <input type="checkbox" formControlName="showBackground" />
+              Use page background
+            </label>
+            <label>
+              Background color:
+              <input type="color" formControlName="backgroundColor" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Header text:
+              <input type="text" formControlName="headerText" />
+            </label>
+          </div>
+        </form>
+      </section>
+
+      <!-- SECTION 2 -->
+      <section class="card">
+        <h2>2. Which fields to show & order</h2>
+        <div class="fields-list">
+          <div *ngFor="let f of fieldsConfig; let i = index" class="field-row">
+            <label>
+              <!-- <input type="checkbox" [formControl]="(configForm.get('fields') as FormGroup).controls[f.key]" /> {{ f.label }} -->
+              Field {{ i + 1 }}
+            </label>
+            <label>
+              Font:
+              <input type="number" [(ngModel)]="f.fontSize" />
+            </label>
+            <!-- <button (click)="fieldsConfig.splice(i,1); fieldsConfig = [...fieldsConfig]">Remove</button> -->
+          </div>
+
+          <p>Order (comma separated keys — top to bottom):</p>
+          <input formControlName="fieldsOrder" />
+          <small>Example: request_id, updated_at, inspection_type, inspector</small>
+        </div>
+      </section>
+
+      <!-- SECTION 3 -->
+      <section class="card">
+        <h2>3. Tables</h2>
+        <button (click)="addEmptyTable()">Add empty table</button>
+
+        <div *ngFor="let t of tables.controls; let i = index" class="table-config">
+          <label>
+            Title:
+            <!-- <input [formControl]="t.get('title')" /> -->
+          </label>
+
+          <label>
+            Columns (comma separated):
+            <!-- <input
+              [value]="t.get('columns')?.value.join(',')"
+              (change)="t.get('columns')?.setValue($event.target.value.split(',').map((s:any)=>s.trim()))"
+            /> -->
+          </label>
+
+          <label>
+            Rows (use “;” for new row, “,” for columns):
+            <!-- <input
+              (change)="
+                t.get('rows')?.setValue(
+                  ($event.target.value || '')
+                  .split(';')
+                  .filter(x=>x)
+                  .map(r=>r.split(',').map(c=>c.trim()))
+                )"
+            /> -->
+          </label>
+          <button (click)="removeTable(i)">Remove table</button>
+        </div>
+      </section>
+
+      <!-- SECTION 4 -->
+      <section class="card">
+        <h2>4. Signature</h2>
+        <div class="signature-wrap">
+          <canvas #sigCanvas class="sig-canvas"></canvas>
+          <div class="sig-controls">
+            <button (click)="clearSignature()">Clear</button>
+            <button (click)="saveSignature()">Save</button>
+            <p *ngIf="signatureDataUrl">Signature saved (embedded in PDF)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5 -->
+      <section class="card">
+        <h2>5. Actions</h2>
+        <label>
+          Fetch ID:
+          <input #fetchId />
+        </label>
+        <div class="action-buttons">
+          <button (click)="generatePdfFromApi(fetchId.value)">Generate PDF (from API)</button>
+          <button (click)="downloadPreviewPdf()">Download Preview (mock data)</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <section class="card preview">
+        <h2>Preview / Debug</h2>
+        <pre>{{ docDefinitionPreview | json }}</pre>
+      </section>
+    </div>
+  </div>
+</div>

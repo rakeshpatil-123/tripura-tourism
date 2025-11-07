@@ -9,13 +9,11 @@
   <span>{{ data.service?.name || data.service || 'Unknown Service' }}</span>
 </div>
 
-
 <mat-dialog-content class="content-wrap">
   <form [formGroup]="feeRuleForm" class="form-container fade-in">
     <div class="form-grid">
-        
         <div class="grid-item">
-          <mat-form-field appearance="outline" class="form-field full">
+          <mat-form-field appearance="outline" class="form-field">
             <mat-label>Is Multi Conditional</mat-label>
             <mat-select formControlName="multi_condition">
               <mat-option value="no">No</mat-option>
@@ -23,9 +21,8 @@
             </mat-select>
           </mat-form-field>
         </div>
-        <div class="grid-item">
-          <mat-form-field appearance="outline" class="form-field full"
-            [hidden]="feeRuleForm.get('multi_condition')?.value !== 'yes'">
+        <div class="grid-item" *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes'">
+          <mat-form-field appearance="outline" class="form-field">
             <mat-label>Pre-Set Conditional Question</mat-label>
             <mat-select formControlName="condition_label_question_id" placeholder="Select question">
               <mat-option *ngFor="let q of questions" [value]="q.id">
@@ -38,11 +35,8 @@
             </mat-select>
           </mat-form-field>
         </div>
-        
-        
-        <div class="grid-item">
-          <mat-form-field appearance="outline" class="form-field full"
-            [hidden]="feeRuleForm.get('multi_condition')?.value !== 'yes'">
+        <div class="grid-item" *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes'">
+          <mat-form-field appearance="outline" class="form-field">
             <mat-label>Pre Condition Operator</mat-label>
             <mat-select formControlName="pre_condition_operator">
               <mat-option value="<">&lt;</mat-option>
@@ -55,17 +49,27 @@
             </mat-select>
           </mat-form-field>
         </div>
-        
-        <div class="grid-item">
-        
-          <mat-form-field appearance="outline" class="form-field full grid-item"
-            [hidden]="feeRuleForm.get('multi_condition')?.value !== 'yes'">
+        <div class="grid-item"
+          *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes' && feeRuleForm.get('pre_condition_operator')?.value !== 'between'">
+          <mat-form-field appearance="outline" class="form-field">
             <mat-label>Pre Condition Value</mat-label>
             <input matInput formControlName="pre_condition_value" placeholder="e.g. 10" />
           </mat-form-field>
           </div>
+          <div class="grid-item range-fields"
+            *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes' && feeRuleForm.get('pre_condition_operator')?.value === 'between'">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Pre Start Value</mat-label>
+              <input matInput formControlName="pre_start_value" placeholder="e.g. 10" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Pre End Value</mat-label>
+              <input matInput formControlName="pre_end_value" placeholder="e.g. 20" />
+            </mat-form-field>
+          </div>
           <div class="grid-item">
-            <mat-form-field appearance="outline" class="form-field full">
+            <mat-form-field appearance="outline" class="form-field">
               <mat-label>Fee Type</mat-label>
               <mat-select formControlName="fee_type">
                 <mat-option value="hardcoded">Hardcoded</mat-option>
@@ -76,7 +80,7 @@
           </div>
         <div class="grid-item">
         <ng-container *ngIf="data.service?.questions?.length; else questionInput">
-          <mat-form-field appearance="outline" class="form-field grid-item full">
+          <mat-form-field appearance="outline" class="form-field">
             <mat-label>Question</mat-label>
             <mat-select formControlName="question_id">
               <mat-option *ngFor="let q of data.service.questions" [value]="q.id + ''">
@@ -90,7 +94,7 @@
         </ng-container>
 
         <ng-template #questionInput>
-          <mat-form-field appearance="outline" class="form-field full">
+          <mat-form-field appearance="outline" class="form-field">
             <mat-label>Question</mat-label>
             <mat-select formControlName="question_id" placeholder="Select question">
               <mat-option *ngFor="let q of questions" [value]="q.id">
@@ -102,10 +106,9 @@
             </mat-select>
           </mat-form-field>
         </ng-template>
-
       </div>
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Condition Operator</mat-label>
           <mat-select formControlName="condition_operator">
             <mat-option value="<">&lt;</mat-option>
@@ -118,64 +121,61 @@
           </mat-select>
         </mat-form-field>
       </div>
-      
+
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Start Value</mat-label>
           <input matInput formControlName="condition_value_start" placeholder="e.g. 10" />
-          <mat-error *ngIf="feeRuleForm.get('condition_value_start')?.hasError('required')">Start value
-            required</mat-error>
+          <mat-error *ngIf="feeRuleForm.get('condition_value_start')?.hasError('required')">Start value required
+          </mat-error>
         </mat-form-field>
       </div>
-        <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+      <div class="grid-item">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>End Value</mat-label>
           <input matInput formControlName="condition_value_end" placeholder="e.g. 10" />
         </mat-form-field>
       </div>
-
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Calculated Fee</mat-label>
           <input matInput type="number" formControlName="calculated_fee" placeholder="e.g. 200" />
         </mat-form-field>
       </div>
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Minimum Fee</mat-label>
           <input matInput type="number" formControlName="minimum_fee" placeholder="e.g. 200" />
         </mat-form-field>
       </div>
 
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Fixed Calculated Fee</mat-label>
           <input matInput type="number" formControlName="fixed_calculated_fee" placeholder="e.g. 200" />
         </mat-form-field>
       </div>
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Fixed Fee</mat-label>
           <input matInput type="number" formControlName="fixed_fee" placeholder="e.g. 100" />
         </mat-form-field>
       </div>
 
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Per Unit Fee</mat-label>
           <input matInput type="number" formControlName="per_unit_fee" placeholder="e.g. 10" />
         </mat-form-field>
       </div>
-
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Priority</mat-label>
           <input matInput type="number" formControlName="priority" />
         </mat-form-field>
       </div>
-
       <div class="grid-item">
-        <mat-form-field appearance="outline" class="form-field full">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Status</mat-label>
           <mat-select formControlName="status">
             <mat-option value="1">Active</mat-option>
@@ -184,11 +184,12 @@
         </mat-form-field>
       </div>
 
-      <mat-form-field appearance="outline" class="form-field full-width">
+    <div class="grid-item">
+      <mat-form-field appearance="outline" class="form-field">
         <mat-label>Renewal Cycle</mat-label>
         <mat-select formControlName="renewal_cycle_id" placeholder="Select Renewal Cycle">
           <mat-option *ngFor="let cycle of renewalCycles; trackBy: trackByCycle" [value]="cycle.id">
-            {{ cycle.renewal_title }},
+            {{ cycle.renewal_title }}
           </mat-option>
           <mat-option *ngIf="renewalCycles.length === 0" [value]="null" disabled>
             No more renewal cycles found, Please add a renewal cycle first.
@@ -196,65 +197,64 @@
         </mat-select>
       </mat-form-field>
     </div>
+    </div>
   </form>
   <div class="preview-section fade-in-up">
     <h3>Fee Rules Preview</h3>
-
     <div class="table-wrap">
       <table mat-table [dataSource]="apiRules" class="mat-elevation-z2 preview-table full-width">
-
         <ng-container matColumnDef="condition_operator">
-          <th mat-header-cell *matHeaderCellDef> Operator </th>
-          <td mat-cell *matCellDef="let r"> {{r.condition_operator}} </td>
+          <th mat-header-cell *matHeaderCellDef>Operator</th>
+          <td mat-cell *matCellDef="let r">{{r.condition_operator}}</td>
         </ng-container>
 
         <ng-container matColumnDef="condition_value_start">
-          <th mat-header-cell *matHeaderCellDef> Start </th>
-          <td mat-cell *matCellDef="let r"> {{r.condition_value_start}} </td>
+          <th mat-header-cell *matHeaderCellDef>Start</th>
+          <td mat-cell *matCellDef="let r">{{r.condition_value_start}}</td>
         </ng-container>
 
         <ng-container matColumnDef="condition_value_end">
-          <th mat-header-cell *matHeaderCellDef> End </th>
-          <td mat-cell *matCellDef="let r"> {{r.condition_value_end || '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>End</th>
+          <td mat-cell *matCellDef="let r">{{r.condition_value_end || '-' }} </td>
         </ng-container>
         <ng-container matColumnDef="pre_condition_operator">
-          <th mat-header-cell *matHeaderCellDef> Pre Operator </th>
-          <td mat-cell *matCellDef="let r"> {{r.pre_condition_operator || '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Pre Operator</th>
+          <td mat-cell *matCellDef="let r">{{r.pre_condition_operator || '-'}}</td>
         </ng-container>
-        
+
         <ng-container matColumnDef="pre_condition_value">
-          <th mat-header-cell *matHeaderCellDef> Pre Value </th>
-          <td mat-cell *matCellDef="let r"> {{r.pre_condition_value || '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Pre Value</th>
+          <td mat-cell *matCellDef="let r">{{r.pre_condition_value || '-'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="fixed_fee">
-          <th mat-header-cell *matHeaderCellDef> Fixed Fee </th>
-          <td mat-cell *matCellDef="let r"> {{r.fixed_fee || '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Fixed Fee</th>
+          <td mat-cell *matCellDef="let r">{{r.fixed_fee || '-'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="calculated_fee">
-          <th mat-header-cell *matHeaderCellDef> Calc Fee </th>
-          <td mat-cell *matCellDef="let r"> {{r.calculated_fee || '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Calc Fee</th>
+          <td mat-cell *matCellDef="let r">{{r.calculated_fee || '-'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="fixed_calculated_fee">
-          <th mat-header-cell *matHeaderCellDef> Fixed Calc Fee </th>
-          <td mat-cell *matCellDef="let r"> {{r.fixed_calculated_fee || '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Fixed Calc Fee</th>
+          <td mat-cell *matCellDef="let r">{{r.fixed_calculated_fee || '-'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="per_unit_fee">
-          <th mat-header-cell *matHeaderCellDef> Per Unit </th>
-          <td mat-cell *matCellDef="let r"> {{r.per_unit_fee || '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Per Unit</th>
+          <td mat-cell *matCellDef="let r">{{r.per_unit_fee || '-'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="priority">
-          <th mat-header-cell *matHeaderCellDef> Priority </th>
-          <td mat-cell *matCellDef="let r"> {{r.priority}} </td>
+          <th mat-header-cell *matHeaderCellDef>Priority</th>
+          <td mat-cell *matCellDef="let r">{{r.priority}}</td>
         </ng-container>
 
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Status </th>
-          <td mat-cell *matCellDef="let r"> {{r.status === '1' || r.status === 1 ? 'Active' : 'Inactive'}} </td>
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let r">{{r.status === '1' || r.status === 1 ? 'Active' : 'Inactive'}}</td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

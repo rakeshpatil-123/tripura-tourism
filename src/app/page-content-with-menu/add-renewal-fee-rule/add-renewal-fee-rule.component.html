@@ -1,12 +1,15 @@
-<div class="renewal-container">
-  <div class="dialog-header">
+<div class="renewal-container" role="dialog" aria-labelledby="renewal-title">
+<div class="dialog-panel" role="document" aria-modal="true">
+<div class="dialog-header" id="renewal-title">
     <h4><b>{{ data.mode === 'add' ? 'Add Renewal Fee Rule' : 'Edit Renewal Fee Rule' }}</b></h4>
-    <button mat-icon-button (click)="close()">
+  <div class="header-actions" aria-hidden="false">
+    <button mat-icon-button (click)="close()" aria-label="Close dialog">
       <mat-icon>close</mat-icon>
     </button>
   </div>
-
-  <form [formGroup]="feeRuleForm" (ngSubmit)="saveFeeRule()">
+</div>
+<div class="dialog-body" tabindex="0">
+  <form [formGroup]="feeRuleForm" (ngSubmit)="saveFeeRule()" class="fee-form" novalidate>
     <div class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Is Multi Conditional</mat-label>
@@ -41,11 +44,21 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes'">
+      <mat-form-field appearance="outline" *ngIf="feeRuleForm.get('multi_condition')?.value === 'yes' && feeRuleForm.get('pre_condition_operator')?.value !== 'between'">
         <mat-label>Pre Condition Value</mat-label>
         <input matInput formControlName="pre_condition_value" placeholder="e.g. 10" />
       </mat-form-field>
 
+      <mat-form-field appearance="outline"
+        *ngIf="feeRuleForm.get('pre_condition_operator')?.value === 'between' && feeRuleForm.get('multi_condition')?.value === 'yes'">
+        <mat-label>Pre Start Value</mat-label>
+        <input matInput formControlName="pre_start_value" placeholder="e.g. 10" />
+      </mat-form-field>
+      <mat-form-field appearance="outline"
+        *ngIf="feeRuleForm.get('pre_condition_operator')?.value === 'between' && feeRuleForm.get('multi_condition')?.value === 'yes'">
+        <mat-label>Pre End Value</mat-label>
+        <input matInput formControlName="pre_end_value" placeholder="e.g. 20" />
+      </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Fee Type</mat-label>
         <mat-select formControlName="fee_type">
@@ -88,7 +101,6 @@
         <mat-label>Value End</mat-label>
         <input matInput formControlName="condition_value_end" />
       </mat-form-field>
-
     </div>
     <div class="form-row">
       <mat-form-field appearance="outline">
@@ -141,4 +153,6 @@
       </button>
     </div>
   </form>
+</div>
+</div>
 </div>

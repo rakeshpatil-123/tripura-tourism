@@ -100,6 +100,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       depends_on: [null],
       operator: [null],
       value: [null],
+      end_value: [null],
+      start_value: [null],
       options: [null],
       default_value: [null],
       is_section: [null],
@@ -154,6 +156,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         this.questionnaireForm.patchValue({
           operator: q.display_rule.operator || '',
           value: q.display_rule.value || null,
+          end_value: q.display_rule.end_value || null,
+          start_value: q.display_rule.start_value || null,
         });
       }
       if (q.validation_rule) {
@@ -258,6 +262,8 @@ export class AddQuestionnaireDialogComponent implements OnInit {
       formData.append('questionnaires[0][display_rule][depends_on]', formValue.depends_on || '');
       formData.append('questionnaires[0][display_rule][operator]', formValue.operator || '');
       formData.append('questionnaires[0][display_rule][value]', formValue.value || '');
+      formData.append('questionnaires[0][display_rule][end_value]', formValue.end_value || '');
+      formData.append('questionnaires[0][display_rule][start_value]', formValue.start_value || '');
     }
     formData.append('questionnaires[0][validation_required]', formValue.validation_required);
     formData.append('questionnaires[0][options]', formValue.options || '');

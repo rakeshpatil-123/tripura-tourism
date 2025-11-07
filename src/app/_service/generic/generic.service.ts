@@ -1741,4 +1741,13 @@ getThirdPartyRedirect(url: string): Observable<string> {
       `${this.baseUrl}/api/get-unit-details`, { id: unitId }, { headers: this.getHeaders() }
     )
   }
+  getInspection(unitId: number | string): any {
+    return this.http.post(
+      `${this.baseUrl}/api/get-unit-details`, { id: unitId }, { headers: this.getHeaders() }
+    )
+  }
+  // getInspection(id: number | string): Observable<InspectionResponse> {
+  //   return this.http.get<InspectionResponse>(`${this.baseUrl}/${id}`);
+  // }
+
 }

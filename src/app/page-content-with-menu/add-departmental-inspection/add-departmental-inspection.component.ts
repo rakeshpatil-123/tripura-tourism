@@ -41,6 +41,7 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
   deptInspectionForm!: FormGroup;
   subs: Subscription = new Subscription();
   deptId: any;
+  unitUserId: number | null = null; 
   holidays: any[] = [];
   riskCategories = [
     { id: 'low', name: 'Low', },
@@ -105,7 +106,7 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
       unitDistrict: ['',],
       unitSubDivision: ['',],
       riskCategory: ['',],
-      inspectionDate: ['', []],
+      inspectionDate: ['',],
       inspectionType: ['',],
       inspector: ['',],
       inspectionFor: ['',],
@@ -161,7 +162,7 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
       inspection_date: this.formatDateToYYYYMMDD(formValue.inspectionDate),
       inspection_type: formValue.inspectionType,
       inspection_for: Array.isArray(formValue.inspectionFor)
-        ? formValue.inspectionFor
+        ? formValue.inspectionFor 
         : [formValue.inspectionFor],
       remarks: formValue.remarks,
       inspector: formValue.inspector.toString(),
@@ -171,6 +172,7 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
       unit_sub_division: formValue.unitSubDivision,
       risk_category: formValue.riskCategory,
       department: formValue.department,
+      department_type: 'dept'
     };
 
     this.loaderService.showLoader();
@@ -181,10 +183,8 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           if (response.status === 1) {
-            // ✅ 1. Close dialog first
             this.dialogRef.close('submitted');
 
-            // ✅ 2. Show Swal only after dialog is closed (smooth delay)
             setTimeout(() => {
               Swal.fire({
                 title: 'Inspection Created!',
@@ -356,6 +356,7 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           if (response.status === 1 && response.data) {
             const unit = response.data;
+            this.unitUserId = unit.user_id;
             this.deptInspectionForm.patchValue({
               unitAddress: unit.unit_address || '',
               unitDistrict: unit.unit_location_district || '',
@@ -389,10 +390,9 @@ export class AddDepartmentalInspectionComponent implements OnInit, OnDestroy {
   }
 
   viewOrganization(): void {
-    if (true) {
+    if (this.unitUserId) {
       this.dialogRef.close();
-      const userId = 96;
-      this.router.navigate([`dashboard/user-caf-view/${userId}`]);
+      this.router.navigate([`dashboard/user-caf-view/${this.unitUserId}`]);
     } else {
       this.genericService.openSnackBar('User ID not found.', 'Close');
     }

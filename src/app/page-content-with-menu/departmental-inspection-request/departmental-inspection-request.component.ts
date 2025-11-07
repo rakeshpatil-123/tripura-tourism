@@ -42,16 +42,17 @@ export class DepartmentalInspectionRequestComponent implements OnInit, OnChanges
     this.inspectionColumns = [
       { key: 'sno', label: 'S.No', type: 'number', width: '70px' },
       { key: 'request_id', label: 'Request ID', type: 'text' },
-      { key: 'proposed_date', label: 'Proposed Inspection Date', type: 'text' },
+      { key: 'proposed_date', label: 'Proposed Date', type: 'text' },
       { key: 'inspection_type', label: 'Inspection Type', type: 'text' },
       { key: 'industry_name', label: 'Industry Name', type: 'text' },
-      { key: 'inspector', label: 'Inspector', type: 'text' },
-      { key: 'status', label: 'Status', type: 'text' },
+      { key: 'inspector', label: 'Inspector Name', type: 'text' },
+      { key: 'status', label: 'Status', type: 'badge' },
+
       {
         key: 'actions',
-        label: 'Action',
+        label: 'Actions',
         type: 'action',
-        width: '200px',
+        width: '220px',
         actions: [
           {
             label: 'Approve',
@@ -79,36 +80,73 @@ export class DepartmentalInspectionRequestComponent implements OnInit, OnChanges
   }
 
   getInspectionList(): void {
-    this.loaderService.showLoader();
-    const payload = { department_id: this.deptId };
+  this.loaderService.showLoader();
 
-    this.genericService
-      .getByConditions(payload, 'api/department/inspections-by-department')
-      .pipe(finalize(() => this.loaderService.hideLoader()))
-      .subscribe({
-        next: (res: any) => {
-          if (res?.data?.length) {
-            this.inspections = res.data.map((item: any, index: number) => ({
-              sno: index + 1,
-              id: item.id,
-              request_id: item.request_id || 'N/A',
-              proposed_date: this.formatProposedDate(item.proposed_date),
-              inspection_type: item.inspection_type || 'N/A',
-              industry_name: item.industry_name || 'N/A',
-              inspector: item.inspector || 'Not Assigned',
-              status: this.formatStatus(item.status)
-            }));
-          } else {
-            this.inspections = [];
-            this.filteredInspections = [];
-          }
-        },
-        error: (err) => {
-          console.error('Failed to fetch inspections:', err);
-          this.genericService.openSnackBar('Failed to load inspections.', 'error');
-        }
-      });
+  // Extract filters safely
+  const { dateFrom, dateTo, industryName } = this.filters || {};
+  const departmentId = this.deptId || 1;
+
+  // Base endpoint
+  let url = `api/department/inspections-by-department?department_id=${departmentId}`;
+
+  // Utility to format date as YYYY-MM-DD
+  const formatDate = (date: any): string | null => {
+    if (!date) return null;
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return null;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Format and append filters
+  const formattedFrom = formatDate(dateFrom);
+  const formattedTo = formatDate(dateTo);
+  const params: string[] = [];
+
+  if (industryName) params.push(`industry_name=${encodeURIComponent(industryName)}`);
+  if (formattedFrom) params.push(`from_date=${encodeURIComponent(formattedFrom)}`);
+  if (formattedTo) params.push(`to_date=${encodeURIComponent(formattedTo)}`);
+
+  if (params.length > 0) {
+    url += '&' + params.join('&');
   }
+
+  // ✅ Call API
+  this.genericService
+    .getByConditions({}, url)
+    .pipe(finalize(() => this.loaderService.hideLoader()))
+    .subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data) && res.data.length > 0) {
+          this.inspections = res.data.map((item: any, index: number) => ({
+            sno: index + 1,
+            id: item.id,
+            request_id: item.request_id || 'N/A',
+            proposed_date: this.formatProposedDate(item.proposed_date),
+            inspection_type: item.inspection_type || 'N/A',
+            industry_name: item.industry_name || 'N/A',
+            inspector: item.inspector || 'Not Assigned',
+            status: this.formatStatus(item.status)
+          }));
+
+          // Keep filteredInspections in sync (for dynamic filter view)
+          this.filteredInspections = [...this.inspections];
+        } else {
+          this.inspections = [];
+          this.filteredInspections = [];
+        }
+      },
+      error: (err) => {
+        console.error('Failed to fetch inspections:', err);
+        this.genericService.openSnackBar('Failed to load inspections.', 'error');
+        this.inspections = [];
+        this.filteredInspections = [];
+      }
+    });
+}
+
 
   //  updateInspectionStatus(row: any, status: string): void {
   //   const actionText = status === 'approved' ? 'Approve' : 'Reject';
@@ -267,7 +305,7 @@ export class DepartmentalInspectionRequestComponent implements OnInit, OnChanges
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['filters'] && !changes['filters'].firstChange) {
-      this.applyFilterLogic();
+      this.getInspectionList(); // fetch filtered data from API
     }
   }
   applyFilterLogic(): void {

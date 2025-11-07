@@ -109,7 +109,8 @@
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "@angular/material/prebuilt-themes/magenta-violet.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.css"
             ]
           }
         }

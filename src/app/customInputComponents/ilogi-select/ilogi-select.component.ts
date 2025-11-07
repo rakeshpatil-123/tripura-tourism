@@ -5,10 +5,12 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnInit,
   Output,
+  ViewChild,
   forwardRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -44,6 +46,7 @@ export interface SelectOption {
 export class IlogiSelectComponent
   implements OnInit, AfterViewInit, ControlValueAccessor
 {
+  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
   @Input() submitted = false;
   @Input() fieldLabel: string = '';
   @Input() hideLabel = false;
@@ -54,6 +57,9 @@ export class IlogiSelectComponent
   @Input() mandatory = false;
   @Input() readonly = false;
   @Input() selectOptions: SelectOption[] = [{ id: '', name: 'Select' }];
+  filteredOptions: SelectOption[] = [];
+  @Input() enableSearch: boolean = false;
+  searchTerm: string = '';
   @Input() errors: { [key: string]: any } | null = null;
   @Input() multiple: boolean = false;
   @Input('multi') set multiAttr(val: any) {
@@ -80,6 +86,7 @@ export class IlogiSelectComponent
     if (this.fieldId) {
       this.errorFieldId = `invalid-input-${this.fieldId}`;
     }
+    this.filteredOptions = this.selectOptions ? [...this.selectOptions] : [];
   }
 
   ngAfterViewInit() {
@@ -88,6 +95,24 @@ export class IlogiSelectComponent
 
   get hasErrors(): boolean {
     return !!this.errors && Object.keys(this.errors).length > 0;
+  }
+  onSearch(term: string): void {
+    if (!this.enableSearch) return;
+    this.searchTerm = term;
+    const lowerTerm = term.toLowerCase();
+    this.filteredOptions = this.selectOptions.filter((opt) =>
+      opt.name.toLowerCase().includes(lowerTerm)
+    );
+  }
+
+  onDropdownShow(): void {
+    this.filteredOptions = this.selectOptions ? [...this.selectOptions] : [];
+    this.searchTerm = '';
+    if (this.enableSearch) {
+      setTimeout(() => {
+        this.searchInputRef?.nativeElement.focus();
+      }, 100);
+    }
   }
 
   // writeValue(value: any): void {

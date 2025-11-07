@@ -5,7 +5,7 @@
       <div class="section">
         <div class="section-view">
           <h3 class="section-title">Unit Details</h3>
-          <button mat-button class="btn btn-success" (click)="viewOrganization()">View Organization</button>
+          <button mat-button class="btn btn-success" *ngIf="unitUserId" (click)="viewOrganization()">View Organization</button>
         </div>
 
         <div class="grid-container">
@@ -25,9 +25,13 @@
             formControlName="unitSubDivision" placeholder="Enter sub-division">
           </app-ilogi-input>
 
-          <app-ilogi-select fieldId="riskCategory" fieldLabel="Risk Category" formControlName="riskCategory"
+          <app-ilogi-input fieldId="riskCategory" class="mt-20" fieldLabel="Risk Category" [readonly]="true"
+            formControlName="riskCategory" placeholder="Enter risk category">
+          </app-ilogi-input>
+
+          <!-- <app-ilogi-select fieldId="riskCategory" fieldLabel="Risk Category" formControlName="riskCategory"
             [selectOptions]="riskCategories" placeholder="Select risk category">
-          </app-ilogi-select>
+          </app-ilogi-select> -->
         </div>
       </div>
       <div class="section">

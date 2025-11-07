@@ -174,3 +174,16 @@
 .mt-5 {
   margin-top: 6px !important;
 }
+.section-view {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+app-ilogi-input-date {
+  display: block;
+  border: 1px solid #ccc !important;
+  border-radius: 8px;
+  padding: 1px !important;
+  background: #fff;
+}
