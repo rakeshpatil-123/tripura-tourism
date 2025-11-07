@@ -19,6 +19,7 @@
           </app-ilogi-select>
         </div>
 
+
         <div class="filter-item">
           <app-ilogi-select fieldLabel="Application Type" fieldId="applicationType" [(ngModel)]="applicationType"
             name="applicationType" [selectOptions]="applicationTypeOptions" placeholder="Select Type"
@@ -26,14 +27,24 @@
           </app-ilogi-select>
         </div>
         <div class="filter-actions">
-          <app-button label="Search" type="primary" (click)="onSearch()" class="me-2 px-4">Search</app-button>
-          <app-button label="Reset" type="outline" (click)="onReset()" class="px-4">Reset</app-button>
+          <app-button label="Search" type="primary" (click)="onSearch()" class="me-2 ">Search</app-button>
+          <app-button label="Reset" type="outline" (click)="onReset()" class="">Reset</app-button>
         </div>
+
       </div>
+      <div class="filter-row">
+
+
+          <app-ilogi-select fieldId="serviceName" fieldLabel="Service" [(ngModel)]="selectedServiceName" name="serviceName"
+          [selectOptions]="serviceFilterOptions" placeholder="Select Service" [mandatory]="false" [readonly]="false"
+          (ngModelChange)="onSearch()">
+        </app-ilogi-select>
+      </div>
+
     </form>
-    <hr class="divider" />
+    <hr class="" />
   </div>
-  <div class="table-area card-surface">
+  <div class="px-3">
     <ng-container *ngIf="loading; else contentBlock">
       <div class="loading-overlay">
         <div class="spinner"></div>

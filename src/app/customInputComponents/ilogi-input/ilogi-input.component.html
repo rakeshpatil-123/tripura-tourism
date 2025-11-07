@@ -15,12 +15,12 @@
       <div class="pos">
 
         <button *ngIf="type === 'password'" type="button" class="password-toggle-btn"
-        (click)="togglePasswordVisibility()" [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
-        tabindex="-1">
-  <mat-icon style="font-size: 18px;">
-    {{ passwordVisible ? 'visibility_off' : 'visibility' }}
-  </mat-icon>
-</button>
+          (click)="togglePasswordVisibility()" [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+          tabindex="-1">
+          <mat-icon style="font-size: 18px;">
+            {{ passwordVisible ? 'visibility_off' : 'visibility' }}
+          </mat-icon>
+        </button>
       </div>
     </div>
 
@@ -32,7 +32,7 @@
       [ngClass]="{ 'is-invalid': submitted && hasErrors, 'readonly-like': readonly }" autocomplete="off"></textarea>
 
     <label [for]="fieldId">
-      {{ fieldLabel }}
+      <span [innerHTML]="fieldLabel"></span>
       <span *ngIf="mandatory" class="required-indicator">*</span>
     </label>
   </p-floatlabel>

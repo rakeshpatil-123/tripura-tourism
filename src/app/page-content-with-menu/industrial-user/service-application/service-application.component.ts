@@ -1,4 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 import {
   FormBuilder,
   FormGroup,
@@ -21,6 +23,7 @@ import { CommonModule } from '@angular/common';
 import { IlogiFileUploadComponent } from '../../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
 import { IlogiInputDateComponent } from '../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { IlogiCheckboxComponent } from '../../../customInputComponents/ilogi-checkbox/ilogi-checkbox.component';
+import { ConfirmationModalComponent } from '../../../shared/component/confirmation-modal/confirmation-modal.component';
 
 interface ValidationRule {
   type: string;
@@ -43,7 +46,9 @@ interface ServiceQuestion {
     | 'checkbox'
     | 'textarea'
     | 'date'
-    | 'file';
+    | 'file'
+    | 'date_mmdd'
+    | 'date_yyyymmdd';
   is_required: 'yes' | 'no';
   options: string | null;
   default_value: string | null;
@@ -84,12 +89,25 @@ interface SectionGroup {
     IlogiFileUploadComponent,
     IlogiInputDateComponent,
     IlogiCheckboxComponent,
+    MatDialogModule,
+    MatButtonModule,
+    ConfirmationModalComponent,
   ],
   templateUrl: './service-application.component.html',
   styleUrl: './service-application.component.scss',
   standalone: true,
 })
 export class ServiceApplicationComponent implements OnInit {
+  formModifiedAfterFeeCalculation = false;
+  showConfirmModal = false;
+  modalConfig = {
+    title: 'Confirm Submission',
+    message: 'Are you sure you want to submit this application?',
+    confirmButtonText: 'Submit',
+    cancelButtonText: 'Cancel',
+    confirmButtonClass: 'btn btn-success',
+    cancelButtonClass: 'btn btn-outline-secondary',
+  };
   questionVisibility: { [key: string]: boolean } = {};
   fileUrls: { [questionId: number]: string } = {};
   defaultValue: any = null;
@@ -307,6 +325,9 @@ export class ServiceApplicationComponent implements OnInit {
   }
 
   groupQuestions(): void {
+    this.questions.sort(
+      (a, b) => (a.display_order ?? 9999) - (b.display_order ?? 9999)
+    );
     this.groupedQuestions = {};
     this.questions.forEach((q) => {
       const group = q.group_label || 'General';
@@ -315,25 +336,25 @@ export class ServiceApplicationComponent implements OnInit {
       }
       this.groupedQuestions[group].push(q);
     });
-    Object.keys(this.groupedQuestions).forEach((group) => {
-      console.log(group, 'groupqqqqqq');
+    // Object.keys(this.groupedQuestions).forEach((group) => {
+    //   console.log(group, 'groupqqqqqq');
 
-      this.groupedQuestions[group].sort((a, b) => {
-        const orderA = a.display_order ?? 9999;
-        const orderB = b.display_order ?? 9999;
-        return orderA - orderB;
-      });
-    });
+    //   this.groupedQuestions[group].sort((a, b) => {
+    //     const orderA = a.display_order ?? 9999;
+    //     const orderB = b.display_order ?? 9999;
+    //     return orderA - orderB;
+    //   });
+    // });
   }
 
   buildForm(): void {
-   this.questions.forEach(q => {
-    if (q.display_rule?.depends_on) {
-      this.questionVisibility[q.id] = false;
-    } else {
-      this.questionVisibility[q.id] = true;
-    }
-  });
+    this.questions.forEach((q) => {
+      if (q.display_rule?.depends_on) {
+        this.questionVisibility[q.id] = false;
+      } else {
+        this.questionVisibility[q.id] = true;
+      }
+    });
     const group: any = {};
 
     this.questions.forEach((q) => {
@@ -404,6 +425,21 @@ export class ServiceApplicationComponent implements OnInit {
         defaultValue = [];
       }
 
+      if (q.question_type === 'date_mmdd') {
+        const today = new Date();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        defaultValue = `${month}${day}`;
+      }
+
+      if (q.question_type === 'date_yyyymmdd') {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        defaultValue = `${year}${month}${day}`;
+      }
+
       group[q.id] = [defaultValue, validators];
     });
 
@@ -418,6 +454,12 @@ export class ServiceApplicationComponent implements OnInit {
         acc[section.sectionName] = section.formArray;
         return acc;
       }, {} as any),
+    });
+
+    this.serviceForm.valueChanges.subscribe(() => {
+      if (this.visible) {
+        this.formModifiedAfterFeeCalculation = true;
+      }
     });
   }
 
@@ -490,6 +532,21 @@ export class ServiceApplicationComponent implements OnInit {
       if (q.question_type === 'date' && defaultValue) {
         const date = new Date(defaultValue);
         defaultValue = isNaN(date.getTime()) ? null : date;
+      }
+
+      if (q.question_type === 'date_mmdd') {
+        const today = new Date();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        defaultValue = `${month}${day}`;
+      }
+
+      if (q.question_type === 'date_yyyymmdd') {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        defaultValue = `${year}${month}${day}`;
       }
 
       if (q.question_type === 'file') {
@@ -633,6 +690,14 @@ export class ServiceApplicationComponent implements OnInit {
 
     return errors;
   }
+  showSubmitConfirmation(): void {
+    this.showConfirmModal = true;
+  }
+
+  handleConfirmSubmission(): void {
+    this.showConfirmModal = false;
+    this.onSubmit();
+  }
 
   onSubmit(): void {
     this.serviceForm.markAllAsTouched();
@@ -723,6 +788,7 @@ export class ServiceApplicationComponent implements OnInit {
       if (question.question_type === 'date' && value instanceof Date) {
         value = value.toISOString().split('T')[0];
       }
+
       if (question.question_type === 'checkbox') {
         value = Array.isArray(value) ? value.join(', ') : value;
       }
@@ -881,29 +947,55 @@ export class ServiceApplicationComponent implements OnInit {
               if (index === 0) {
                 const rowGroup = section.formArray.at(0) as FormGroup;
                 section.questions.forEach((q) => {
-                  const rowValue = row[q.id] ?? '';
-                  rowGroup.get(q.id.toString())?.setValue(rowValue);
-                });
-              } else {
-                const newRow = this.createSectionRow(section.questions);
-                section.questions.forEach((q) => {
-                  const rowValue = row[q.id] ?? '';
+                  const rowValue = row[q.id];
 
                   if (
                     q.question_type === 'file' &&
-                    typeof rowValue === 'string'
+                    typeof rowValue === 'string' &&
+                    rowValue.trim() !== ''
                   ) {
                     this.fileUrls[q.id] = rowValue;
-
                     const fileName = decodeURIComponent(
                       rowValue.split('/').pop() || 'file.pdf'
                     );
                     const fakeFile = new File([], fileName, {
                       type: this.getFileMimeType(fileName),
                     });
+                    (fakeFile as any)._isFake = true;
+                    rowGroup.get(q.id.toString())?.setValue(fakeFile);
+                  } else {
+                    const finalValue =
+                      Array.isArray(rowValue) && rowValue.length === 0
+                        ? null
+                        : rowValue ?? '';
+                    rowGroup.get(q.id.toString())?.setValue(finalValue);
+                  }
+                });
+              } else {
+                const newRow = this.createSectionRow(section.questions);
+                section.questions.forEach((q) => {
+                  const rowValue = row[q.id];
+
+                  if (
+                    q.question_type === 'file' &&
+                    typeof rowValue === 'string' &&
+                    rowValue.trim() !== ''
+                  ) {
+                    this.fileUrls[q.id] = rowValue;
+                    const fileName = decodeURIComponent(
+                      rowValue.split('/').pop() || 'file.pdf'
+                    );
+                    const fakeFile = new File([], fileName, {
+                      type: this.getFileMimeType(fileName),
+                    });
+                    (fakeFile as any)._isFake = true;
                     newRow.get(q.id.toString())?.setValue(fakeFile);
                   } else {
-                    newRow.get(q.id.toString())?.setValue(rowValue);
+                    const finalValue =
+                      Array.isArray(rowValue) && rowValue.length === 0
+                        ? null
+                        : rowValue ?? '';
+                    newRow.get(q.id.toString())?.setValue(finalValue);
                   }
                 });
                 section.formArray.push(newRow);
@@ -917,16 +1009,22 @@ export class ServiceApplicationComponent implements OnInit {
       const question = this.questions.find((q) => q.id.toString() === key);
       if (!question) return;
 
-      if (question.question_type === 'file' && typeof value === 'string') {
-        this.fileUrls[question.id] = value;
-        const fileName = decodeURIComponent(
-          value.split('/').pop() || 'file.pdf'
-        );
-        const fakeFile = new File([], fileName, {
-          type: this.getFileMimeType(fileName),
-        });
-        (fakeFile as any)._isFake = true;
-        this.serviceForm.get(key)?.setValue(fakeFile);
+      if (question.question_type === 'file') {
+        if (typeof value === 'string' && value.trim() !== '') {
+          this.fileUrls[question.id] = value;
+          const fileName = decodeURIComponent(
+            value.split('/').pop() || 'file.pdf'
+          );
+          const fakeFile = new File([], fileName, {
+            type: this.getFileMimeType(fileName),
+          });
+          (fakeFile as any)._isFake = true;
+          this.serviceForm.get(key)?.setValue(fakeFile);
+        } else {
+          const finalValue =
+            Array.isArray(value) && value.length === 0 ? null : value ?? '';
+          this.serviceForm.get(key)?.setValue(finalValue);
+        }
       } else {
         let formValue: any;
         if (Array.isArray(value)) {
@@ -949,28 +1047,38 @@ export class ServiceApplicationComponent implements OnInit {
     });
 
     this.cdr.detectChanges();
-   this.questions.forEach(q => {
-  if (q.children_id && q.children_id.length > 0 && !q.display_rule?.depends_on) {
-    const control = this.serviceForm.get(q.id.toString());
-    if (control) {
-      this.updateChildVisibility(q.id, control.value);
-    }
-  }
-});
 
-  this.sectionGroups.forEach(section => {
-    const formArray = this.getSectionFormArray(section.sectionName);
-    formArray.controls.forEach((rowGroup, rowIndex) => {
-      section.questions.forEach(q => {
-        if (q.children_id && q.children_id.length > 0) {
-          const control = (rowGroup as FormGroup).get(q.id.toString());
-          if (control) {
-            this.updateChildVisibilityInSection(section.sectionName, rowIndex, q.id, control.value);
-          }
+    this.questions.forEach((q) => {
+      if (
+        q.children_id &&
+        q.children_id.length > 0 &&
+        !q.display_rule?.depends_on
+      ) {
+        const control = this.serviceForm.get(q.id.toString());
+        if (control) {
+          this.updateChildVisibility(q.id, control.value);
         }
+      }
+    });
+
+    this.sectionGroups.forEach((section) => {
+      const formArray = this.getSectionFormArray(section.sectionName);
+      formArray.controls.forEach((rowGroup, rowIndex) => {
+        section.questions.forEach((q) => {
+          if (q.children_id && q.children_id.length > 0) {
+            const control = (rowGroup as FormGroup).get(q.id.toString());
+            if (control) {
+              this.updateChildVisibilityInSection(
+                section.sectionName,
+                rowIndex,
+                q.id,
+                control.value
+              );
+            }
+          }
+        });
       });
     });
-  });
   }
 
   calFee(): void {
@@ -1069,6 +1177,7 @@ export class ServiceApplicationComponent implements OnInit {
           if (res?.status === 1) {
             this.calculatedFee = Number(res.data.final_fee);
             this.visible = true;
+            this.formModifiedAfterFeeCalculation = false;
             this.apiService.openSnackBar(
               'Fee calculated successfully!',
               'success'
@@ -1095,69 +1204,96 @@ export class ServiceApplicationComponent implements OnInit {
       });
   }
 
-private setupConditionalLogic(): void {
-  this.questions.forEach(question => {
-    if (question.children_id && question.children_id.length > 0 && !question.display_rule?.depends_on) {
-      const control = this.serviceForm.get(question.id.toString());
-      if (control) {
-        control.valueChanges.subscribe(value => {
-          this.updateChildVisibility(question.id, value);
-        });
+  private setupConditionalLogic(): void {
+    this.questions.forEach((question) => {
+      if (
+        question.children_id &&
+        question.children_id.length > 0 &&
+        !question.display_rule?.depends_on
+      ) {
+        const control = this.serviceForm.get(question.id.toString());
+        if (control) {
+          control.valueChanges.subscribe((value) => {
+            this.updateChildVisibility(question.id, value);
+          });
+        }
       }
-    }
-  });
+    });
 
-  this.sectionGroups.forEach(section => {
-    const formArray = this.getSectionFormArray(section.sectionName);
-    formArray.valueChanges.subscribe(sectionValues => {
-      sectionValues.forEach((rowValue: any, rowIndex: number) => {
-        section.questions.forEach(q => {
-          if (q.children_id && q.children_id.length > 0 && !q.display_rule?.depends_on) {
-            const controlValue = rowValue?.[q.id];
-            if (controlValue !== undefined) {
-              this.updateChildVisibilityInSection(section.sectionName, rowIndex, q.id, controlValue);
+    this.sectionGroups.forEach((section) => {
+      const formArray = this.getSectionFormArray(section.sectionName);
+      formArray.valueChanges.subscribe((sectionValues) => {
+        sectionValues.forEach((rowValue: any, rowIndex: number) => {
+          section.questions.forEach((q) => {
+            if (
+              q.children_id &&
+              q.children_id.length > 0 &&
+              !q.display_rule?.depends_on
+            ) {
+              const controlValue = rowValue?.[q.id];
+              if (controlValue !== undefined) {
+                this.updateChildVisibilityInSection(
+                  section.sectionName,
+                  rowIndex,
+                  q.id,
+                  controlValue
+                );
+              }
             }
-          }
+          });
         });
       });
     });
-  });
-}
+  }
 
   private updateChildVisibility(parentId: number, parentValue: any): void {
- 
-  const children = this.questions.filter(q => 
-    q.display_rule?.depends_on == parentId 
-  );
+    const children = this.questions.filter(
+      (q) => q.display_rule?.depends_on == parentId
+    );
 
-  children.forEach(child => {
-    if (child.display_rule) {
-      const isVisible = this.evaluateCondition(parentValue, child.display_rule.operator, child.display_rule.value);
-      this.questionVisibility[child.id] = isVisible;
-    }
-  });
+    children.forEach((child) => {
+      if (child.display_rule) {
+        const isVisible = this.evaluateCondition(
+          parentValue,
+          child.display_rule.operator,
+          child.display_rule.value
+        );
+        this.questionVisibility[child.id] = isVisible;
+      }
+    });
 
-  this.cdr.detectChanges();
-}
+    this.cdr.detectChanges();
+  }
 
-private updateChildVisibilityInSection(sectionName: string, rowIndex: number, parentId: number, parentValue: any): void {
-  const section = this.sectionGroups.find(s => s.sectionName === sectionName);
-  if (!section) return;
+  private updateChildVisibilityInSection(
+    sectionName: string,
+    rowIndex: number,
+    parentId: number,
+    parentValue: any
+  ): void {
+    const section = this.sectionGroups.find(
+      (s) => s.sectionName === sectionName
+    );
+    if (!section) return;
 
-  const children = section.questions.filter(q => 
-    q.display_rule?.depends_on == parentId
-  );
+    const children = section.questions.filter(
+      (q) => q.display_rule?.depends_on == parentId
+    );
 
-  children.forEach(child => {
-    if (child.display_rule) {
-      const isVisible = this.evaluateCondition(parentValue, child.display_rule.operator, child.display_rule.value);
-      const sectionKey = `${sectionName}_${rowIndex}_${child.id}`;
-      this.questionVisibility[sectionKey] = isVisible;
-    }
-  });
+    children.forEach((child) => {
+      if (child.display_rule) {
+        const isVisible = this.evaluateCondition(
+          parentValue,
+          child.display_rule.operator,
+          child.display_rule.value
+        );
+        const sectionKey = `${sectionName}_${rowIndex}_${child.id}`;
+        this.questionVisibility[sectionKey] = isVisible;
+      }
+    });
 
-  this.cdr.detectChanges();
-}
+    this.cdr.detectChanges();
+  }
 
   private evaluateCondition(
     actualValue: any,
@@ -1209,5 +1345,11 @@ private updateChildVisibilityInSection(sectionName: string, rowIndex: number, pa
     }
     return this.questionVisibility[questionId] !== false;
   }
-}
 
+  stripHtmlTags(html: string): string {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  }
+}

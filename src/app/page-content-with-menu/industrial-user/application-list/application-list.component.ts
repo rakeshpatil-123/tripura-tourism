@@ -53,6 +53,8 @@ interface ApplicationDataItem {
   ],
 })
 export class ApplicationSearchPageComponent implements OnInit {
+  serviceFilterOptions: Array<{ id: string | null; name: string }> = [];
+  selectedServiceName: string | null = null;
   ApplicationData: ApplicationDataItem[] = [];
   filteredData: ApplicationDataItem[] = [];
   ApplicationColumns: TableColumn[] = [];
@@ -226,6 +228,17 @@ export class ApplicationSearchPageComponent implements OnInit {
               } as ApplicationDataItem;
             });
 
+            const uniqueServices = [
+              ...new Set(
+                this.ApplicationData.map((item) => item.applicationFor)
+              ),
+            ];
+            this.serviceFilterOptions = [
+              { id: null, name: 'All Services' },
+              ...uniqueServices.map((name) => ({ id: name, name })),
+            ];
+            this.selectedServiceName = null;
+
             this.filteredData = [...this.ApplicationData];
           } else {
             this.ApplicationData = [];
@@ -318,6 +331,15 @@ export class ApplicationSearchPageComponent implements OnInit {
               (row.status || '').toLowerCase() === 'approved',
             handler: (row: ApplicationDataItem) => {
               this.downloadCertificate(row.id);
+            },
+          },
+          {
+            label: 'View',
+            action: 'view',
+            color: 'warn',
+            visible: (row) => row.id != null,
+            handler: (row: ApplicationDataItem) => {
+              this.router.navigate([`/dashboard/user-app-view`, row.service_id, row.id]);
             },
           },
         ],
@@ -439,6 +461,12 @@ export class ApplicationSearchPageComponent implements OnInit {
       );
     }
 
+     if (this.selectedServiceName) {
+    result = result.filter(
+      (row) => row.applicationFor === this.selectedServiceName
+    );
+  }
+
     this.filteredData = result;
   }
 
@@ -475,7 +503,8 @@ export class ApplicationSearchPageComponent implements OnInit {
           const openPdf = baseUrl + res.download_url;
           window.open(openPdf, '_blank');
         } else {
-          this.error = res?.message || 'PDF file not found for this application.';
+          this.error =
+            res?.message || 'PDF file not found for this application.';
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -488,8 +517,7 @@ export class ApplicationSearchPageComponent implements OnInit {
         Swal.fire({
           icon: 'error',
           title: 'Download Failed',
-          text:
-             this.error|| 'PDF file not found for this application.',
+          text: err?.error?.message || 'PDF file not found for this application.',
           confirmButtonText: 'Retry',
         });
       },
