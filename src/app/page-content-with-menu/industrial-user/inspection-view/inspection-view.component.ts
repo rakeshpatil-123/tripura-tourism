@@ -28,7 +28,7 @@ inspectionColumns: any[] = [
   { key: 'created_by', label: 'Created By', type: 'text' },
   { key: 'updated_by', label: 'Updated By', type: 'text' },
 ];
-constructor( private apiService: GenericService, private route : ActivatedRoute){}
+constructor(private apiService: GenericService, private route : ActivatedRoute){}
 
 
 ngOnInit(): void{

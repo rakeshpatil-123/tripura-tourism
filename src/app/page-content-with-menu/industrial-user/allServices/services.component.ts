@@ -55,13 +55,24 @@ export class ServicesComponent {
   const sample = data[0];
   const columns: any[] = [];
 
+   const excludeKeys = new Set([
+    'actions',
+    'department_id',
+    'verification_token',
+    'allow_repeat_application', 
+    'application_id',
+    'application_status',
+    'created_by',
+    'updated_by',
+    'status',
+    'is_special',
+    'allow_repeat_application_display', 
+    'noc_payment_type'
+  ]);
+
+
   Object.keys(sample).forEach((key) => {
-    if (
-      key === 'actions' ||
-      key === 'department_id' ||
-      key === 'verification_token' ||
-      key === 'allow_repeat_application' 
-    )
+    if (excludeKeys.has(key))
       return;
 
 
@@ -91,67 +102,118 @@ export class ServicesComponent {
     });
   });
 
-    columns.push({
-      key: 'actions',
-      label: 'Actions',
-      type: 'action',
-      actions: [
-        {
-          label: 'View Applications',
-          color: 'primary',
-          visible: (row: any) =>
-            row.allow_repeat_application === 'yes' &&
-            row.application_id !== null,
-          onClick: (row: any) => {
-            this.router.navigate(['/dashboard/repeat-application', row.id]);
-          },
-        },
-        {
-          label: (row: any) => {
-            if (
-              row.application_status === 'send_back' &&
-              row.allow_repeat_application !== 'yes'
-            ) {
-              return 'Re-apply';
-            }
-            return 'Apply';
-          },
-          color: 'primary',
-          visible: (row: any) => {
-            return (
-              row.application_id === null ||
-              row.application_status === 'send_back' ||
-              row.allow_repeat_application === 'yes'
-            );
-          },
-          onClick: (row: any) => {
-            this.onApply(row);
-          },
-        },
-      ],
-    });
+    // columns.push({
+    //   key: 'actions',
+    //   label: 'Actions',
+    //   type: 'action',
+    //   actions: [
+    //     {
+    //       label: 'View Applications',
+    //       color: 'primary',
+    //       visible: (row: any) =>
+    //         row.allow_repeat_application === 'yes' &&
+    //         row.application_id !== null,
+    //       onClick: (row: any) => {
+    //         this.router.navigate(['/dashboard/repeat-application', row.id]);
+    //       },
+    //     },
+    //     {
+    //       label: (row: any) => {
+    //         if (
+    //           row.application_status === 'send_back' &&
+    //           row.allow_repeat_application !== 'yes'
+    //         ) {
+    //           return 'Re-apply';
+    //         }
+    //         return 'Apply';
+    //       },
+    //       color: 'primary',
+    //       visible: (row: any) => {
+    //         return (
+    //           row.application_id === null ||
+    //           row.application_status === 'send_back' ||
+    //           row.allow_repeat_application === 'yes'
+    //         );
+    //       },
+    //       onClick: (row: any) => {
+    //         this.onApply(row);
+    //       },
+    //     },
+    //   ],
+    // });
 
-    columns.push({
-      key: 'view',
-      label: 'View',
-      type: 'icon',
-      icon: 'visibility',
-      width: '60px',
-      onClick: (row: any) => {
+    // columns.push({
+    //   key: 'view',
+    //   label: 'View',
+    //   type: 'icon',
+    //   icon: 'visibility',
+    //   width: '60px',
+    //   onClick: (row: any) => {
+    //     this.router.navigate([
+    //       '/dashboard/user-app-view',
+    //       row.id,
+    //       row.application_id,
+    //     ]);
+    //   },
+    //   cellClass: (value: any, row: any) => {
+    //     const shouldShow =
+    //       row.application_status !== null &&
+    //       row.application_status !== 'send_back' &&
+    //       row.allow_repeat_application !== 'yes';
+    //     return shouldShow ? '' : 'd-none';
+    //   },
+    // });
+
+columns.push({
+  key: 'apply_icon',
+  label: 'Apply',
+  type: 'icon',
+  icon: 'exit_to_app', 
+  width: '60px',
+  onClick: (row: any) => {
+    this.onApply(row);
+  },
+  cellClass: (value: any, row: any) => {
+    const shouldShow =
+      row.application_id === null ||
+      row.application_status === 'send_back' ||
+      row.allow_repeat_application === 'yes';
+    return shouldShow ? '' : 'd-none';
+  },
+});
+
+  columns.push({
+    key: 'view',
+    label: 'View',
+    type: 'icon',
+    icon: 'visibility',
+    width: '60px',
+    onClick: (row: any) => {
+      if (row.allow_repeat_application === 'yes' && row.application_id !== null) {
+        this.router.navigate(['/dashboard/repeat-application', row.id]);
+      } else if (
+        row.application_status !== null &&
+        row.application_status !== 'send_back' &&
+        row.allow_repeat_application !== 'yes'
+      ) {
         this.router.navigate([
           '/dashboard/user-app-view',
           row.id,
           row.application_id,
         ]);
-      },
-      cellClass: (value: any, row: any) => {
-        const shouldShow =
+      }
+    },
+    cellClass: (value: any, row: any) => {
+      const shouldShow =
+        (row.allow_repeat_application === 'yes' && row.application_id !== null) ||
+        (
           row.application_status !== null &&
           row.application_status !== 'send_back' &&
-          row.allow_repeat_application !== 'yes';
-        return shouldShow ? '' : 'd-none';
-      },
-    });
+          row.allow_repeat_application !== 'yes'
+        );
+      return shouldShow ? '' : 'd-none';
+    },
+  });
 
     this.ApplicationColumns = columns;
   }

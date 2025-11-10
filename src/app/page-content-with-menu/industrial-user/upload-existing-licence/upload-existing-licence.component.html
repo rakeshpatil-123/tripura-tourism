@@ -1,7 +1,161 @@
-<div class="upload-existing-container">
-  <div style="margin-bottom: 2rem">
-    <h1>Upload Existing Licence</h1>
+
+
+<div class="view-col">
+  <div class="header-actions mt-4">
+    <h1 class="page-head">Upload Existing Licence</h1>
+    <button type="primary" (click)="openDialog()" class="btn btn-success">
+      Upload License Details
+    </button>
   </div>
-  <app-p-dynamic-table [columns]="columns" [data]="tableData">
-  </app-p-dynamic-table>
+  <div class="form-field">
+    <app-dynamic-table 
+      [data]="licDatas" 
+      [columns]="licColumns" 
+      [pageSize]="5" 
+      [showPagination]="true"
+      [searchable]="false">
+    </app-dynamic-table>
+  </div>
+
+  <app-confirmation-modal
+    [isVisible]="showDeleteModal"
+    title="Delete License?"
+    message="Are you sure you want to delete this license? This action cannot be undone."
+    confirmButtonText="Yes, Delete"
+    [confirmButtonClass]="'btn btn-danger'"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+    (close)="showDeleteModal = false">
+  </app-confirmation-modal>
+
+  <ng-container *ngIf="isDialogOpen">
+    <ng-container *ngTemplateOutlet="inspectionRequestDialog"></ng-container>
+  </ng-container>
 </div>
+
+<ng-template #inspectionRequestDialog>
+  <div class="dialog-overlay" (click)="closeDialog()">
+    <div class="dialog-container" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2 class="page-head">{{ isEditing ? 'Edit License' : 'Upload Existing Licence' }}</h2>
+        <button class="close-btn" (click)="closeDialog()">&times;</button>
+      </div>
+
+      <form [formGroup]="licForm" class="inspection-form">
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-select 
+              formControlName="department_id" 
+              fieldLabel="Department" 
+              [mandatory]="true"
+              [selectOptions]="departments" 
+              placeholder="Select Department"
+              (change)="onDepartmentChange($event.value)">
+            </app-ilogi-select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-select 
+              formControlName="service_id" 
+              fieldLabel="Service" 
+              [mandatory]="true"
+              [selectOptions]="services" 
+              placeholder="Select Service">
+            </app-ilogi-select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input 
+              formControlName="license_name" 
+              fieldLabel="Licence Name" 
+              [mandatory]="true"
+              [type]="'text'"
+              placeholder="Enter Licence Name"
+              [errorMessages]="{ maxlength: 'Maximum 255 characters allowed' }">
+            </app-ilogi-input>
+          </div>
+        </div>
+
+        <div class="form-row" *ngIf="!isEditing">
+          <div class="form-field">
+            <app-ilogi-file-upload 
+              formControlName="upload_lic"   
+              accept=".png,.jpg,.jpeg,.pdf"
+              label="Upload File"
+              [mandatory]="true">
+            </app-ilogi-file-upload>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input 
+              formControlName="Application_no" 
+              fieldLabel="Application No" 
+              [mandatory]="true"
+              [type]="'text'" 
+              placeholder="Enter Application No"
+              [errorMessages]="{ maxlength: 'Maximum 500 characters allowed' }">
+            </app-ilogi-input>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input 
+              formControlName="license_no" 
+              fieldLabel="Licence No." 
+              [mandatory]="true" 
+              [type]="'text'"
+              placeholder="Enter Licence No."
+              [errorMessages]="{ maxlength: 'Maximum 500 characters allowed' }">
+            </app-ilogi-input>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input-date 
+              formControlName="valid_from_date" 
+              fieldLabel="Licence Valid From Date" 
+              [mandatory]="true"
+              placeholder="DD/MM/YYYY">
+            </app-ilogi-input-date>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input-date 
+              formControlName="expiry_date" 
+              fieldLabel="Licence Validity Expiry Date" 
+              [mandatory]="true"
+              placeholder="DD/MM/YYYY">
+            </app-ilogi-input-date>
+          </div>
+        </div>
+
+        <div class="dialog-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="closeDialog()"
+            [disabled]="isSubmitting">
+            Cancel
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="submitLic()"
+            [disabled]="licForm.invalid || isSubmitting">
+            {{ isEditing ? 'Update License' : 'Submit License' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>
