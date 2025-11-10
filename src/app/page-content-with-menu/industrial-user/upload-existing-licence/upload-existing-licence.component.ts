@@ -1,414 +1,337 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { PDynamicTableComponent } from '../../../shared/p-dynamic-table/p-dynamic-table.component';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DynamicTableComponent } from '../../../shared/component/table/table.component';
-import { TableColumn } from '../../../shared/p-dynamic-table/p-table.model';
+import { GenericService } from '../../../_service/generic/generic.service';
+import {
+  IlogiSelectComponent,
+  SelectOption,
+} from '../../../customInputComponents/ilogi-select/ilogi-select.component';
+import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
+import { CommonModule } from '@angular/common';
+import { IlogiInputDateComponent } from '../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
+import { IlogiFileUploadComponent } from '../../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ConfirmationModalComponent } from '../../../shared/component/confirmation-modal/confirmation-modal.component';
 
-@Component({
-  selector: 'app-clearance-dialog',
-  template: `
-    <div class="dialog-container">
-      <div class="dialog-header">
-        <h2>Clearance Details</h2>
-        <button class="close-btn" (click)="closeDialog()">×</button>
-      </div>
+interface Department {
+  id: number;
+  name: string;
+  details: string;
+}
 
-      <div class="dialog-content">
-        <div class="loading" *ngIf="loading">
-          <p>Loading clearance details...</p>
-        </div>
-
-        <div class="details" *ngIf="!loading && selectedRow">
-          <div class="detail-row">
-            <span class="label">ID:</span>
-            <span class="value">{{ selectedRow.id }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Certificate Number:</span>
-            <span class="value">{{ selectedRow.certificate_number }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Certificate Date:</span>
-            <span class="value">{{ selectedRow.certificate_date }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Clearance Type:</span>
-            <span class="value">{{ selectedRow.type }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Clearance Name:</span>
-            <span class="value">{{ selectedRow.name_of_noc }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Department:</span>
-            <span class="value">{{ selectedRow.department }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Valid Till:</span>
-            <span class="value">{{ selectedRow.valid_till }}</span>
-          </div>
-
-          <!-- Simulated API response data -->
-          <div class="api-data" *ngIf="apiResponse">
-            <h3>Additional Details (from API)</h3>
-            <div class="detail-row">
-              <span class="label">Status:</span>
-              <span class="value status-active">{{ apiResponse.status }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="label">Issued By:</span>
-              <span class="value">{{ apiResponse.issuedBy }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="label">Remarks:</span>
-              <span class="value">{{ apiResponse.remarks }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog-actions">
-        <button class="btn btn-secondary" (click)="closeDialog()">Close</button>
-        <button class="btn btn-primary" (click)="editItem()">Edit</button>
-      </div>
-    </div>
-  `,
-  styles: [
-    `
-      .dialog-container {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        min-width: 500px;
-        max-width: 90vw;
-      }
-
-      .dialog-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 24px 16px;
-        border-bottom: 1px solid #eee;
-      }
-
-      .dialog-header h2 {
-        margin: 0;
-        font-size: 20px;
-        color: #333;
-      }
-
-      .close-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #999;
-        padding: 0;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .close-btn:hover {
-        color: #333;
-      }
-
-      .dialog-content {
-        padding: 20px 24px;
-        max-height: 70vh;
-        overflow-y: auto;
-      }
-
-      .loading {
-        text-align: center;
-        padding: 30px;
-        color: #666;
-      }
-
-      .detail-row {
-        display: flex;
-        margin-bottom: 12px;
-        padding: 8px 0;
-        border-bottom: 1px solid #f5f5f5;
-      }
-
-      .detail-row:last-child {
-        border-bottom: none;
-      }
-
-      .label {
-        font-weight: 600;
-        color: #555;
-        flex-shrink: 0;
-      }
-
-      .value {
-        flex: 1;
-        color: #333;
-      }
-
-      .status-active {
-        background-color: #d1f7e5;
-        color: #0a7a4a;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-      }
-
-      .api-data {
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 2px solid #eee;
-      }
-
-      .api-data h3 {
-        margin: 0 0 15px 0;
-        color: #444;
-        font-size: 16px;
-      }
-
-      .dialog-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        padding: 16px 24px;
-        border-top: 1px solid #eee;
-        background: #fafafa;
-        border-radius: 0 0 8px 8px;
-      }
-
-      .btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.2s;
-      }
-
-      .btn-secondary {
-        background: #f1f1f1;
-        color: #333;
-      }
-
-      .btn-secondary:hover {
-        background: #e1e1e1;
-      }
-
-      .btn-primary {
-        background: #003c5b;
-        color: white;
-      }
-
-      .btn-primary:hover {
-        background: #0056b3;
-      }
-    `,
-  ],
-  standalone: true,
-  imports: [CommonModule],
-})
-export class ClearanceDialogComponent {
-  selectedRow: any;
-  loading = true;
-  apiResponse: any = null;
-
-  constructor(private dialog: MatDialog) {}
-
-  ngOnInit() {
-    setTimeout(() => {
-      this.loading = false;
-      this.apiResponse = {
-        status: 'Active',
-        issuedBy: 'Chief Fire Officer',
-        remarks: 'All safety requirements met. Certificate valid for 2 years.',
-      };
-    }, 1500);
-  }
-
-  closeDialog() {
-    this.dialog.closeAll();
-  }
-
-  editItem() {
-    console.log('Edit clicked for:', this.selectedRow);
-    alert(`Editing item: ${this.selectedRow.certificate_number}`);
-    this.closeDialog();
-  }
+interface Service {
+  service_id: number;
+  service_name: string;
+  description: string;
 }
 
 @Component({
   selector: 'app-upload-existing-licence',
   imports: [
+    DynamicTableComponent,
+    IlogiSelectComponent,
+    IlogiInputComponent,
     CommonModule,
-    MatDialogModule,
-    MatButtonModule,
-    PDynamicTableComponent,
+    ReactiveFormsModule,
+    IlogiInputDateComponent,
+    IlogiFileUploadComponent,
+    ConfirmationModalComponent,
   ],
   templateUrl: './upload-existing-licence.component.html',
   styleUrl: './upload-existing-licence.component.scss',
 })
-export class UploadExistingLicenceComponent {
-  constructor(private dialog: MatDialog) {}
+export class UploadExistingLicenceComponent implements OnInit {
+  licDatas: any[] = [];
+  isDialogOpen: boolean = false;
+  departments: SelectOption[] = [];
+  services: SelectOption[] = [];
+  licForm!: FormGroup;
+  isSubmitting = false;
+  isEditing = false;
+  editingLicenseId: number | null = null;
+  showDeleteModal = false;
+  licenseToDelete: any = null;
 
-  simulateApiCall(action: string, id: number) {
-    setTimeout(() => {
-      console.log(`${action} API call completed for ID: ${id}`);
-      alert(
-        `${
-          action.charAt(0).toUpperCase() + action.slice(1)
-        } successful for item ID: ${id}`
-      );
-    }, 1000);
-  }
-
-  columns: TableColumn[] = [
-    {
-      key: 'id',
-      label: 'ID',
-      type: 'number',
-    },
-    {
-      key: 'name',
-      label: 'Full Name',
-      type: 'text',
-    },
-    {
-      key: 'email',
-      label: 'Email',
-      type: 'text',
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      type: 'status',
-    },
-    {
-      key: 'paymentStatus',
-      label: 'Payment',
-      type: 'payment',
-    },
-    {
-      key: 'amount',
-      label: 'Amount',
-      type: 'currency',
-    },
-    {
-      key: 'dateApplied',
-      label: 'Applied On',
-      type: 'date',
-    },
-    {
-      key: 'lastLogin',
-      label: 'Last Seen',
-      type: 'text',
-    },
-    {
-      key: 'profileLink',
-      label: 'Profile',
-      type: 'link',
-      linkHref: (row) => row.profileLink,
-      linkText: (row) => 'View Profile',
-    },
+  licColumns: any[] = [
+    { key: 'licensee_name', label: 'Licensee Name', type: 'text' },
+    { key: 'license_no', label: 'Licence No.', type: 'text' },
+    { key: 'application_no', label: 'Application No', type: 'text' },
+    { key: 'valid_from', label: 'Valid From', type: 'text' },
+    { key: 'expiry_date', label: 'Expiry Date', type: 'text' },
+    { key: 'status', label: 'Status', type: 'text' },
+    { key: 'created_at', label: 'Created At', type: 'text' },
+    { key: 'updated_at', label: 'Updated At', type: 'text' },
     {
       key: 'actions',
-      label: 'Actions',
+      label: 'Action',
       type: 'action',
-      class: 'text-center',
+      width: '120px',
       actions: [
         {
-          label: 'View',
-          icon: 'pi pi-eye',
-          color: 'secondary',
-          handler: (row) => console.log('View:', row),
-        },
-        {
           label: 'Edit',
-          icon: 'pi pi-pencil',
-          color: 'info',
-          handler: (row) => console.log('Edit:', row),
+          color: 'primary',
+          onClick: (row: any) => {
+            this.openEditModal(row);
+          },
         },
         {
           label: 'Delete',
-          icon: 'pi pi-trash',
-          color: 'danger',
-          handler: (row) => confirm(`Delete ${row.name}?`),
+          color: 'warn',
+          onClick: (row: any) => {
+            this.licenseToDelete = row;
+            this.showDeleteModal = true;
+          },
         },
       ],
     },
   ];
 
-  tableData = [
-    {
-      id: 1,
-      name: 'Alice Johnson',
-      email: 'alice@example.com',
-      status: 'Active',
-      paymentStatus: 'Paid',
-      amount: 299.99,
-      dateApplied: new Date('2024-01-15'),
-      lastLogin: '2 hours ago',
-      profileLink: 'https://example.com/alice',
-    },
-    {
-      id: 2,
-      name: 'Bob Smith',
-      email: 'bob@example.com',
-      status: 'Pending',
-      paymentStatus: 'Partially Paid',
-      amount: 149.5,
-      dateApplied: new Date('2024-02-03'),
-      lastLogin: '1 day ago',
-      profileLink: 'https://example.com/bob',
-    },
-    {
-      id: 3,
-      name: 'Carol Davis',
-      email: 'carol@example.com',
-      status: 'Inactive',
-      paymentStatus: 'Overdue',
-      amount: 399.0,
-      dateApplied: new Date('2024-01-28'),
-      lastLogin: '3 weeks ago',
-      profileLink: 'https://example.com/carol',
-    },
-    {
-      id: 4,
-      name: 'Dan Lee',
-      email: 'dan@example.com',
-      status: 'Active',
-      paymentStatus: 'Refunded',
-      amount: 199.99,
-      dateApplied: new Date('2024-03-10'),
-      lastLogin: '5 days ago',
-      profileLink: 'https://example.com/dan',
-    },
-    {
-      id: 5,
-      name: 'Eva Martinez',
-      email: 'eva@example.com',
-      status: 'Completed',
-      paymentStatus: 'Paid',
-      amount: 599.99,
-      dateApplied: new Date('2024-02-20'),
-      lastLogin: 'Just now',
-      profileLink: 'https://example.com/eva',
-    },
-  ];
+  constructor(
+    private fb: FormBuilder,
+    private apiService: GenericService
+  ) {
+    this.licForm = this.fb.group({
+      department_id: ['', Validators.required],
+      service_id: ['', Validators.required],
+      license_name: ['', [Validators.required, Validators.maxLength(255)]],
+      upload_lic: [null],
+      Application_no: ['', [Validators.required, Validators.maxLength(500)]],
+      license_no: ['', [Validators.required, Validators.maxLength(500)]],
+      valid_from_date: ['', Validators.required],
+      expiry_date: ['', Validators.required],
+    });
+  }
 
-  openDialog(row: any) {
-    const dialogRef = this.dialog.open(ClearanceDialogComponent, {
-      maxWidth: '95vw',
-      data: { selectedRow: row },
+  ngOnInit(): void {
+    this.loadDepartments();
+    this.loadLicenses();
+  }
+
+  loadDepartments(): void {
+    this.apiService
+      .getByConditions({}, 'api/department-get-all-departments')
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status === 1 && res.data) {
+            const data = Array.isArray(res.data) ? res.data : [res.data];
+            this.departments = data.map((dept: Department) => ({
+              id: dept.id,
+              name: dept.name,
+            }));
+          }
+        },
+        error: (err) => {
+          console.error('Failed to load departments:', err);
+          this.apiService.openSnackBar('Failed to load departments', 'error');
+        },
+      });
+  }
+
+  onDepartmentChange(deptId: number | null): void {
+    this.licForm.get('service_id')?.reset();
+    this.services = [];
+
+    if (!deptId) return;
+
+    this.apiService
+      .getByConditions({ department_id: deptId }, 'api/department/services')
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status === 1 && Array.isArray(res.data)) {
+            this.services = res.data.map((svc: Service) => ({
+              id: svc.service_id,
+              name: svc.service_name,
+            }));
+          } else {
+            this.services = [];
+          }
+        },
+        error: (err) => {
+          console.error('Failed to load services:', err);
+          this.apiService.openSnackBar('Failed to load services', 'error');
+          this.services = [];
+        },
+      });
+  }
+
+  loadLicenses(): void {
+    this.apiService
+      .getByConditions({}, 'api/user/existing-license-view')
+      .subscribe({
+        next: (res: any) => {
+          this.licDatas = res?.status === 1 && Array.isArray(res.data) ? res.data : [];
+        },
+        error: (err) => {
+          console.error('Failed to load licenses:', err);
+          this.licDatas = [];
+          this.apiService.openSnackBar('Failed to load licenses', 'error');
+        },
+      });
+  }
+
+ openDialog(): void {
+    this.isEditing = false;
+    this.editingLicenseId = null;
+    this.licForm.reset();
+    this.isDialogOpen = true;
+    document.body.classList.add('dialog-open');
+  }
+
+  openEditModal(row: any): void {
+    this.isEditing = true;
+    this.editingLicenseId = row.id;
+
+    const validFrom = row.valid_from ? new Date(row.valid_from) : null;
+    const expiryDate = row.expiry_date ? new Date(row.expiry_date) : null;
+
+    this.licForm.patchValue({
+      department_id: row.department_id,
+      service_id: row.service_id,
+      license_name: row.licensee_name,
+      Application_no: row.application_no,
+      license_no: row.license_no,
+      valid_from_date: validFrom,
+      expiry_date: expiryDate,
     });
 
-    dialogRef.afterOpened().subscribe(() => {
-      const dialogComponent = dialogRef.componentInstance;
-      dialogComponent.selectedRow = row;
-    });
+    this.onDepartmentChange(row.department_id);
+
+    this.isDialogOpen = true;
+    document.body.classList.add('dialog-open');
+  }
+
+  closeDialog(): void {
+    this.isDialogOpen = false;
+    this.isEditing = false;
+    this.editingLicenseId = null;
+    this.licForm.reset();
+    document.body.classList.remove('dialog-open');
+  }
+
+  submitLic(): void {
+    if (this.licForm.invalid) {
+      this.licForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
+
+    const raw = this.licForm.value;
+
+    const validFrom = raw.valid_from_date instanceof Date 
+      ? raw.valid_from_date.toISOString().split('T')[0] 
+      : raw.valid_from_date;
+    
+    const expiryDate = raw.expiry_date instanceof Date 
+      ? raw.expiry_date.toISOString().split('T')[0] 
+      : raw.expiry_date;
+
+    if (this.isEditing && this.editingLicenseId) {
+      const payload = {
+        id: this.editingLicenseId,
+        department_id: raw.department_id,
+        service_id: raw.service_id,
+        licensee_name: raw.license_name,
+        application_no: raw.Application_no,
+        license_no: raw.license_no,
+        valid_from: validFrom,
+        expiry_date: expiryDate,
+        status: 'pending'
+      };
+
+      this.apiService
+        .getByConditions(payload, 'api/user/existing-license-update')
+        .subscribe({
+          next: (res: any) => {
+            this.isSubmitting = false;
+            if (res?.status === 1) {
+              this.apiService.openSnackBar('License updated successfully!', 'success');
+              this.closeDialog();
+              this.loadLicenses();
+            } else {
+              this.apiService.openSnackBar(res?.message || 'Failed to update license', 'error');
+            }
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            console.error('Update error:', err);
+            this.apiService.openSnackBar('Failed to update license', 'error');
+          },
+        });
+    } else {
+      const payload = {
+        department_id: raw.department_id,
+        service_id: raw.service_id,
+        licensee_name: raw.license_name,
+        application_no: raw.Application_no,
+        license_no: raw.license_no,
+        valid_from: validFrom,
+        expiry_date: expiryDate,
+      };
+
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(payload)) {
+        if (value != null) {
+          formData.append(key, value as string | Blob);
+        }
+      }
+
+      const file = raw.upload_lic;
+      if (file) {
+        formData.append('upload_lic', file);
+      }
+
+      this.apiService
+        .getByConditions(formData, 'api/user/existing-license-store')
+        .subscribe({
+          next: (res: any) => {
+            this.isSubmitting = false;
+            if (res?.status === 1) {
+              this.apiService.openSnackBar('License uploaded successfully!', 'success');
+              this.closeDialog();
+              this.loadLicenses();
+            } else {
+              this.apiService.openSnackBar(res?.message || 'Failed to upload license', 'error');
+            }
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            console.error('Upload error:', err);
+            this.apiService.openSnackBar('Failed to upload license', 'error');
+          },
+        });
+    }
+  }
+
+  confirmDelete(): void {
+    if (!this.licenseToDelete) return;
+
+    const payload = { id: this.licenseToDelete.id };
+    this.apiService
+      .getByConditions(payload, 'api/user/existing-license-delete')
+      .subscribe({
+        next: (res: any) => {
+          this.showDeleteModal = false;
+          this.licenseToDelete = null;
+          if (res?.status === 1) {
+            this.apiService.openSnackBar('License deleted successfully!', 'success');
+            this.loadLicenses();
+          } else {
+            this.apiService.openSnackBar(res?.message || 'Failed to delete license', 'error');
+          }
+        },
+        error: (err) => {
+          this.showDeleteModal = false;
+          this.licenseToDelete = null;
+          console.error('Delete error:', err);
+          this.apiService.openSnackBar('Failed to delete license', 'error');
+        },
+      });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.licenseToDelete = null;
   }
 }

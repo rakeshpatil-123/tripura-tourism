@@ -188,23 +188,23 @@ export class IlogiInputDateComponent
     return `${y}-${m}-${d}`;
   }
 
-  dateFilter = (d: Date | null): boolean => {
-    if (!d) return false;
+  // dateFilter = (d: Date | null): boolean => {
+  //   if (!d) return false;
 
-    const date = new Date(d);
-    const today = new Date();
-    const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  //   const date = new Date(d);
+  //   const today = new Date();
+  //   const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    const currentYear = todayLocal.getFullYear();
-    const formatted = this.formatToLocalYMD(date);
-    const isDisabled = this.disabledDates?.includes(formatted);
+  //   const currentYear = todayLocal.getFullYear();
+  //   const formatted = this.formatToLocalYMD(date);
+  //   const isDisabled = this.disabledDates?.includes(formatted);
 
-    const isCurrentYear = date.getFullYear() === currentYear;
+  //   const isCurrentYear = date.getFullYear() === currentYear;
 
-    const isPastDate = date < todayLocal;
+  //   const isPastDate = date < todayLocal;
 
-    return !isDisabled && isCurrentYear && !isPastDate;
-  };
+  //   return !isDisabled && isCurrentYear && !isPastDate;
+  // };
 
   // Handle date changes from date picker
 onDateChange(value: Date | null): void {
