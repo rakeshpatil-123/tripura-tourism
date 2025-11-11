@@ -128,7 +128,7 @@ export class NewNavComponent implements OnDestroy {
       ]
     },
     {
-      label: 'Related Departments',
+      label: 'Departments',
       path: '/page/related-departments',
       hasDropdown: false,
       isActive: false,
@@ -136,13 +136,29 @@ export class NewNavComponent implements OnDestroy {
       children: []
     },
     {
-      label: 'Information Wizard',
-      path: '/page/information-wizard',
+      label: 'Land',
+      path: 'https://landbank.tripura.gov.in/',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,
       children: []
     },
+    {
+      label: 'KYA',
+      path: '/page/',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    // {
+    //   label: 'Information Wizard',
+    //   path: '/page/information-wizard',
+    //   hasDropdown: false,
+    //   isActive: false,
+    //   dropdownOpen: false,
+    //   children: []
+    // },
     {
       label: 'Acts & Rules',
       path: '/page/acts-rules',
@@ -151,9 +167,17 @@ export class NewNavComponent implements OnDestroy {
       dropdownOpen: false,
       children: []
     },
+    // {
+    //   label: 'Contact Us',
+    //   path: '/page/contact-us',
+    //   hasDropdown: false,
+    //   isActive: false,
+    //   dropdownOpen: false,
+    //   children: []
+    // },
     {
-      label: 'Contact Us',
-      path: '/page/contact-us',
+      label: 'NSWS',
+      path: '/page/',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,
@@ -170,6 +194,22 @@ export class NewNavComponent implements OnDestroy {
     {
       label: 'Incentive Calculator',
       path: '/page/incentive-calculator',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Login',
+      path: '/page/login',
+      hasDropdown: false,
+      isActive: false,
+      dropdownOpen: false,
+      children: []
+    },
+    {
+      label: 'Register',
+      path: '/page/registration',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,
@@ -226,15 +266,20 @@ export class NewNavComponent implements OnDestroy {
   }
 
   onNavItemClick(item: NavigationItem, index: number): void {
-    if (item.hasDropdown) {
-      item.dropdownOpen = !item.dropdownOpen;
-    } else {
-      this.setActiveItem(index);
-      if (item.path) {
+  if (item.hasDropdown) {
+    item.dropdownOpen = !item.dropdownOpen;
+  } else {
+    this.setActiveItem(index);
+    if (item.path) {
+      // Check if the path is an external URL
+      if (item.path.startsWith('http://') || item.path.startsWith('https://')) {
+        window.open(item.path, '_blank');
+      } else {
         this.router.navigate([item.path]);
       }
     }
   }
+}
 
   onDropdownItemClick(parentIndex: number, childItem: NavigationItem): void {
     this.closeAllDropdowns();
