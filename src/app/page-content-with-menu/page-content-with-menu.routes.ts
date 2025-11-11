@@ -327,6 +327,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department'] },
       },
+    
       {
         path: 'business-user',
         loadComponent: () =>

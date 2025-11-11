@@ -142,6 +142,15 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                 loadComponent: () =>
                     import('./nav-pages/try-use/try-use.component').then(m => m.TryUseComponent)
             },
+              {
+                    path: 'application-submission',
+                    loadComponent: () =>
+                      import(
+                        '../page-content/application-submission/application-submission.component'
+                      ).then((m) => m.ApplicationSubmissionComponent),
+                    // canActivate: [authGuard],
+                    data: { roles: ['individual'] },
+                  },
         ]
     }
 ];

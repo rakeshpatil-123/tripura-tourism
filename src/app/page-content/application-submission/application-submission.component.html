@@ -1,0 +1,33 @@
+<div class="container" *ngIf="!loading">
+  <div *ngIf="error; else successBlock" class="error">
+    <h3>❌ Something went wrong</h3>
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-template #successBlock>
+    <div class="success-popup">
+      <div class="success-icon">✅</div>
+      <h2>Application Submitted Successfully!</h2>
+      
+      <div class="application-details">
+        <p><strong>Application ID:</strong> {{ applicationData.applicationId }}</p>
+        <p><strong>User Name:</strong> {{ applicationData.swaagat_user_name }}</p>
+        <p><strong>Service ID:</strong> {{ applicationData.service_id }}</p>
+        <p><strong>Payment Status:</strong> {{ applicationData.payment_status }}</p>
+        <p><strong>Application Status:</strong> {{ applicationData.status }}</p>
+        <p><strong>Max Processing Date:</strong> {{ applicationData.max_processing_date }}</p>
+        <p><strong>NOC Number:</strong> {{ applicationData.noc_number }}</p>
+        <p><strong>NOC Valid Till:</strong> {{ applicationData.noc_valid_till }}</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" (click)="goToDashboard()">View Dashboard</button>
+        <!-- <button class="btn-secondary" (click)="printDetails()">Print Details</button> -->
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<div *ngIf="loading" class="loading">
+  <p>Processing your application...</p>
+</div>
