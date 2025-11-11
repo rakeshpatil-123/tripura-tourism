@@ -1,9 +1,12 @@
 <div class="brand-header">
   <div class="logo-section">
-    <img src="assets/logo/SWAAGAT2.0LogoRecreated.png" alt="SWAAGAT 2.0 Logo" class="logo">
+    <a [routerLink]="['/']" class="logo-link">
+      <img src="assets/logo/SWAAGAT2.0LogoRecreated.png" alt="SWAAGAT 2.0 Logo" class="logo">
+    </a>
   </div>
 
   <div class="action-section">
+    <!-- 
     <ng-container *ngIf="!isLoggedIn">
       <button 
         class="action-btn secondary"
@@ -27,7 +30,6 @@
         <span>Login</span>
       </button>
 
-      <!-- NEW REGISTRATION BUTTON -->
       <button 
         class="action-btn primary register-btn"
         aria-label="Register"
@@ -53,6 +55,7 @@
         <span>Register</span>
       </button>
     </ng-container>
+    -->
 
     <ng-container *ngIf="isLoggedIn">
       <button
