@@ -1,14 +1,13 @@
 .main-footer {
-  background: #00b2d8;
-  color: #000000;
-  padding: 1rem 0;
+  background: #003c5b; // Updated background color
+  color: #d1d5db; // gray-300
+  padding: 1rem 0 1rem 0; // Adjusted padding for mini-footer
   position: relative;
   overflow: hidden;
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+  p {
+    margin: 0;
+    color: #ffffff; // gray-500
   }
 
   .footer-bottom {
@@ -31,11 +30,10 @@
       gap: 1.5rem;
       flex-wrap: wrap;
 
-      a {
-        color: #000000;
-        text-decoration: none;
-        transition: color 0.3s ease;
-        font-weight: 500;
+    a {
+      color: #ffffff; // gray-500
+      text-decoration: none;
+      transition: color 0.3s ease; // base = 0.3s ease
 
         &:hover {
           color: #ffffff;

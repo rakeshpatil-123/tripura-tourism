@@ -208,6 +208,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['individual'] }
       },
       {
+        path: 'licence-details/:id',
+        loadComponent: () =>
+          import(
+            './industrial-user/license-details/license-details.component'
+          ).then((m) => m.LicenseDetailsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
+      },
+      {
         path: 'example-form',
         loadComponent: () =>
           import('./example-form/example-form.component').then(
@@ -327,6 +336,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department'] },
       },
+    
       {
         path: 'business-user',
         loadComponent: () =>
