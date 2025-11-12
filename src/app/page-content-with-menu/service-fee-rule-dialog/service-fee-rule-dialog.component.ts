@@ -40,8 +40,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     'condition_value_start',
     'pre_condition_value',
     'condition_value_end',
-    'fixed_fee',
-    'calculated_fee',
     'fixed_calculated_fee',
     'per_unit_fee',
     'priority',
@@ -66,8 +64,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       pre_start_value: [null], 
       pre_end_value: [null], 
       condition_value_end: [null],
-      fixed_fee: [null],
-      calculated_fee: [null],
       minimum_fee: [null],
       fixed_calculated_fee: [null],
       per_unit_fee: [null],
@@ -93,8 +89,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
           pre_start_value: values.pre_start_value,
           pre_end_value: values.pre_end_value,
           condition_value_end: values.condition_value_end,
-          fixed_fee: values.fixed_fee,
-          calculated_fee: values.calculated_fee,
           minimum_fee: values.minimum_fee,
           fixed_calculated_fee: values.fixed_calculated_fee,
           per_unit_fee: values.per_unit_fee,
@@ -122,8 +116,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
         pre_start_value: r.pre_start_value !== '-' ? r.pre_start_value : null,
         pre_end_value: r.pre_end_value !== '-' ? r.pre_end_value : null,
         condition_value_end: r.condition_value_end !== '-' ? r.condition_value_end : null,
-        fixed_fee: r.fixed_fee && r.fixed_fee !== '-' ? r.fixed_fee : null,
-        calculated_fee: r.calculated_fee && r.calculated_fee !== '-' ? r.calculated_fee : null,
         minimum_fee: r.minimum_fee && r.minimum_fee !== '-' ? r.minimum_fee : null,
         fixed_calculated_fee: r.fixed_calculated_fee && r.fixed_calculated_fee !== '-' ? r.fixed_calculated_fee : null,
         per_unit_fee: r.per_unit_fee && r.per_unit_fee !== '-' ? r.per_unit_fee : null,
@@ -175,7 +167,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
   }
 
   private applyDynamicValidations(feeType: string, operator: string) {
-    const fixedFee = this.feeRuleForm.get('fixed_fee');
     const questionId = this.feeRuleForm.get('question_id');
     const condLabel = this.feeRuleForm.get('condition_label_question_id');
     const condStart = this.feeRuleForm.get('condition_value_start');
@@ -184,14 +175,13 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
     const condStartValue = this.feeRuleForm.get('pre_start_value');
     const condEndValue = this.feeRuleForm.get('pre_end_value');
     const condEnd = this.feeRuleForm.get('condition_value_end');
-    const calcFee = this.feeRuleForm.get('calculated_fee');
     const minFee = this.feeRuleForm.get('minimum_fee');
     const fixedCalcFee = this.feeRuleForm.get('fixed_calculated_fee');
     const perUnitFee = this.feeRuleForm.get('per_unit_fee');
 
-    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, condStartValue, condEndValue, calcFee, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
+    [ questionId, condLabel, condStart, isMulti, condEnd, condValue, condStartValue, condEndValue, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.clearValidators());
 
-    [fixedFee, questionId, condLabel, condStart, isMulti, condEnd, condValue, condStartValue, condEndValue, calcFee, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
+    [ questionId, condLabel, condStart, isMulti, condEnd, condValue, condStartValue, condEndValue, minFee, fixedCalcFee, perUnitFee].forEach(c => c?.updateValueAndValidity());
   }
 
   submit() {
@@ -213,8 +203,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
       condition_value_start: raw.condition_value_start ? String(raw.condition_value_start) : null,
       multi_condition: raw.multi_condition ? String(raw.multi_condition) : null,
       condition_value_end: raw.condition_value_end ? String(raw.condition_value_end) : null,
-      fixed_fee: raw.fixed_fee ? String(raw.fixed_fee) : null,
-      calculated_fee: raw.calculated_fee ? String(raw.calculated_fee) : null,
       minimum_fee: raw.minimum_fee ? String(raw.minimum_fee) : null,
       fixed_calculated_fee: raw.fixed_calculated_fee ? String(raw.fixed_calculated_fee) : null,
       per_unit_fee: raw.per_unit_fee ? String(raw.per_unit_fee) : null,
@@ -253,8 +241,6 @@ export class ServiceFeeRuleDialogComponent implements OnInit {
               pre_start_value: null,
               pre_end_value: null,
               condition_value_end: null,
-              fixed_fee: null,
-              calculated_fee: null,
               minimum_fee: null,
               fixed_calculated_fee: null,
               per_unit_fee: null,
