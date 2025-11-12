@@ -1,17 +1,17 @@
 <section class="section">
   <div class="container">
     <div class="header">
-      <h2>Quick Access Tools & Dashboard</h2>
-      <p>Access essential tools, track applications, and monitor performance through our comprehensive dashboard.</p>
+      <h2>Quick Access Tools</h2>
+      <!-- <p>Access essential tools, track applications, and monitor performance through our comprehensive dashboard.</p> -->
     </div>
     <div class="cards">
       <button *ngFor="let tool of tools; let i = index" 
               #toolCard
-              [@cardAnimation]="{ value: cardState, params: { delay: i * 0.2 } }" 
+              [@cardAnimation]="{ value: cardState, params: { delay: i * 0.15 } }" 
               class="card {{tool.bgColor}}"
               (click)="onToolClick(tool)">
         <div class="card-content">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="card-icon" [innerHTML]="tool.iconSvgSafe"></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="card-icon" [innerHTML]="tool.iconSvgSafe"></svg>
           <span class="badge {{tool.bgColor}}">{{ tool.badge }}</span>
         </div>
         <h4>{{ tool.title }}</h4>

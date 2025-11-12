@@ -145,7 +145,7 @@ export class NewNavComponent implements OnDestroy {
     },
     {
       label: 'KYA',
-      path: '/page/',
+      path: '/page/kya',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,
@@ -177,7 +177,7 @@ export class NewNavComponent implements OnDestroy {
     // },
     {
       label: 'NSWS',
-      path: '/page/',
+      path: 'https://www.nsws.gov.in/',
       hasDropdown: false,
       isActive: false,
       dropdownOpen: false,
