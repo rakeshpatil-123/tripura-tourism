@@ -4,43 +4,57 @@
   padding: 1rem 0 1rem 0; // Adjusted padding for mini-footer
   position: relative;
   overflow: hidden;
-}
-
-.footer-bottom {
-  // border-top: 1px solid #1f2937; // gray-800
-  // padding-top: 1rem; // xl = 2rem
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1.5rem; // lg = 1.5rem
-  font-size: 0.875rem;
-  position: relative;
-  z-index: 1;
 
   p {
     margin: 0;
     color: #ffffff; // gray-500
   }
 
-  .footer-links {
+  .footer-bottom {
     display: flex;
-    gap: 1.5rem; // lg = 1.5rem
+    justify-content: space-around;
+    align-items: center;
     flex-wrap: wrap;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    text-align: center;
+
+    p {
+      margin: 0;
+      color: #000000;
+      font-weight: 500;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
 
     a {
       color: #ffffff; // gray-500
       text-decoration: none;
       transition: color 0.3s ease; // base = 0.3s ease
 
-      &:hover {
-        color: #ffffff; // white
-        // text-decoration: underline;
+        &:hover {
+          color: #ffffff;
+        }
       }
+    }
+
+    .last-updated {
+      font-size: 0.75rem;
+      opacity: 0.9;
     }
   }
 }
 
-a {
-  text-decoration: none;
+@media (max-width: 768px) {
+  .main-footer .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+
+    .footer-links {
+      justify-content: center;
+    }
+  }
 }
