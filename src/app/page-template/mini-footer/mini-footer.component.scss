@@ -1,5 +1,5 @@
 .main-footer {
-  background: #00b2d8; // Updated background color
+  background: #003c5b; // Updated background color
   color: #d1d5db; // gray-300
   padding: 1rem 0 1rem 0; // Adjusted padding for mini-footer
   position: relative;
@@ -20,7 +20,7 @@
 
   p {
     margin: 0;
-    color: #000000; // gray-500
+    color: #ffffff; // gray-500
   }
 
   .footer-links {
@@ -29,7 +29,7 @@
     flex-wrap: wrap;
 
     a {
-      color: #000000; // gray-500
+      color: #ffffff; // gray-500
       text-decoration: none;
       transition: color 0.3s ease; // base = 0.3s ease
 

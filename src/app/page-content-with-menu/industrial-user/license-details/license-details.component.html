@@ -1,0 +1,21 @@
+<div class="swgt-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-head">License Details</h1>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-4">Loading details...</div>
+
+ 
+
+  <app-dynamic-table
+    [data]="applications"
+    [columns]="columns"
+    [searchable]="true"
+    [showPagination]="true"
+    [pageSize]="10">
+  </app-dynamic-table>
+
+  <div *ngIf="!loading && applications.length === 0" class="text-center py-5">
+    <p class="text-muted">No Details found</p>
+  </div>
+</div>

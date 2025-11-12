@@ -12,6 +12,7 @@ import { IlogiInputDateComponent } from '../../../customInputComponents/ilogi-in
 import { IlogiFileUploadComponent } from '../../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationModalComponent } from '../../../shared/component/confirmation-modal/confirmation-modal.component';
+import { Router } from '@angular/router';
 
 interface Department {
   id: number;
@@ -68,6 +69,14 @@ export class UploadExistingLicenceComponent implements OnInit {
       width: '120px',
       actions: [
         {
+          label: 'View',
+          color: 'primary',
+          onClick: (row: any) => {
+           this.router.navigate([`dashboard/licence-details/${row.id}`])
+           
+          },
+        },
+        {
           label: 'Edit',
           color: 'primary',
           onClick: (row: any) => {
@@ -88,7 +97,8 @@ export class UploadExistingLicenceComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private apiService: GenericService
+    private apiService: GenericService,
+    private router: Router
   ) {
     this.licForm = this.fb.group({
       department_id: ['', Validators.required],
