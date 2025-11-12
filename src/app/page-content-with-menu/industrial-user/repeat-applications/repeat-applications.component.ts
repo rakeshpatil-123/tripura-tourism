@@ -21,7 +21,7 @@ export class RepeatApplicationsComponent implements OnInit {
     private apiService: GenericService,
     private router: Router
   ) {}
- columns: any[] = [];
+  columns: any[] = [];
 
   ngOnInit(): void {
     this.serviceId = Number(this.route.snapshot.paramMap.get('serviceid'));
@@ -35,7 +35,7 @@ export class RepeatApplicationsComponent implements OnInit {
   }
 
   loadApplications(): void {
-    const userId = this.apiService.getDecryptedUserId(); 
+    const userId = this.apiService.getDecryptedUserId();
     if (!userId) {
       this.apiService.openSnackBar('User not authenticated', 'error');
       this.router.navigate(['/login']);
@@ -68,72 +68,85 @@ export class RepeatApplicationsComponent implements OnInit {
       });
   }
 
-buildColumns(): void {
-  if (this.applications.length === 0) return;
+  buildColumns(): void {
+    if (this.applications.length === 0) return;
 
-  const allowedKeys = [
-    'application_id',
-    'service_title_or_description',
-    'application_type',
-    'department_name',
-    'application_number',
-    'application_date',
-    'payment_status',
-    'status',
-    'latest_workflow_status'
-  ];
+    const allowedKeys = [
+      'application_id',
+      'service_title_or_description',
+      'application_type',
+      'department_name',
+      'application_number',
+      'application_date',
+      'payment_status',
+      'status',
+      'latest_workflow_status',
+    ];
 
-  const columns: any[] = [];
+    const columns: any[] = [];
 
-  allowedKeys.forEach(key => {
-    let label = key
-      .replace(/_([a-z])/g, (match, letter) => ` ${letter.toUpperCase()}`)
-      .replace(/^./, str => str.toUpperCase());
+    allowedKeys.forEach((key) => {
+      let label = key
+        .replace(/_([a-z])/g, (match, letter) => ` ${letter.toUpperCase()}`)
+        .replace(/^./, (str) => str.toUpperCase());
 
-    let type = 'text';
-    if (key.includes('status')) {
-      type = 'status';
-    } else if (key === 'application_id') {
-      type = 'number';
-    }
+      let type = 'text';
+      if (key.includes('status')) {
+        type = 'status';
+      } else if (key === 'application_id') {
+        type = 'number';
+      }
+
+      columns.push({
+        key,
+        label,
+        type,
+        sortable: true,
+        width: key === 'service_title_or_description' ? '200px' : '140px',
+      });
+    });
 
     columns.push({
-      key,
-      label,
-      type,
-      sortable: true,
-      width: key === 'service_title_or_description' ? '200px' : '140px'
+      key: 'actions',
+      label: 'Actions',
+      type: 'action',
+      actions: [
+        {
+          label: 'View',
+          color: 'primary',
+          visible: () => true,
+          onClick: (row: any) => {
+            const queryParams: any = {};
+            if (row.service_mode === 'third_party') {
+              queryParams.service = 'third_party';
+            }
+            this.router.navigate(
+              ['/dashboard/user-app-view', this.serviceId, row.application_id],
+              {
+                queryParams: queryParams,
+              }
+            );
+          },
+        },
+        {
+          label: 'Re-apply',
+          color: 'warn',
+          visible: (row: any) => row.status === 'send_back',
+          onClick: (row: any) => {
+            this.router.navigate(
+              ['/dashboard/service-application', this.serviceId],
+              {
+                queryParams: {
+                  application_status: row.status,
+                  application_id: row.application_id,
+                },
+              }
+            );
+          },
+        },
+      ],
     });
-  });
 
-  columns.push({
-    key: 'actions',
-    label: 'Actions',
-    type: 'action',
-    actions: [
-      {
-        label: 'View',
-        color: 'primary',
-        visible: () => true,
-        onClick: (row: any) => {
-          this.router.navigate(['/dashboard/user-app-view', this.serviceId, row.application_id]);
-        }
-      },
-      {
-        label: 'Re-apply',
-        color: 'warn',
-        visible: (row: any) => row.status === 'send_back',
-        onClick: (row: any) => {
-          this.router.navigate(['/dashboard/service-application', this.serviceId], {
-            queryParams: { application_status: row.status,
-              application_id: row.application_id
-             }
-          });
-        }
-      }
-    ]
-  });
-
-  this.columns = columns;
-}
+    this.columns = columns;
+  }
 }

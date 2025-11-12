@@ -1,7 +1,5 @@
 <!-- user-application-view.component.html -->
 <div class="application-view-container">
-
-
   <div class="loading" *ngIf="isLoading">
     <div class="spinner"></div>
     <p>Loading application details...</p>
@@ -14,15 +12,21 @@
   </div>
 
   <div class="application-card" *ngIf="application && !isLoading">
-
     <section class="section">
       <div class="app-header">
         <h2 class="app-title">Application Information</h2>
-        <button class="btn-download" (click)="downloadCertificate()">
+        <!-- Show Download Certificate button only if not third-party AND has download URL -->
+        <button class="btn-download" 
+                *ngIf=" hasDownloadUrl" 
+                (click)="downloadCertificate()">
           Download Certificate
         </button>
       </div>
       <div class="grid">
+        <div class="field" *ngIf="application?.applicationId">
+          <label>Application Id</label>
+          <span>{{ application?.applicationId || '—' }}</span>
+        </div>
         <div class="field">
           <label>Application Date</label>
           <span>{{ formatDate(application?.application_date) || '—' }}</span>
@@ -32,36 +36,44 @@
           <span>{{ formatDate(application?.max_processing_date) || '—' }}</span>
         </div>
         <div class="field">
+          <label>Approved Fee</label>
+          <span>{{ application?.approved_fee || '₹0' }}</span>
+        </div>
+        <div class="field" *ngIf="!isThirdParty">
           <label>Current Step</label>
           <span>Step {{ application?.current_step_number || '—' }}</span>
         </div>
-        <div class="field">
+        <div class="field" *ngIf="!isThirdParty">
           <label>Base Fee</label>
-          <span>₹{{ application?.final_fee || '0' }}</span>
+          <span>₹{{ application?.final_fee || '₹0' }}</span>
         </div>
         <div class="field" *ngIf="hasExtraPayment">
           <label>Extra Payment</label>
           <span>₹{{ application?.extra_payment }}</span>
         </div>
-        <div class="field">
+        <div class="field" *ngIf="!isThirdParty">
           <label>Total Fee</label>
-          <span>₹{{ application?.total_fee || '0' }}</span>
+          <span>₹{{ application?.total_fee || '₹0' }}</span>
+        </div>
+        <div class="field" *ngIf="serviceName !== '' ">
+          <label>Applied For</label>
+          <span>{{ serviceName}}</span>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <h2> Status</h2>
+      <h2>Status</h2>
       <div class="status-display">
         <span [ngClass]="getStatusBadgeClass(application?.status || '')">
           {{ (application?.status || '—') | titlecase }}
         </span>
-
       </div>
     </section>
 
-    <section class="section" *ngIf="application?.application_data_structured?.length">
-      <h2> Applicant Information</h2>
+    <section class="section" 
+             *ngIf="!isThirdParty && application?.application_data_structured?.length">
+      <h2>Applicant Information</h2>
       <div class="grid">
         <div class="field" *ngFor="let qa of application.application_data_structured">
           @if(!qa.answer.includes('http')) {
@@ -71,7 +83,6 @@
           @if(qa.answer.includes('http')) {
           <div class="file-display">
           <label>{{ qa.question }}</label>
-
             <span>{{ getFileNameFromUrl(qa.answer) }}</span>
             <button type="button" class="btn-view btn-success btn-sm" (click)="previewFile(qa.answer)">
               View
@@ -82,8 +93,10 @@
       </div>
     </section>
 
-    <section class="section" *ngIf="!application?.application_data_structured?.length && application?.application_data">
-      <h2> Applicant Information </h2>
+    <!-- Hide Applicant Information section for third-party -->
+    <section class="section" 
+             *ngIf="!isThirdParty && !application?.application_data_structured?.length && application?.application_data">
+      <h2>Applicant Information</h2>
       <div class="grid">
         <div class="field" *ngFor="let entry of application.application_data | keyvalue">
           <label>{{ getLabel(entry.key) }}</label>
@@ -92,8 +105,8 @@
       </div>
     </section>
 
-    <section class="section">
-      <h2> Payment Information</h2>
+    <section class="section" *ngIf="application?.payment_status">
+      <h2>Payment Information</h2>
       <div class="grid">
         <div class="field">
           <label>Payment Status</label>
@@ -151,7 +164,7 @@
       <h2>Remarks</h2>
       <div class="grid">
         <div class="field">
-          <label>Document Status </label>
+          <label>Document Status</label>
           <div class="file-display">
             <span>{{ getFileNameFromUrl(application?.history_data?.status_file) }}</span>
             <button type="button" class="btn-view btn-success btn-sm"

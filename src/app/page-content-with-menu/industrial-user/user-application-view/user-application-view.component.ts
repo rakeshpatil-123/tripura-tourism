@@ -18,6 +18,8 @@ interface HistoryData {
 
 
 interface ApplicationDetail {
+  approved_fee: string;
+  applicationId: string;
   application_date: string;
   status: string;
   application_data: Record<string, string>;
@@ -45,6 +47,7 @@ interface ApplicationDetail {
 
 }
 
+
 @Component({
   selector: 'app-user-application-view',
   templateUrl: './user-application-view.component.html',
@@ -54,12 +57,13 @@ interface ApplicationDetail {
 })
 export class UserApplicationViewComponent implements OnInit {
   serviceId: number | null = null;
+  serviceName: string | null = null;
   appId: number | null = null;
   application: ApplicationDetail | null = null;
   isLoading: boolean = false;
   error: string | null = null;
-  
-
+  isThirdParty: boolean = false;
+hasDownloadUrl: boolean = false; 
   fieldLabelMap: Record<string, string> = {
     '17': 'Applicant Name',
     '18': 'Business Name',
@@ -77,8 +81,40 @@ export class UserApplicationViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadRouteParams();
+    this.checkThirdPartyService();
   }
   
+checkThirdPartyService(): void {
+    this.route.queryParams.subscribe(params => {
+      this.isThirdParty = params['service'] === 'third_party';
+    });
+  }
+
+  checkDownloadUrlAvailability(): void {
+    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+    this.apiService.downloadServiceCertificate(this.appId).subscribe({
+      next: (res: any) => {
+        this.hasDownloadUrl = !!(res?.download_url); 
+      },
+      error: () => {
+        this.hasDownloadUrl = false;
+      }
+    });
+  }
+
+  // loadRouteParams(): void {
+  //   const serviceIdParam = this.route.snapshot.paramMap.get('serviceId');
+  //   const appIdParam = this.route.snapshot.paramMap.get('appId');
+
+  //   this.serviceId = serviceIdParam ? +serviceIdParam : null;
+  //   this.appId = appIdParam ? +appIdParam : null;
+
+  //   if (this.serviceId && this.appId) {
+  //     this.fetchApplicationDetails();
+  //   } else {
+  //     this.error = 'Invalid or missing route parameters.';
+  //   }
+  // }
 
   loadRouteParams(): void {
     const serviceIdParam = this.route.snapshot.paramMap.get('serviceId');
@@ -93,8 +129,6 @@ export class UserApplicationViewComponent implements OnInit {
       this.error = 'Invalid or missing route parameters.';
     }
   }
-
- 
   fetchApplicationDetails(): void {
   this.isLoading = true;
   this.error = null;
@@ -117,7 +151,9 @@ export class UserApplicationViewComponent implements OnInit {
           res.data &&
           typeof res.data === 'object'
         ) {
-          const appData = res.data;
+
+          this.serviceName= res?.service_name;
+          const appData = res?.data;;
 
           this.application = {
             ...appData,
@@ -133,6 +169,7 @@ export class UserApplicationViewComponent implements OnInit {
             total_fee: appData.total_fee || '0',
              history_data: res.history_data || null,
           };
+             this.checkDownloadUrlAvailability();
         } else {
           this.error = res?.message || 'No application details found.';
         }
@@ -192,7 +229,36 @@ previewFile(url: string): void {
   const amount = parseFloat(this.application.extra_payment);
   return !isNaN(amount) && amount > 0;
   }
-  downloadCertificate(): void {
+  // downloadCertificate(): void {
+  //   const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+  //   this.apiService.downloadServiceCertificate(this.appId).subscribe({
+  //     next: (res: any) => {
+  //       if (res?.download_url) {
+  //         const openPdf = baseUrl + res.download_url;
+  //         window.open(openPdf, '_blank');
+  //       } else {
+  //         Swal.fire({
+  //           icon: 'error',
+  //           title: 'Error',
+  //           text: 'PDF URL not found. Please try again.',
+  //           confirmButtonText: 'OK'
+  //         });
+  //       }
+  //     },
+  //     error: () => {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Download Failed',
+  //         text: 'Something went wrong while fetching the certificate.',
+  //         confirmButtonText: 'Retry'
+  //       });
+  //     }
+  //   });
+  // }
+
+   downloadCertificate(): void {
+    
+    
     const baseUrl = 'http://swaagatstaging.tripura.cloud/';
     this.apiService.downloadServiceCertificate(this.appId).subscribe({
       next: (res: any) => {

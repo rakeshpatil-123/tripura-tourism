@@ -217,10 +217,25 @@ export class UserProfileComponent implements OnInit {
     }
 
     switch (val.hierarchy_level) {
-      case 'district':
+      
+      case 'district1':
         payload.district_id = val.district_code;
         break;
-      case 'subdivision':
+      case 'district2':
+        payload.district_id = val.district_code;
+        break;
+      case 'district3':
+        payload.district_id = val.district_code;
+        break;
+      case 'subdivision1':
+        payload.district_id = val.district_code;
+        payload.subdivision_id = val.subdivision_code;
+        break;
+      case 'subdivision2':
+        payload.district_id = val.district_code;
+        payload.subdivision_id = val.subdivision_code;
+        break;
+      case 'subdivision3':
         payload.district_id = val.district_code;
         payload.subdivision_id = val.subdivision_code;
         break;

@@ -36,6 +36,7 @@ interface ApplicationDataItem {
   service_id: number;
   // keep original raw object in case you need it
   _raw?: any;
+  service_mode: string
 }
 
 @Component({
@@ -339,7 +340,13 @@ export class ApplicationSearchPageComponent implements OnInit {
             color: 'warn',
             visible: (row) => row.id != null,
             handler: (row: ApplicationDataItem) => {
-              this.router.navigate([`/dashboard/user-app-view`, row.service_id, row.id]);
+                const queryParams: any = {};
+            if (row.service_mode === 'third_party') {
+              queryParams.service = 'third_party';
+            }
+              this.router.navigate([`/dashboard/user-app-view`, row.service_id, row.id],  {
+                queryParams: queryParams,
+              });
             },
           },
         ],
