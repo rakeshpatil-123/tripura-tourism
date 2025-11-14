@@ -1,0 +1,14 @@
+<div class="chart-container">
+  @if (chartOptions) {
+    <apx-chart
+      #chart
+      [series]="chartOptions.series!"
+      [chart]="chartOptions.chart!"
+      [labels]="chartOptions.labels!"
+      [colors]="chartOptions.colors!"
+      [legend]="chartOptions.legend!"
+      [responsive]="chartOptions.responsive!"
+      [title]="chartOptions.title!"
+    ></apx-chart>
+  }
+</div>

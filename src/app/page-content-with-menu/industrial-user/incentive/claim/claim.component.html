@@ -19,9 +19,13 @@
     </div> -->
 
     <!-- Dynamic Table -->
-    <div class="mt-2">
+    <div class="mt-2" *ngIf="applications">
       <app-dynamic-table [data]="applications" [columns]="columns" [searchable]="true" [showPagination]="true"
         [pageSize]="5"></app-dynamic-table>
+    </div>
+    <div class="mt-4 " *ngIf="!applications">
+      <p class="info" >You need to apply for eligibility first. Once it’s approved by the department, you’ll be eligible to make a
+        claim!</p>
     </div>
   </div>
 </div>

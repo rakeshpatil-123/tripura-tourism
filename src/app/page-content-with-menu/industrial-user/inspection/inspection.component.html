@@ -1,4 +1,4 @@
-<div class="inspection-container">
+<!-- <div class="inspection-container">
   <app-confirmation-modal [isVisible]="showDeleteModal" title="Delete Inspection?"
     message="Are you sure you want to delete this inspection record?" confirmButtonText="Yes, Delete"
     (confirm)="onConfirmDelete()" (cancel)="onCancelDelete()" (close)="showDeleteModal = false">
@@ -69,12 +69,142 @@
     </div>
   </div>
 
-  <!-- Modal Dialog -->
   <ng-container *ngIf="isDialogOpen">
     <ng-container *ngTemplateOutlet="inspectionRequestDialog"></ng-container>
   </ng-container>
 
 </div>
+<ng-template #inspectionRequestDialog>
+  <div class="dialog-overlay" (click)="closeDialog()">
+    <div class="dialog-container" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2 class="page-head">{{ isEditing ? 'Edit Inspection Request' : 'Request for Inspection' }}</h2>
+        <button class="close-btn" (click)="closeDialog()">&times;</button>
+      </div>
+
+      <form [formGroup]="inspectionForm" class="inspection-form">
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-select formControlName="department_id" fieldLabel="Department" [mandatory]="true"
+              [selectOptions]="departments" placeholder="Select Department">
+            </app-ilogi-select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input-date formControlName="proposed_date" fieldLabel="Proposed Date" [mandatory]="true"
+              placeholder="DD/MM/YYYY">
+            </app-ilogi-input-date>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input formControlName="reason_for_request" fieldLabel="Reason for Request" [mandatory]="true"
+              [type]="'textarea'" placeholder="Enter reason for inspection request"
+              [errorMessages]="{ maxlength: 'Maximum 500 characters allowed' }">
+            </app-ilogi-input>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input formControlName="remarks" fieldLabel="Remarks" [mandatory]="false" [type]="'textarea'"
+              placeholder="Enter any additional remarks">
+            </app-ilogi-input>
+          </div>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeDialog()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="submitInspectionRequest()">
+            {{ isEditing ? 'Update Request' : 'Submit Request' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template> -->
+
+
+
+<div class="inspection-container">
+  <app-confirmation-modal [isVisible]="showDeleteModal" title="Delete Inspection?"
+    message="Are you sure you want to delete this inspection record?" confirmButtonText="Yes, Delete"
+    (confirm)="onConfirmDelete()" (cancel)="onCancelDelete()" (close)="showDeleteModal = false">
+  </app-confirmation-modal>
+  <h1 class="page-head">Inspection List</h1>
+  <div class="inspection-content">
+    <div class="list-header ">
+      <div class="filter-row">
+        <div class="filter-section">
+          <app-ilogi-input-date placeholder="DD/MM/YYYY" [mandatory]="false" fieldLabel="Date From" #dateFromPicker>
+          </app-ilogi-input-date>
+        </div>
+
+        <div class="filter-item date-to mb-2">
+          <app-ilogi-input-date fieldLabel="Date To" placeholder="DD/MM/YYYY" [mandatory]="false" #dateToPicker>
+          </app-ilogi-input-date>
+        </div>
+
+        <div>
+          <app-ilogi-select fieldId="deptId" placeholder="Select Department" [mandatory]="false"
+            [selectOptions]="departments" fieldLabel="Department" (change)="onDepartmentChange($event.value)">
+          </app-ilogi-select>
+        </div>
+
+        <div class="button-group mt-4">
+          <button type="button" class="btn-primary btn" (click)="applyFilters()">
+            Search
+          </button>
+          <button type="button" class="btn-secondary btn" (click)="resetFilters()">
+            Reset
+          </button>
+        </div>
+      </div>
+      <div class="header-actions mt-4">
+        <button type="primary" (click)="requestInspection()" class="btn btn-success">
+          Request for Inspection
+        </button>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="list-section">
+      <div class="tabs-container">
+        <mat-tab-group dynamicHeight>
+          <mat-tab label="Inspection List">
+            <div class="table-wrapper">
+              <app-dynamic-table [data]="inspectionListData" [columns]="inspectionColumns" [pageSize]="5"
+                [showPagination]="true" [searchable]="true">
+              </app-dynamic-table>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Inspection Request">
+            <div class="table-wrapper">
+              <app-dynamic-table [data]="inspectionRequestListData" [columns]="requestColumns" [pageSize]="5"
+                [showPagination]="true" [searchable]="true">
+              </app-dynamic-table>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dialogs -->
+  <ng-container *ngIf="isDialogOpen">
+    <ng-container *ngTemplateOutlet="inspectionRequestDialog"></ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="isConfirmDateDialogOpen">
+    <ng-container *ngTemplateOutlet="confirmDateDialog"></ng-container>
+  </ng-container>
+</div>
+
 <!-- Inspection Request Dialog Template -->
 <ng-template #inspectionRequestDialog>
   <div class="dialog-overlay" (click)="closeDialog()">
@@ -122,6 +252,56 @@
           <button type="button" class="btn btn-secondary" (click)="closeDialog()">Cancel</button>
           <button type="button" class="btn btn-primary" (click)="submitInspectionRequest()">
             {{ isEditing ? 'Update Request' : 'Submit Request' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Confirm Date Dialog Template -->
+<ng-template #confirmDateDialog>
+  <div class="dialog-overlay" (click)="closeConfirmDateDialog()">
+    <div class="dialog-container" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2 class="page-head">Confirm Inspection Date</h2>
+        <button class="close-btn" (click)="closeConfirmDateDialog()">&times;</button>
+      </div>
+
+      <form [formGroup]="confirmDateForm" class="inspection-form">
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input-date formControlName="inspection_date" fieldLabel="Inspection Date" [mandatory]="true"
+              placeholder="DD/MM/YYYY" [readonly]="!isConfirmDateEditing">
+            </app-ilogi-input-date>
+          </div>
+        </div>
+
+        <div class="form-row" *ngIf="isConfirmDateEditing">
+          <div class="form-field">
+            <app-ilogi-input formControlName="remarks" fieldLabel="Remarks" [mandatory]="false" [type]="'textarea'"
+              placeholder="Enter any additional remarks">
+            </app-ilogi-input>
+          </div>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeConfirmDateDialog()">Cancel</button>
+          
+          <!-- Confirm Date Button (when not editing) -->
+          <button *ngIf="!isConfirmDateEditing" type="button" class="btn btn-primary" (click)="confirmDate()">
+            Confirm Date
+          </button>
+          
+          <!-- Change Date Button (when not editing) -->
+          <button *ngIf="!isConfirmDateEditing" type="button" class="btn btn-warning" (click)="openChangeDateModal()">
+            Change Date
+          </button>
+          
+          <!-- Submit Changed Date Button (when editing) -->
+          <button *ngIf="isConfirmDateEditing" type="button" class="btn btn-primary" 
+            (click)="submitChangedDate()" [disabled]="confirmDateForm.invalid">
+            Submit Changed Date
           </button>
         </div>
       </form>

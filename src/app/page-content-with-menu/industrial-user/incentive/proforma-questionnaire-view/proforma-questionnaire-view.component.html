@@ -99,7 +99,7 @@
           <strong>Total Claim Amount:</strong> ₹{{ totalClaimAmount | number }}
         </div>
         }
-        @if(appData?.is_editable === true || appData === null && questionnaireData.length > 0) {
+        @if(questionnaireData.length > 0 && appData?.is_editable === true || appData === null  ) {
 
         <div class="mt-2">
           <button type="button" class="btn btn-secondary me-2" (click)="onSaveAsDraft()"
