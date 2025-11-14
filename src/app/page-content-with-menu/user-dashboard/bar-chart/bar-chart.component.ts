@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule, ChartComponent, ApexChart, ApexXAxis, ApexYAxis, ApexDataLabels, ApexPlotOptions, ApexGrid, ApexTitleSubtitle, ApexLegend } from 'ng-apexcharts';
-// import { DashboardService, DashboardSummary } from '../../../services/dashboard.service';
 
 export type BarChartOptions = {
   series: ApexAxisChartSeries;
@@ -30,12 +29,12 @@ export class BarChartComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-  
+   
       this.chartOptions = {
         series: [
           {
             name: 'Applications',
-            data: [5, 10, 15]
+            data: [2, 5, 6]
           }
         ],
         chart: {
@@ -101,5 +100,5 @@ export class BarChartComponent implements OnInit {
         }
       };
     };
-  
-}
+  }
+
