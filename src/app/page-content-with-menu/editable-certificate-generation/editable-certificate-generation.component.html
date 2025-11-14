@@ -1,0 +1,75 @@
+<div class="dialog-container" role="dialog" aria-labelledby="dialogTitle">
+  <div class="dialog-header flex items-center justify-between">
+    <h2 class="dialog-title">Edit Certificate Data</h2>
+    <button type="button" (click)="closeDialog()" class="close-btn" aria-label="Close dialog">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <form [formGroup]="form" (ngSubmit)="$event.preventDefault()" class="form-grid">
+      <ng-container *ngIf="variableList && variableList.length > 0; else fallbackFields">
+        <ng-container *ngFor="let v of variableList">
+          <div class="form-row" *ngIf="form.contains(v.key)">
+            <label class="field-label" [for]="v.key">{{ v.label }}</label>
+
+            <div class="field-input">
+              <ng-container [ngSwitch]="inputTypeForKey(v.key)">
+                <app-ilogi-input-date *ngSwitchCase="'date'" formControlName="{{ v.key }}" fieldId="{{ v.key }}"
+                  [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false"
+                  [readonly]="false" (ngModelChange)="updateLivePreview()">
+                </app-ilogi-input-date>
+                <input *ngSwitchCase="'email'" [formControlName]="v.key" type="email" class="input-field"
+                  (input)="updateLivePreview()" />
+                <input *ngSwitchCase="'tel'" [formControlName]="v.key" type="tel" class="input-field"
+                  (input)="updateLivePreview()" />
+
+                <input *ngSwitchCase="'number'" [formControlName]="v.key" type="number" class="input-field"
+                  (input)="updateLivePreview()" />
+                <textarea *ngSwitchCase="'textarea'" [formControlName]="v.key" rows="2" class="input-field resize-none"
+                  (input)="updateLivePreview()"></textarea>
+                <div *ngSwitchCase="'image'" class="image-field">
+                  <input type="file" accept="image/*" (change)="onImageSelected($event, v.key)" />
+                  <img *ngIf="form.get(v.key)?.value?.startsWith('data:image')" [src]="form.get(v.key)?.value"
+                    alt="{{ v.key }}" class="preview-image" />
+                </div>
+                <input *ngSwitchDefault [formControlName]="v.key" type="text" class="input-field"
+                  (input)="updateLivePreview()" />
+              </ng-container>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <ng-template #fallbackFields>
+        <p class="no-fields">
+          No variables or application data found. Form will populate when variables load.
+        </p>
+      </ng-template>
+    </form>
+    <div class="footer-buttons flex justify-end gap-3 mt-6 border-t pt-4">
+      <button pButton type="button"
+        class="p-button-outlined p-button-secondary px-5 py-2 text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
+        (click)="previewTemplate()">
+        <i class="pi pi-eye mr-2"></i>
+        Preview
+      </button>
+      <button pButton type="button"
+        class="p-button-success px-6 py-2 text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all"
+        (click)="generateCertificate()" [disabled]="generating">
+        <i class="pi pi-cog mr-2" *ngIf="!generating"></i>
+        <i class="pi pi-spin pi-spinner mr-2" *ngIf="generating"></i>
+        {{ generating ? 'Generating...' : 'Generate' }}
+      </button>
+
+      <button pButton type="button"
+        class="p-button-danger p-button-outlined px-5 py-2 text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
+        (click)="closeDialog()">
+        <i class="pi pi-times mr-2"></i>
+        Close
+      </button>
+    </div>
+  </div>
+</div>

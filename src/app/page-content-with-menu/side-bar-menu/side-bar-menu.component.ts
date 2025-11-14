@@ -207,7 +207,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       id: 'reports',
       title: 'Reports',
       icon: 'assessment',
-      roles: ['individual', 'department', 'moderator'],
+      roles: ['department', 'moderator'],
       children: [
         {
           id: 'sales-report',

@@ -8,6 +8,9 @@ import { GenericService } from '../../_service/generic/generic.service';
 import { LoaderService } from '../../_service/loader/loader.service';
 import { Router } from '@angular/router';
 import { DynamicTableComponent } from "../../shared/component/table/table.component";
+import { ConfirmDateDialogComponent } from '../confirm-date-dialog/confirm-date-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-departmental-inspection-list',
@@ -33,6 +36,7 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
   constructor(
     private genericService: GenericService,
     private loaderService: LoaderService,
+    private dialog: MatDialog,
     private router: Router
   ) { }
 
@@ -104,6 +108,14 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
           // visible: (row: any) => !!row.report_file_url,
           visible: (row: any) => !row.report_file_url,
           onClick: (row: any) => this.downloadReport(row),
+        },
+        {
+          label: (row: any) =>
+            row.department_type === 'joint' ? 'Suggest Date' : 'Confirm Date',
+          color: 'accent',
+          // visible: (row: any) => row.status !== 'pending',
+           visible: (row: any) => row.status === 'pending' || row.status === 'approved',
+          onClick: (row: any) => this.openConfirmDateDialog(row),
         },
       ],
     });
@@ -189,15 +201,41 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
     error: (err) => {
       const errorMessage =
         err?.error?.message ||
-        err?.message || 'Something went wrong while fetching inspection list.';
+        err?.message || 'Something went wrong while fetching the inspection list.';
       this.genericService.openSnackBar?.(errorMessage, 'error');
+      Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: errorMessage,
+        background: '#ffffff',
+        color: '#333',
+        iconColor: '#e53935',
+        showConfirmButton: true,
+        confirmButtonColor: '#e53935',
+        confirmButtonText: 'Okay',
+        backdrop: `
+      rgba(0,0,0,0.4)
+      left top
+      no-repeat
+    `,
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOut animate__faster'
+        }
+      });
+
+      this.loading = false;
+      this.loaderService.hideLoader();
     },
+
     complete: () => {
       this.loading = false;
       this.loaderService.hideLoader();
     },
   });
-}
+  }
 
 
   private formatLabel(key: string): string {
@@ -218,6 +256,70 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
       return;
     }
     window.open(row.report_file_url, '_blank');
+  }
+  openConfirmDateDialog(row: any): void {
+    const dialogRef = this.dialog.open(ConfirmDateDialogComponent, {
+      width: '700px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: '180vh',
+      data: { row },
+      panelClass: 'confirm-date-dialog-container',
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '200ms',
+      autoFocus: false,
+      restoreFocus: false,
+    });
+
+
+    dialogRef.afterClosed().subscribe(
+      (result: { selectedDates: string[]; remarks: string } | null) => {
+        if (!result || !result.selectedDates || result.selectedDates.length === 0) {
+          return;
+        }
+        let payload: any;
+
+        if (row.department_type === 'joint') {
+          payload = {
+            inspection_id: row.id,
+            proposed_date: result.selectedDates,
+            remarks: result.remarks,
+          };
+
+          this.loaderService.showLoader();
+          this.genericService.updateInspectionRequestStatus(payload).subscribe({
+            next: (res: any) => {
+              this.loaderService.hideLoader();
+              row.proposed_date = payload.proposed_date;
+              row.remarks = payload.remarks;
+              this.getApprovedInspections();
+            },
+            error: (err: any) => {
+              this.loaderService.hideLoader();
+            },
+          });
+        } else {
+          payload = {
+            id: row.id,
+            inspection_date: result.selectedDates[0],
+            remarks: result.remarks,
+          };
+
+          this.loaderService.showLoader();
+          this.genericService.updateInspectionRequesDateChangetStatus(payload).subscribe({
+            next: (res: any) => {
+              this.loaderService.hideLoader();
+              row.actual_date_of_inspection = payload.inspection_date;
+              row.remarks = payload.remarks;
+              this.getApprovedInspections();
+            },
+            error: (err: any) => {
+              this.loaderService.hideLoader();
+            },
+          });
+        }
+      }
+    );
   }
 
   deleteInspection(row: any): void {

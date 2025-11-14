@@ -13,14 +13,14 @@
 
             <app-ilogi-select fieldId="industryName" fieldLabel="Industry Name"
               [selectOptions]="industryOptions" [formControl]="industryName"
-              [placeholder]="'Select Industry'"></app-ilogi-select>
+              [placeholder]="'Select Industry'"[enableSearch]="true"></app-ilogi-select>
               <div class="filter-actions">
-                <button mat-raised-button class="apply-btn" (click)="applyFilters()">
+                <button class="apply-btn" mat-raised-button (click)="applyFilters()">
                   <mat-icon>search</mat-icon>
                   Apply Filters
                 </button>
 
-                <button mat-stroked-button class="reset-btn" (click)="resetFilters()">
+                <button class="reset-btn" mat-stroked-button (click)="resetFilters()">
                   <mat-icon>refresh</mat-icon>
                   Reset
                 </button>

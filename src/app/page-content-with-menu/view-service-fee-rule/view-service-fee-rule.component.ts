@@ -37,8 +37,6 @@ export class ViewServiceFeeRuleComponent implements OnInit, AfterViewInit {
     'condition_operator',
     'condition_value_start',
     'condition_value_end',
-    'fixed_fee',
-    'calculated_fee',
     'fixed_calculated_fee',
     'per_unit_fee',
     'priority',

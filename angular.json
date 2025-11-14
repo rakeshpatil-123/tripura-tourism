@@ -32,17 +32,23 @@
             "assets": [
               "src/assets",
               "src/favicon.ico",
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              { "glob": "**/*", "input": "public" }
             ],
             "styles": [
               "@angular/material/prebuilt-themes/magenta-violet.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-
               "src/styles.scss"
+            ],
+            "allowedCommonJsDependencies": [
+              "sweetalert2",
+              "canvg",
+              "core-js",
+              "raf",
+              "rgbcolor",
+              "pdfmake/build/vfs_fonts",
+              "@ckeditor/ckeditor5-build-classic",
+              "html2canvas"
             ]
           },
           "configurations": {
@@ -55,8 +61,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "50kB",
-                  "maximumError": "100kB"
+                  "maximumWarning": "200kB",
+                  "maximumError": "400kB"
                 },
                 {
                   "type": "any",
@@ -64,9 +70,11 @@
                   "maximumError": "6MB"
                 }
               ],
-
               "outputHashing": "all",
-              "serviceWorker": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json",
+              "optimization": true,
+              "extractLicenses": true,
+              "sourceMap": false
             },
             "development": {
               "optimization": false,
@@ -100,10 +108,7 @@
             "assets": [
               "src/assets",
               "src/favicon.ico",
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              { "glob": "**/*", "input": "public" }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
@@ -111,6 +116,16 @@
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "src/styles.scss",
               "node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "pdfmake/build/vfs_fonts",
+              "@ckeditor/ckeditor5-build-classic",
+              "html2canvas",
+              "sweetalert2",
+              "canvg",
+              "core-js",
+              "raf",
+              "rgbcolor"
             ]
           }
         }
