@@ -37,6 +37,11 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                     import('./nav-pages/information-wizard/information-wizard.component').then(m => m.InformationWizardComponent)
             },
             {
+                path: 'kya',
+                loadComponent: () =>
+                    import('./nav-pages/kya/kya.component').then(m => m.KYAComponent)
+            },
+            {
                 path: 'acts-rules',
                 loadComponent: () =>
                     import('./nav-pages/acts-rules/acts-rules.component').then(m => m.ActsRulesComponent)
