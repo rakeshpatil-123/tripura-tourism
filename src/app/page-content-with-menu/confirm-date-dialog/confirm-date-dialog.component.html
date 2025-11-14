@@ -1,0 +1,100 @@
+<div class="confirm-dialog">
+  <!-- ========================= -->
+  <!-- HEADER -->
+  <!-- ========================= -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">Confirm Inspection Date</h2>
+
+    <button class="dialog-close-btn" (click)="cancel()">
+      ✕
+    </button>
+  </div>
+
+  <!-- ========================= -->
+  <!-- BODY -->
+  <!-- ========================= -->
+  <div class="dialog-body" [formGroup]="form">
+    <!-- ========================= -->
+    <!-- JOINT MODE -->
+    <!-- ========================= -->
+    <ng-container *ngIf="isJoint; else singleMode">
+      <div formArrayName="selectedDates" class="date-list">
+        <div *ngFor="let group of selectedDatesArray.controls; let i = index" [formGroupName]="i" class="date-slot">
+          <div style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+      " class="date-input-wrapper">
+            <div style="flex: 0 0 75%;">
+              <app-ilogi-input-date fieldLabel="Select Date {{ i + 1 }}" fieldId="date_{{ i }}" placeholder="DD-MM-YYYY"
+                [monthsRange]="24" [allowFutureDates]="true" [readonly]="false" [mandatory]="false"
+                formControlName="date"></app-ilogi-input-date>
+            </div>
+            <div style="
+      flex: 0 0 25%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    ">
+              <button type="button" (click)="removeSlot(i)" *ngIf="selectedDatesArray.length > 1"
+                aria-label="Remove date" style="
+        width: 51px;
+        margin-top: 23px;
+        padding: 8px 0;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background-color: #ffffff; /* solid background */
+        color: #b91c1c;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      " onmouseover="this.style.backgroundColor='#fee2e2'; this.style.transform='scale(1.05)'"
+                onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='scale(1)'"
+                onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
+                ✕
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="add-btn-container">
+        <button type="button" class="add-btn" (click)="addSlot()" [disabled]="selectedDatesArray.length >= 3">
+          + Add Another Date
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- ========================= -->
+    <!-- SINGLE MODE -->
+    <!-- ========================= -->
+    <ng-template #singleMode>
+      <app-ilogi-input-date fieldLabel="Select Date" fieldId="single_date" placeholder="DD-MM-YYYY" [monthsRange]="24"
+        [allowFutureDates]="true" [readonly]="false" [mandatory]="false"
+        formControlName="singleDate"></app-ilogi-input-date>
+    </ng-template>
+
+    <!-- ========================= -->
+    <!-- REMARKS -->
+    <!-- ========================= -->
+    <div class="remarks-section">
+      <app-ilogi-input fieldId="remarks" fieldLabel="Remarks" formControlName="remarks"
+        placeholder="Enter remarks (e.g., date changed or updated)" type="text"></app-ilogi-input>
+    </div>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- ACTION BUTTONS -->
+  <!-- ========================= -->
+  <div class="dialog-actions">
+    <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+    <button type="button" class="confirm-btn" [disabled]="pickedCount() === 0" (click)="confirm()">
+      Confirm
+    </button>
+  </div>
+</div>

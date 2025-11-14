@@ -105,7 +105,7 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
       unitDistrict: ['',],
       unitSubDivision: ['',],
       riskCategory: ['',],
-      proposedDate: ['',],
+      proposedDates: this.fb.array([this.createDateControl()]),
       inspectionType: ['',],
       department: ['',],
       inspectionFor: ['',],
@@ -141,6 +141,30 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
     });
   }
 
+  get proposedDates(): FormArray {
+    return this.deptJointInspectionForm.get('proposedDates') as FormArray;
+  }
+
+  createDateControl() {
+    return this.fb.control(null);
+  }
+
+  addDate() {
+    if (this.proposedDates.length < 3) {
+      this.proposedDates.push(this.createDateControl());
+    }
+  }
+
+  removeDate(i: number) {
+    if (this.proposedDates.length > 1) {
+      this.proposedDates.removeAt(i);
+    }
+  }
+
+  formatToYMD(date: any): string {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
 
   onSubmit(): void {
     //  Optional: Enable this section if you want to validate before submit
@@ -175,11 +199,15 @@ export class AddDepartmentalJointInspectionComponent implements OnInit, OnDestro
 
     const formValue = this.deptJointInspectionForm.value;
 
-    const proposedDateArray = Array.isArray(formValue.proposedDate)
-      ? formValue.proposedDate.map((date: any) =>
-        this.formatDateToYYYYMMDD(date)
-      )
-      : [this.formatDateToYYYYMMDD(formValue.proposedDate)];
+    // const proposedDateArray = Array.isArray(formValue.proposedDate)
+    //   ? formValue.proposedDate.map((date: any) =>
+    //     this.formatDateToYYYYMMDD(date)
+    //   )
+    //   : [this.formatDateToYYYYMMDD(formValue.proposedDate)];
+    const proposedDateArray = this.proposedDates.value
+      .filter((d: any) => d)
+      .map((d: any) => this.formatToYMD(d));
+
 
     const payload = {
       department_id: this.deptId,

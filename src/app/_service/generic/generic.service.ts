@@ -1746,8 +1746,33 @@ getThirdPartyRedirect(url: string): Observable<string> {
       `${this.baseUrl}/api/get-unit-details`, { id: unitId }, { headers: this.getHeaders() }
     )
   }
-  // getInspection(id: number | string): Observable<InspectionResponse> {
-  //   return this.http.get<InspectionResponse>(`${this.baseUrl}/${id}`);
-  // }
-
+  getCertificateGenerationVariables(): any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/certificate-variables-list`, {}, { headers: this.getHeaders() }
+    )
+  }
+  getCertificateApplicationData(appId: any): any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/certificate-view`, { application_id: appId }, { headers: this.getHeaders() }
+    )
+  }
+  generateCertificate(payload: any): any {
+    return this.http.post(
+      `${this.baseUrl}/api/department/generate-certificate`, payload, { headers: this.getHeaders() }
+    )
+  }
+  updateInspectionRequestStatus(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department/update-joint-inspection`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+  updateInspectionRequesDateChangetStatus(body: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/api/department/inspection-date-update-by-inspector`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
 }

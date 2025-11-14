@@ -57,7 +57,7 @@ export class DepartmentalInspectionRequestComponent implements OnInit, OnChanges
           {
             label: 'Approve',
             color: 'success',
-            visible: (row: any) => row.status?.toLowerCase() === 'pending',
+            visible: (row: any) => row.status?.toLowerCase() === 'pending' || row.status?.toLowerCase() === 're_submitted',
             onClick: (row: any) => this.updateInspectionStatus(row, 'approved')
           },
           {
