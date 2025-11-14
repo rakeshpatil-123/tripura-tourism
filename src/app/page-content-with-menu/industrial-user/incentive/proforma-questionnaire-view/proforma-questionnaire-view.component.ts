@@ -94,7 +94,7 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Resolved URLs:', this.resolvedFileUrls);
+    // console.log('Resolved URLs:', this.resolvedFileUrls);
     const proformaId = this.route.snapshot.paramMap.get('proformaId');
     const schemeId = this.route.snapshot.paramMap.get('schemeId');
     const appType = this.route.snapshot.queryParamMap.get('proforma_type');
@@ -173,6 +173,9 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
                 parsedOptions,
               };
             });
+
+            console.log(this.questionnaireData.length, "aye");
+            
 
             this.groupQuestions();
             this.buildFormGroup();

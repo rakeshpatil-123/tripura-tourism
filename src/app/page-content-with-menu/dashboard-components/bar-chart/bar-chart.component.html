@@ -1,0 +1,17 @@
+<div class="chart-container">
+  @if (chartOptions) {
+    <apx-chart
+      #chart
+      [series]="chartOptions.series!"
+      [chart]="chartOptions.chart!"
+      [xaxis]="chartOptions.xaxis!"
+      [yaxis]="chartOptions.yaxis!"
+      [dataLabels]="chartOptions.dataLabels!"
+      [plotOptions]="chartOptions.plotOptions!"
+      [colors]="chartOptions.colors!"
+      [grid]="chartOptions.grid!"
+      [legend]="chartOptions.legend!"
+      [title]="chartOptions.title!"
+    ></apx-chart>
+  }
+</div>

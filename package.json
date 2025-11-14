@@ -35,6 +35,7 @@
     "gsap": "^3.13.0",
     "jspdf": "^3.0.2",
     "moment": "^2.30.1",
+    "ng-apexcharts": "^2.0.3",
     "ngx-cookie-service": "^20.0.1",
     "ngx-mat-select-search": "^8.0.3",
     "pdfmake": "^0.2.20",
