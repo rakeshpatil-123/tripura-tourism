@@ -225,6 +225,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['individual'] }
       },
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./industrial-user/all-payments/all-payments.component').then(
+            (m) => m.AllPaymentsComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
+      },
       // {
       //   path: 'demo',
       //   loadComponent: () =>

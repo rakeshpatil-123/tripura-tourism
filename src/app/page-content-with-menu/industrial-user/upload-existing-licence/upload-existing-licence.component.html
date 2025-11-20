@@ -1,5 +1,7 @@
-
-
+@if(isLoading){
+  <app-loader></app-loader>
+}
+@else{
 <div class="view-col">
   <div class="header-actions mt-4">
     <h1 class="page-head">Upload Existing Licence</h1>
@@ -158,4 +160,4 @@
       </form>
     </div>
   </div>
-</ng-template>
+</ng-template>}

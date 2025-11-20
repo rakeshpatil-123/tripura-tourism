@@ -33,7 +33,8 @@ export type ColumnType =
   | 'file'
   | 'action'
   | 'custom'
-  | 'icon';
+  | 'icon'
+  | 'view-link';
 
 export interface TableColumn {
   key: string;
@@ -44,9 +45,9 @@ export interface TableColumn {
   format?: (value: any, row: any) => string;
   linkHref?: (row: any) => string;
   linkText?: (row: any) => string;
-
-  icon?: string;            
-  onClick?: (row: any) => void; 
+  linkQueryParams?: (row: any) => { [key: string]: any };
+  icon?: string;
+  onClick?: (row: any) => void;
 
   actions?: Array<{
     label: string;
@@ -76,13 +77,21 @@ export interface TableRowAction {
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatMenuModule, MatButtonModule, IlogiSelectComponent, MatIcon, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatMenuModule,
+    MatButtonModule,
+    IlogiSelectComponent,
+    MatIcon,
+    ReactiveFormsModule,
+  ],
 })
 export class DynamicTableComponent implements OnChanges {
   @Input() data: any[] = [];
   @Input() columns: TableColumn[] = [];
- private _pageSize = 10;
-  @Input() 
+  private _pageSize = 10;
+  @Input()
   set pageSize(value: number) {
     this._pageSize = value;
     this.applyPagination();
@@ -92,17 +101,17 @@ export class DynamicTableComponent implements OnChanges {
   }
   @Input() showPagination: boolean = true;
   @Input() searchable: boolean = true;
-@Input() filterColumnKey?: string;           // e.g., 'status'
-@Input() filterLabel: string = '';   // Label for dropdown
-@Input() filterOptions: Array<{ id: any; name: string }> = [];  // Options
-@Input() filterPlaceholder: string = 'Select...'; // Placeholder
+  @Input() filterColumnKey?: string; // e.g., 'status'
+  @Input() filterLabel: string = ''; // Label for dropdown
+  @Input() filterOptions: Array<{ id: any; name: string }> = []; // Options
+  @Input() filterPlaceholder: string = 'Select...'; // Placeholder
 
- @Input() selectedFilterValue: any = null;
-//   get selectedFilterValue(): any {
-//   return this._selectedFilterValue;
-// }
+  @Input() selectedFilterValue: any = null;
+  //   get selectedFilterValue(): any {
+  //   return this._selectedFilterValue;
+  // }
   @Output() rowAction = new EventEmitter<TableRowAction>();
-pageSizes = [5, 10, 20, 30, 40, 50];
+  pageSizes = [5, 10, 20, 30, 40, 50];
   filteredData: any[] = [];
   paginatedData: any[] = [];
   currentPage: number = 1;
@@ -161,36 +170,36 @@ pageSizes = [5, 10, 20, 30, 40, 50];
   // }
 
   applyFilters(): void {
-  let result = [...this.data];
+    let result = [...this.data];
 
-  // 🔹 1. Apply select filter (if active)
-  if (this.filterColumnKey && this.selectedFilterValue !== null) {
-    result = result.filter(row => {
-      const cellValue = row[this.filterColumnKey!];
-      return cellValue == this.selectedFilterValue; // '==' to match string/number
-    });
+    // 🔹 1. Apply select filter (if active)
+    if (this.filterColumnKey && this.selectedFilterValue !== null) {
+      result = result.filter((row) => {
+        const cellValue = row[this.filterColumnKey!];
+        return cellValue == this.selectedFilterValue; // '==' to match string/number
+      });
+    }
+
+    // 🔹 2. Apply search term (existing)
+    if (this.searchable && this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
+      result = result.filter((row) =>
+        Object.values(row).some((val) =>
+          String(val).toLowerCase().includes(term)
+        )
+      );
+    }
+
+    // 🔹 3. Apply sorting (existing)
+    if (this.sortColumn) {
+      const col = this.columns.find((c) => c.key === this.sortColumn);
+      result.sort((a, b) => this.sortData(a, b, this.sortColumn!, col?.type));
+    }
+
+    this.filteredData = result;
+    this.currentPage = 1;
+    this.applyPagination();
   }
-
-  // 🔹 2. Apply search term (existing)
-  if (this.searchable && this.searchTerm) {
-    const term = this.searchTerm.toLowerCase();
-    result = result.filter((row) =>
-      Object.values(row).some((val) =>
-        String(val).toLowerCase().includes(term)
-      )
-    );
-  }
-
-  // 🔹 3. Apply sorting (existing)
-  if (this.sortColumn) {
-    const col = this.columns.find((c) => c.key === this.sortColumn);
-    result.sort((a, b) => this.sortData(a, b, this.sortColumn!, col?.type));
-  }
-
-  this.filteredData = result;
-  this.currentPage = 1;
-  this.applyPagination();
-}
 
   applyPagination(): void {
     if (!this.showPagination) {
@@ -335,11 +344,19 @@ pageSizes = [5, 10, 20, 30, 40, 50];
 
       case 'link':
         const href = column.linkHref ? column.linkHref(row) : '#';
+        const queryParams = column.linkQueryParams
+          ? column.linkQueryParams(row)
+          : {};
         const text = column.linkText
           ? column.linkText(row)
           : String(value || href);
+            let fullHref = href;
+        if (Object.keys(queryParams).length > 0) {
+          const queryString = new URLSearchParams(queryParams).toString();
+          fullHref = queryString ? `${href}?${queryString}` : href;
+        }
         return this.sanitizer.bypassSecurityTrustHtml(
-          `<a href="${href}" class="table-link">${text}</a>`
+          `<a href="${fullHref}" class="table-link">${text}</a>`
         );
 
       case 'file':
@@ -351,6 +368,18 @@ pageSizes = [5, 10, 20, 30, 40, 50];
           `<a href="${this.sanitizeUrl(
             fileHref
           )}" target="_blank" class="table-file">📎 ${fileName}</a>`
+        );
+
+      case 'view-link':
+        if (value) {
+          return this.sanitizer.bypassSecurityTrustHtml(
+            `<button class="btn btn-success" onclick="window.open('${this.sanitizeUrl(
+              value
+            )}', '_blank')" type="button">View</button>`
+          );
+        }
+        return this.sanitizer.bypassSecurityTrustHtml(
+          '<span class="text-muted">—</span>'
         );
 
       default:
@@ -416,7 +445,7 @@ pageSizes = [5, 10, 20, 30, 40, 50];
       label: string;
       handler?: (row: any) => void;
       onClick?: (row: any) => void;
-      visible?: (row: any) => boolean; // ✅ Added for type safety
+      visible?: (row: any) => boolean;
     },
     row: any
   ): void {
@@ -468,27 +497,25 @@ pageSizes = [5, 10, 20, 30, 40, 50];
     return inputs;
   }
 
-// shouldShowActionMenu(col: TableColumn, row: any): boolean {
-//   if (!col.actions || col.actions.length === 0) return false;
+  // shouldShowActionMenu(col: TableColumn, row: any): boolean {
+  //   if (!col.actions || col.actions.length === 0) return false;
 
-//   // Show menu if at least one action is visible (or has no visible condition)
-//   return col.actions.some(action => 
-//     !action.visible || action.visible(row)
-//   );
-// }
+  //   // Show menu if at least one action is visible (or has no visible condition)
+  //   return col.actions.some(action =>
+  //     !action.visible || action.visible(row)
+  //   );
+  // }
 
-shouldEnableActionMenu(col: TableColumn, row: any): boolean {
-  if (!col.actions || col.actions.length === 0) return false;
+  shouldEnableActionMenu(col: TableColumn, row: any): boolean {
+    if (!col.actions || col.actions.length === 0) return false;
 
-  return col.actions.some(action => 
-    !action.visible || action.visible(row)
-  );
-}
-
-getActionLabel(action: any, row: any): string {
-  if (typeof action.label === 'function') {
-    return action.label(row);
+    return col.actions.some((action) => !action.visible || action.visible(row));
   }
-  return action.label || 'Action';
-}
+
+  getActionLabel(action: any, row: any): string {
+    if (typeof action.label === 'function') {
+      return action.label(row);
+    }
+    return action.label || 'Action';
+  }
 }

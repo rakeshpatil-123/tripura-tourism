@@ -1,4 +1,6 @@
-<div class="mt-2">
+@if(isLoading){
+  <app-loader></app-loader>
+}@else{<div class="mt-2">
     <h1 class="page-head" >Workflow History</h1>
   <app-dynamic-table
     [searchable]="true"
@@ -7,4 +9,4 @@
     [showPagination]="true"
     [pageSize]="5">
   </app-dynamic-table>
-</div>
+</div>}

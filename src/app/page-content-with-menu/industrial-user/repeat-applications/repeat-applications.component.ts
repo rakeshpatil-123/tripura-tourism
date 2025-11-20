@@ -4,10 +4,11 @@ import { DynamicTableComponent } from '../../../shared/component/table/table.com
 import { GenericService } from '../../../_service/generic/generic.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { LoaderComponent } from '../../../page-template/loader/loader.component';
 
 @Component({
   selector: 'app-repeat-applications',
-  imports: [DynamicTableComponent, CommonModule],
+  imports: [DynamicTableComponent, CommonModule, LoaderComponent],
   templateUrl: './repeat-applications.component.html',
   styleUrl: './repeat-applications.component.scss',
   standalone: true,
@@ -15,14 +16,13 @@ import { CommonModule } from '@angular/common';
 export class RepeatApplicationsComponent implements OnInit {
   serviceId!: number;
   applications: any[] = [];
-  loading = true;
+  loading: boolean = true;
   constructor(
     private route: ActivatedRoute,
     private apiService: GenericService,
     private router: Router
   ) {}
   columns: any[] = [];
-
   ngOnInit(): void {
     this.serviceId = Number(this.route.snapshot.paramMap.get('serviceid'));
     if (!this.serviceId) {
@@ -35,6 +35,7 @@ export class RepeatApplicationsComponent implements OnInit {
   }
 
   loadApplications(): void {
+    this.loading = true;
     const userId = this.apiService.getDecryptedUserId();
     if (!userId) {
       this.apiService.openSnackBar('User not authenticated', 'error');
@@ -52,6 +53,7 @@ export class RepeatApplicationsComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data)) {
+
             this.applications = res.data;
             this.buildColumns();
           } else {
@@ -129,7 +131,7 @@ export class RepeatApplicationsComponent implements OnInit {
           },
         },
         {
-          label: 'Re-apply',
+          label: 'Re-Submit',
           color: 'warn',
           visible: (row: any) => row.status === 'send_back',
           onClick: (row: any) => {

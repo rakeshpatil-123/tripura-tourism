@@ -9,20 +9,21 @@ import {
 } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LoaderComponent } from '../../../../page-template/loader/loader.component';
 
 @Component({
   selector: 'app-eligibility',
   templateUrl: './claim.component.html',
   styleUrls: ['./claim.component.scss'],
   standalone: true,
-  imports: [CommonModule, DynamicTableComponent, FormsModule, CommonModule],
+  imports: [CommonModule, DynamicTableComponent, FormsModule, CommonModule, LoaderComponent],
 })
 export class ClaimComponent implements OnInit {
   schemes: SelectOption[] = [];
   selectedSchemeId: number | null = null;
   applications: any[] = [];
   columns: any[] = [];
-
+  isLoading: boolean = false;
   constructor(private appiService: GenericService, private router: Router) {}
 
   ngOnInit(): void {
@@ -31,11 +32,14 @@ export class ClaimComponent implements OnInit {
   }
 
   loadEligibilityProforma(): void {
+    this.isLoading = true;
     this.appiService
       .getByConditions({}, 'api/user/incentive/claim-proforma-list')
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data)) {
+            this.isLoading = false;
+
             this.applications = res.data.map((item: any, index: number) => ({
               slNo: index + 1,
               applicationCode: item.application_code || '—',
@@ -69,6 +73,7 @@ export class ClaimComponent implements OnInit {
             'Failed to load eligibility proforma',
             'Close'
           );
+          this.isLoading = false;
         },
       });
   }
@@ -141,7 +146,6 @@ export class ClaimComponent implements OnInit {
         label: 'Status',
         type: 'text',
         width: '180px',
-     
       },
       {
         key: 'applicationNo',
@@ -164,9 +168,8 @@ export class ClaimComponent implements OnInit {
           {
             label: 'Re Apply',
             color: 'primary',
-            visible: (row: any) => row.isReapply === true ,
+            visible: (row: any) => row.isReapply === true,
             onClick: (row: any) => {
-
               const navigationCommands = [
                 '/dashboard/proforma-questionnaire-view',
                 row.ProformaId,
@@ -174,7 +177,7 @@ export class ClaimComponent implements OnInit {
               ];
 
               const queryParams: any = {
-                proforma_type: "claim",
+                proforma_type: 'claim',
               };
 
               // if (
@@ -191,7 +194,7 @@ export class ClaimComponent implements OnInit {
           {
             label: 'Apply',
             color: 'primary',
-            visible: (row: any) => row.isEdit === true ,
+            visible: (row: any) => row.isEdit === true,
             onClick: (row: any) => {
               console.log(row.proformaType);
 
@@ -202,7 +205,7 @@ export class ClaimComponent implements OnInit {
               ];
 
               const queryParams: any = {
-                proforma_type: "claim",
+                proforma_type: 'claim',
               };
 
               if (
@@ -218,7 +221,7 @@ export class ClaimComponent implements OnInit {
           },
           {
             label: 'View',
-            visible: (row: any) => row.isEdit === false ,
+            visible: (row: any) => row.isEdit === false,
 
             color: 'primary',
             onClick: (row: any) => {
@@ -245,12 +248,21 @@ export class ClaimComponent implements OnInit {
               this.router.navigate(navigationCommands, { queryParams });
             },
           },
-           {
+          {
             label: 'History',
-            visible: (row: any) => row.applicationId && row.applicationId !== '_' && row.applicationId !== null,
+            visible: (row: any) =>
+              row.applicationId &&
+              row.applicationId !== '_' &&
+              row.applicationId !== null &&
+              row.status !== 'Draft',
             color: 'accent',
-             onClick: (row: any) => {this.router.navigate(['/dashboard/workflow-history', row.applicationId]);}
-          }
+            onClick: (row: any) => {
+              this.router.navigate([
+                '/dashboard/workflow-history',
+                row.applicationId,
+              ]);
+            },
+          },
         ],
       },
     ];

@@ -24,6 +24,7 @@ import { IlogiFileUploadComponent } from '../../../customInputComponents/ilogi-f
 import { IlogiInputDateComponent } from '../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { IlogiCheckboxComponent } from '../../../customInputComponents/ilogi-checkbox/ilogi-checkbox.component';
 import { ConfirmationModalComponent } from '../../../shared/component/confirmation-modal/confirmation-modal.component';
+import { LoaderComponent } from '../../../page-template/loader/loader.component';
 
 interface ValidationRule {
   type: string;
@@ -92,6 +93,7 @@ interface SectionGroup {
     MatDialogModule,
     MatButtonModule,
     ConfirmationModalComponent,
+    LoaderComponent
   ],
   templateUrl: './service-application.component.html',
   styleUrl: './service-application.component.scss',
@@ -122,7 +124,7 @@ export class ServiceApplicationComponent implements OnInit {
   groupedQuestions: { [group: string]: ServiceQuestion[] } = {};
   sectionGroups: SectionGroup[] = [];
   serviceId!: number;
-  loading = true;
+  loading: boolean = false;
   visible = false;
   readonlyFields: { [key: number]: boolean } = {};
   private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
@@ -170,6 +172,7 @@ export class ServiceApplicationComponent implements OnInit {
   }
 
   loadServiceDetails(): void {
+    this.loading = true;
     const payload = { service_id: this.serviceId };
 
     this.apiService

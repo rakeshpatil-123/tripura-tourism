@@ -1,11 +1,16 @@
 <div class="swgt-container">
-  <div>
-    <h1 class="page-head">List All Services</h1>
-  </div>
 
- 
+  @if (isLoading) {
+    <app-loader></app-loader>
+  }@else{
 
-  <app-dynamic-table
+    <div>
+      <h1 class="page-head">List All Services</h1>
+    </div>
+    
+    
+    
+    <app-dynamic-table
     [data]="ApplicationData"
     [columns]="ApplicationColumns"
     [searchable]="true"
@@ -16,6 +21,7 @@
     [filterOptions]="filterOptions"
     [selectedFilterValue]="selectedNocType"
     fieldLabel="Filter by NOC Type"
-  >
+    >
   </app-dynamic-table>
+}
 </div>

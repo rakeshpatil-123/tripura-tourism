@@ -1,7 +1,7 @@
 <div class="dashboard-page">
   <div class="dashboard-header">
+    <p class="subtitle">Welcome to the</p>
     <h1>Dashboard</h1>
-    <p class="subtitle">Welcome to the Dashboard</p>
   </div>
 
   <!-- Summary Cards Section -->
@@ -11,36 +11,33 @@
 
   <!-- Charts Section -->
   <section class="dashboard-section charts-section">
-    <div class="charts-grid">
+    <!-- <div class="charts-grid">
       <div class="chart-item">
-        <!-- <app-line-chart></app-line-chart> -->
         <app-bar-chart></app-bar-chart>
 
       </div>
       <div class="chart-item">
         <app-pie-chart></app-pie-chart>
       </div>
-    </div>
+    </div> -->
+    <app-line-chart></app-line-chart>
   </section>
 
-  <!-- Second Row Charts Section -->
   <section class="dashboard-section charts-section">
-    <div class="charts-grid">
-      <div class="chart-item">
-        <!-- <app-bar-chart></app-bar-chart> -->
-      </div>
-      <div class="chart-item">
-        <!-- <app-horizontal-bar-chart></app-horizontal-bar-chart> -->
-      </div>
+    <div class="table-h">
+    <p class="" >  Clarification Raised </p>
+    <app-dynamic-table [data]="clarification_required" [columns]="columns" [searchable]="false" [showPagination]="true"
+        [pageSize]="5"></app-dynamic-table>
+    </div>
+  </section>
+  <section class="dashboard-section charts-section">
+    <div class="table-h">
+    <p class="" >  Pending Payment</p>
+    <app-dynamic-table  [searchable]="false" [showPagination]="true"
+        [pageSize]="5"></app-dynamic-table>
     </div>
   </section>
 
-  <!-- Tables Section -->
-  <section class="dashboard-section">
-    <!-- <app-claim-status-table></app-claim-status-table> -->
-  </section>
+ 
 
-  <section class="dashboard-section">
-    <!-- <app-clarification-table></app-clarification-table> -->
-  </section>
 </div>

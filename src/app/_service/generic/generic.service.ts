@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
 export class GenericService {
   // API URLs (same as provided)
   static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud'; 
+  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
@@ -85,13 +85,10 @@ export class GenericService {
   }
 
   registerUser(userData: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/user/register`,
-      userData,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<any>(`${this.baseUrl}/api/user/register`, userData, {
+      headers: this.getHeaders(),
+    });
   }
-
 
   loginAdmin(adminData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/api/user/login`, adminData);
@@ -175,13 +172,15 @@ export class GenericService {
   //   }
   // }
 
-   decryptLocalStorageItem(key: string): string {
+  decryptLocalStorageItem(key: string): string {
     try {
       const encryptedValue = localStorage.getItem(key);
-      
+
       // If key doesn't exist, return empty string (not null)
       if (!encryptedValue) {
-        console.warn(`Encrypted value not found in localStorage for key: "${key}"`);
+        console.warn(
+          `Encrypted value not found in localStorage for key: "${key}"`
+        );
         return '';
       }
 
@@ -194,8 +193,6 @@ export class GenericService {
       return ''; // Always return string — never null
     }
   }
-
-
 
   // getByConditions(conditionParams: any, apiObject: string): Observable<any> {
   //   const token = localStorage.getItem('token');
@@ -250,31 +247,36 @@ export class GenericService {
   //     );
   // }
 
+  getByConditions(conditionParams: any, apiObject: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
 
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
 
-getByConditions(conditionParams: any, apiObject: string): Observable<any> {
-  const token = localStorage.getItem('token');
-  let headers = new HttpHeaders();
+    if (!(conditionParams instanceof FormData)) {
+      headers = headers.set('Content-Type', 'application/json');
+    }
 
-  if (token) {
-    headers = headers.set(
-      'Authorization',
-      `Bearer ${this.decryptData(token)}`
-    );
-  }
-
-  if (!(conditionParams instanceof FormData)) {
-    headers = headers.set('Content-Type', 'application/json');
-  }
-
-  return this.http.post(`${this.baseUrl}/${apiObject}`, conditionParams, {
-    headers,
-  }).pipe(
+    return this.http
+      .post(`${this.baseUrl}/${apiObject}`, conditionParams, {
+        headers,
+      })
+      .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.error && typeof error.error === 'object') {
             const message = error.error.message;
 
-            if (message === 'Unauthenticated.' || message === 'Unauthorised' || message === 'Session expired or logged out' || message === 'Session expired due to inactivity') {
+            if (
+              message === 'Unauthenticated.' ||
+              message === 'Unauthorised' ||
+              message === 'Session expired or logged out' ||
+              message === 'Session expired due to inactivity'
+            ) {
               console.warn(
                 'Session expired or invalid. Redirecting to login...'
               );
@@ -286,27 +288,75 @@ getByConditions(conditionParams: any, apiObject: string): Observable<any> {
           }
 
           return throwError(() => error);
-        }));
-}
-
-
-getThirdPartyRedirect(url: string): Observable<string> {
-  const token = localStorage.getItem('token');
-  let headers = new HttpHeaders();
-
-  if (token) {
-    headers = headers.set('Authorization', `Bearer ${this.decryptData(token)}`);
+        })
+      );
   }
 
-  return this.http.post<string>(
-    `${this.baseUrl}/${url}`, 
-    {}, 
-    { 
-      responseType: 'text' as 'json', 
-      headers 
+  postPublicApi(conditionParams: any, apiObject: string): Observable<any> {
+    // const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    // if (token) {
+    //   headers = headers.set(
+    //     'Authorization',
+    //     `Bearer ${this.decryptData(token)}`
+    //   );
+    // }
+
+    if (!(conditionParams instanceof FormData)) {
+      headers = headers.set('Content-Type', 'application/json');
     }
-  );
-}
+
+    return this.http
+      .post(`${this.baseUrl}/${apiObject}`, conditionParams, {
+        headers,
+      })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.error && typeof error.error === 'object') {
+            const message = error.error.message;
+
+            if (
+              message === 'Unauthenticated.' ||
+              message === 'Unauthorised' ||
+              message === 'Session expired or logged out' ||
+              message === 'Session expired due to inactivity'
+            ) {
+              console.warn(
+                'Session expired or invalid. Redirecting to login...'
+              );
+              this.handleUnauthenticated();
+            }
+          } else if (error.status === 401) {
+            console.warn('401 Unauthorized. Redirecting to login...');
+            this.handleUnauthenticated();
+          }
+
+          return throwError(() => error);
+        })
+      );
+  }
+
+  getThirdPartyRedirect(url: string): Observable<string> {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+
+    return this.http.post<string>(
+      `${this.baseUrl}/${url}`,
+      {},
+      {
+        responseType: 'text' as 'json',
+        headers,
+      }
+    );
+  }
 
   private handleUnauthenticated(): void {
     localStorage.clear();
@@ -344,7 +394,7 @@ getThirdPartyRedirect(url: string): Observable<string> {
       duration: 3000,
       verticalPosition: 'top',
       horizontalPosition: 'center',
-      panelClass: [panelClass, 'snack-bar-global']
+      panelClass: [panelClass, 'snack-bar-global'],
     });
   }
 
@@ -483,6 +533,16 @@ getThirdPartyRedirect(url: string): Observable<string> {
   //   }
   // }
 
+userDashData(): Observable<any> {
+  const uid = localStorage.getItem('userId');
+  const payload = { user_id: uid };
+  
+  return this.getByConditions(
+    payload,
+    `api/user/get-total-applications-by-user`
+  );
+}
+
   postWithoutAuth(apiObject: string, body: any = {}): Observable<any> {
     return this.http.post(`${this.baseUrl}/${apiObject}`, body);
   }
@@ -505,7 +565,9 @@ getThirdPartyRedirect(url: string): Observable<string> {
       next: (res: any) => {
         Swal.fire({
           title: 'Logging Out...',
-          html: `<strong>${res.message || 'You have been successfully logged out.'}</strong>`,
+          html: `<strong>${
+            res.message || 'You have been successfully logged out.'
+          }</strong>`,
           timer: 2500,
           timerProgressBar: true,
           allowOutsideClick: false,
@@ -514,15 +576,15 @@ getThirdPartyRedirect(url: string): Observable<string> {
             Swal.showLoading();
           },
           showClass: {
-            popup: 'animate__animated animate__fadeInDown'
+            popup: 'animate__animated animate__fadeInDown',
           },
           hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
+            popup: 'animate__animated animate__fadeOutUp',
           },
           background: '#f0f4f8',
           color: '#1e293b',
           iconColor: '#10b981',
-          icon: 'success'
+          icon: 'success',
         }).then(() => {
           this.removeSessionData();
           this.router.navigate(['/']);
@@ -541,20 +603,20 @@ getThirdPartyRedirect(url: string): Observable<string> {
             Swal.showLoading();
           },
           showClass: {
-            popup: 'animate__animated animate__fadeInDown'
+            popup: 'animate__animated animate__fadeInDown',
           },
           hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
+            popup: 'animate__animated animate__fadeOutUp',
           },
           background: '#fff7ed',
           color: '#b45309',
           iconColor: '#f59e0b',
-          icon: 'warning'
+          icon: 'warning',
         }).then(() => {
           this.removeSessionData();
           this.router.navigate(['/']);
         });
-      }
+      },
     });
   }
 
@@ -577,11 +639,11 @@ getThirdPartyRedirect(url: string): Observable<string> {
         Swal.showLoading();
       },
       showClass: {
-        popup: 'animate__animated animate__fadeInDown animate__faster'
+        popup: 'animate__animated animate__fadeInDown animate__faster',
       },
       hideClass: {
-        popup: 'animate__animated animate__fadeOutUp animate__faster'
-      }
+        popup: 'animate__animated animate__fadeOutUp animate__faster',
+      },
     }).then(() => {
       this.router.navigate(['/page/login']);
     });
@@ -1403,13 +1465,15 @@ getThirdPartyRedirect(url: string): Observable<string> {
   }
   updateProfile(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.baseUrl}/api/user/profile-update`, payload,
+      `${this.baseUrl}/api/user/profile-update`,
+      payload,
       { headers: this.getHeaders() }
     );
   }
   changePassword(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.baseUrl}/api/user/change-password`, payload,
+      `${this.baseUrl}/api/user/change-password`,
+      payload,
       { headers: this.getHeaders() }
     );
   }
@@ -1428,32 +1492,24 @@ getThirdPartyRedirect(url: string): Observable<string> {
     );
   }
   addHoliday(body: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/holidays-store`,
-      body,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<any>(`${this.baseUrl}/api/holidays-store`, body, {
+      headers: this.getHeaders(),
+    });
   }
   updateHoliday(body: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/holidays-update`,
-      body,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<any>(`${this.baseUrl}/api/holidays-update`, body, {
+      headers: this.getHeaders(),
+    });
   }
   viewHolidays(id: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/holidays-view`,
-      id,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<any>(`${this.baseUrl}/api/holidays-view`, id, {
+      headers: this.getHeaders(),
+    });
   }
   deleteHoliday(id: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/holiday-delete`,
-      id,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<any>(`${this.baseUrl}/api/holiday-delete`, id, {
+      headers: this.getHeaders(),
+    });
   }
 
   generateServiceCertificateGenerate(body: any): Observable<any> {
@@ -1503,7 +1559,7 @@ getThirdPartyRedirect(url: string): Observable<string> {
         department_id: deptId,
         page: page,
       },
-     { headers: this.getHeaders() }
+      { headers: this.getHeaders() }
     );
   }
 
@@ -1519,7 +1575,7 @@ getThirdPartyRedirect(url: string): Observable<string> {
     return this.http.post<any>(
       `${this.baseUrl}/api/admin/incentive/proforma-list`,
       {
-        scheme_id: proformaId
+        scheme_id: proformaId,
       },
       { headers: this.getHeaders() }
     );
@@ -1592,8 +1648,7 @@ getThirdPartyRedirect(url: string): Observable<string> {
     return this.http.post<any>(
       `${this.baseUrl}/api/admin/incentive/proforma-questionnaire-view`,
       {
-        proforma_id:
-          proformaId
+        proforma_id: proformaId,
       },
       { headers: this.getHeaders() }
     );
@@ -1659,20 +1714,22 @@ getThirdPartyRedirect(url: string): Observable<string> {
     return this.http.post<any>(
       `${this.baseUrl}/api/admin/get-department-user-details`,
       {
-        id: deptUserId
+        id: deptUserId,
       },
       { headers: this.getHeaders() }
     );
   }
   updateBusinessUserStatus(userId: any) {
     return this.http.post<any>(
-      `${this.baseUrl}/api/admin/update-user-status/${userId.id}`, {},
+      `${this.baseUrl}/api/admin/update-user-status/${userId.id}`,
+      {},
       { headers: this.getHeaders() }
     );
   }
   updateDepartmentalUserStatus(userId: any) {
     return this.http.post<any>(
-      `${this.baseUrl}/api/admin/update-user-status/${userId.id}`, {},
+      `${this.baseUrl}/api/admin/update-user-status/${userId.id}`,
+      {},
       { headers: this.getHeaders() }
     );
   }
@@ -1680,14 +1737,15 @@ getThirdPartyRedirect(url: string): Observable<string> {
     return this.http.post<any>(
       `${this.baseUrl}/api/admin/fetch-questionnaire-section`,
       {
-        service_id: serviceId
+        service_id: serviceId,
       },
       { headers: this.getHeaders() }
     );
   }
   updateAdminServiceStatus(serviceId: any) {
     return this.http.post<any>(
-      `${this.baseUrl}/api/admin/update-service-status/${serviceId.id}`, {},
+      `${this.baseUrl}/api/admin/update-service-status/${serviceId.id}`,
+      {},
       { headers: this.getHeaders() }
     );
   }
@@ -1697,7 +1755,7 @@ getThirdPartyRedirect(url: string): Observable<string> {
       {},
       {
         headers: this.getHeaders(),
-        responseType: 'blob'
+        responseType: 'blob',
       }
     );
   }
@@ -1707,59 +1765,79 @@ getThirdPartyRedirect(url: string): Observable<string> {
       {},
       {
         headers: this.getHeaders(),
-        responseType: 'blob'
+        responseType: 'blob',
       }
     );
   }
-  getAllIncentiveApplications() : any {
+  getAllIncentiveApplications(): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/incentive/applications`,{}, {headers: this.getHeaders()}
-    )
+      `${this.baseUrl}/api/department/incentive/applications`,
+      {},
+      { headers: this.getHeaders() }
+    );
   }
-  changeIncentiveStatus(payload: any) : any {
+  changeIncentiveStatus(payload: any): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/incentive/update-application-status`,payload, {headers: this.getHeaders()}
-    )
+      `${this.baseUrl}/api/department/incentive/update-application-status`,
+      payload,
+      { headers: this.getHeaders() }
+    );
   }
   getViewDetailsOfIncentive(applicationId: any): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/incentive/application-details`, { application_id: applicationId }, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/department/incentive/application-details`,
+      { application_id: applicationId },
+      { headers: this.getHeaders() }
+    );
   }
   getAllInspectorList(deptId: any): any {
     return this.http.post(
-      `${this.baseUrl}/api/inspectors-by-department`, { department_id: deptId }, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/inspectors-by-department`,
+      { department_id: deptId },
+      { headers: this.getHeaders() }
+    );
   }
   getUnitsList(): any {
     return this.http.post(
-      `${this.baseUrl}/api/unit-list`, {}, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/unit-list`,
+      {},
+      { headers: this.getHeaders() }
+    );
   }
   getUnitDetails(unitId: number): any {
     return this.http.post(
-      `${this.baseUrl}/api/get-unit-details`, { id: unitId }, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/get-unit-details`,
+      { id: unitId },
+      { headers: this.getHeaders() }
+    );
   }
   getInspection(unitId: number | string): any {
     return this.http.post(
-      `${this.baseUrl}/api/get-unit-details`, { id: unitId }, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/get-unit-details`,
+      { id: unitId },
+      { headers: this.getHeaders() }
+    );
   }
   getCertificateGenerationVariables(): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/certificate-variables-list`, {}, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/department/certificate-variables-list`,
+      {},
+      { headers: this.getHeaders() }
+    );
   }
   getCertificateApplicationData(appId: any): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/certificate-view`, { application_id: appId }, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/department/certificate-view`,
+      { application_id: appId },
+      { headers: this.getHeaders() }
+    );
   }
   generateCertificate(payload: any): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/generate-certificate`, payload, { headers: this.getHeaders() }
-    )
+      `${this.baseUrl}/api/department/generate-certificate`,
+      payload,
+      { headers: this.getHeaders() }
+    );
   }
   updateInspectionRequestStatus(body: any): Observable<any> {
     return this.http.post<any>(

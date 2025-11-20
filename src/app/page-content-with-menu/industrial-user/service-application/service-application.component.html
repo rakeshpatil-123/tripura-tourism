@@ -1,4 +1,8 @@
 <div class="swgt-container">
+  @if(loading){
+  <app-loader></app-loader>
+  }@else{
+
   <!-- Add this at the bottom of your template -->
   <app-confirmation-modal [isVisible]="showConfirmModal" [title]="modalConfig.title" [message]="modalConfig.message"
     [confirmButtonText]="modalConfig.confirmButtonText" [cancelButtonText]="modalConfig.cancelButtonText"
@@ -29,10 +33,10 @@
                 q.question_type === 'number' ||
                 q.question_type === 'email' ||
                 q.question_type === 'textarea'
-              " [formControlName]="q.id" [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                " [formControlName]="q.id" [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
                 [type]="q.question_type" [errorMessages]="{
-                pattern: q.validation_rule?.errorMessage || 'Invalid input.'
-              }"></app-ilogi-input>
+                  pattern: q.validation_rule?.errorMessage || 'Invalid input.'
+                }"></app-ilogi-input>
 
               <!-- Date -->
               <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
@@ -44,9 +48,9 @@
                 [readonly]="true">
               </app-ilogi-input-date>
               <app-ilogi-input-date *ngIf="q.question_type === 'date_yyyymmdd'" [formControlName]="q.id"
-                [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" [submitted]="serviceForm.touched"
-                [readonly]="true">
-              </app-ilogi-input-date> -->
+              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" [submitted]="serviceForm.touched"
+              [readonly]="true">
+            </app-ilogi-input-date> -->
               <!-- File Upload -->
               <ng-container *ngIf="q.question_type === 'file'">
                 <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
@@ -114,10 +118,10 @@
                             q.question_type === 'number' ||
                             q.question_type === 'email' ||
                             q.question_type === 'textarea'
-                          " [formControlName]="q.id" [fieldLabel]="q.question_label"
+                            " [formControlName]="q.id" [fieldLabel]="q.question_label"
                             [mandatory]="q.is_required === 'yes'" [type]="q.question_type" [errorMessages]="{
-                            pattern: q.validation_rule?.errorMessage || 'Invalid input.'
-                          }"></app-ilogi-input>
+                              pattern: q.validation_rule?.errorMessage || 'Invalid input.'
+                            }"></app-ilogi-input>
 
                           <!-- Date -->
                           <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
@@ -125,11 +129,11 @@
                             [submitted]="serviceForm.touched"></app-ilogi-input-date>
 
                           <!-- <app-ilogi-input-date *ngIf="q.question_type === 'date_mmdd'" [formControlName]="q.id"
-                            [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
-                            [submitted]="serviceForm.touched" [readonly]="true">
-                          </app-ilogi-input-date>
+                          [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                          [submitted]="serviceForm.touched" [readonly]="true">
+                        </app-ilogi-input-date>
 
-                          <app-ilogi-input-date *ngIf="q.question_type === 'date_yyyymmdd'" [formControlName]="q.id"
+                        <app-ilogi-input-date *ngIf="q.question_type === 'date_yyyymmdd'" [formControlName]="q.id"
                             [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
                             [submitted]="serviceForm.touched" [readonly]="false">
                           </app-ilogi-input-date> -->
@@ -206,4 +210,5 @@
       </div>
     </form>
   </ng-template>
+  }
 </div>

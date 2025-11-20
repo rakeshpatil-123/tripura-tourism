@@ -10,6 +10,7 @@ import { IlogiInputComponent } from '../../../../customInputComponents/ilogi-inp
 import { IlogiRadioComponent } from '../../../../customInputComponents/ilogi-radio/ilogi-radio.component';
 import { IlogiInputDateComponent } from '../../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { CommonModule } from '@angular/common';
+import { LoaderComponent } from '../../../../page-template/loader/loader.component';
 
 interface FileMeta {
   file_id: string;
@@ -64,6 +65,7 @@ interface Question {
     IlogiInputDateComponent,
     CommonModule,
     ReactiveFormsModule,
+    LoaderComponent
   ],
 })
 export class ProformaQuestionnaireViewComponent implements OnInit {
@@ -77,7 +79,7 @@ export class ProformaQuestionnaireViewComponent implements OnInit {
   questionnaireData: Question[] = [];
   groupedQuestions: { [key: string]: Question[] } = {};
   proformaForm!: FormGroup;
-  loading = false;
+  loading: boolean = false;
   error: string | null = null;
   readonlyFields: { [questionId: number]: boolean } = {};
   // resolvedFileUrls: { [id: number]: string } = {};

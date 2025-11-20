@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { TransactionHistoryDialogComponent } from './transaction-history';
 import Swal from 'sweetalert2';
+import { LoaderComponent } from '../../../page-template/loader/loader.component';
 
 interface ApplicationDataItem {
   id: number;
@@ -34,7 +35,6 @@ interface ApplicationDataItem {
   noc_master_id: string;
   nocMasterId: string;
   service_id: number;
-  // keep original raw object in case you need it
   _raw?: any;
   service_mode: string
 }
@@ -51,6 +51,7 @@ interface ApplicationDataItem {
     IlogiSelectComponent,
     IlogiInputDateComponent,
     ButtonComponent,
+    LoaderComponent
   ],
 })
 export class ApplicationSearchPageComponent implements OnInit {
@@ -98,7 +99,7 @@ export class ApplicationSearchPageComponent implements OnInit {
     },
   };
 
-  loading = false;
+  loading:boolean = false;
   loadingDepartments = false;
   appId: number | null = null;
   noDataMessage = 'No applications found';
