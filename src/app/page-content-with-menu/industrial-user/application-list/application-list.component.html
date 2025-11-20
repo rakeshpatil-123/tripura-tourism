@@ -1,4 +1,6 @@
-<div class="swgt-container page-card">
+@if(loading){
+    <app-loader></app-loader>
+}@else{<div class="swgt-container page-card">
   <div class="page-header">
     <h1 class="page-head">Application List</h1>
   </div>
@@ -70,4 +72,4 @@
       </ng-template>
     </ng-template>
   </div>
-</div>
+</div>}

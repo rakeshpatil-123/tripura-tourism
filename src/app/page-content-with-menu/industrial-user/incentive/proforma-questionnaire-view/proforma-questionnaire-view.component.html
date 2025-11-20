@@ -1,6 +1,6 @@
 <div class="swgt-container">
   <ng-container *ngIf="loading; else formTemplate">
-    <div class="text-center">Loading questionnaire...</div>
+   <app-loader></app-loader>
   </ng-container>
 
   <ng-template #formTemplate>

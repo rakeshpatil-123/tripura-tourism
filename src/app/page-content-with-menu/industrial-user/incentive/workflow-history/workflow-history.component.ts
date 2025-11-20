@@ -2,16 +2,17 @@ import { Component } from '@angular/core';
 import { DynamicTableComponent } from '../../../../shared/component/table/table.component';
 import { GenericService } from '../../../../_service/generic/generic.service';
 import { ActivatedRoute } from '@angular/router';
+import { LoaderComponent } from '../../../../page-template/loader/loader.component';
 
 @Component({
   selector: 'app-workflow-history',
-  imports: [DynamicTableComponent],
+  imports: [DynamicTableComponent, LoaderComponent],
   templateUrl: './workflow-history.component.html',
   styleUrl: './workflow-history.component.scss',
 })
 export class WorkflowHistoryComponent {
   applications: any[] = [];
-  
+  isLoading: boolean = false;
   columns = [
     { key: 'date', label: 'Date' },
     { key: 'from_status', label: 'From Status' },
@@ -37,6 +38,7 @@ export class WorkflowHistoryComponent {
   }
 
   private fetchWorkflowHistory(): void {
+    this.isLoading = true
     this.apiService
       .getByConditions(
         { application_id: this.application_id },
@@ -54,6 +56,7 @@ export class WorkflowHistoryComponent {
             this.applications = [];
             this.apiService.openSnackBar(res?.message || 'No workflow history found.', 'info');
           }
+          this.isLoading = false
         },
         error: (err) => {
           console.error('Error fetching workflow history:', err);

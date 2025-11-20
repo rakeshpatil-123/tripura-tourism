@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
+import { LoaderComponent } from '../../../page-template/loader/loader.component';
 
 
 interface HistoryData {
@@ -53,7 +54,7 @@ interface ApplicationDetail {
   templateUrl: './user-application-view.component.html',
   styleUrls: ['./user-application-view.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
 })
 export class UserApplicationViewComponent implements OnInit {
   serviceId: number | null = null;

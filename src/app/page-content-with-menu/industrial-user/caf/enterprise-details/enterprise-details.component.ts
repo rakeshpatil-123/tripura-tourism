@@ -10,6 +10,7 @@ import { IlogiInputComponent } from '../../../../customInputComponents/ilogi-inp
 import { IlogiInputDateComponent } from '../../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { GenericService } from '../../../../_service/generic/generic.service';
 import { CommonModule } from '@angular/common';
+import { LoaderComponent } from '../../../../page-template/loader/loader.component';
 
 @Component({
   selector: 'app-enterprise-form',
@@ -21,11 +22,13 @@ import { CommonModule } from '@angular/common';
     IlogiInputDateComponent,
     ReactiveFormsModule,
     CommonModule,
+    LoaderComponent,
   ],
 })
 export class EnterpriseDetailsComponent implements OnInit {
   enterpriseForm!: FormGroup;
   submitted = false;
+  isLoading: boolean = false;
 
   constitutionOptions = [
     { id: 'Pvt. Ltd', name: 'Pvt. Ltd' },
@@ -66,104 +69,47 @@ export class EnterpriseDetailsComponent implements OnInit {
     this.loadEnterpriseDetails();
   }
 
-  // loadEnterpriseDetails(): void {
-  //   this.apiService
-  //     .getByConditions({}, 'api/caf/core-application-show-enterprise-detail')
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         if (res && res.data) {
-  //           const data = res.data;
-
-  //           this.enterpriseForm = this.fb.group({
-  //             constitution: [
-  //               data.constitution_of_enterprise || '',
-  //               Validators.required,
-  //             ],
-  //             enterpriseName: [data.enterprise_name || '', Validators.required],
-  //             businessPan: [data.business_pan_no || '', Validators.required],
-
-  //             registeredAddress: [data.enterprise_address || ''],
-  //             habitation: [data.habitation_area_building || ''],
-  //             pin: [
-  //               data.pin || '',
-  //               [Validators.required, Validators.pattern(/^[0-9]{6}$/)],
-  //             ],
-  //             postOffice: [data.post_office || '', Validators.required],
-  //             policeStation: [data.police_station || '', Validators.required],
-
-  //             repName: [
-  //               data.authorized_representative_name || '',
-  //               Validators.required,
-  //             ],
-  //             designation: [data.authorized_representative_designation || ''],
-  //             aadhar: [
-  //               data.authorized_representative_aadhar_no || '',
-  //               [Validators.required, Validators.pattern(/^[0-9]{12}$/)],
-  //             ],
-  //             mobile: [
-  //               data.authorized_representative_mobile_no || '',
-  //               [Validators.required, Validators.pattern(/^[0-9]{10}$/)],
-  //             ],
-  //             phone: [data.authorized_representative_phone_no || ''],
-  //             email: [
-  //               data.authorized_representative_email_id || '',
-  //               [Validators.required, Validators.email],
-  //             ],
-  //             altMobile: [
-  //               data.authorized_representative_alternate_mobile_no || '',
-  //             ],
-  //             proposalFor: [data.proposal_for || '', Validators.required],
-  //             commissioningDate: [
-  //               data.proposed_date_of_commissioning
-  //                 ? new Date(data.proposed_date_of_commissioning)
-  //                 : '',
-  //               Validators.required,
-  //             ],
-  //           });
-  //         }
-  //       },
-  //       error: (err: any) => {
-  //         console.error('Failed to load enterprise details:', err);
-  //       },
-  //     });
-  // }
-
   loadEnterpriseDetails(): void {
-  this.apiService
-    .getByConditions({}, 'api/caf/core-application-show-enterprise-detail')
-    .subscribe({
-      next: (res: any) => {
-        if (res && res.data) {
-          const data = res.data;
+    this.isLoading = true;
+    this.apiService
+      .getByConditions({}, 'api/caf/core-application-show-enterprise-detail')
+      .subscribe({
+        next: (res: any) => {
+          if (res && res.data) {
+            this.isLoading = false;
 
-          this.enterpriseForm.patchValue({
-            constitution: data.constitution_of_enterprise || '',
-            enterpriseName: data.enterprise_name || '',
-            businessPan: data.business_pan_no || '',
-            registeredAddress: data.enterprise_address || '',
-            habitation: data.habitation_area_building || '',
-            pin: data.pin || '',
-            postOffice: data.post_office || '',
-            policeStation: data.police_station || '',
-            repName: data.authorized_representative_name || '',
-            designation: data.authorized_representative_designation || '',
-            aadhar: data.authorized_representative_aadhar_no || '',
-            mobile: data.authorized_representative_mobile_no || '',
-            phone: data.authorized_representative_phone_no || '',
-            email: data.authorized_representative_email_id || '',
-            altMobile: data.authorized_representative_alternate_mobile_no || '',
-            proposalFor: data.proposal_for || '',
-            commissioningDate: data.proposed_date_of_commissioning
-              ? new Date(data.proposed_date_of_commissioning)
-              : '',
-          });
-        }
-      },
-      error: (err: any) => {
-        console.error('Failed to load enterprise details:', err);
-      },
-    });
-}
+            const data = res.data;
+
+            this.enterpriseForm.patchValue({
+              constitution: data.constitution_of_enterprise || '',
+              enterpriseName: data.enterprise_name || '',
+              businessPan: data.business_pan_no || '',
+              registeredAddress: data.enterprise_address || '',
+              habitation: data.habitation_area_building || '',
+              pin: data.pin || '',
+              postOffice: data.post_office || '',
+              policeStation: data.police_station || '',
+              repName: data.authorized_representative_name || '',
+              designation: data.authorized_representative_designation || '',
+              aadhar: data.authorized_representative_aadhar_no || '',
+              mobile: data.authorized_representative_mobile_no || '',
+              phone: data.authorized_representative_phone_no || '',
+              email: data.authorized_representative_email_id || '',
+              altMobile:
+                data.authorized_representative_alternate_mobile_no || '',
+              proposalFor: data.proposal_for || '',
+              commissioningDate: data.proposed_date_of_commissioning
+                ? new Date(data.proposed_date_of_commissioning)
+                : '',
+            });
+          }
+        },
+        error: (err: any) => {
+          console.error('Failed to load enterprise details:', err);
+          this.isLoading = false;
+        },
+      });
+  }
 
   onSave(isDraft: boolean = false): void {
     this.submitted = true;

@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { DynamicTableComponent } from '../../../shared/component/table/table.component';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { Router } from '@angular/router';
+import { LoaderComponent } from '../../../page-template/loader/loader.component';
 
 @Component({
   selector: 'app-services',
-  imports: [DynamicTableComponent],
+  imports: [DynamicTableComponent, LoaderComponent],
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.scss'],
   standalone: true,
@@ -18,7 +19,7 @@ export class ServicesComponent {
   filterPlaceholder = 'Select NOC Type';
   filterOptions: Array<{ id: any; name: string }> = [];
   selectedNocType: any = null;
-
+  isLoading: boolean = false;
   constructor(private apiService: GenericService, private router: Router) {}
 
   ngOnInit(): void {
@@ -26,9 +27,11 @@ export class ServicesComponent {
   }
 
   allServices(): void {
+    this.isLoading = true;
     this.apiService.getByConditions({}, 'api/fetch-all-services').subscribe({
       next: (response: any) => {
         if (response?.status === 1 && Array.isArray(response.data)) {
+          this.isLoading = false;
           this.ApplicationData = response.data.map((item: any) => ({
             ...item,
             allow_repeat_application_display:
@@ -47,8 +50,10 @@ export class ServicesComponent {
           this.createColumns(this.ApplicationData);
         }
       },
+
       error: (error) => {
         console.error('Error fetching services:', error);
+        this.isLoading = false;
       },
     });
   }
@@ -227,8 +232,8 @@ export class ServicesComponent {
 
   formatLabel(key: string): string {
     if (key === 'id') {
-    return '#'; 
-  }
+      return '#';
+    }
     return key
       .replace(/_([a-z])/g, (match, letter) => ` ${letter.toUpperCase()}`)
       .replace(/^./, (str) => str.toUpperCase());
@@ -238,8 +243,8 @@ export class ServicesComponent {
     switch (key) {
       case 'service_title_or_description':
         return '200px';
-         case 'id': 
-      return '60px';
+      case 'id':
+        return '60px';
       case 'actions':
         return '120px';
       default:
@@ -250,18 +255,19 @@ export class ServicesComponent {
   onApply(row: any): void {
     if (row.service_mode === 'third_party') {
       this.apiService
-        .getThirdPartyRedirect(`api/user/third-party-apply/${row.id}`).subscribe({
-        next: (html) => {
-          const temp = document.createElement('div');
-          temp.innerHTML = html;
-          document.body.appendChild(temp);
-          const form = temp.querySelector('form');
-          if (form) form.submit();
-        },
-        error: (err) => {
-          this.apiService.openSnackBar('Redirect failed.', 'error');
-        },
-      });
+        .getThirdPartyRedirect(`api/user/third-party-apply/${row.id}`)
+        .subscribe({
+          next: (html) => {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            document.body.appendChild(temp);
+            const form = temp.querySelector('form');
+            if (form) form.submit();
+          },
+          error: (err) => {
+            this.apiService.openSnackBar('Redirect failed.', 'error');
+          },
+        });
       return;
     }
 

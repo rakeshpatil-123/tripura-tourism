@@ -1,5 +1,8 @@
 <!-- eligibility.component.html -->
 <div class="">
+    @if(isLoading){
+    <app-loader></app-loader>
+  }@else {
   <div>
     <h1 class="page-head">APPLY FOR CLAIM</h1>
 
@@ -28,4 +31,5 @@
         claim!</p>
     </div>
   </div>
+}
 </div>

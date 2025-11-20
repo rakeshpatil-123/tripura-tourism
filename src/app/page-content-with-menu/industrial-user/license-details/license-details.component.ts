@@ -3,10 +3,11 @@ import { DynamicTableComponent } from '../../../shared/component/table/table.com
 import { CommonModule } from '@angular/common';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { ActivatedRoute } from '@angular/router';
+import { LoaderComponent } from '../../../page-template/loader/loader.component';
 
 @Component({
   selector: 'app-license-details',
-  imports: [DynamicTableComponent, CommonModule],
+  imports: [DynamicTableComponent, CommonModule, LoaderComponent],
   templateUrl: './license-details.component.html',
   styleUrl: './license-details.component.scss',
 })
@@ -58,6 +59,8 @@ export class LicenseDetailsComponent {
           this.applications = [];
           console.error('Failed to load Details:', err);
           this.apiService.openSnackBar('Failed to load Details', 'error');
+          this.loading = false;
+
         },
       });
   }
