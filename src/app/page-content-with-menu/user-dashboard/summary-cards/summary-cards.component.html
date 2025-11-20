@@ -1,0 +1,14 @@
+<div class="summary-cards">
+  @for (card of cards; track card.title) {
+    <div class="card" [attr.data-color]="card.color">
+      <div class="card-header">
+        <div class="icon">{{ card.icon }}</div>
+        <div class="title">{{ card.title }}</div>
+      </div>
+      <div class="card-body">
+        <div class="value">{{ card.value }}</div>
+        <div class="change">{{ card.change }}</div>
+      </div>
+    </div>
+  }
+</div>

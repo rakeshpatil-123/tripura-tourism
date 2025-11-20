@@ -48,6 +48,8 @@ export class ClaimComponent implements OnInit {
               appliedOn: item.applied_on || '_',
               approvedOn: item.approved_on || '_',
               ProformaId: item.proforma_id || '_',
+              approvedAmount: item.approved_amount || '_',
+              claimedAmount: item.claimed_amount || '_',
               schemeId: item.scheme_id || '_',
               applicationId: item.application_id || '_',
               isEdit: item.is_editable || false,
@@ -113,6 +115,18 @@ export class ClaimComponent implements OnInit {
       {
         key: 'appliedOn',
         label: 'Applied On',
+        type: 'text',
+        width: '150px',
+      },
+      {
+        key: 'claimedAmount',
+        label: 'Caimed Amount',
+        type: 'text',
+        width: '150px',
+      },
+      {
+        key: 'approvedAmount',
+        label: 'Approved Amount',
         type: 'text',
         width: '150px',
       },

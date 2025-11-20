@@ -23,9 +23,7 @@ export class ViewRenewalFeeRuleComponent implements OnInit {
   displayedColumns: string[] = [
     'id',
     'feeType',
-    'fixedFee',
     'condition',
-    'calculatedFee',
     'perUnitFee',
     'priority',
     'status',

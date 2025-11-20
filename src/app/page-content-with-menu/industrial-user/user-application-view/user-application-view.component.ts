@@ -229,32 +229,6 @@ previewFile(url: string): void {
   const amount = parseFloat(this.application.extra_payment);
   return !isNaN(amount) && amount > 0;
   }
-  // downloadCertificate(): void {
-  //   const baseUrl = 'http://swaagatstaging.tripura.cloud/';
-  //   this.apiService.downloadServiceCertificate(this.appId).subscribe({
-  //     next: (res: any) => {
-  //       if (res?.download_url) {
-  //         const openPdf = baseUrl + res.download_url;
-  //         window.open(openPdf, '_blank');
-  //       } else {
-  //         Swal.fire({
-  //           icon: 'error',
-  //           title: 'Error',
-  //           text: 'PDF URL not found. Please try again.',
-  //           confirmButtonText: 'OK'
-  //         });
-  //       }
-  //     },
-  //     error: () => {
-  //       Swal.fire({
-  //         icon: 'error',
-  //         title: 'Download Failed',
-  //         text: 'Something went wrong while fetching the certificate.',
-  //         confirmButtonText: 'Retry'
-  //       });
-  //     }
-  //   });
-  // }
 
    downloadCertificate(): void {
     

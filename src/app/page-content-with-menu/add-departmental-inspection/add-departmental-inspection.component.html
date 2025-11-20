@@ -9,7 +9,7 @@
           </div>
         <div class="grid-container">
           <app-ilogi-select fieldId="unitName" fieldLabel="Unit Name" [mandatory]="true" formControlName="unitName"
-            [selectOptions]="unitOptions" placeholder="Select unit name">
+            [selectOptions]="unitOptions" placeholder="Select unit name" [enableSearch]="true">
           </app-ilogi-select>
 
           <app-ilogi-input fieldId="unitAddress" class="mt-20" fieldLabel="Unit Address" formControlName="unitAddress"
@@ -29,12 +29,12 @@
           </app-ilogi-input>
         </div>
       </div>
-      <div class="section">
+      <!-- <div class="section">
         <h3 class="section-title">Upcoming Inspection Details</h3>
         <app-dynamic-table [data]="upcomingInspections" [columns]="inspectionColumns" [pageSize]="5"
           [showPagination]="false" [searchable]="false">
         </app-dynamic-table>
-      </div>
+      </div> -->
       <div class="section">
         <h3 class="section-title">Inspection Details</h3>
         <div class="grid-container">
@@ -50,11 +50,11 @@
 
 
           <app-ilogi-select fieldId="inspector" fieldLabel="Inspector" [mandatory]="true" formControlName="inspector"
-            [selectOptions]="inspectors" placeholder="Select inspector">
+            [selectOptions]="inspectors" placeholder="Select inspector" [enableSearch]="true">
           </app-ilogi-select>
 
           <app-ilogi-select fieldId="inspectionFor" fieldLabel="Inspection For" [mandatory]="true"
-            formControlName="inspectionFor" [selectOptions]="inspectionForOptions" placeholder="Select inspection for">
+            formControlName="inspectionFor" [selectOptions]="inspectionForOptions" placeholder="Select inspection for" [enableSearch]="true">
           </app-ilogi-select>
 
           <app-ilogi-input fieldId="remarks" fieldLabel="Remarks" type="textarea" formControlName="remarks"

@@ -13,6 +13,9 @@ import { MatIcon } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { IlogiFileUploadComponent } from '../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
 import { MatButton } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { InspectionReportComponent } from '../inspection-report/inspection-report.component';
+import { EditableCertificateGenerationComponent } from '../editable-certificate-generation/editable-certificate-generation.component';
 
 interface StatusActionModal {
   visible: boolean;
@@ -59,6 +62,7 @@ export class ServiceViewComponent implements OnInit {
     private router: Router,
     private apiService: GenericService,
     private fb: FormBuilder,
+    public dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {
     this.remarkForm = this.fb.group({
@@ -450,6 +454,28 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
           text: 'Something went wrong while fetching the certificate.',
           confirmButtonText: 'Retry'
         });
+      }
+    });
+  }
+  editCertificateGeneration(): void {
+    const dialogRef = this.dialog.open(EditableCertificateGenerationComponent, {
+      width: '80vw',
+      height: '90vh',
+      maxWidth: '1200px',
+      panelClass: 'custom-dialog',
+      enterAnimationDuration: '400ms',
+      exitAnimationDuration: '400ms',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      data: this.applicationData,
+      disableClose: false,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'generated') {
+        console.log('Certificate is generated!');
+      } else {
+        console.log('Dialog closed without generation.');
       }
     });
   }

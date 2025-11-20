@@ -10,7 +10,7 @@
 
         <div class="grid-container">
           <app-ilogi-select fieldId="unitName" fieldLabel="Unit Name" [mandatory]="true" formControlName="unitName"
-            [selectOptions]="unitOptions" placeholder="Select unit name">
+            [selectOptions]="unitOptions" placeholder="Select unit name" [enableSearch]="true">
           </app-ilogi-select>
 
           <app-ilogi-input fieldId="unitAddress" class="mt-20" [readonly]="true" fieldLabel="Unit Address"
@@ -34,28 +34,88 @@
           </app-ilogi-select> -->
         </div>
       </div>
-      <div class="section">
+      <!-- <div class="section">
         <h3 class="section-title">Upcoming Inspection Details</h3>
         <app-dynamic-table [data]="upcomingInspections" [columns]="inspectionColumns" [pageSize]="5"
           [showPagination]="false" [searchable]="false">
         </app-dynamic-table>
-      </div>
+      </div> -->
       <div class="section">
         <h3 class="section-title">Inspection Details</h3>
         <div class="grid-container">
-          <app-ilogi-input-date fieldId="proposedDate" [disabledDates]="holidays" class="mt-5" fieldLabel="Proposed Date" formControlName="proposedDate"
+          <!-- <app-ilogi-input-date fieldId="proposedDate" [disabledDates]="holidays" class="mt-5" fieldLabel="Proposed Date" formControlName="proposedDate"
             placeholder="DD/MM/YYYY">
-          </app-ilogi-input-date>
+          </app-ilogi-input-date> -->
+       <!-- ============================= -->
+<!--  PROPOSED DATES (MAX 3)       -->
+<!-- ============================= -->
+
+<div class="proposed-dates-wrapper" formArrayName="proposedDates">
+
+  <h4 class="sub-section-title">Proposed Dates (Max 3)</h4>
+
+  <div class="dates-grid">
+
+    <div
+      class="date-item"
+      *ngFor="let ctrl of proposedDates.controls; let i = index"
+    >
+      <app-ilogi-input-date
+        [disabledDates]="holidays"
+        fieldId="proposed_date_{{ i }}"
+        fieldLabel="Proposed Date {{ i + 1 }}"
+        placeholder="DD/MM/YYYY"
+        [monthsRange]="24"
+        [allowFutureDates]="true"
+        formControlName="{{ i }}"
+      ></app-ilogi-input-date>
+
+      <button
+        type="button"
+        class="btn remove-btn"
+        *ngIf="proposedDates.length > 1"
+        (click)="removeDate(i)"
+      >
+        Remove
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Add button -->
+  <button
+    type="button"
+    class="btn add-btn"
+    (click)="addDate()"
+    [disabled]="proposedDates.length >= 3"
+  >
+    + Add Another Date
+  </button>
+
+ <!-- Selected dates preview -->
+<div *ngIf="proposedDates.value.length" class="selected-dates-box">
+  <h4 class="selected-dates-title">Selected Dates</h4>
+  <ul class="selected-dates-list">
+    <li *ngFor="let date of proposedDates.value">
+      {{ date | date: 'yyyy-MM-dd' }}
+    </li>
+  </ul>
+</div>
+
+
+</div>
+
+
           <app-ilogi-select fieldId="department" [multiple]="true" [errorMessages]="{ required: 'department field is required'}" fieldLabel="Departments" [mandatory]="true"
-            formControlName="department" [selectOptions]="departmentsOptions" placeholder="Select department">
+            formControlName="department" [selectOptions]="departmentsOptions" placeholder="Select department" [enableSearch]="true">
           </app-ilogi-select>
 
           <app-ilogi-select fieldId="inspectionType" fieldLabel="Inspection Type" [mandatory]="true"
             formControlName="inspectionType" [selectOptions]="inspectionTypeOptions"
-            placeholder="Select inspection type">
+            placeholder="Select inspection type" [enableSearch]="true">
           </app-ilogi-select>
           <app-ilogi-select fieldId="inspectionFor" fieldLabel="Inspection For" [mandatory]="true"
-            formControlName="inspectionFor" [selectOptions]="inspectionForOptions" placeholder="Select inspection for">
+            formControlName="inspectionFor" [selectOptions]="inspectionForOptions" placeholder="Select inspection for" [enableSearch]="true">
           </app-ilogi-select>
 
           <app-ilogi-input fieldId="remarks" fieldLabel="Remarks" type="textarea" formControlName="remarks"
