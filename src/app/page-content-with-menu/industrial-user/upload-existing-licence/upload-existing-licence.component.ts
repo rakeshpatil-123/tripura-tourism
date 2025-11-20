@@ -13,6 +13,7 @@ import { IlogiFileUploadComponent } from '../../../customInputComponents/ilogi-f
 import { ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationModalComponent } from '../../../shared/component/confirmation-modal/confirmation-modal.component';
 import { Router } from '@angular/router';
+import { LoaderComponent } from '../../../page-template/loader/loader.component';
 
 interface Department {
   id: number;
@@ -37,6 +38,7 @@ interface Service {
     IlogiInputDateComponent,
     IlogiFileUploadComponent,
     ConfirmationModalComponent,
+    LoaderComponent
   ],
   templateUrl: './upload-existing-licence.component.html',
   styleUrl: './upload-existing-licence.component.scss',
@@ -52,6 +54,7 @@ export class UploadExistingLicenceComponent implements OnInit {
   editingLicenseId: number | null = null;
   showDeleteModal = false;
   licenseToDelete: any = null;
+  isLoading: boolean = false;
 
   licColumns: any[] = [
     { key: 'licensee_name', label: 'Licensee Name', type: 'text' },
@@ -118,6 +121,7 @@ export class UploadExistingLicenceComponent implements OnInit {
   }
 
   loadDepartments(): void {
+    this.isLoading = true
     this.apiService
       .getByConditions({}, 'api/department-get-all-departments')
       .subscribe({
@@ -129,11 +133,15 @@ export class UploadExistingLicenceComponent implements OnInit {
               name: dept.name,
             }));
           }
+          this.isLoading = false
+
         },
         error: (err) => {
           console.error('Failed to load departments:', err);
           this.apiService.openSnackBar('Failed to load departments', 'error');
+          this.isLoading = false
         },
+
       });
   }
 

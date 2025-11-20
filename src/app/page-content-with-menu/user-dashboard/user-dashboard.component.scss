@@ -1,5 +1,5 @@
 .dashboard-page {
-  padding: 2rem;
+  padding: 0.5rem;
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
@@ -202,4 +202,20 @@
       padding: 0.875rem 0.625rem;
     }
   }
+}
+
+
+.table-h{
+  display: flex;
+  flex-direction: column;
+}
+.table-h p{
+font-size: 14px;
+font-weight: 600;
+background-color: #cfcfcf2f;
+border-radius: 2px;
+color: #003953;
+padding: 6px 10px;
+width: fit-content;
+border-bottom: 3px solid #fda00f ;
 }

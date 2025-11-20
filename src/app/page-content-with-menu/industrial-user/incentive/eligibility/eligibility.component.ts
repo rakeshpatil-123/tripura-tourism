@@ -9,6 +9,7 @@ import {
 } from '../../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LoaderComponent } from '../../../../page-template/loader/loader.component';
 
 @Component({
   selector: 'app-eligibility',
@@ -21,6 +22,7 @@ import { Router } from '@angular/router';
     IlogiSelectComponent,
     FormsModule,
     CommonModule,
+    LoaderComponent,
   ],
 })
 export class EligibilityComponent implements OnInit {
@@ -28,6 +30,7 @@ export class EligibilityComponent implements OnInit {
   selectedSchemeId: number | null = null;
   applications: any[] = [];
   columns: any[] = [];
+  isLoading: boolean = false;
 
   constructor(private appiService: GenericService, private router: Router) {}
 
@@ -37,11 +40,14 @@ export class EligibilityComponent implements OnInit {
   }
 
   loadSchemes(): void {
+    this.isLoading = true;
     this.appiService
       .getByConditions({}, 'api/user/incentive/scheme-list')
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data)) {
+            this.isLoading = false;
+
             this.schemes = res.data.map((item: any) => ({
               id: item.id,
               name: item.title,
@@ -65,6 +71,7 @@ export class EligibilityComponent implements OnInit {
           this.appiService.openSnackBar(errorMsg, 'Close');
           this.schemes = [];
           this.applications = [];
+          this.isLoading = false;
         },
       });
   }
@@ -235,7 +242,8 @@ export class EligibilityComponent implements OnInit {
             visible: (row: any) =>
               row.applicationId &&
               row.applicationId !== '_' &&
-              row.applicationId !== null,
+              row.applicationId !== null &&
+              row.status !== "draft",
             color: 'accent',
             onClick: (row: any) => {
               this.router.navigate([

@@ -1,3 +1,11 @@
+
+<div>
+
+@if(isLoading){
+  <app-loader></app-loader>
+}@else{
+
+
 <form [formGroup]="enterpriseForm" (ngSubmit)="onSave()" class="enterprise-form">
 
   <app-ilogi-select fieldId="constitution" fieldLabel="Constitution of the Enterprise"
@@ -97,3 +105,6 @@
     <button type="submit" class="btn btn-success">Submit</button>
   </div>
 </form>
+
+}
+</div>
