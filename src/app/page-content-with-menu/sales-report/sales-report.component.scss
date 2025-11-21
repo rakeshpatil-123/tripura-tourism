@@ -1,0 +1,80 @@
+.page-container {
+  padding: 20px;
+}
+
+.page-title {
+  font-size: 22px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.responsive-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.small {
+  width: 200px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.btn {
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+
+  &.primary {
+    background: #007bff;
+    color: #fff;
+  }
+
+  &.secondary {
+    background: #e4e4e4;
+    color: #000;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+
+  th {
+    background: #f3f3f3;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom: 2px solid #ccc;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #e2e2e2;
+  }
+}
+
+.export-button {
+  padding: 10px 20px;
+  background: #22aa22;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

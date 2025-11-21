@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 
 interface SummaryCard {
   title: string;
   value: number;
+  percentage: number;
   icon: string;
   color: string;
-  change: string;
+  change?: string;
 }
 
 @Component({
@@ -16,42 +18,60 @@ interface SummaryCard {
   templateUrl: './summary-cards.component.html',
   styleUrl: './summary-cards.component.scss'
 })
-export class SummaryCardsComponent implements OnInit {
+export class SummaryCardsComponent implements OnInit, OnChanges {
+  @Input() dashboardData: any;
+  @Input() sidebarCollapsed: boolean = false;
+
   cards: SummaryCard[] = [];
 
-  constructor() {}
+
+  constructor() { }
+
 
   ngOnInit(): void {
+    if (this.dashboardData) {
+      this.mapDashboardDataToCards();
+    }
+  }
+
+
+  ngOnChanges(): void {
+    if (this.dashboardData) {
+      this.mapDashboardDataToCards();
+    }
+  }
+
+
+  mapDashboardDataToCards() {
       this.cards = [
         {
           title: 'Total Applications',
-          value: 5,
+          value: this.dashboardData.total_applications_for_this_department ?? 0,
+          percentage: this.dashboardData.percentage_total_application ?? 0,
           icon: '📝',
           color: 'blue',
-          change: '+12% from last month'
         },
         {
           title: 'Approved',
-          value: 5,
+          value: this.dashboardData.total_count_approved_application_in_department ?? 0,
+          percentage: this.dashboardData.percentage_approved_application ?? 0,
           icon: '✅',
           color: 'green',
-          change: '+8% from last month'
         },
         {
           title: 'Pending',
-          value: 5,
+          value: this.dashboardData.total_count_pending_application_in_department ?? 0,
+          percentage: this.dashboardData.percentage_pending_application ?? 0,
           icon: '⏳',
           color: 'orange',
-          change: '-3% from last month'
         },
         {
           title: 'Rejected',
-          value: 5,
+          value: this.dashboardData.$total_count_rejected_application_in_department ?? 0,
+          percentage: this.dashboardData.percentage_rejected_application ?? 0,
           icon: '❌',
           color: 'red',
-          change: '+2% from last month'
         }
       ];
-    };
+    }
   }
-

@@ -1,0 +1,94 @@
+<div class="page-container">
+  <h2 class="page-title">CIS Details Report</h2>
+  <div class="responsive-filter">
+    <div class="form-group small mb-10">
+      <app-ilogi-input-date [(ngModel)]="fromDate" (ngModelChange)="validateDates()" name="from_dt"
+        fieldLabel="From Date" fieldId="from_dt" placeholder="DD-MM-YYYY">
+      </app-ilogi-input-date>
+      <p class="error" *ngIf="dateError">{{ dateError }}</p>
+    </div>
+    <div class="form-group small mb-10">
+      <app-ilogi-input-date [(ngModel)]="toDate" (ngModelChange)="validateDates()" name="to_dt" fieldLabel="To Date"
+        fieldId="to_dt" placeholder="DD-MM-YYYY">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select fieldId="department" fieldLabel="Select Department/Organization" [(ngModel)]="selectedDept"
+        [selectOptions]="departments" placeholder="Select Department" [enableSearch]="true">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select fieldId="inspection" fieldLabel="Inspection For" [(ngModel)]="selectedInspection"
+        [selectOptions]="inspections" placeholder="Select Inspection">
+      </app-ilogi-select>
+    </div>
+
+    <div class="button-align">
+      <button class="btn btn-reset" (click)="reset()">Reset</button>
+      <button class="btn btn-search" (click)="search()" [disabled]="dateError">Search</button>
+    </div>
+  </div>
+  <div class="title-excel-row">
+    <h3 class="table-title">CIS Details List</h3>
+    <button class="btn-excel" (click)="exportExcel()" [disabled]="!data.length">
+      <i class="pi pi-file-excel"></i> Excel
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table" [ngClass]="{ 'fade-in': animateTable }">
+      <thead>
+        <tr>
+          <th>SL No</th>
+          <th *ngFor="let col of columns">{{ formatColumn(col) }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="!pagedData.length">
+          <td [attr.colspan]="columns.length + 1" class="no-record">No record found!</td>
+        </tr>
+        <tr *ngFor="let row of pagedData; let i = index">
+          <td>{{ (page - 1) * pageSize + i + 1 }}</td>
+          <td *ngFor="let col of columns">
+            {{
+            (row[col] !== null && row[col] !== undefined && row[col] !== '' && row[col].toString().trim() !== '')
+            ? row[col]
+            : 'N/A'
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination-wrapper" *ngIf="data?.length">
+    <div class="pagination-container">
+      <button class="pagination-btn nav-btn" (click)="onPageChange(page - 1)" [disabled]="page === 1">Prev</button>
+
+      <button class="pagination-number" [class.active]="page === 1" (click)="onPageChange(1)"
+        [disabled]="page === 1">1</button>
+
+      <ng-container *ngIf="totalPages > 1">
+        <button *ngIf="page - 1 > 1" class="pagination-number" (click)="onPageChange(page - 1)">{{ page - 1 }}</button>
+
+        <button *ngIf="page > 1 && page < totalPages" class="pagination-number active">{{ page }}</button>
+
+        <button *ngIf="page + 1 < totalPages" class="pagination-number" (click)="onPageChange(page + 1)">{{ page + 1
+          }}</button>
+
+        <button *ngIf="totalPages > 1" class="pagination-number" [class.active]="page === totalPages"
+          (click)="onPageChange(totalPages)">{{ totalPages }}</button>
+      </ng-container>
+
+      <button class="pagination-btn nav-btn" (click)="onPageChange(page + 1)"
+        [disabled]="page >= totalPages">Next</button>
+    </div>
+    <div class="page-size-wrapper" *ngIf="data?.length">
+      <label>Rows per page:</label>
+      <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+  </div>
+</div>

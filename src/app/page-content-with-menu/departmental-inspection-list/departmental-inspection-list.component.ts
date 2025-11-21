@@ -8,9 +8,9 @@ import { GenericService } from '../../_service/generic/generic.service';
 import { LoaderService } from '../../_service/loader/loader.service';
 import { Router } from '@angular/router';
 import { DynamicTableComponent } from "../../shared/component/table/table.component";
-import { ConfirmDateDialogComponent } from '../confirm-date-dialog/confirm-date-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
+import { ConfirmDateDialogCertificateComponent } from '../confirm-date-dialog/confirm-date-dialog.component';
 
 @Component({
   selector: 'app-departmental-inspection-list',
@@ -258,7 +258,7 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
     window.open(row.report_file_url, '_blank');
   }
   openConfirmDateDialog(row: any): void {
-    const dialogRef = this.dialog.open(ConfirmDateDialogComponent, {
+    const dialogRef = this.dialog.open(ConfirmDateDialogCertificateComponent, {
       width: '700px',
       maxWidth: '90vw',
       height: 'auto',
@@ -272,54 +272,143 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
     });
 
 
-    dialogRef.afterClosed().subscribe(
-      (result: { selectedDates: string[]; remarks: string } | null) => {
-        if (!result || !result.selectedDates || result.selectedDates.length === 0) {
-          return;
-        }
-        let payload: any;
-
-        if (row.department_type === 'joint') {
-          payload = {
-            inspection_id: row.id,
-            proposed_date: result.selectedDates,
-            remarks: result.remarks,
-          };
-
-          this.loaderService.showLoader();
-          this.genericService.updateInspectionRequestStatus(payload).subscribe({
-            next: (res: any) => {
-              this.loaderService.hideLoader();
-              row.proposed_date = payload.proposed_date;
-              row.remarks = payload.remarks;
-              this.getApprovedInspections();
-            },
-            error: (err: any) => {
-              this.loaderService.hideLoader();
-            },
-          });
-        } else {
-          payload = {
-            id: row.id,
-            inspection_date: result.selectedDates[0],
-            remarks: result.remarks,
-          };
-
-          this.loaderService.showLoader();
-          this.genericService.updateInspectionRequesDateChangetStatus(payload).subscribe({
-            next: (res: any) => {
-              this.loaderService.hideLoader();
-              row.actual_date_of_inspection = payload.inspection_date;
-              row.remarks = payload.remarks;
-              this.getApprovedInspections();
-            },
-            error: (err: any) => {
-              this.loaderService.hideLoader();
-            },
-          });
-        }
+  dialogRef.afterClosed().subscribe(
+    (result: { selectedDates: string[]; remarks: string } | null) => {
+      if (!result || !result.selectedDates || result.selectedDates.length === 0) {
+        return;
       }
-    );
+      let payload: any;
+
+      if (row.department_type === 'joint') {
+        payload = {
+          inspection_id: row.id,
+          proposed_date: result.selectedDates,
+          remarks: result.remarks,
+        };
+
+        this.loaderService.showLoader();
+        this.genericService.updateInspectionRequestStatus(payload).subscribe({
+          next: (res: any) => {
+            this.loaderService.hideLoader();
+            row.proposed_date = payload.proposed_date;
+            row.remarks = payload.remarks;
+            this.getApprovedInspections();
+
+            Swal.fire({
+              title: 'Proposed Dates Updated!',
+              html: `
+                <p>The proposed inspection dates have been successfully updated:</p>
+                <ul style="text-align: left; margin-left: 1rem;">
+                  ${res.proposed_date.map((date: any) => `<li> ${new Date(date).toDateString()}</li>`).join('')}
+                </ul>
+              `,
+              icon: 'success',
+              showConfirmButton: true,
+              confirmButtonText: 'Awesome!',
+              customClass: {
+                popup: 'swal2-popup-custom',
+                title: 'swal2-title-custom',
+                confirmButton: 'swal-btn-animate'
+              },
+              backdrop: `
+                rgba(0, 0, 0, 0.4)
+                url("/assets/animations/success.json") 
+                left top
+                no-repeat
+              `,
+              showClass: {
+                popup: 'swal-popup-show',
+                icon: 'swal-icon-show'
+              },
+              hideClass: {
+                popup: 'swal-popup-hide'
+              }
+            });
+
+          },
+          error: (err: any) => {
+            this.loaderService.hideLoader();
+
+            Swal.fire({
+              title: 'Oops!',
+              text: 'Failed to update proposed dates. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'Retry',
+              customClass: {
+                popup: 'swal2-popup-custom',
+                title: 'swal2-title-custom',
+                confirmButton: 'swal-btn-animate'
+              }
+            });
+          },
+        });
+      } else {
+        payload = {
+          id: row.id,
+          inspection_date: result.selectedDates[0],
+          remarks: result.remarks,
+        };
+
+        this.loaderService.showLoader();
+        this.genericService.updateInspectionRequesDateChangetStatus(payload).subscribe({
+          next: (res: any) => {
+            this.loaderService.hideLoader();
+            row.actual_date_of_inspection = payload.inspection_date;
+            row.remarks = payload.remarks;
+            this.getApprovedInspections();
+            Swal.fire({
+              title: 'Inspection Updated!',
+              html: `
+                <p>The inspection date and status have been updated successfully.</p>
+                <table style="margin: 0 auto; text-align: left; border-collapse: collapse;">
+                  <tr><td> <strong>Request ID:</strong></td><td>${res.data.request_id}</td></tr>
+                  <tr><td> <strong>Inspection Date:</strong></td><td>${new Date(res.data.inspection_date).toDateString()}</td></tr>
+                  <tr><td><strong>Status:</strong></td><td>${res.data.updated_status}</td></tr>
+                  <tr><td> <strong>Remarks:</strong></td><td>${res.data.remarks || '-'}</td></tr>
+                </table>
+              `,
+              icon: 'success',
+              showConfirmButton: true,
+              confirmButtonText: 'Great!',
+              customClass: {
+                popup: 'swal2-popup-custom',
+                title: 'swal2-title-custom',
+                confirmButton: 'swal-btn-animate'
+              },
+              backdrop: `
+                rgba(0, 0, 0, 0.4)
+                url("/assets/animations/success.json") 
+                left top
+                no-repeat
+              `,
+              showClass: {
+                popup: 'swal-popup-show',
+                icon: 'swal-icon-show'
+              },
+              hideClass: {
+                popup: 'swal-popup-hide'
+              }
+            });
+          },
+          error: (err: any) => {
+            this.loaderService.hideLoader();
+
+            Swal.fire({
+              title: 'Oops!',
+              text: 'Failed to update inspection. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'Retry',
+              customClass: {
+                popup: 'swal2-popup-custom',
+                title: 'swal2-title-custom',
+                confirmButton: 'swal-btn-animate'
+              }
+            });
+          },
+        });
+      }
+    }
+  );
   }
 
   deleteInspection(row: any): void {

@@ -1,0 +1,188 @@
+<div class="payment-list-root">
+  <header class="page-heading" role="banner" aria-label="Page heading: Mark as Paid">
+    <h1 class="page-title">Mark as Paid</h1>
+    <p class="page-sub">Approve and mark user payments as paid</p>
+  </header>
+  <div class="overlay" *ngIf="isLoading" aria-hidden="{{!isLoading}}">
+    <div class="spinner" role="status" aria-live="polite" aria-label="Loading"></div>
+  </div>
+  <form [formGroup]="filterForm" class="controls" (ngSubmit)="$event.preventDefault()">
+    <div class="filters-and-actions">
+      <div class="filters-row" role="region" aria-label="Filters (single row)">
+        <div class="filter-item filter-user mt-10">
+          <app-ilogi-input fieldId="user_name" fieldLabel="Username or Email" [mandatory]="false"
+            formControlName="user_name" type="text" placeholder="Enter username or email">
+          </app-ilogi-input>
+        </div>
+        <div class="filter-item filter-date mb-10">
+          <app-ilogi-input-date formControlName="fromDate" fieldLabel="From Date" [monthsRange]="24"
+            [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false" [readonly]="false">
+          </app-ilogi-input-date>
+        </div>
+        <div class="filter-item filter-date mb-10">
+          <app-ilogi-input-date formControlName="toDate" fieldLabel="To Date" [monthsRange]="24"
+            [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false" [readonly]="false">
+          </app-ilogi-input-date>
+        </div>
+        <div class="filter-item filter-amt mt-10">
+          <label class="sr-only" for="amountMin">Amount min</label>
+          <input id="amountMin" type="number" placeholder="Min amount" formControlName="amountMin"
+            (input)="applyFilters()" aria-label="Minimum amount" />
+        </div>
+        <div class="filter-item filter-amt mt-10">
+          <label class="sr-only" for="amountMax">Amount max</label>
+          <input id="amountMax" type="number" placeholder="Max amount" formControlName="amountMax"
+            (input)="applyFilters()" aria-label="Maximum amount" />
+        </div>
+      </div>
+      <div class="actions-row" role="region" aria-label="Actions">
+        <div class="actions-inner">
+          <label for="rowsSelect" class="rows-label">Rows:</label>
+          <select id="rowsSelect" formControlName="rows" aria-label="Rows per page">
+            <option *ngFor="let p of pageSizes" [value]="p">{{ p }}</option>
+          </select>
+
+          <button type="button" class="btn export" (click)="exportToExcel(true)" [disabled]="isExporting"
+            aria-label="Export filtered">
+            Export (Filtered)
+          </button>
+          <button type="button" class="btn export ghost" (click)="exportToExcel(false)" [disabled]="isExporting"
+            aria-label="Export all">
+            Export (All)
+          </button>
+          <div class="filter-item filter-action">
+            <button type="button" class="btn ghost" (click)="refreshList()" title="Refresh list"
+              aria-label="Refresh list">
+              ⟳ Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+  <div class="table-wrap">
+    <table class="payments-table">
+      <thead>
+        <tr>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('invoiceId')"
+            (keydown.enter)="toggleSort('invoiceId')" [class.sorted]="sortColumn==='invoiceId'"
+            [class.asc]="sortDirection==='asc'" [class.desc]="sortDirection==='desc'"
+            [attr.aria-sort]="sortColumn==='invoiceId' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Invoice
+            <span class="sort-indicator" *ngIf="sortColumn==='invoiceId'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('userName')" (keydown.enter)="toggleSort('userName')"
+            [class.sorted]="sortColumn==='userName'" [class.asc]="sortDirection==='asc'"
+            [class.desc]="sortDirection==='desc'"
+            [attr.aria-sort]="sortColumn==='userName' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            User name
+            <span class="sort-indicator" *ngIf="sortColumn==='userName'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('businessName')"
+            (keydown.enter)="toggleSort('businessName')" [class.sorted]="sortColumn==='businessName'"
+            [class.asc]="sortDirection==='asc'" [class.desc]="sortDirection==='desc'"
+            [attr.aria-sort]="sortColumn==='businessName' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Business
+            <span class="sort-indicator" *ngIf="sortColumn==='businessName'">{{ sortDirection==='asc' ? '▲' : '▼'
+              }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('email')" (keydown.enter)="toggleSort('email')"
+            [class.sorted]="sortColumn==='email'"
+            [attr.aria-sort]="sortColumn==='email' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Email
+            <span class="sort-indicator" *ngIf="sortColumn==='email'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('phone')" (keydown.enter)="toggleSort('phone')"
+            [class.sorted]="sortColumn==='phone'"
+            [attr.aria-sort]="sortColumn==='phone' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Phone
+            <span class="sort-indicator" *ngIf="sortColumn==='phone'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('amount')" (keydown.enter)="toggleSort('amount')"
+            [class.sorted]="sortColumn==='amount'"
+            [attr.aria-sort]="sortColumn==='amount' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Amount
+            <span class="sort-indicator" *ngIf="sortColumn==='amount'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('dueDate')" (keydown.enter)="toggleSort('dueDate')"
+            [class.sorted]="sortColumn==='dueDate'"
+            [attr.aria-sort]="sortColumn==='dueDate' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Due Date
+            <span class="sort-indicator" *ngIf="sortColumn==='dueDate'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('status')" (keydown.enter)="toggleSort('status')"
+            [class.sorted]="sortColumn==='status'"
+            [attr.aria-sort]="sortColumn==='status' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Status
+            <span class="sort-indicator" *ngIf="sortColumn==='status'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('paymentMethod')"
+            (keydown.enter)="toggleSort('paymentMethod')" [class.sorted]="sortColumn==='paymentMethod'"
+            [attr.aria-sort]="sortColumn==='paymentMethod' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Method
+            <span class="sort-indicator" *ngIf="sortColumn==='paymentMethod'">{{ sortDirection==='asc' ? '▲' : '▼'
+              }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('notes')" (keydown.enter)="toggleSort('notes')"
+            [class.sorted]="sortColumn==='notes'"
+            [attr.aria-sort]="sortColumn==='notes' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Notes
+            <span class="sort-indicator" *ngIf="sortColumn==='notes'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('createdAt')"
+            (keydown.enter)="toggleSort('createdAt')" [class.sorted]="sortColumn==='createdAt'"
+            [attr.aria-sort]="sortColumn==='createdAt' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
+            Created
+            <span class="sort-indicator" *ngIf="sortColumn==='createdAt'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of displayedData" class="row-animate"
+          [ngClass]="{'paid': r.status === 'Paid', 'overdue': r.status === 'Overdue'}">
+          <td class="invoice">{{ r.invoiceId }}</td>
+          <td class="client">
+            <div class="name">{{ r.userName }}</div>
+          </td>
+          <td class="business">{{ r.businessName }}</td>
+          <td class="email">{{ r.email }}</td>
+          <td class="phone">{{ r.phone }}</td>
+          <td class="amount">{{ formatCurrency(r.amount, r.currency) }}</td>
+          <td class="due">{{ r.dueDate ? (r.dueDate | date : 'mediumDate') : '—' }}</td>
+          <td class="status">
+            <span class="pill">{{ r.status }}</span>
+          </td>
+          <td class="method">{{ r.paymentMethod }}</td>
+          <td class="notes">{{ r.notes }}</td>
+          <td class="created">{{ r.createdAt ? (r.createdAt | date : 'short') : '—' }}</td>
+          <td class="actions">
+            <button class="btn mark" (click)="markAsPaid(r)" [disabled]="r.status === 'Paid'">
+              {{ r.status === 'Paid' ? 'Paid' : 'Mark as Paid' }}
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="displayedData.length === 0">
+          <td colspan="12" class="no-data">No records found — try adjusting filters</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination-wrapper" *ngIf="filteredData.length > pageSize">
+    <div class="pagination-container">
+      <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+        ◀ Prev
+      </button>
+      <ng-container *ngFor="let p of totalPagesArray">
+        <button class="pagination-number" [class.active]="p === currentPage" (click)="goToPage(p)">
+          {{ p }}
+        </button>
+      </ng-container>
+      <button class="pagination-btn nav-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Next ▶
+      </button>
+    </div>
+  </div>
+</div>

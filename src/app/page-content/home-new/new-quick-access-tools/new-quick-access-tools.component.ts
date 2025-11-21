@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, ViewChildren, QueryList, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { trigger, state, style, animate, transition } from '@angular/animations';
@@ -37,7 +37,7 @@ interface Tool {
     ])
   ]
 })
-export class NewQuickAccessToolsComponent implements AfterViewInit {
+export class NewQuickAccessToolsComponent implements OnInit, AfterViewInit {
   @ViewChildren('toolCard') toolCards!: QueryList<ElementRef>;
   cardState: string = 'hidden';
 
@@ -90,6 +90,9 @@ export class NewQuickAccessToolsComponent implements AfterViewInit {
     private sanitizer: DomSanitizer,
     private el: ElementRef
   ) {}
+  ngOnInit(): void {
+
+  }
 
   ngAfterViewInit(): void {
     this.tools.forEach(tool => {

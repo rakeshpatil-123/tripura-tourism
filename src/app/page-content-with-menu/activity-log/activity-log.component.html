@@ -1,0 +1,106 @@
+<div class="activity-log-container">
+  <div class="activity-log-header">
+    <h1 class="animated-gradient-heading">Activity Log</h1>
+  </div>
+  <div class="filter-bar">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input #gb type="text" pInputText placeholder="Search all"
+        (input)="dt.filterGlobal($event.target.value, 'contains')" />
+    </span>
+    <button pButton type="button" icon="pi pi-filter-slash" label="Clear" (click)="clearFilters(dt)"></button>
+  </div>
+  <p-table #dt class="activity-log-table" [value]="activityData" [paginator]="true" [rows]="5"
+    [rowsPerPageOptions]="[5,10,20]" dataKey="date" [globalFilterFields]="['action','by','forWhom','module']"
+    responsiveLayout="scroll" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+        <th pSortableColumn="action">Action <p-sortIcon field="action"></p-sortIcon></th>
+        <th pSortableColumn="by">Action By <p-sortIcon field="by"></p-sortIcon></th>
+        <th pSortableColumn="forWhom">For Whom <p-sortIcon field="forWhom"></p-sortIcon></th>
+        <th pSortableColumn="module">Module <p-sortIcon field="module"></p-sortIcon></th>
+        <th pSortableColumn="platform">Platform <p-sortIcon field="platform"></p-sortIcon></th>
+        <th>Details</th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="date" field="date" display="menu"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter field="action" display="menu" matchMode="equals">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-columnFilter field="action" display="menu" matchMode="equals">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <app-ilogi-select fieldId="action" fieldLabel="Action Type" [selectOptions]="actionTypes"
+                    placeholder="Select Action" [ngModel]="value" (ngModelChange)="filter($event)">
+                  </app-ilogi-select>
+                </ng-template>
+              </p-columnFilter>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="by" placeholder="Filter By"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="forWhom" placeholder="Filter For"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter field="module" display="menu" matchMode="equals">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <app-ilogi-select fieldId="module" fieldLabel="Module" [selectOptions]="modules"
+                placeholder="Select Module" [ngModel]="value" (ngModelChange)="filter($event)">
+              </app-ilogi-select>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter field="platform" matchMode="in" display="menu" [showOperator]="false" [showAddButton]="false"
+            [showMatchModes]="false">
+            <ng-template #filter let-value let-filter="filterCallback">
+              <p-multiSelect [options]="platforms" optionLabel="name" (onChange)="filter($event.value)"
+                placeholder="Select Platform" class="p-column-filter"></p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-activity let-rowIndex="rowIndex">
+      <tr [@fadeIn]>
+        <td>{{ activity.date | date:'short' }}</td>
+        <td>{{ activity.action }}</td>
+        <td>{{ activity.by }}</td>
+        <td>{{ activity.forWhom }}</td>
+        <td>{{ activity.module }}</td>
+        <td>{{ activity.platform }}</td>
+        <td>
+          <button pButton type="button" label="View Details" icon="pi pi-info-circle" class="info-btn"
+            (click)="viewDetails(activity)" pTooltip="View changes" tooltipPosition="top">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <p-dialog header="Change Details" [(visible)]="displayDialog" responsive="true" [style]="{width: '400px'}"
+    [modal]="true">
+    <div *ngIf="selectedActivity">
+      <p><strong>Date:</strong> {{selectedActivity.date | date:'fullDate'}}</p>
+      <p><strong>Action:</strong> {{selectedActivity.action}}</p>
+      <p><strong>By:</strong> {{selectedActivity.by}}</p>
+      <p><strong>Module:</strong> {{selectedActivity.module}}</p>
+      <p><strong>Platform:</strong> {{selectedActivity.platform}}</p>
+      <p><strong>Old Value:</strong> {{selectedActivity.oldValue}}</p>
+      <p><strong>New Value:</strong> {{selectedActivity.newValue}}</p>
+    </div>
+  </p-dialog>
+  <div class="chart-container">
+    <p-chart type="pie" [data]="{
+        labels: ['Create', 'Update', 'Delete'],
+        datasets: [{ data: [5,3,2], backgroundColor: ['#42A5F5','#66BB6A','#FFA726'] }]
+      }" [options]="{plugins:{legend:{position:'bottom'}}}">
+    </p-chart>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<div class="page-container">
+  <h2 class="page-title">User Report</h2>
+  <div class="responsive-filter">
+    <div class="form-group small">
+      <app-ilogi-input-date [(ngModel)]="fromDate" fieldId="fromDate" fieldLabel="From Date" placeholder="DD-MM-YYYY"
+        [allowFutureDates]="true">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-input-date [(ngModel)]="toDate" fieldId="toDate" fieldLabel="To Date" placeholder="DD-MM-YYYY"
+        [allowFutureDates]="true">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select [selectOptions]="departments" fieldId="department" fieldLabel="Department"
+        placeholder="Select Department" [(ngModel)]="selectedDept">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select [selectOptions]="roles" fieldId="role" fieldLabel="Role" placeholder="Select Role"
+        [(ngModel)]="selectedRole">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select [selectOptions]="statuses" fieldId="status" fieldLabel="Status" placeholder="Select Status"
+        [(ngModel)]="selectedStatus">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group button-group">
+      <button class="btn primary" (click)="search()">Search</button>
+      <button class="btn secondary" (click)="reset()">Reset</button>
+    </div>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>User Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Report Type</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td>{{ user.userName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.department }}</td>
+          <td>{{ user.status }}</td>
+          <td>{{ user.reportType }}</td>
+          <td>{{ user.amount }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="export-button" (click)="exportData()">Export</button>
+</div>

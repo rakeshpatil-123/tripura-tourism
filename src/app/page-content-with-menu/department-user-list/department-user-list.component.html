@@ -1,0 +1,88 @@
+<div class="page-container">
+  <h2 class="page-title">Department User List</h2>
+  <form [formGroup]="filterForm">
+    <div class="filter-row">
+      <div class="form-group">
+        <app-ilogi-select fieldLabel="Department/Organization" [selectOptions]="departments"
+          formControlName="department" placeholder="Select Department" optionLabel="name" [enableSearch]="true"
+          filterPlaceholder="Search Department..."></app-ilogi-select>
+      </div>
+      <div class="form-group">
+        <app-ilogi-select [fieldLabel]="'Services'" [selectOptions]="serviceList" formControlName="service"
+          placeholder="Select Service" optionLabel="name" [enableSearch]="true"
+          filterPlaceholder="Search Service..."></app-ilogi-select>
+      </div>
+      <div class="form-group">
+        <app-ilogi-select fieldLabel="Approval Step List" [selectOptions]="approvalStepList"
+          formControlName="approvalStep" placeholder="Select Step" optionLabel="name" [enableSearch]="true"
+          filterPlaceholder="Search Step..."></app-ilogi-select>
+      </div>
+      <div class="button-align">
+        <button type="button" class="btn btn-reset" (click)="reset()">Reset</button>
+        <button type="button" class="btn btn-search" (click)="search()">Search</button>
+      </div>
+    </div>
+  </form>
+  <div class="heading-excel-row">
+    <h3 class="section-title">User List</h3>
+    <button class="btn-excel" [disabled]="!users.length" (click)="exportExcel()">
+      <i class="pi pi-file-excel"></i> Excel
+    </button>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Department Name</th>
+          <th>Role</th>
+          <th>User Name</th>
+          <th>Name</th>
+          <th>Designation</th>
+          <th>Email ID</th>
+          <th>Mobile Number</th>
+          <th>Date of Assignment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="users.length === 0">
+          <td colspan="9" class="no-record">No record found!</td>
+        </tr>
+        <tr *ngFor="let user of displayedData; let i = index">
+          <td>{{ (currentPageSize - 1) * pageSize + i + 1 }}</td>
+          <td>{{ user.department }}</td>
+          <td>{{ user.role || '---' }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.designation }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.mobile }}</td>
+          <td>{{ user.assignmentDate }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination-wrapper" *ngIf="totalPages > 0">
+    <div class="pagination-container">
+      <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPageSize === 1">
+        ◀ Prev
+      </button>
+      <ng-container *ngFor="let p of totalPagesArray">
+        <button class="pagination-number" [class.active]="p === currentPageSize" (click)="goToPage(p)">
+          {{ p }}
+        </button>
+      </ng-container>
+      <button class="pagination-btn nav-btn" (click)="nextPage()" [disabled]="currentPageSize === totalPages">
+        Next ▶
+      </button>
+      <div class="page-size-wrapper">
+        <label>Rows per page:</label>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">
+            {{ size }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

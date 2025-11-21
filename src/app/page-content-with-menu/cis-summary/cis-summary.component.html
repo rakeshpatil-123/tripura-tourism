@@ -1,0 +1,69 @@
+<div class="page-container">
+  <h2 class="page-title">CIS Summary</h2>
+  <form [formGroup]="filterForm" class="responsive-filter" (ngSubmit)="search()">
+    <div class="form-group small">
+      <app-ilogi-select formControlName="year" fieldId="year" fieldLabel="Year" [selectOptions]="years"
+        placeholder="Select Year">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select formControlName="month" fieldId="month" fieldLabel="Month" [selectOptions]="months"
+        placeholder="Select Month">
+      </app-ilogi-select>
+    </div>
+  </form>
+  <div class="button-inline">
+    <button type="button" class="btn btn-reset" (click)="reset()">Reset</button>
+    <button type="button" class="btn btn-search" (click)="search()">
+      <span *ngIf="!loading">Search</span>
+      <span *ngIf="loading" class="loading-dot">Searching</span>
+    </button>
+  </div>
+  <div class="heading-excel-row">
+    <h3 class="section-title">CIS SUMMARY</h3>
+    <button class="btn-excel" type="button" (click)="exportExcel()" [disabled]="!data?.length">
+      <i class="pi pi-file-excel"></i>
+      <span>Excel</span>
+    </button>
+  </div>
+  <div class="loader-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table animate__animated animate__fadeIn" aria-label="CIS Summary table">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th *ngFor="let col of tableColumns">
+            {{ formatColumn(col) }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of pagedData; let i = index">
+          <td>{{ (page - 1) * pageSize + i + 1 }}</td>
+          <td *ngFor="let col of tableColumns">
+            {{ row[col] ?? 'N/A' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination-wrapper" *ngIf="data?.length">
+    <div class="pagination-container">
+      <button class="pagination-btn nav-btn" (click)="onPageChange(page - 1)" [disabled]="page === 1">Prev</button>
+      <button class="pagination-number" [class.active]="page === 1" (click)="onPageChange(1)"
+        [disabled]="page === 1">1</button>
+      <ng-container *ngIf="totalPages > 1">
+        <button *ngIf="page - 1 > 1" class="pagination-number" (click)="onPageChange(page - 1)">{{ page - 1 }}</button>
+        <button *ngIf="page > 1 && page < totalPages" class="pagination-number active">{{ page }}</button>
+        <button *ngIf="page + 1 < totalPages" class="pagination-number" (click)="onPageChange(page + 1)">{{ page + 1
+          }}</button>
+        <button *ngIf="totalPages > 1" class="pagination-number" [class.active]="page === totalPages"
+          (click)="onPageChange(totalPages)">{{ totalPages }}</button>
+      </ng-container>
+      <button class="pagination-btn nav-btn" (click)="onPageChange(page + 1)"
+        [disabled]="page >= totalPages">Next</button>
+    </div>
+  </div>
+</div>

@@ -87,13 +87,13 @@
         <div class="modal-actions">
           <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'" mat-raised-button color="primary"
               (click)="previewCertificate()">
-              <span style="color: white;">Preview </span>
+              <span style="color: white;">Preview Certificate</span>
             </button>
           
             <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'" mat-raised-button class="generate-btn"
               (click)="editCertificateGeneration()">
-              <mat-icon class="mr-2">workspace_premium</mat-icon>
-              <span style="color: white;">Generate </span>
+              <mat-icon style="color: white;" class="mr-2">workspace_premium</mat-icon>
+              <span style="color: white;">Generate Certificate</span>
             </button>
           
           

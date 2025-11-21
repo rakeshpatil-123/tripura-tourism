@@ -1,0 +1,37 @@
+<div class="dashboard-page" [class.loading]="isLoading">
+  <div class="loader-overlay" *ngIf="isLoading" aria-hidden="true">
+    <div class="loader-box" role="status" aria-live="polite">
+      <div class="spinner"></div>
+      <div class="loader-text">Loading admin dashboard…</div>
+    </div>
+  </div>
+  <div class="dashboard-header fade-in">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p class="subtitle">Welcome to the Admin Dashboard</p>
+      </div>
+    </div>
+  </div>
+  <section class="dashboard-section fade-in">
+    <app-summary-cards [dashboardData]="dashboardData" [sidebarCollapsed]="sidebarCollapsed">
+    </app-summary-cards>
+  </section>
+  <section class="dashboard-section charts-section">
+    <div class="charts-grid two-column">
+      <div class="chart-item slide-up">
+        <app-bar-chart [data]="dashboardData?.application_count_per_service"></app-bar-chart>
+      </div>
+      <div class="chart-item slide-up">
+        <app-pie-chart [data]="dashboardData?.district_wise_application_in_department"></app-pie-chart>
+      </div>
+    </div>
+  </section>
+  <section class="dashboard-section charts-section">
+    <div class="charts-grid single-column">
+      <div class="chart-item slide-up">
+        <app-horizontal-bar-chart [data]="dashboardData?.application_count_per_service"></app-horizontal-bar-chart>
+      </div>
+    </div>
+  </section>
+</div>

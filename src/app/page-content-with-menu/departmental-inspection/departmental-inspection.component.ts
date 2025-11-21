@@ -18,6 +18,7 @@ import { AddDepartmentalInspectionComponent } from '../add-departmental-inspecti
 import { AddDepartmentalJointInspectionComponent } from '../add-departmental-joint-inspection/add-departmental-joint-inspection.component';
 import { GenericService } from '../../_service/generic/generic.service';
 import { InspectionReportComponent } from '../inspection-report/inspection-report.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-departmental-inspection',
@@ -182,9 +183,35 @@ export class DepartmentalInspectionComponent implements OnInit {
       dateTo: this.dateTo.value,
       industryName: this.industryName.value,
     };
-
     if (!filters.dateFrom && !filters.dateTo && !filters.industryName) {
-      alert('Please select at least one filter before applying.');
+      Swal.fire({
+        title: '<span class="swal-title">Oops!</span>',
+        html: '<div class="swal-text">Please select at least one filter before applying.</div>',
+        icon: 'warning',
+        background: '#ffffff',
+        showConfirmButton: true,
+        confirmButtonText: 'Got it!',
+        customClass: {
+          popup: 'swal-popup',
+          confirmButton: 'swal-btn-animate',
+          title: 'swal-title',
+          htmlContainer: 'swal-text'
+        },
+        showClass: {
+          popup: 'swal-popup-show'
+        },
+        hideClass: {
+          popup: 'swal-popup-hide'
+        },
+        timer: 4000,
+        timerProgressBar: true,
+        allowOutsideClick: true,
+        allowEnterKey: true,
+        didOpen: (popup) => {
+          const btn = popup.querySelector('.swal2-confirm');
+        }
+      });
+
       return;
     }
 

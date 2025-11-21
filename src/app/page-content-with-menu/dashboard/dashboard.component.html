@@ -1,5 +1,52 @@
 <div class="dashboard-container">
-  @if(userType === "individual"){
-  <app-user-dashboard></app-user-dashboard>
-  }
+  <!-- <div class="stats-cards-grid">
+    <app-stats-card
+      title="Total Applications"
+      value="124"
+      type="total"
+      iconClass="fas fa-file-alt"
+    ></app-stats-card>
+    <app-stats-card
+      title="Approved"
+      value="86"
+      type="approved"
+      iconClass="fas fa-check-circle"
+    ></app-stats-card>
+    <app-stats-card
+      title="Pending"
+      value="28"
+      type="pending"
+      iconClass="fas fa-hourglass-half"
+    ></app-stats-card>
+    <app-stats-card
+      title="Rejected"
+      value="10"
+      type="rejected"
+      iconClass="fas fa-times-circle"
+    ></app-stats-card>
+  </div> -->
+  <!-- <div class="charts-grid">
+    <div class="bar-chart-item">
+      <app-bar-chart [data]="barChartData"></app-bar-chart>
+    </div>
+    <div class="chart-item donut-chart-item">
+      <app-donut-chart [data]="donutChartData"></app-donut-chart>
+    </div>
+  </div>
+  <app-claim-status-table [data]="claimStatusData"></app-claim-status-table>
+  <app-clarification-required-table
+    [data]="clarificationRequiredData"
+  ></app-clarification-required-table>
+  <div class="flex">
+    <app-button [type]="'primary'" [size]="'small'" route="/"
+      >View All</app-button
+    >
+    <app-button [type]="'danger'" [size]="'small'">Delete All</app-button>
+    <app-button [type]="'ghost'" [size]="'small'">ghost</app-button>
+  </div> -->
+<!-- ------------------------------------------------------------------------- -->
+    <app-user-dashboard *ngIf="userRole === 'individual'"></app-user-dashboard>
+    <app-departmental-user-dashboard *ngIf="userRole === 'department'"></app-departmental-user-dashboard>
+    <app-admin-dashboard *ngIf="userRole === 'admin'"></app-admin-dashboard>
+<!-- ----------------------------------------------------------------------------->
 </div>

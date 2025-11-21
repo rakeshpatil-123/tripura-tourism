@@ -1,0 +1,44 @@
+.filter-container {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.75);
+    padding: 1rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    justify-content: space-between;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+
+    label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #444;
+        margin-bottom: 0.25rem;
+    }
+
+    select,
+    input {
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        font-size: 0.9rem;
+        transition: 0.2s;
+
+        &:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.1);
+        }
+    }
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+}

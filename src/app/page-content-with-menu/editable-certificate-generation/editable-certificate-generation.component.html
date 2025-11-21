@@ -17,6 +17,11 @@
 
             <div class="field-input">
               <ng-container [ngSwitch]="inputTypeForKey(v.key)">
+                <select *ngSwitchCase="'dropdown'" [formControlName]="v.key" class="input-field" (change)="updateLivePreview()">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
                 <app-ilogi-input-date *ngSwitchCase="'date'" formControlName="{{ v.key }}" fieldId="{{ v.key }}"
                   [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false"
                   [readonly]="false" (ngModelChange)="updateLivePreview()">

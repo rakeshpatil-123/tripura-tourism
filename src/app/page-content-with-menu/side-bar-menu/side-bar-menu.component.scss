@@ -430,6 +430,45 @@ $bg-dark: #ffffff;
     font-size: 1.5rem;
   }
 }
+.submenu-link {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
 
+.submenu-item {
+  cursor: pointer !important;
+}
 
+.submenu-item:hover .submenu-link {
+  background-color: rgba(0, 0, 0, 0.05);
+}
 
+.nav-link.has-children {
+  pointer-events: auto;
+}
+
+.nav-link.has-children .nav-text,
+.nav-link.has-children .nav-icon {
+  pointer-events: none;
+}
+
+.user-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.label {
+  font-weight: 600;
+  color: #333;
+}
+
+.separator {
+  color: #999;
+  font-weight: bold;
+}
+
+.value {
+  color: #555;
+}

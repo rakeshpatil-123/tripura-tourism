@@ -1,0 +1,58 @@
+<div class="page-container">
+  <h2 class="page-title">Labour Register</h2>
+  <form [formGroup]="labourForm">
+    <div class="responsive-filter">
+      <div class="form-group small">
+        <app-ilogi-select fieldLabel="Select Organization" fieldId="organization" [enableSearch]="true"
+          placeholder="Select Organization" [selectOptions]="organizations" formControlName="organization">
+        </app-ilogi-select>
+      </div>
+      <div class="form-group small">
+        <label>Select Form</label>
+        <div class="form-inline-radio">
+          <label><input type="radio" value="A" formControlName="form" /> Form A</label>
+          <label><input type="radio" value="B" formControlName="form" /> Form B</label>
+          <label><input type="radio" value="C" formControlName="form" /> Form C</label>
+          <label><input type="radio" value="D" formControlName="form" /> Form D</label>
+        </div>
+      </div>
+      <div class="button-row">
+        <button class="btn btn-reset" type="button" (click)="reset()">Reset</button>
+        <button class="btn btn-search" type="button" (click)="search()">Search</button>
+      </div>
+    </div>
+  </form>
+  <div class="heading-excel-row">
+    <h3 class="section-title">Labour Register View</h3>
+    <button class="btn-excel" [disabled]="!data?.length" (click)="exportExcel()">
+      <i class="pi pi-file-excel"></i> Excel
+    </button>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Organization</th>
+        <th>Form</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="!data.length">
+        <td colspan="3" class="no-record">No record found!</td>
+      </tr>
+      <tr *ngFor="let item of paginatedData">
+        <td>{{ item.org }}</td>
+        <td>{{ item.form }}</td>
+        <td>{{ item.date }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pagination-container" *ngIf="data.length">
+    <button (click)="prevPage()" [disabled]="pageIndex === 0">Prev</button>
+
+    <span>Page {{ pageIndex + 1 }} of {{ totalPages }}</span>
+
+    <button (click)="nextPage()" [disabled]="pageIndex === totalPages - 1">Next</button>
+  </div>
+
+</div>

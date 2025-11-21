@@ -1,0 +1,81 @@
+<div class="table-container">
+  <div class="table-header">
+    <h3>Clarification Raised</h3>
+    <button class="export-btn" (click)="exportToExcel()" [disabled]="!displayedData?.length">
+      Export Excel
+    </button>
+  </div>
+  <div class="filters-section" [formGroup]="filterForm">
+    <div class="filter-row">
+      <app-ilogi-input fieldId="searchText" fieldLabel="Search by Application ID" formControlName="searchText"
+        type="text" placeholder="Enter Application ID" [mandatory]="false">
+      </app-ilogi-input>
+      <app-ilogi-select fieldId="selectedStatus" fieldLabel="Status" [mandatory]="false"
+        formControlName="selectedStatus" [selectOptions]="statusOptions" placeholder="Select Status"
+        [enableSearch]="true">
+      </app-ilogi-select>
+      <button *ngIf="filterForm.value.searchText || filterForm.value.selectedStatus" class="clear-filters-btn"
+        (click)="clearFilters()">
+        ✖ Clear
+      </button>
+    </div>
+    <div class="results-count">
+      Showing {{ displayedData.length }} of {{ filteredData.length }} records
+    </div>
+  </div>
+  <div class="table-wrapper">
+    <table class="clarification-table">
+      <thead>
+        <tr>
+          <th>Application ID</th>
+          <th>NOC Number</th>
+          <th>Status</th>
+          <th class="text-center">View File</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="!displayedData?.length" class="no-data-row fade-in">
+          <td colspan="4" class="no-data">No matching records found.</td>
+        </tr>
+        <tr *ngFor="let item of displayedData; trackBy: trackById" class="data-row fade-in">
+          <td title="Application ID: {{ item.applicationId }}">
+            <span class="app-id-badge">{{ item.applicationId }}</span>
+          </td>
+          <td title="NOC Number: {{ item.noc }}">
+            {{ item.noc }}
+          </td>
+          <td [ngClass]="{
+        '': item.status === 'missing',
+        'alert-success': item.status !== 'missing'
+      }" class=""
+            title="Status: {{ item.status === 'missing' ? 'Clarification Required' : item.documentName + ' uploaded' }}">
+            <span class="alert-text">
+              {{ item.status === 'missing' ? 'Clarification Required' : item.documentName + ' uploaded' }}
+            </span>
+          </td>
+          <td class="text-center">
+            <button class="eye-btn" [disabled]="!item.status_file" (click)="openFile(item.status_file)"
+              title="{{ item.status_file ? 'Click to view file' : 'No file uploaded' }}">
+              👁️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pagination-wrapper" *ngIf="filteredData.length > pageSize">
+      <div class="pagination-container">
+        <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+          ◀ Prev
+        </button>
+        <ng-container *ngFor="let p of totalPagesArray">
+          <button class="pagination-number" [class.active]="p === currentPage" (click)="goToPage(p)">
+            {{ p }}
+          </button>
+        </ng-container>
+        <button class="pagination-btn nav-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+          Next ▶
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

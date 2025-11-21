@@ -1,0 +1,76 @@
+<div class="page-container">
+  <h2 class="page-title">Industry Report Summary</h2>
+  <form class="filter-row full-inline-row" [formGroup]="industrySummaryForm">
+    <div class="form-group mb-10">
+      <app-ilogi-input-date formControlName="fromDate" name="from_dt" fieldLabel="From Date" fieldId="from_dt"
+        [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="true" [readonly]="false">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group mb-10">
+      <app-ilogi-input-date formControlName="toDate" name="to_dt" fieldLabel="To Date" fieldId="to_dt"
+        [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="true" [readonly]="false">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group">
+      <app-ilogi-select fieldId="district_code" [enableSearch]="true" fieldLabel="District"
+        formControlName="district_code" [selectOptions]="districts" placeholder="Select district">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group">
+      <app-ilogi-select fieldId="subdivision_code" [enableSearch]="true" fieldLabel="Subdivision"
+        formControlName="subdivision_code" [selectOptions]="subdivisions" placeholder="Select subdivision">
+      </app-ilogi-select>
+    </div>
+  </form>
+  <div class="button-inline">
+    <button class="btn btn-reset" (click)="reset()">Reset</button>
+    <button class="btn btn-search" (click)="search()">Search</button>
+  </div>
+
+  <h3 class="section-title">REPORT SUMMARY LIST</h3>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>District</th>
+        <th>Sub Division</th>
+        <th>Manufacturing Count</th>
+        <th>Services Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of displayedData">
+        <td>{{ item.district_name || '—' }}</td>
+        <td>{{ item.sub_division_name || '—' }}</td>
+        <td>{{ item.manufacturing_count ?? 0 }}</td>
+        <td>{{ item.services_count ?? 0 }}</td>
+      </tr>
+
+      <tr *ngIf="!filteredData.length">
+        <td colspan="4" class="no-record">No record found!</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pagination-wrapper" *ngIf="totalPages > 0">
+    <div class="pagination-container">
+      <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPageSize === 1">
+        ◀ Prev
+      </button>
+      <ng-container *ngFor="let p of totalPagesArray">
+        <button class="pagination-number" [class.active]="p === currentPageSize" (click)="goToPage(p)">
+          {{ p }}
+        </button>
+      </ng-container>
+      <button class="pagination-btn nav-btn" (click)="nextPage()" [disabled]="currentPageSize === totalPages">
+        Next ▶
+      </button>
+      <div class="page-size-wrapper">
+        <label>Rows per page:</label>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">
+            {{ size }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

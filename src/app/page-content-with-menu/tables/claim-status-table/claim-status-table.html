@@ -1,0 +1,55 @@
+<div class="table-container">
+  <div class="table-header">
+    <h3>NOC Issued List</h3>
+    <button class="export-btn" (click)="exportToExcel()">
+      <span class="icon">📥</span>
+      Export Excel
+    </button>
+  </div>
+  <div class="table-wrapper">
+    <table class="claim-table">
+      <thead>
+        <tr>
+          <th>Application ID</th>
+          <th>Applicant Name</th>
+          <th>Application Date</th>
+          <th>Unit Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (displayedData && displayedData.length > 0) {
+        @for (item of displayedData; track item.application_id) {
+        <tr>
+          <td>{{ item.application_id }}</td>
+          <td>{{ item.applicant_name }}</td>
+          <td>{{ item.application_date }}</td>
+          <td>{{ item.name_of_unit }}</td>
+        </tr>
+        }
+        } @else {
+        <tr>
+          <td colspan="4" class="no-data">No NOC Issued Data Available</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (pagination && pagination.last_page > 1) {
+  <div class="pagination-wrapper">
+    <div class="pagination-container">
+      <button class="pagination-btn nav-btn" [disabled]="pagination.current_page === 1"
+        (click)="changePage(pagination.current_page - 1)">
+        ⬅ Prev
+      </button>
+      @for (page of getPageNumbers(); track page) {
+      <button class="pagination-number" [class.active]="page === pagination.current_page" (click)="changePage(page)">
+        {{ page }}
+      </button>
+      }
+      <button class="pagination-btn nav-btn" [disabled]="pagination.current_page === pagination.last_page"
+        (click)="changePage(pagination.current_page + 1)">
+        Next ➡
+      </button>
+    </div>
+  </div>
+  }

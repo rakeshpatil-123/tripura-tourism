@@ -1860,17 +1860,13 @@ export class GenericService {
   }
   getCertificateApplicationData(appId: any): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/certificate-view`,
-      { application_id: appId },
-      { headers: this.getHeaders() }
-    );
+      `${this.baseUrl}/api/department/user-certificate-view`, { application_id: appId }, { headers: this.getHeaders() }
+    )
   }
   generateCertificate(payload: any): any {
     return this.http.post(
-      `${this.baseUrl}/api/department/generate-certificate`,
-      payload,
-      { headers: this.getHeaders() }
-    );
+      `${this.baseUrl}/api/department/user-certificate-generate `, payload, { headers: this.getHeaders() }
+    )
   }
   updateInspectionRequestStatus(body: any): Observable<any> {
     return this.http.post<any>(
