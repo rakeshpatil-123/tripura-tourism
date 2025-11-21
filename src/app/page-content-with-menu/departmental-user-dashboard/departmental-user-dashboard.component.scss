@@ -1,0 +1,146 @@
+.dashboard-page {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    margin: 0;
+    font-size: 1rem;
+    color: #64748b;
+  }
+}
+
+.dashboard-section {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.charts-section {
+  .charts-grid {
+    display: grid;
+    gap: 1.5rem;
+    width: 100%;
+    transition: all 0.35s ease-in-out;
+  }
+
+  .charts-grid.single-column {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-grid.two-column {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .chart-item {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+
+    ::ng-deep .chart-container {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+}
+
+@media (max-width: 1400px) {
+  .dashboard-page {
+    padding: 1.75rem;
+  }
+
+  .charts-section .charts-grid {
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-page {
+    padding: 1.5rem;
+  }
+
+  .charts-section .charts-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem;
+  }
+
+  .chart-item {
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 1rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.85rem;
+  }
+
+  .dashboard-header .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .chart-item {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-page {
+    padding: 0.875rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-header .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .chart-item {
+    min-height: 280px;
+
+    ::ng-deep .chart-container {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  .dashboard-page {
+    padding: 0.75rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .chart-item {
+    min-height: 260px;
+
+    ::ng-deep .chart-container {
+      padding: 0.625rem 0.5rem;
+    }
+  }
+}

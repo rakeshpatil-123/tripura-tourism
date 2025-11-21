@@ -77,12 +77,29 @@ export class EditableCertificateGenerationComponent implements OnInit {
       complete: () => (this.loadingVariables = false)
     });
   }
+  private formatToDDMMYYYY(date: any): string {
+    if (!date) return '';
+
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
 
   private buildFormFromVariables(): void {
     if (!this.form) this.form = this.fb.group({});
     this.variableList.forEach(v => {
       if (!this.form.contains(v.key)) {
         const initial = this.applicationData?.[v.key] ?? '';
+        if (v.key === 'add_watermark') {
+          const val = initial?.toString().toLowerCase();
+          this.form.addControl(v.key, new FormControl(val === 'yes' ? 'yes' : 'no'));
+          return;
+        }
         this.form.addControl(v.key, new FormControl(initial));
       }
     });
@@ -104,7 +121,7 @@ export class EditableCertificateGenerationComponent implements OnInit {
     this.loadingApplication = true;
     const payload = { application_id: appId };
 
-    this.genericService.getByConditions(payload, 'api/department/certificate-view').subscribe({
+    this.genericService.getByConditions(payload, 'api/department/user-certificate-view').subscribe({
       next: (res: any) => {
         if (res?.status === 1 && res.data) {
           this.applicationData = res.data;
@@ -119,7 +136,7 @@ export class EditableCertificateGenerationComponent implements OnInit {
         }
       },
       error: (err: HttpErrorResponse) => {
-        console.error('Error fetching certificate data:', err);
+        this.dialogRef.close();
         Swal.fire('Error', 'Could not fetch application data', 'error');
       },
       complete: () => (this.loadingApplication = false)
@@ -227,7 +244,12 @@ export class EditableCertificateGenerationComponent implements OnInit {
 
     this.generating = true;
     const payload: any = { application_id: this.selectedAppId || this.form.value.application_id || null, ...this.form.value };
-
+    if (payload.add_watermark) {
+      payload.add_watermark = payload.add_watermark === 'yes' ? 'yes' : 'no';
+    }
+    if (payload.valid_upto) {
+      payload.valid_upto = this.formatToDDMMYYYY(payload.valid_upto);
+    }
     this.genericService.generateCertificate(payload).subscribe({
       next: (res: any) => {
         this.generating = false;
@@ -268,7 +290,8 @@ export class EditableCertificateGenerationComponent implements OnInit {
   inputTypeForKey(key: string): string {
     if (!key) return 'text';
     const k = key.toLowerCase();
-    if (k.includes('date') || k.includes('dob') || k.includes('issued_on') || k.includes('valid_from')) return 'date';
+    if (k === 'add_watermark') return 'dropdown';
+    if (k.includes('date') || k.includes('dob') || k.includes('issued_on') || k.includes('valid_from') || k.includes('valid_upto')) return 'date';
     if (k.includes('email')) return 'email';
     if (k.includes('phone') || k.includes('mobile') || k.includes('contact')) return 'tel';
     if (k.includes('amount') || k.includes('fee') || k.includes('number') || k.includes('no') || k.endsWith('_id')) return 'number';

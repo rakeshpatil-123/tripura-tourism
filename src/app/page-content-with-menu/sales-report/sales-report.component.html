@@ -1,0 +1,52 @@
+<div class="page-container">
+  <h2 class="page-title">Sales Report</h2>
+  <div class="responsive-filter">
+    <div class="form-group small">
+      <app-ilogi-input-date [(ngModel)]="fromDate" fieldId="fromDate" fieldLabel="From Date" placeholder="DD-MM-YYYY"
+        [allowFutureDates]="true">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-input-date [(ngModel)]="toDate" fieldId="toDate" fieldLabel="To Date" placeholder="DD-MM-YYYY"
+        [allowFutureDates]="true">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select [selectOptions]="products" fieldId="product" fieldLabel="Select Product"
+        placeholder="Select Product" [(ngModel)]="selectedProduct">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group small">
+      <app-ilogi-select [selectOptions]="regions" fieldId="region" fieldLabel="Select Region"
+        placeholder="Select Region" [(ngModel)]="selectedRegion">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group button-group">
+      <button class="btn primary" (click)="search()">Search</button>
+      <button class="btn secondary" (click)="reset()">Reset</button>
+    </div>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Region</th>
+          <th>Date</th>
+          <th>Quantity</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredSales">
+          <td>{{ item.product }}</td>
+          <td>{{ item.region }}</td>
+          <td>{{ item.date }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.amount }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="export-button" (click)="exportData()">Export</button>
+</div>

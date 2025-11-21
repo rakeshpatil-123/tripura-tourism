@@ -1,0 +1,106 @@
+<div class="page-container">
+  <h2 class="page-title">Industry Report Details</h2>
+  <form class="filter-row full-inline-row" [formGroup]="industryDetailsForm" (ngSubmit)="$event.preventDefault()">
+    <div class="form-group mb-10">
+      <app-ilogi-input-date formControlName="fromDate" name="from_dt" fieldLabel="From Date" fieldId="from_dt"
+        [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="true" [readonly]="false">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group mb-10">
+      <app-ilogi-input-date formControlName="toDate" name="to_dt" fieldLabel="To Date" fieldId="to_dt"
+        [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="true" [readonly]="false">
+      </app-ilogi-input-date>
+    </div>
+    <div class="form-group">
+      <app-ilogi-select fieldId="district_code" [enableSearch]="true" fieldLabel="District"
+        formControlName="district_code" [selectOptions]="districts" placeholder="Select district">
+      </app-ilogi-select>
+    </div>
+    <div class="form-group">
+      <app-ilogi-select fieldId="subdivision_code" [enableSearch]="true" fieldLabel="Subdivision"
+        formControlName="subdivision_code" [selectOptions]="subdivisions" placeholder="Select subdivision">
+      </app-ilogi-select>
+    </div>
+  </form>
+  <div class="button-inline" style="margin-top: 10px;">
+    <button class="btn btn-reset" type="button" (click)="reset()">Reset</button>
+    <button class="btn btn-search" type="button" (click)="search()">Search</button>
+  </div>
+  <h3 class="section-title" style="margin-top: 20px;">REPORT DETAILS LIST</h3>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>District</th>
+          <th>Sub Division</th>
+          <th>Unique ID</th>
+          <th>Enterprise Name</th>
+          <th>Mobile No</th>
+          <th>Registration Date</th>
+          <th>Services Availed</th>
+          <th>Activity</th>
+          <th>Manufacturing Process</th>
+          <th>Category</th>
+          <th>Women Entrepreneur</th>
+          <th>NIC (2)</th>
+          <th>NIC (4)</th>
+          <th>NIC (5)</th>
+          <th>Investment</th>
+          <th>Employment</th>
+          <th>Turnover</th>
+          <th>Land Type</th>
+          <th>Industrial Area</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of displayedData; let i = index">
+          <td>{{ item.district }}</td>
+          <td>{{ item.subdivision }}</td>
+          <td>{{ item.unique_id }}</td>
+          <td>{{ item.enterprise_name }}</td>
+          <td>{{ item.mobile_no }}</td>
+          <td>{{ item.registration_date }}</td>
+          <td>{{ item.services_availed_count }}</td>
+          <td>{{ item.activity }}</td>
+          <td>{{ item.product_manufacturing_process }}</td>
+          <td>{{ item.category }}</td>
+          <td>{{ item.women_entrepreneur ?? 'N/A' }}</td>
+          <td>{{ item.nic_2_digit }}</td>
+          <td>{{ item.nic_4_digit }}</td>
+          <td>{{ item.nic_5_digit }}</td>
+          <td>{{ item.investment ?? 'N/A' }}</td>
+          <td>{{ item.employment ?? 'N/A' }}</td>
+          <td>{{ item.turnover ?? 'N/A' }}</td>
+          <td>{{ item.land_type }}</td>
+          <td>{{ item.industrial_area_name }}</td>
+        </tr>
+        <tr *ngIf="displayedData.length === 0">
+          <td colspan="19" class="no-record">No record found!</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination-wrapper" *ngIf="totalPages > 0">
+    <div class="pagination-container">
+      <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPageSize === 1">
+        ◀ Prev
+      </button>
+      <ng-container *ngFor="let p of totalPagesArray">
+        <button class="pagination-number" [class.active]="p === currentPageSize" (click)="goToPage(p)">
+          {{ p }}
+        </button>
+      </ng-container>
+      <button class="pagination-btn nav-btn" (click)="nextPage()" [disabled]="currentPageSize === totalPages">
+        Next ▶
+      </button>
+      <div class="page-size-wrapper">
+        <label>Rows per page:</label>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">
+            {{ size }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

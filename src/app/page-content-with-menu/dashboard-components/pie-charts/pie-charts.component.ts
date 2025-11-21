@@ -1,6 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgApexchartsModule, ChartComponent, ApexChart, ApexNonAxisChartSeries, ApexLegend, ApexResponsive, ApexTitleSubtitle } from 'ng-apexcharts';
+import {
+  NgApexchartsModule,
+  ChartComponent,
+  ApexChart,
+  ApexNonAxisChartSeries,
+  ApexLegend,
+  ApexResponsive,
+  ApexTitleSubtitle
+} from 'ng-apexcharts';
 
 export type PieChartOptions = {
   series: ApexNonAxisChartSeries;
@@ -10,12 +18,6 @@ export type PieChartOptions = {
   legend: ApexLegend;
   responsive: ApexResponsive[];
   title: ApexTitleSubtitle;
-  toolbar?: {
-    show: boolean;
-    tools?: {
-      download: boolean;
-    };
-  };
 };
 
 @Component({
@@ -25,51 +27,42 @@ export type PieChartOptions = {
   templateUrl: './pie-charts.component.html',
   styleUrl: './pie-charts.component.scss'
 })
-export class PieChartsComponent implements OnInit {
+export class PieChartsComponent implements OnChanges {
+  @Input() data: any[] | null = null;
   @ViewChild('chart') chart!: ChartComponent;
   public chartOptions!: Partial<PieChartOptions>;
 
-  constructor() {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'] && this.data) {
+      this.prepareChartData();
+    }
+  }
 
-  ngOnInit(): void {
-    
+  private prepareChartData(): void {
+    const labels = this.data?.map((d: any) => d.district_name) ?? [];
+    const series = this.data?.map((d: any) => d.count) ?? [];
       this.chartOptions = {
-        series: [50, 60, 70],
+        series: series,
         chart: {
           type: 'pie',
-          height: 380,
-          toolbar: {
-            show: true,
-            tools: {
-              download: true
-            }
-          }
+          height: 380
         },
-        labels: ['Approved', 'Pending', 'Rejected'],
-        colors: ['#4CAF50', '#FF9800', '#F44336'],
+        labels: labels,
+        colors: ['#4CAF50', '#FF9800', '#2196F3', '#F44336', '#9C27B0'],
         legend: {
           position: 'bottom',
-          fontSize: '14px',
-          fontFamily: 'Inter, sans-serif',
-          labels: {
-            colors: '#64748b'
-          }
-        },
+          fontSize: '14px' },
         responsive: [
           {
             breakpoint: 480,
             options: {
-              chart: {
-                height: 300
-              },
-              legend: {
-                position: 'bottom'
-              }
+              chart: { height: 300 },
+              legend: { position: 'bottom' }
             }
           }
         ],
         title: {
-          text: 'Status Distribution',
+          text: 'District-wise Application Distribution',
           align: 'left',
           style: {
             fontSize: '18px',
@@ -77,7 +70,6 @@ export class PieChartsComponent implements OnInit {
             color: '#1e293b'
           }
         }
-      };
     };
   }
-
+}

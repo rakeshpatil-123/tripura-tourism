@@ -1,0 +1,28 @@
+<div class="filter-container">
+    <div class="filter-group">
+        <label>Trigger Events</label>
+        <select [(ngModel)]="filters.triggerEvent">
+            <option *ngFor="let t of triggerEvents" [value]="t">{{ t }}</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Feedback Forms</label>
+        <select [(ngModel)]="filters.feedbackForm">
+            <option *ngFor="let f of feedbackForms" [value]="f">{{ f }}</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Duration</label>
+        <select [(ngModel)]="filters.duration">
+            <option *ngFor="let d of durations" [value]="d">{{ d }}</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Start Date *</label>
+        <input type="date" [(ngModel)]="filters.startDate" />
+    </div>
+    <div class="filter-group">
+        <label>End Date *</label>
+        <input type="date" [(ngModel)]="filters.endDate" />
+    </div>
+</div>

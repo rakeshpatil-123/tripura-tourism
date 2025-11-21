@@ -1,0 +1,166 @@
+<div class="dashboard-container" @fadeIn @pageFade>
+  <div class="header">
+    <div class="title-area">
+      <h2 @slideInHeader>Feedback Dashboard</h2>
+      <p class="subtitle" @fadeUp>Department wise feedback &amp; ratings</p>
+    </div>
+    <div class="header-actions">
+      <button class="refresh-btn" (click)="refreshDashboard()" aria-label="Refresh dashboard" title="Refresh dashboard"
+        type="button">
+        <span class="refresh-icon" aria-hidden="true">🔄</span>
+        <span class="refresh-text">REFRESH</span>
+      </button>
+    </div>
+  </div>
+  <div class="filter-panel">
+    <form [formGroup]="filterForm" class="controls" @listStagger>
+      <div class="control-item dept-select stagger-item">
+        <app-ilogi-select formControlName="department_id" fieldId="department_id" fieldLabel="Department"
+          [selectOptions]="departmentsList" [enableSearch]="true" placeholder="Select department"
+          (change)="onDepartmentSelect(filterForm.value.department_id)">
+        </app-ilogi-select>
+      </div>
+      <div class="control-item search-box stagger-item">
+        <app-ilogi-input fieldId="user_name" fieldLabel="Username or Feedback" formControlName="user_name" type="text"
+          placeholder="Search by username or feedback">
+        </app-ilogi-input>
+      </div>
+      <div class="control-item small-filter stagger-item mb-10">
+        <app-ilogi-input-date formControlName="from_dt" name="from_dt" fieldLabel="From Date" fieldId="from_dt"
+          [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false">
+        </app-ilogi-input-date>
+      </div>
+      <div class="control-item small-filter stagger-item mb-10">
+        <app-ilogi-input-date formControlName="to_dt" name="to_dt" fieldLabel="To Date" fieldId="to_dt"
+          [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false">
+        </app-ilogi-input-date>
+      </div>
+      <div class="control-item actions-slot stagger-item"></div>
+    </form>
+  </div>
+  <div class="stats-grid" @listStagger aria-live="polite">
+    <div class="stat-card stat-card--glass" role="region" aria-label="Total feedbacks">
+      <div class="stat-left">
+        <div class="stat-label">Total Feedbacks</div>
+        <div class="stat-value" aria-hidden="true">{{ totalCount }}</div>
+        <div class="stat-meta">All feedback received</div>
+      </div>
+      <div class="stat-right stat-badge stat-badge--blue" aria-hidden="true">📊</div>
+    </div>
+    <div class="stat-card stat-card--glass" role="region" aria-label="Average rating">
+      <div class="stat-left">
+        <div class="stat-label">Average Rating</div>
+        <div class="stat-value" aria-haidden="true">{{ summary.avg_rating != null ? (summary.avg_rating |
+          number:'1.2-2') : '—' }}</div>
+        <div class="stat-meta">Based on department summary</div>
+      </div>
+      <div class="stat-right stat-badge stat-badge--orange" aria-hidden="true">⭐</div>
+    </div>
+    <div class="stat-card stat-card--glass" role="region" aria-label="Shown rows">
+      <div class="stat-left">
+        <div class="stat-label">Shown Rows</div>
+        <div class="stat-value" aria-hidden="true">{{ shownRows }}</div>
+        <div class="stat-meta">Filtered results</div>
+      </div>
+      <div class="stat-right stat-badge stat-badge--teal" aria-hidden="true">🔎</div>
+    </div>
+    <div class="stat-card stat-card--glass" role="region" aria-label="Positive feedback count">
+      <div class="stat-left">
+        <div class="stat-label">Positive (≥4★)</div>
+        <div class="stat-value" aria-hidden="true">{{ positiveCount }}</div>
+        <div class="stat-meta">Highly satisfied users</div>
+      </div>
+      <div class="stat-right stat-badge stat-badge--orange-strong" aria-hidden="true">💙</div>
+    </div>
+  </div>
+  <div class="charts-root">
+    <div class="hero">
+      <h2 class="title" @slideInHeader>Ratings & Sentiment</h2>
+    </div>
+    <div class="charts-row" role="region" aria-label="Rating and sentiment charts">
+      <div class="chart-card" #card @cardStagger>
+        <div class="chart-header">
+          <h4>Rating Counts</h4>
+          <p class="muted">Distribution of ratings (1 to 5)</p>
+        </div>
+        <div class="chart-body" @chartFadeIn>
+          <div class="chart-box">
+            <canvas #barCanvas aria-label="Bar chart showing rating counts" role="img"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card" #card>
+        <div class="chart-header">
+          <h4>Sentiment</h4>
+          <p class="muted">Positive / Neutral / Negative</p>
+        </div>
+        <div class="chart-body center">
+          <div class="pie-wrapper" @chartFadeIn>
+            <canvas #pieCanvas aria-label="Doughnut chart showing sentiment" role="img"></canvas>
+            <div class="center-badge" aria-hidden="true">
+              <div class="big-number" id="sentimentPercent">—</div>
+              <div class="small-label">Overall</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="feedback-container" @listStagger>
+    <div class="feedback-header" @slideInHeader>
+      <div class="header-left">
+        <h3>Feedback Data</h3>
+        <p class="muted">Detailed view for <strong>{{ summary.department_name || 'Selected Dept' }}</strong></p>
+      </div>
+      <div class="feedback-actions">
+        <button class="btn-export btn-excel" (click)="exportExcel()" [disabled]="exportDisabled"
+          aria-disabled="{{ exportDisabled }}" title="Export visible rows as CSV">
+          📄 Export Excel
+          <span class="shimmer" *ngIf="!exportDisabled" aria-hidden></span>
+        </button>
+      </div>
+    </div>
+    <div class="table-wrapper clean-table">
+      <table class="simple-table" *ngIf="pagedFeedbacks?.length; else noData" role="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Submitted On</th>
+            <th>Rating</th>
+            <th>Feedback</th>
+            <th>Suggestions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fb of pagedFeedbacks; let i = index" @listStagger>
+            <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td>{{ fb.user_name || '-' }}</td>
+            <td>{{ formatDate(fb.created_at) }}</td>
+            <td>{{ fb.rating ?? '-' }}</td>
+            <td class="td-feedback">{{ fb.feedback || '-' }}</td>
+            <td class="td-suggest">{{ fb.suggestions || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noData>
+        <div class="no-data" @noDataAnim>
+          <div class="no-data-illustration"></div>
+          <p class="no-title">No records to show</p>
+          <p class="no-sub">There are currently no feedback records for the selected department.</p>
+        </div>
+      </ng-template>
+    </div>
+    <div class="pagination" *ngIf="totalPages > 1">
+      <p class="rows-count">{{ filteredFeedbacks?.length || 0 }} rows</p>
+      <div class="page-controls">
+        <div class="pagination-wrapper">
+          <div class="pagination-container" @fadeUp>
+            <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPage === 1"
+              aria-label="Previous page"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

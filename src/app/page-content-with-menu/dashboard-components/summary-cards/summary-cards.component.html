@@ -1,4 +1,4 @@
-<div class="summary-cards">
+<div class="summary-cards" [class.shrink]="sidebarCollapsed">
   @for (card of cards; track card.title) {
     <div class="card" [attr.data-color]="card.color">
       <div class="card-header">
@@ -7,7 +7,8 @@
       </div>
       <div class="card-body">
         <div class="value">{{ card.value }}</div>
-        <div class="change">{{ card.change }}</div>
+        <div class="percentage {{ card.color }}">
+      {{ card.percentage.toFixed(2) }}%</div>
       </div>
     </div>
   }

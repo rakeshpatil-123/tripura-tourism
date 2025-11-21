@@ -260,6 +260,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['admin', 'department', 'individual'] }
       },
       {
+        path: 'feedback',
+        loadComponent: () =>
+          import('./feedback-dashboard/feedback-dashboard.component').then(
+            (m) => m.FeedbackDashboardComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'department'] }
+      },
+      {
         path: 'admin-services',
         loadComponent: () =>
           import('./admin-services/admin-services.component').then(
@@ -354,7 +363,24 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department'] },
       },
-    
+      {
+        path: 'user-payment-list',
+        loadComponent: () =>
+          import('./user-payment-list/user-payment-list.component').then(
+            (m) => m.UserPaymentListComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
+      {
+        path: 'activity-log',
+        loadComponent: () =>
+          import('./activity-log/activity-log.component').then(
+            (m) => m.ActivityLogComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+      },
       {
         path: 'business-user',
         loadComponent: () =>
@@ -381,6 +407,114 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           ),
         canActivate: [authGuard],
         data: { roles: ['admin', 'department'] }
+      },
+      {
+        path: 'reports/sales',
+        loadComponent: () =>
+          import('./sales-report/sales-report.component').then(
+            (m) => m.SalesReportComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['individual', 'department'] },
+      },
+      {
+        path: 'reports/users',
+        loadComponent: () =>
+          import('./user-report/user-report.component').then(
+            (m) => m.UserReportComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['individual', 'department'] },
+      },
+      {
+        path: 'reports/payment',
+        loadComponent: () =>
+          import('./payment/payment.component').then(
+            (m) => m.PaymentComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['individual', 'department'] },
+      },
+      {
+        path: 'reports/department-user-list',
+        loadComponent: () =>
+          import('./department-user-list/department-user-list.component').then(
+            (m) => m.DepartmentUserListComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'moderator'] },
+      },
+      {
+        path: 'reports/application-status',
+        loadComponent: () =>
+          import('./application-status/application-status.component').then(
+            (m) => m.ApplicationStatusComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['individual', 'department'] },
+      },
+      {
+        path: 'reports/industry-report-summary',
+        loadComponent: () =>
+          import('./industry-report-summary/industry-report-summary.component').then(
+            (m) => m.IndustryReportSummaryComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'moderator'] },
+      },
+      {
+        path: 'reports/industry-report-details',
+        loadComponent: () =>
+          import('./industry-report-details/industry-report-details.component').then(
+            (m) => m.IndustryReportDetailsComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'moderator'] },
+      },
+      {
+        path: 'reports/noc-issue-status',
+        loadComponent: () =>
+          import('./nod-issue-status/nod-issue-status.component').then(
+            (m) => m.NodIssueStatusComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['individual', 'department'] },
+      },
+      {
+        path: 'reports/cis-summary',
+        loadComponent: () =>
+          import('./cis-summary/cis-summary.component').then(
+            (m) => m.CisSummaryComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'moderator'] },
+      },
+      {
+        path: 'reports/cis-details',
+        loadComponent: () =>
+          import('./cis-details/cis-details.component').then(
+            (m) => m.CisDetailsComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'moderator'] },
+      },
+      {
+        path: 'reports/user-list',
+        loadComponent: () =>
+          import('./user-list/user-list.component').then(
+            (m) => m.UserListComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['moderator', 'department'] },
+      },
+      {
+        path: 'reports/labour-register',
+        loadComponent: () =>
+          import('./labour-register/labour-register.component').then(
+            (m) => m.LabourRegisterComponent,
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'moderator'] },
       },
     ],
   },

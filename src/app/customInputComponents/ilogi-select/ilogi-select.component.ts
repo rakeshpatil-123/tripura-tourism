@@ -8,8 +8,10 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
   forwardRef,
 } from '@angular/core';
@@ -44,7 +46,7 @@ export interface SelectOption {
   ],
 })
 export class IlogiSelectComponent
-  implements OnInit, AfterViewInit, ControlValueAccessor
+  implements OnInit, AfterViewInit, ControlValueAccessor, OnChanges
 {
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
   @Input() submitted = false;
@@ -103,6 +105,12 @@ export class IlogiSelectComponent
     this.filteredOptions = this.selectOptions.filter((opt) =>
       opt.name.toLowerCase().includes(lowerTerm)
     );
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectOptions']) {
+      this.filteredOptions = [...this.selectOptions];
+      this.cdr.detectChanges();
+    }
   }
 
   onDropdownShow(): void {

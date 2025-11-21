@@ -12,13 +12,13 @@ import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilo
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, IlogiInputDateComponent, IlogiInputComponent],
 })
-export class ConfirmDateDialogComponent {
+export class ConfirmDateDialogCertificateComponent {
   form: FormGroup;
   isJoint = false;
 
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<ConfirmDateDialogComponent>,
+    public dialogRef: MatDialogRef<ConfirmDateDialogCertificateComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.isJoint = data.row?.department_type === 'joint';
