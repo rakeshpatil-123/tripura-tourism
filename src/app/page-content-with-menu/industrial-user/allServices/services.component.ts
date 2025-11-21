@@ -177,7 +177,10 @@ export class ServicesComponent {
       icon: 'star',
       width: '60px',
       onClick: (row: any) => {
-        console.log(row.id);
+      this.router.navigate(
+                [`/dashboard/service-feedback`, row.id],
+            
+              );
         
       },
     
