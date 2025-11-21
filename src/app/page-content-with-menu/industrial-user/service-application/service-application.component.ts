@@ -93,7 +93,7 @@ interface SectionGroup {
     MatDialogModule,
     MatButtonModule,
     ConfirmationModalComponent,
-    LoaderComponent
+    LoaderComponent,
   ],
   templateUrl: './service-application.component.html',
   styleUrl: './service-application.component.scss',
@@ -127,6 +127,7 @@ export class ServiceApplicationComponent implements OnInit {
   loading: boolean = false;
   visible = false;
   readonlyFields: { [key: number]: boolean } = {};
+  extraPayment: string | number | null = null;
   private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
@@ -921,6 +922,9 @@ export class ServiceApplicationComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && res.data?.application_data) {
+            if (res.data?.extra_payment) {
+              this.extraPayment = res.data.extra_payment;
+            }
             this.patchFormWithExistingData(res.data.application_data);
           }
         },
@@ -1111,6 +1115,15 @@ export class ServiceApplicationComponent implements OnInit {
     const formData = new FormData();
     formData.append('user_id', userId);
     formData.append('service_id', this.serviceId.toString());
+    const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
+    
+    if (actualAppId !== null) {
+      formData.append('application_id', actualAppId.toString());
+    }
+
+    if (this.extraPayment) {
+      formData.append('extra_payment', this.extraPayment.toString());
+    }
 
     Object.keys(preparedRaw).forEach((key) => {
       if (this.sectionGroups.some((s) => s.sectionName === key)) return;

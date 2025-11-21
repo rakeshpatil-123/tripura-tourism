@@ -36,7 +36,8 @@ interface ApplicationDataItem {
   nocMasterId: string;
   service_id: number;
   _raw?: any;
-  service_mode: string
+  service_mode: string;
+  application_id: number;
 }
 
 @Component({
@@ -51,7 +52,7 @@ interface ApplicationDataItem {
     IlogiSelectComponent,
     IlogiInputDateComponent,
     ButtonComponent,
-    LoaderComponent
+    LoaderComponent,
   ],
 })
 export class ApplicationSearchPageComponent implements OnInit {
@@ -99,7 +100,7 @@ export class ApplicationSearchPageComponent implements OnInit {
     },
   };
 
-  loading:boolean = false;
+  loading: boolean = false;
   loadingDepartments = false;
   appId: number | null = null;
   noDataMessage = 'No applications found';
@@ -219,7 +220,7 @@ export class ApplicationSearchPageComponent implements OnInit {
                 payment_status: this.toTitleCase(
                   app.payment_status || 'pending'
                 ),
-                nocDetailsId: String(app.application_id || app.id || 0),
+                nocDetailsId: String(app.application_id || 0),
                 noc_master_id: String(app.service_id || app.noc_master_id || 0),
                 nocMasterId:
                   this.serviceMap[app.service_id]?.code ||
@@ -321,6 +322,19 @@ export class ApplicationSearchPageComponent implements OnInit {
         cellClass: () => 'input-large-custom wid-cus',
       },
       {
+        key: 'feedback',
+        label: 'Feedback',
+        type: 'icon',
+        icon: 'star',
+        width: '60px',
+        onClick: (row: any) => {
+            this.router.navigate(
+                [`/dashboard/service-feedback`, row.service_id],
+            
+              );
+        },
+      },
+      {
         key: 'actions',
         label: 'Action',
         type: 'action',
@@ -341,60 +355,42 @@ export class ApplicationSearchPageComponent implements OnInit {
             color: 'warn',
             visible: (row) => row.id != null,
             handler: (row: ApplicationDataItem) => {
-                const queryParams: any = {};
-            if (row.service_mode === 'third_party') {
-              queryParams.service = 'third_party';
-            }
-              this.router.navigate([`/dashboard/user-app-view`, row.service_id, row.id],  {
-                queryParams: queryParams,
-              });
+              const queryParams: any = {};
+              if (row.service_mode === 'third_party') {
+                queryParams.service = 'third_party';
+              }
+              this.router.navigate(
+                [`/dashboard/user-app-view`, row.service_id, row.id],
+                {
+                  queryParams: queryParams,
+                }
+              );
             },
           },
+          {
+            label: 'Re-submit',
+            action: 'view',
+            color: 'warn',
+            visible: (row) => row.status === "extra_payment" || row.status === "send_back",
+            handler: (row: ApplicationDataItem) => {
+              const queryParams: any = {application_status : row.status, application_id : row.nocDetailsId};
+              // console.log(row.nocDetailsId);
+              
+             
+              this.router.navigate(
+                [`/dashboard/service-application`, row.service_id],
+                {
+                  queryParams: queryParams,
+                }
+              );
+            },
+          },
+        
         ],
         class: 'text-center',
       },
 
-      // {
-      //   key: 'dueDate',
-      //   label: 'Due Date',
-      //   type: 'date',
-      //   format: (value: string) => value || '',
-      // },
-      // {
-      //   key: 'actions',
-      //   label: 'Action',
-      //   type: 'action',
-      //   actions: [
-      //     {
-      //       label: 'View',
-      //       action: 'view',
-      //       icon: 'visibility',
-      //       color: 'primary',
-      //       handler: (row: ApplicationDataItem) => {
-      //         this.router.navigate([`/dashboard/service-view`, row.id]);
-      //       },
-      //     },
-      //     {
-      //       label: 'Modify',
-      //       action: 'modify',
-      //       icon: 'edit',
-      //       color: 'accent',
-      //       handler: (row: ApplicationDataItem) => {
-      //         this.handleModifyNavigation(row);
-      //       },
-      //     },
-      //     {
-      //       label: 'Transaction History',
-      //       action: 'transactionHistory',
-      //       icon: 'receipt',
-      //       color: 'success',
-      //       handler: (row: ApplicationDataItem) => {
-      //         this.openTransactionHistoryDialog(row);
-      //       },
-      //     },
-      //   ],
-      //   class: 'text-center',
-      // },
+    
     ];
   }
 
@@ -469,11 +465,11 @@ export class ApplicationSearchPageComponent implements OnInit {
       );
     }
 
-     if (this.selectedServiceName) {
-    result = result.filter(
-      (row) => row.applicationFor === this.selectedServiceName
-    );
-  }
+    if (this.selectedServiceName) {
+      result = result.filter(
+        (row) => row.applicationFor === this.selectedServiceName
+      );
+    }
 
     this.filteredData = result;
   }
@@ -525,7 +521,8 @@ export class ApplicationSearchPageComponent implements OnInit {
         Swal.fire({
           icon: 'error',
           title: 'Download Failed',
-          text: err?.error?.message || 'PDF file not found for this application.',
+          text:
+            err?.error?.message || 'PDF file not found for this application.',
           confirmButtonText: 'Retry',
         });
       },

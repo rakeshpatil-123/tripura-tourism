@@ -124,10 +124,17 @@
   border-radius: 5px;
   position: absolute;
   inset: 0;
- background: linear-gradient(to bottom, #003c5b 50%, #fda00f 50%);
-
   clip-path: polygon(0 0, 100% 0, 100% 67%, 50% 67%, 50% 34%, 0 34%);
   animation: sp7 2s infinite;
+}
+.loader::after {
+  background: #003c5b  ;
+
+}
+.loader::before
+{
+  background:   #fda00f;
+
 }
 
 

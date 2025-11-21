@@ -172,6 +172,18 @@ export class ServicesComponent {
 
     columns.push({
       key: 'apply_icon',
+      label: 'Feedback',
+      type: 'icon',
+      icon: 'star',
+      width: '60px',
+      onClick: (row: any) => {
+        console.log(row.id);
+        
+      },
+    
+    });
+    columns.push({
+      key: 'apply_icon',
       label: 'Apply',
       type: 'icon',
       icon: 'exit_to_app',
@@ -183,6 +195,7 @@ export class ServicesComponent {
         const shouldShow =
           row.application_id === null ||
           row.application_status === 'send_back' ||
+          row.application_status === 'extra_payment' ||
           row.allow_repeat_application === 'yes';
         return shouldShow ? '' : 'd-none';
       },
