@@ -1,0 +1,47 @@
+<div class="feedback-wrapper">
+
+  <div class="feedback-card">
+
+    <h2 class="title">Share Your Feedback</h2>
+  <div class="card">
+
+    <p class="subtitle">Your opinion helps us improve!</p>
+
+    <!-- Rating Section -->
+    <div class="rating-box">
+      <label class="label">Rate Your Experience</label>
+      <div class="stars">
+        <ng-container *ngFor="let s of [1,2,3,4,5]">
+          <span 
+            class="star" 
+            [class.active]="s <= rating"
+            (click)="setRating(s)"
+          >★</span>
+        </ng-container>
+      </div>
+
+      <p class="rating-text">
+        {{
+          rating === 5 ? 'Very Satisfied' :
+          rating === 4 ? 'Satisfied' :
+          rating === 3 ? 'Neutral' :
+          rating === 2 ? 'Dissatisfied' :
+          rating === 1 ? 'Very Dissatisfied' :
+          'Tap a star to rate'
+        }}
+      </p>
+    </div>
+
+    <!-- Textarea Section -->
+    <div class="feedback-text">
+      <label class="label">Add Your Comments</label>
+      <textarea placeholder="Tell us more about your experience..."></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <button class="submit-btn">Submit Feedback</button>
+
+  </div>
+</div>
+</div>
+F

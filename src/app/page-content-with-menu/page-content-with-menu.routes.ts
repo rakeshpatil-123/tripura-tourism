@@ -146,6 +146,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department', 'individual'] }
       },
       {
+        path: 'service-feedback/:id',
+        loadComponent: () =>
+          import(
+            './industrial-user/service-feedback/service-feedback.component'
+          ).then((m) => m.ServiceFeedbackComponent),
+        canActivate: [authGuard],
+        data: { roles: [ 'individual'] }
+      },
+      {
         path: 'repeat-application/:serviceid',
         loadComponent: () =>
           import(

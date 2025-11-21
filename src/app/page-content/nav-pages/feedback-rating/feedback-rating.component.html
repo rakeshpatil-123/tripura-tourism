@@ -1,145 +1,94 @@
-<div class="container">
-  <div class="form-container">
-    <div class="page-header">
-      <h1 class="page-title">Feedback & Rating Form</h1>
-      <p class="page-subtitle">Your feedback helps us improve our services. Please share your experience with us.</p>
+<div class="feedback-container">
+  <h1 class="page-head">Feedback & Ratings</h1>
+  
+  <form [formGroup]="feedbackForm" class="feedback-form" (ngSubmit)="submitFeedback()">
+    <div class="form-row">
+      <div class="form-field">
+        <app-ilogi-input
+          formControlName="user_name"
+          fieldLabel="Full Name"
+          [mandatory]="true"
+          [type]="'text'"
+          placeholder="Enter your full name"
+          [errorMessages]="{ required: 'Name is required', maxlength: 'Maximum 255 characters allowed' }">
+        </app-ilogi-input>
+      </div>
     </div>
 
-    <div class="success-message" [style.display]="showSuccessMessage ? 'block' : 'none'">
-      <strong>Thank you!</strong> Your feedback has been submitted successfully.
+    <div class="form-row">
+      <div class="form-field">
+        <app-ilogi-input
+          formControlName="email"
+          fieldLabel="Email Address"
+          [mandatory]="true"
+          [type]="'email'"
+          placeholder="Enter your email address"
+          [errorMessages]="{
+            required: 'Email is required',
+            email: 'Please enter a valid email address',
+            maxlength: 'Maximum 255 characters allowed'
+          }">
+        </app-ilogi-input>
+      </div>
     </div>
 
-    <form #feedbackFormRef="ngForm" (ngSubmit)="onSubmit()" novalidate>
-      <div class="form-group">
-        <label for="username" class="form-label">
-          Username (SWAAGAT 2.0) <span class="required">*</span>
-        </label>
-        <div class="input-wrapper">
-          <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
-          <input 
-            type="text" 
-            id="username" 
-            name="username" 
-            class="form-input has-icon"
-            [class.error]="formErrors['username']"
-            [(ngModel)]="feedbackForm.username"
-            (input)="clearFieldError('username')"
-            placeholder="Enter your username"
-            required>
-        </div>
+    <div class="form-row">
+      <div class="form-field">
+        <app-ilogi-select
+          formControlName="department_id"
+          fieldLabel="Department"
+          [mandatory]="true"
+          [selectOptions]="departments"
+          placeholder="Select Department">
+        </app-ilogi-select>
       </div>
-
-      <div class="form-group">
-        <label for="email" class="form-label">
-          Registered Email ID <span class="required">*</span>
-        </label>
-        <div class="input-wrapper">
-          <fa-icon [icon]="faEnvelope" class="input-icon"></fa-icon>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            class="form-input has-icon"
-            [class.error]="formErrors['email']"
-            [(ngModel)]="feedbackForm.email"
-            (input)="clearFieldError('email')"
-            placeholder="Enter your registered email address"
-            required>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="department" class="form-label">
-          Department of Service Availed <span class="required">*</span>
-        </label>
-        <select 
-          id="department" 
-          name="department" 
-          class="form-select"
-          [class.error]="formErrors['department']"
-          [(ngModel)]="feedbackForm.department"
-          (change)="clearFieldError('department')"
-          required>
-          <option *ngFor="let dept of departments" [value]="dept.value">
-            {{ dept.label }}
-          </option>
-        </select>
-      </div>
-
-      <div class="rating-section" [class.rating-error]="ratingBorderError">
-        <div class="rating-title">How satisfied are you with our service? <span class="required">*</span></div>
-        <div class="star-rating">
-          <div *ngFor="let rating of ratingOptions; let i = index" class="rating-item">
-            <input 
-              type="radio" 
-              [id]="'rating' + rating.value" 
-              name="satisfaction" 
-              [value]="rating.value"
-              [(ngModel)]="feedbackForm.satisfaction"
-              (change)="onRatingChange()"
-              required>
-            <label 
-              [for]="'rating' + rating.value"
-              (mouseenter)="onStarHover(rating.value)"
-              (mouseleave)="onStarLeave()">
-              <span class="star" [class.star-selected]="getStarRating(parseNumber(rating.value))" [class.star-hovered]="isStarHovered(parseNumber(rating.value))">★</span>
-              <span class="rating-text">{{ rating.label }}</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="feedback" class="form-label">
-          Feedback <span class="required">*</span>
-        </label>
-        <div class="textarea-group">
-          <textarea 
-            id="feedback" 
-            name="feedback" 
-            class="form-textarea"
-            [class.error]="formErrors['feedback']"
-            [(ngModel)]="feedbackForm.feedback"
-            (input)="onFeedbackInput($event)"
-            placeholder="Please share your detailed feedback about the service you received..."
-            maxlength="1000"
-            required></textarea>
-          <div class="char-counter">
-            <span>{{ feedbackCharCount }}</span>/1000
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="suggestions" class="form-label">
-          Suggestions for Improvement
-        </label>
-        <div class="textarea-group">
-          <textarea 
-            id="suggestions" 
-            name="suggestions" 
-            class="form-textarea"
-            [(ngModel)]="feedbackForm.suggestions"
-            (input)="onSuggestionsInput($event)"
-            placeholder="Any suggestions to help us improve our services? (Optional)"
-            maxlength="500"></textarea>
-          <div class="char-counter">
-            <span>{{ suggestionsCharCount }}</span>/500
-          </div>
-        </div>
-      </div>
-
-      <div class="submit-section">
-        <button type="submit" class="submit-btn" [class.loading]="isSubmitting" [disabled]="isSubmitting">Submit Feedback</button>
-      </div>
-    </form>
-
-    <div class="privacy-note">
-      <strong>Privacy Protected:</strong> Your feedback is confidential and will be used only for service improvement purposes.
     </div>
 
-    <div class="form-footer">
-      <p>For technical issues, contact: <strong><a href="mailto:support@swaagat.gov.in">support@swaagat.gov.in</a></strong></p>
+    <div class="form-row">
+      <div class="form-field">
+        <app-ilogi-select
+          formControlName="satisfaction"
+          fieldLabel="Satisfaction Level"
+          [mandatory]="true"
+          [selectOptions]="satisfactionOptions"
+          placeholder="How satisfied are you?">
+        </app-ilogi-select>
+      </div>
     </div>
-  </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <app-ilogi-input
+          formControlName="feedback"
+          fieldLabel="Feedback"
+          [mandatory]="true"
+          [type]="'textarea'"
+          placeholder="Please share your feedback about our service"
+          [errorMessages]="{ required: 'Feedback is required', maxlength: 'Maximum 1000 characters allowed' }">
+        </app-ilogi-input>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <app-ilogi-input
+          formControlName="suggestions"Fe
+          fieldLabel="Suggestions"
+          [mandatory]="false"
+          [type]="'textarea'"
+          placeholder="Any suggestions for improvement? (Optional)"
+          [errorMessages]="{ maxlength: 'Maximum 1000 characters allowed' }">
+        </app-ilogi-input>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="feedbackForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Submitting...' : 'Submit Feedback' }}
+      </button>
+    </div>
+  </form>
 </div>
