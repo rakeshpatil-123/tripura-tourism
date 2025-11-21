@@ -61,7 +61,7 @@ export class GenericService {
     private router: Router,
     private snackBar: MatSnackBar,
     private cookieService: CookieService
-  ) {}
+  ) { }
 
   loginUser(credentials: {
     username: string;
@@ -337,6 +337,40 @@ export class GenericService {
       );
   }
 
+  getPublicApi(apiObject: string, queryParams?: any): Observable<any> {
+    // Create options object with query parameters if provided
+    const options = {
+      params: queryParams
+    };
+
+    return this.http
+      .get(`${this.baseUrl}/${apiObject}`, options)
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          // Handle authentication errors
+          if (error.error && typeof error.error === 'object') {
+            const message = error.error.message;
+
+            if (
+              message === 'Unauthenticated.' ||
+              message === 'Unauthorised' ||
+              message === 'Session expired or logged out' ||
+              message === 'Session expired due to inactivity'
+            ) {
+              console.warn('Session expired or invalid. Redirecting to login...');
+              this.handleUnauthenticated();
+            }
+          } else if (error.status === 401) {
+            console.warn('401 Unauthorized. Redirecting to login...');
+            this.handleUnauthenticated();
+          }
+
+          return throwError(() => error);
+        })
+      );
+  }
+
+
   getThirdPartyRedirect(url: string): Observable<string> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
@@ -533,15 +567,15 @@ export class GenericService {
   //   }
   // }
 
-userDashData(): Observable<any> {
-  const uid = localStorage.getItem('userId');
-  const payload = { user_id: uid };
-  
-  return this.getByConditions(
-    payload,
-    `api/user/get-total-applications-by-user`
-  );
-}
+  userDashData(): Observable<any> {
+    const uid = localStorage.getItem('userId');
+    const payload = { user_id: uid };
+
+    return this.getByConditions(
+      payload,
+      `api/user/get-total-applications-by-user`
+    );
+  }
 
   postWithoutAuth(apiObject: string, body: any = {}): Observable<any> {
     return this.http.post(`${this.baseUrl}/${apiObject}`, body);
@@ -565,9 +599,8 @@ userDashData(): Observable<any> {
       next: (res: any) => {
         Swal.fire({
           title: 'Logging Out...',
-          html: `<strong>${
-            res.message || 'You have been successfully logged out.'
-          }</strong>`,
+          html: `<strong>${res.message || 'You have been successfully logged out.'
+            }</strong>`,
           timer: 2500,
           timerProgressBar: true,
           allowOutsideClick: false,

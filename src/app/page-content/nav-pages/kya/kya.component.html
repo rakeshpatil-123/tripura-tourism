@@ -1,1 +1,203 @@
-<p>kya works!</p>
+<div class="kya-container">
+  <div class="kya-header">
+    <h1>Know Your Approvals (KYA)</h1>
+    <p>Select your sector and industry to find required approvals</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!showApprovalDetails" class="form-section">
+    <!-- Sector Dropdown -->
+    <div class="form-group">
+      <label for="sector">Sector <span class="required">*</span></label>
+      <select 
+        id="sector" 
+        [(ngModel)]="selectedSector" 
+        (change)="onSectorChange()"
+        class="form-control"
+        [disabled]="loading">
+        <option value="">-- Select Sector --</option>
+        <option *ngFor="let sector of sectors" [value]="sector">{{ sector }}</option>
+      </select>
+    </div>
+
+    <!-- Industry Sector Dropdown -->
+    <div class="form-group" *ngIf="industrySectors.length > 0">
+      <label for="industry">Industry Sector <span class="required">*</span></label>
+      <select 
+        id="industry" 
+        [(ngModel)]="selectedIndustry" 
+        (change)="onIndustryChange()"
+        class="form-control"
+        [disabled]="loading">
+        <option value="">-- Select Industry Sector --</option>
+        <option *ngFor="let industry of industrySectors" [value]="industry">{{ industry }}</option>
+      </select>
+    </div>
+
+    <!-- Risk Category Display -->
+    <div *ngIf="riskCategory" class="risk-category-badge">
+      <strong>Risk Category:</strong> <span class="badge" [class.badge-red]="riskCategory === 'Red'" [class.badge-orange]="riskCategory === 'Orange'" [class.badge-green]="riskCategory === 'Green'">{{ riskCategory }}</span>
+    </div>
+
+    <!-- Industry Questions Section -->
+    <div *ngIf="industryQuestions.length > 0" class="questions-section">
+      <div class="risk-category">
+        <h3 class="category-title">Industry Approvals</h3>
+        
+        <div class="questions-list">
+          <div *ngFor="let question of industryQuestions; let i = index" class="question-item">
+            <div class="question-text">
+              <span class="question-number">{{ i + 1 }}.</span>
+              <span>{{ question.question }}</span>
+            </div>
+            
+            <div class="answer-options">
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'question_' + question.id" 
+                  [value]="true"
+                  (change)="onAnswerChange(question, true)"
+                  [checked]="question.answer === true">
+                <span>Yes</span>
+              </label>
+              
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'question_' + question.id" 
+                  [value]="false"
+                  (change)="onAnswerChange(question, false)"
+                  [checked]="question.answer === false">
+                <span>No</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utility Questions Section -->
+    <div *ngIf="utilityQuestions.length > 0" class="questions-section">
+      <div class="risk-category">
+        <h3 class="category-title">Utility Requirements</h3>
+        
+        <div class="questions-list">
+          <div *ngFor="let question of utilityQuestions; let i = index" class="question-item">
+            <div class="question-text">
+              <span class="question-number">{{ i + 1 }}.</span>
+              <span>{{ question.question }}</span>
+            </div>
+            
+            <div class="answer-options">
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'utility_' + question.id" 
+                  [value]="true"
+                  (change)="onAnswerChange(question, true)"
+                  [checked]="question.answer === true">
+                <span>Yes</span>
+              </label>
+              
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'utility_' + question.id" 
+                  [value]="false"
+                  (change)="onAnswerChange(question, false)"
+                  [checked]="question.answer === false">
+                <span>No</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div *ngIf="industryQuestions.length > 0 || utilityQuestions.length > 0" class="action-buttons">
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="showApplicationInformation()"
+        [disabled]="loading">
+        Show Application Information
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="resetForm()"
+        [disabled]="loading">
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Approval Details Table -->
+  <div *ngIf="showApprovalDetails" class="approval-details-section">
+    <div class="details-header">
+      <h2>Application Information</h2>
+      <button 
+        type="button" 
+        class="btn btn-back" 
+        (click)="backToQuestions()">
+        ← Back to Questions
+      </button>
+    </div>
+
+    <!-- Industry Approvals Table -->
+    <div *ngIf="approvalDetails.length > 0">
+      <h3 class="section-subtitle">Industry Approvals</h3>
+      <div class="table-container">
+        <table class="approval-table">
+          <thead>
+            <tr>
+              <th *ngFor="let key of getObjectKeys(approvalDetails[0])">
+                {{ formatKey(key) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let detail of approvalDetails">
+              <td *ngFor="let key of getObjectKeys(detail)">
+                {{ detail[key] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Utilities Table -->
+    <div *ngIf="utilitiesData.length > 0" style="margin-top: 30px;">
+      <h3 class="section-subtitle">Utility Requirements</h3>
+      <div class="table-container">
+        <table class="approval-table">
+          <thead>
+            <tr>
+              <th *ngFor="let key of getObjectKeys(utilitiesData[0])">
+                {{ formatKey(key) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let utility of utilitiesData">
+              <td *ngFor="let key of getObjectKeys(utility)">
+                {{ utility[key] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="approvalDetails.length === 0 && utilitiesData.length === 0" class="no-data">
+      <p>No approval details found.</p>
+    </div>
+  </div>
+</div>
