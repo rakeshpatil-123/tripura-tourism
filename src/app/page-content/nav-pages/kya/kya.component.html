@@ -1,217 +1,203 @@
 <div class="kya-container">
-  <!-- Header -->
-  <header class="kya-header">
-    <div class="header-content">
-      <div class="header-left">
-        <div class="header-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-            <line x1="9" y1="6" x2="15" y2="6"></line>
-            <line x1="9" y1="10" x2="15" y2="10"></line>
-            <line x1="9" y1="14" x2="15" y2="14"></line>
-          </svg>
-        </div>
-        <div>
-          <h1 class="header-title">Know Your Approvals</h1>
-          <p class="header-subtitle">Tripura Business Approval Navigator</p>
+  <div class="kya-header">
+    <h1>Know Your Approvals (KYA)</h1>
+    <p>Select your sector and industry to find required approvals</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!showApprovalDetails" class="form-section">
+    <!-- Sector Dropdown -->
+    <div class="form-group">
+      <label for="sector">Sector <span class="required">*</span></label>
+      <select 
+        id="sector" 
+        [(ngModel)]="selectedSector" 
+        (change)="onSectorChange()"
+        class="form-control"
+        [disabled]="loading">
+        <option value="">-- Select Sector --</option>
+        <option *ngFor="let sector of sectors" [value]="sector">{{ sector }}</option>
+      </select>
+    </div>
+
+    <!-- Industry Sector Dropdown -->
+    <div class="form-group" *ngIf="industrySectors.length > 0">
+      <label for="industry">Industry Sector <span class="required">*</span></label>
+      <select 
+        id="industry" 
+        [(ngModel)]="selectedIndustry" 
+        (change)="onIndustryChange()"
+        class="form-control"
+        [disabled]="loading">
+        <option value="">-- Select Industry Sector --</option>
+        <option *ngFor="let industry of industrySectors" [value]="industry">{{ industry }}</option>
+      </select>
+    </div>
+
+    <!-- Risk Category Display -->
+    <div *ngIf="riskCategory" class="risk-category-badge">
+      <strong>Risk Category:</strong> <span class="badge" [class.badge-red]="riskCategory === 'Red'" [class.badge-orange]="riskCategory === 'Orange'" [class.badge-green]="riskCategory === 'Green'">{{ riskCategory }}</span>
+    </div>
+
+    <!-- Industry Questions Section -->
+    <div *ngIf="industryQuestions.length > 0" class="questions-section">
+      <div class="risk-category">
+        <h3 class="category-title">Industry Approvals</h3>
+        
+        <div class="questions-list">
+          <div *ngFor="let question of industryQuestions; let i = index" class="question-item">
+            <div class="question-text">
+              <span class="question-number">{{ i + 1 }}.</span>
+              <span>{{ question.question }}</span>
+            </div>
+            
+            <div class="answer-options">
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'question_' + question.id" 
+                  [value]="true"
+                  (change)="onAnswerChange(question, true)"
+                  [checked]="question.answer === true">
+                <span>Yes</span>
+              </label>
+              
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'question_' + question.id" 
+                  [value]="false"
+                  (change)="onAnswerChange(question, false)"
+                  [checked]="question.answer === false">
+                <span>No</span>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </header>
 
-  <div class="main-content">
-    <!-- Business Information Form -->
-    <div *ngIf="!showApprovals" class="form-container">
-      <div class="form-header">
-        <h2 class="form-title">Business Information</h2>
-        <p class="form-subtitle">Tell us about your business to discover required approvals</p>
-      </div>
-
-      <div class="form-fields">
-        <!-- Location -->
-        <div class="form-group">
-          <label class="form-label">Location (State/District)</label>
-          <select [(ngModel)]="location" class="form-control">
-            <option value="">Select Location</option>
-            <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
-          </select>
-        </div>
-
-        <!-- Industry Sector -->
-        <div class="form-group">
-          <label class="form-label">Industry Sector *</label>
-          <select [(ngModel)]="selectedSector" (change)="onSectorChange(selectedSector)" class="form-control">
-            <option value="">Select Industry Sector</option>
-            <option *ngFor="let sector of industrySectors" [value]="sector">{{ sector }}</option>
-          </select>
-        </div>
-
-        <!-- Risk Category (Auto-populated) -->
-        <div class="form-group" *ngIf="riskCategory">
-          <label class="form-label">Risk Category (Auto-assigned)</label>
-          <div class="risk-badge" [ngClass]="getRiskColorClass(riskCategory)">
-            <span class="risk-text">{{ riskCategory }}</span>
+    <!-- Utility Questions Section -->
+    <div *ngIf="utilityQuestions.length > 0" class="questions-section">
+      <div class="risk-category">
+        <h3 class="category-title">Utility Requirements</h3>
+        
+        <div class="questions-list">
+          <div *ngFor="let question of utilityQuestions; let i = index" class="question-item">
+            <div class="question-text">
+              <span class="question-number">{{ i + 1 }}.</span>
+              <span>{{ question.question }}</span>
+            </div>
+            
+            <div class="answer-options">
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'utility_' + question.id" 
+                  [value]="true"
+                  (change)="onAnswerChange(question, true)"
+                  [checked]="question.answer === true">
+                <span>Yes</span>
+              </label>
+              
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  [name]="'utility_' + question.id" 
+                  [value]="false"
+                  (change)="onAnswerChange(question, false)"
+                  [checked]="question.answer === false">
+                <span>No</span>
+              </label>
+            </div>
           </div>
         </div>
-
-        <!-- Number of Employees -->
-        <div class="form-group">
-          <label class="form-label">Number of Employees</label>
-          <input 
-            type="number" 
-            [(ngModel)]="employees" 
-            placeholder="Enter number of employees"
-            class="form-control"
-          />
-        </div>
-
-        <!-- Firm Size -->
-        <div class="form-group">
-          <label class="form-label">Firm Size</label>
-          <select [(ngModel)]="firmSize" class="form-control">
-            <option value="">Select Firm Size</option>
-            <option *ngFor="let size of firmSizes" [value]="size">{{ size }}</option>
-          </select>
-        </div>
-
-        <!-- Applicant Type -->
-        <div class="form-group">
-          <label class="form-label">Applicant Type</label>
-          <select [(ngModel)]="applicantType" class="form-control">
-            <option value="">Select Applicant Type</option>
-            <option *ngFor="let type of applicantTypes" [value]="type">{{ type }}</option>
-          </select>
-        </div>
       </div>
+    </div>
 
+    <!-- Action Buttons -->
+    <div *ngIf="industryQuestions.length > 0 || utilityQuestions.length > 0" class="action-buttons">
       <button 
-        (click)="viewApprovals()" 
-        [disabled]="!selectedSector"
-        class="btn-primary"
-      >
-        <span>View Required Approvals</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        type="button" 
+        class="btn btn-primary" 
+        (click)="showApplicationInformation()"
+        [disabled]="loading">
+        Show Application Information
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="resetForm()"
+        [disabled]="loading">
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Approval Details Table -->
+  <div *ngIf="showApprovalDetails" class="approval-details-section">
+    <div class="details-header">
+      <h2>Application Information</h2>
+      <button 
+        type="button" 
+        class="btn btn-back" 
+        (click)="backToQuestions()">
+        ← Back to Questions
       </button>
     </div>
 
-    <!-- Approvals View -->
-    <div *ngIf="showApprovals">
-      <!-- Summary Card -->
-      <div class="summary-card">
-        <div class="summary-content">
-          <div>
-            <h2 class="summary-title">{{ selectedSector }}</h2>
-            <div class="summary-badges">
-              <span class="badge" [ngClass]="getRiskColorClass(riskCategory)">
-                {{ riskCategory }} Category
-              </span>
-              <span *ngIf="employees" class="employee-count">
-                {{ employees }} Employees
-              </span>
-            </div>
-          </div>
-          <button (click)="backToForm()" class="btn-back">
-            ← Back to Form
-          </button>
-        </div>
+    <!-- Industry Approvals Table -->
+    <div *ngIf="approvalDetails.length > 0">
+      <h3 class="section-subtitle">Industry Approvals</h3>
+      <div class="table-container">
+        <table class="approval-table">
+          <thead>
+            <tr>
+              <th *ngFor="let key of getObjectKeys(approvalDetails[0])">
+                {{ formatKey(key) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let detail of approvalDetails">
+              <td *ngFor="let key of getObjectKeys(detail)">
+                {{ detail[key] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+    </div>
 
-      <!-- Filter by Stage -->
-      <div class="filter-card">
-        <div class="filter-content">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-          </svg>
-          <label class="filter-label">Filter by Stage:</label>
-          <select [(ngModel)]="selectedStage" (change)="onStageFilterChange(selectedStage)" class="filter-select">
-            <option *ngFor="let stage of businessStages" [value]="stage === 'All Stages' ? 'all' : stage">
-              {{ stage }}
-            </option>
-          </select>
-        </div>
+    <!-- Utilities Table -->
+    <div *ngIf="utilitiesData.length > 0" style="margin-top: 30px;">
+      <h3 class="section-subtitle">Utility Requirements</h3>
+      <div class="table-container">
+        <table class="approval-table">
+          <thead>
+            <tr>
+              <th *ngFor="let key of getObjectKeys(utilitiesData[0])">
+                {{ formatKey(key) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let utility of utilitiesData">
+              <td *ngFor="let key of getObjectKeys(utility)">
+                {{ utility[key] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+    </div>
 
-      <!-- Approvals List -->
-      <div class="approvals-list">
-        <div *ngIf="filteredApprovals.length === 0" class="no-approvals">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          <p>No approvals found for the selected filter.</p>
-        </div>
-
-        <div *ngFor="let approval of filteredApprovals" class="approval-card">
-          <div class="approval-header">
-            <div class="approval-main">
-              <h3 class="approval-title">{{ approval['Approval Name'] }}</h3>
-              <p class="approval-question">{{ approval['Questions'] }}</p>
-              <div class="approval-badges">
-                <span class="badge" [ngClass]="getStageColorClass(approval['Stage of Business'] || '')">
-                  {{ approval['Stage of Business'] }}
-                </span>
-                <span class="badge badge-department">
-                  {{ approval['Department'] }}
-                </span>
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-          </div>
-
-          <div class="approval-details">
-            <div *ngIf="approval['SLA (days)']" class="detail-item">
-              <p class="detail-label">Timeline (SLA)</p>
-              <p class="detail-value">{{ approval['SLA (days)'] }} days</p>
-            </div>
-            <div *ngIf="approval['Steps']" class="detail-item">
-              <p class="detail-label">Number of Steps</p>
-              <p class="detail-value">{{ approval['Steps'] }} steps</p>
-            </div>
-            <div *ngIf="approval['Fees(INR)']" class="detail-item">
-              <p class="detail-label">Fees</p>
-              <p class="detail-value">₹ {{ approval['Fees(INR)'] }}</p>
-            </div>
-          </div>
-
-          <div *ngIf="approval['Documents Required']" class="documents-section">
-            <p class="documents-title">Documents Required:</p>
-            <div class="documents-list">
-              <ul>
-                <li *ngFor="let doc of getDisplayedDocuments(approval['Documents Required'])">
-                  <span class="bullet">•</span>
-                  <span>{{ doc }}</span>
-                </li>
-              </ul>
-              <p *ngIf="getRemainingDocumentsCount(approval['Documents Required']) > 0" class="more-docs">
-                +{{ getRemainingDocumentsCount(approval['Documents Required']) }} more documents
-              </p>
-            </div>
-          </div>
-
-          <div *ngIf="approval['Legal Provision']" class="legal-provision">
-            <p>Legal Provision: <span>{{ approval['Legal Provision'] }}</span></p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Summary Footer -->
-      <div class="summary-footer">
-        <div class="footer-content">
-          <div>
-            <h3 class="footer-title">Total Approvals Required</h3>
-            <p class="footer-subtitle">for {{ selectedSector }}</p>
-          </div>
-          <div class="footer-count">
-            {{ filteredApprovals.length }}
-          </div>
-        </div>
-      </div>
+    <div *ngIf="approvalDetails.length === 0 && utilitiesData.length === 0" class="no-data">
+      <p>No approval details found.</p>
     </div>
   </div>
 </div>
