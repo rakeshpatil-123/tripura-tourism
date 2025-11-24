@@ -1,6 +1,9 @@
 <div class="chart-container" *ngIf="chartOptions">
+  <div class="chart-scroll">
   <apx-chart #chart [series]="chartOptions.series!" [chart]="chartOptions.chart!" [xaxis]="chartOptions.xaxis!"
     [yaxis]="chartOptions.yaxis!" [dataLabels]="chartOptions.dataLabels!" [plotOptions]="chartOptions.plotOptions!"
-    [colors]="chartOptions.colors!" [grid]="chartOptions.grid!" [title]="chartOptions.title!">
+    [colors]="chartOptions.colors!" [grid]="chartOptions.grid!" [title]="chartOptions.title!"
+      [style.height.px]="chartOptions.chart?.height">
   </apx-chart>
+</div>
 </div>

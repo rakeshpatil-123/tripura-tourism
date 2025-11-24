@@ -14,7 +14,7 @@
             formControlName="user_name" type="text" placeholder="Enter username or email">
           </app-ilogi-input>
         </div>
-        <div class="filter-item filter-date mb-10">
+        <!-- <div class="filter-item filter-date mb-10">
           <app-ilogi-input-date formControlName="fromDate" fieldLabel="From Date" [monthsRange]="24"
             [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false" [readonly]="false">
           </app-ilogi-input-date>
@@ -23,7 +23,7 @@
           <app-ilogi-input-date formControlName="toDate" fieldLabel="To Date" [monthsRange]="24"
             [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false" [readonly]="false">
           </app-ilogi-input-date>
-        </div>
+        </div> -->
         <div class="filter-item filter-amt mt-10">
           <label class="sr-only" for="amountMin">Amount min</label>
           <input id="amountMin" type="number" placeholder="Min amount" formControlName="amountMin"
@@ -34,14 +34,8 @@
           <input id="amountMax" type="number" placeholder="Max amount" formControlName="amountMax"
             (input)="applyFilters()" aria-label="Maximum amount" />
         </div>
-      </div>
-      <div class="actions-row" role="region" aria-label="Actions">
+      <div class="actions-row  mt-10" role="region" aria-label="Actions">
         <div class="actions-inner">
-          <label for="rowsSelect" class="rows-label">Rows:</label>
-          <select id="rowsSelect" formControlName="rows" aria-label="Rows per page">
-            <option *ngFor="let p of pageSizes" [value]="p">{{ p }}</option>
-          </select>
-
           <button type="button" class="btn export" (click)="exportToExcel(true)" [disabled]="isExporting"
             aria-label="Export filtered">
             Export (Filtered)
@@ -50,14 +44,23 @@
             aria-label="Export all">
             Export (All)
           </button>
-          <div class="filter-item filter-action">
-            <button type="button" class="btn ghost" (click)="refreshList()" title="Refresh list"
-              aria-label="Refresh list">
-              ⟳ Refresh
-            </button>
-          </div>
+          <label for="rowsSelect" class="rows-label">Rows:</label>
+          <select id="rowsSelect" formControlName="rows" aria-label="Rows per page">
+          <option *ngFor="let p of pageSizes" [value]="p">{{ p }}</option>
+          </select>
+          
         </div>
       </div>
+      
+    </div>
+<div class="refresh-wrapper">
+<button type="button" class="btn ghost refresh-btn"
+  (click)="refreshList()"
+  title="Refresh list"
+  aria-label="Refresh list">
+  ⟳ Refresh
+</button>
+</div>
 
     </div>
   </form>
@@ -65,107 +68,65 @@
     <table class="payments-table">
       <thead>
         <tr>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('invoiceId')"
-            (keydown.enter)="toggleSort('invoiceId')" [class.sorted]="sortColumn==='invoiceId'"
-            [class.asc]="sortDirection==='asc'" [class.desc]="sortDirection==='desc'"
-            [attr.aria-sort]="sortColumn==='invoiceId' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Invoice
-            <span class="sort-indicator" *ngIf="sortColumn==='invoiceId'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('application_number')"
+             [class.sorted]="sortColumn==='application_number'">
+            Application No
+          <span class="sort-indicator" *ngIf="sortColumn==='application_number'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
           </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('userName')" (keydown.enter)="toggleSort('userName')"
-            [class.sorted]="sortColumn==='userName'" [class.asc]="sortDirection==='asc'"
-            [class.desc]="sortDirection==='desc'"
-            [attr.aria-sort]="sortColumn==='userName' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            User name
-            <span class="sort-indicator" *ngIf="sortColumn==='userName'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('businessName')"
-            (keydown.enter)="toggleSort('businessName')" [class.sorted]="sortColumn==='businessName'"
-            [class.asc]="sortDirection==='asc'" [class.desc]="sortDirection==='desc'"
-            [attr.aria-sort]="sortColumn==='businessName' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Business
-            <span class="sort-indicator" *ngIf="sortColumn==='businessName'">{{ sortDirection==='asc' ? '▲' : '▼'
-              }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('email')" (keydown.enter)="toggleSort('email')"
-            [class.sorted]="sortColumn==='email'"
-            [attr.aria-sort]="sortColumn==='email' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Email
-            <span class="sort-indicator" *ngIf="sortColumn==='email'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('phone')" (keydown.enter)="toggleSort('phone')"
-            [class.sorted]="sortColumn==='phone'"
-            [attr.aria-sort]="sortColumn==='phone' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Phone
-            <span class="sort-indicator" *ngIf="sortColumn==='phone'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('amount')" (keydown.enter)="toggleSort('amount')"
-            [class.sorted]="sortColumn==='amount'"
-            [attr.aria-sort]="sortColumn==='amount' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Amount
-            <span class="sort-indicator" *ngIf="sortColumn==='amount'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('dueDate')" (keydown.enter)="toggleSort('dueDate')"
-            [class.sorted]="sortColumn==='dueDate'"
-            [attr.aria-sort]="sortColumn==='dueDate' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Due Date
-            <span class="sort-indicator" *ngIf="sortColumn==='dueDate'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('status')" (keydown.enter)="toggleSort('status')"
-            [class.sorted]="sortColumn==='status'"
-            [attr.aria-sort]="sortColumn==='status' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Status
-            <span class="sort-indicator" *ngIf="sortColumn==='status'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('paymentMethod')"
-            (keydown.enter)="toggleSort('paymentMethod')" [class.sorted]="sortColumn==='paymentMethod'"
-            [attr.aria-sort]="sortColumn==='paymentMethod' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Method
-            <span class="sort-indicator" *ngIf="sortColumn==='paymentMethod'">{{ sortDirection==='asc' ? '▲' : '▼'
-              }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('notes')" (keydown.enter)="toggleSort('notes')"
-            [class.sorted]="sortColumn==='notes'"
-            [attr.aria-sort]="sortColumn==='notes' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Notes
-            <span class="sort-indicator" *ngIf="sortColumn==='notes'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('createdAt')"
-            (keydown.enter)="toggleSort('createdAt')" [class.sorted]="sortColumn==='createdAt'"
-            [attr.aria-sort]="sortColumn==='createdAt' ? (sortDirection==='asc' ? 'ascending' : 'descending') : 'none'">
-            Created
-            <span class="sort-indicator" *ngIf="sortColumn==='createdAt'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-          <th>Actions</th>
-        </tr>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('business')" [class.sorted]="sortColumn==='business'">Business
+    </th>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('email_id')" [class.sorted]="sortColumn==='email_id'">Email
+    </th>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('mobile_no')" [class.sorted]="sortColumn==='mobile_no'">Phone
+    </th>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('amount')" [class.sorted]="sortColumn==='amount'">Amount</th>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('expiry_date')" [class.sorted]="sortColumn==='expiry_date'">
+      Expiry Date</th>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('status')" [class.sorted]="sortColumn==='status'">Status</th>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('method')" [class.sorted]="sortColumn==='method'">Method</th>
+    <th role="columnheader" tabindex="0" (click)="toggleSort('comments')" [class.sorted]="sortColumn==='comments'">Comments
+      </th>
+      <th>Actions</th>
+      </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let r of displayedData" class="row-animate"
-          [ngClass]="{'paid': r.status === 'Paid', 'overdue': r.status === 'Overdue'}">
-          <td class="invoice">{{ r.invoiceId }}</td>
-          <td class="client">
-            <div class="name">{{ r.userName }}</div>
-          </td>
-          <td class="business">{{ r.businessName }}</td>
-          <td class="email">{{ r.email }}</td>
-          <td class="phone">{{ r.phone }}</td>
-          <td class="amount">{{ formatCurrency(r.amount, r.currency) }}</td>
-          <td class="due">{{ r.dueDate ? (r.dueDate | date : 'mediumDate') : '—' }}</td>
+        <tr *ngFor="let r of displayedData" class="row-animate">
+          <td class="application-no">{{ r.application_number || '—' }}</td>
+          <td class="business">{{ r.business || '—' }}</td>
+          <td class="email">{{ r.email_id || '—' }}</td>
+          <td class="phone">{{ r.mobile_no || '—' }}</td>
+          <td class="amount">{{ formatCurrency(toNumber(r.amount || 0), r.currency || 'INR') }}</td>
+          <td class="expiry">{{ r.expiry_date ? (r.expiry_date | date:'mediumDate') : '—' }}</td>
+      
           <td class="status">
-            <span class="pill">{{ r.status }}</span>
+            <span class="pill" [ngClass]="{
+                'pill-paid': (r.status || '').toLowerCase() === 'paid',
+                'pill-pending': (r.status || '').toLowerCase() === 'pending',
+                'pill-overdue': (r.status || '').toLowerCase() === 'overdue',
+                'pill-approved': (r.status || '').toLowerCase() === 'approved',
+                'pill-rejected': (r.status || '').toLowerCase() === 'rejected',
+                'pill-default': (
+                  (r.status || '').toLowerCase() !== 'paid' &&
+                  (r.status || '').toLowerCase() !== 'pending' &&
+                  (r.status || '').toLowerCase() !== 'overdue' &&
+                  (r.status || '').toLowerCase() !== 'approved' &&
+                  (r.status || '').toLowerCase() !== 'rejected'
+                )
+              }" [attr.aria-label]="'Status: ' + ((r.status || '—') | titlecase)">
+              {{ (r.status || '—') | titlecase }}
+            </span>
           </td>
-          <td class="method">{{ r.paymentMethod }}</td>
-          <td class="notes">{{ r.notes }}</td>
-          <td class="created">{{ r.createdAt ? (r.createdAt | date : 'short') : '—' }}</td>
+          <td class="method">{{ r.method || '—' }}</td>
+          <td class="comments">{{ r.comments || '—' }}</td>
           <td class="actions">
-            <button class="btn mark" (click)="markAsPaid(r)" [disabled]="r.status === 'Paid'">
-              {{ r.status === 'Paid' ? 'Paid' : 'Mark as Paid' }}
+            <button class="btn mark action-btn" [ngClass]="{ 'btn-paid': isPaid(r.status), 'btn-mark': !isPaid(r.status) }"
+              (click)="markAsPaid(r)" [disabled]="isPaid(r.status)" [attr.aria-disabled]="isPaid(r.status)">
+              {{ isPaid(r.status) ? 'Paid' : 'Mark as Paid' }}
             </button>
-          </td>
+          </td>  
         </tr>
-
         <tr *ngIf="displayedData.length === 0">
-          <td colspan="12" class="no-data">No records found — try adjusting filters</td>
+          <td colspan="10" class="no-data">No records found — try adjusting filters</td>
         </tr>
       </tbody>
     </table>

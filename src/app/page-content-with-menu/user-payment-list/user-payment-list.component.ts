@@ -13,19 +13,17 @@ import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilo
 import { IlogiInputDateComponent } from '../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 
 interface PaymentRecord {
-  id: string;
-  userName: string;
-  businessName: string;
-  email?: string;
-  phone?: string;
-  invoiceId?: string;
+  id: string | number;
+  application_number: string;
+  business: string;
+  email_id?: string | null;
+  mobile_no?: string | null;
   amount: number;
+  expiry_date?: string | null;
+  status?: string | null;
+  method?: string | null;
+  comments?: string | null;
   currency?: string;
-  dueDate?: string;
-  createdAt?: string;
-  status?: 'Pending' | 'Paid' | 'Overdue';
-  paymentMethod?: string;
-  notes?: string;
   paidAt?: string | null;
 }
 
@@ -95,15 +93,15 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
     this.loaderService.showLoader();
 
     const subs = this.genericService
-      .getByConditions({}, 'get-user-payment-list')
+      .getByConditions({}, 'api/admin/get-all-applications-list')
       .pipe(
         finalize(() => {
           this.isLoading = false;
           this.loaderService.hideLoader();
         }),
         catchError(err => {
-          console.error('API fetch failed, using dummy data', err);
-          return of({ data: this.getDummyData() });
+          console.error('API fetch failed', err);
+          return of({ data: [] });
         })
       )
       .subscribe((res: any) => {
@@ -113,11 +111,11 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
 
     this.subs.add(subs);
   }
-  toggleSort(field: keyof PaymentRecord) {
-    if (this.sortColumn === field) {
+  toggleSort(column: string) {
+    if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
-      this.sortColumn = field;
+      this.sortColumn = column as any;
       this.sortDirection = 'asc';
     }
     this.sortField = String(this.sortColumn);
@@ -128,103 +126,40 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   }
 
   private normalizeRecord(raw: any): PaymentRecord {
+    const id = raw.id ?? raw._id ?? `id-${Math.random().toString(36).slice(2)}`;
+
+    const application_number = String(raw.application_number ?? '');
+    const business = String(raw.business ?? raw.businessName ?? '—');
+    const email_id = raw.email_id ?? raw.email ?? null;
+    const mobile_no = raw.mobile_no ?? raw.mobileNo ?? raw.mobile ?? null;
+    const amt = Number(raw.amount ?? 0);
+    const amount = Number.isFinite(amt) ? amt : 0;
+
+    const expiry_date = raw.expiry_date ?? null;
+    const status = raw.status ? String(raw.status).trim().toLowerCase().replace(/^\w/, c => c.toUpperCase()) : 'Pending';
+    const method = raw.method ?? null;
+    const comments = raw.comments ?? null;
+
     return {
-      id: raw.id ?? raw._id ?? 'id-' + Math.random().toString(36).slice(2),
-      userName: raw.userName ?? raw.name ?? (raw.user?.name ?? 'Unknown User'),
-      businessName: raw.businessName ?? raw.company ?? (raw.user?.company ?? '—'),
-      email: raw.email ?? raw.user?.email ?? '',
-      phone: raw.phone ?? raw.user?.phone ?? '',
-      invoiceId: raw.invoiceId ?? raw.invoice ?? ('INV-' + Math.floor(Math.random() * 900000 + 100000)),
-      amount: Number(raw.amount ?? raw.total ?? 0),
+      id,
+      application_number,
+      business,
+      email_id,
+      mobile_no,
+      amount,
+      expiry_date,
+      status,
+      method,
+      comments,
       currency: raw.currency ?? 'INR',
-      dueDate: raw.dueDate ?? raw.due_at ?? raw.due ?? new Date().toISOString(),
-      createdAt: raw.createdAt ?? raw.created_at ?? new Date().toISOString(),
-      status: raw.status ?? 'Pending',
-      paymentMethod: raw.paymentMethod ?? raw.method ?? 'Bank Transfer',
-      notes: raw.notes ?? '',
       paidAt: raw.paidAt ?? null
     };
   }
 
-  private getDummyData(): PaymentRecord[] {
-    const now = new Date();
-    const d = (i: number) => new Date(now.getTime() - i * 86400000).toISOString();
-
-    return [
-      {
-        id: '1',
-        userName: 'Acme Corp',
-        businessName: 'Acme Corporation',
-        email: 'billing@acme.com',
-        phone: '555-1001',
-        invoiceId: 'INV-1001',
-        amount: 1200.0,
-        currency: 'INR',
-        dueDate: d(2),
-        createdAt: d(10),
-        status: 'Pending',
-        paymentMethod: 'Wire',
-        notes: 'Quarterly invoice'
-      },
-      {
-        id: '2',
-        userName: 'Beta LLC',
-        businessName: 'Beta LLC',
-        email: 'pay@beta.com',
-        phone: '555-1002',
-        invoiceId: 'INV-1002',
-        amount: 450.5,
-        currency: 'INR',
-        dueDate: d(5),
-        createdAt: d(15),
-        status: 'Overdue',
-        paymentMethod: 'Credit Card',
-        notes: 'Late fee applied'
-      },
-      {
-        id: '3',
-        userName: 'Gamma Traders',
-        businessName: 'Gamma Traders',
-        email: 'finance@gamma.com',
-        phone: '555-1003',
-        invoiceId: 'INV-1003',
-        amount: 200.0,
-        currency: 'INR',
-        dueDate: d(0),
-        createdAt: d(7),
-        status: 'Paid',
-        paymentMethod: 'PayPal',
-        notes: '',
-        paidAt: d(0)
-      },
-      ...Array.from({ length: 32 }).map(
-        (_, i): PaymentRecord => ({
-          id: `d${i + 4}`,
-          userName: `rakesh ${i + 4}`,
-          businessName: `rakesh enterprise ${i + 4} Ltd.`,
-          email: `businessuser${i + 4}@gmail.com`,
-          phone: `+91-555-${1000 + i}`,
-          invoiceId: `INV-${1100 + i}`,
-          amount: Math.round((100 + Math.random() * 900) * 100) / 100,
-          currency: 'INR',
-          dueDate: new Date(Date.now() + (i - 10) * 86400000).toISOString(),
-          createdAt: new Date(Date.now() - (i + 5) * 86400000).toISOString(),
-          status:
-            i % 7 === 0
-              ? 'Paid'
-              : i % 5 === 0
-                ? 'Overdue'
-                : 'Pending',
-
-          paymentMethod: ['Wire', 'Credit Card', 'PayPal'][i % 3],
-          notes: i % 6 === 0 ? 'Priority customer' : ''
-        })
-      )
-    ];
-  }
 
   applyFilters(): void {
     const fv = this.filterForm?.value || {};
+    const term = (fv.user_name || '').toString().trim().toLowerCase();
     const name = (fv.user_name || '').toString().trim().toLowerCase();
     const parseDateString = (s: any): Date | null => {
       if (!s) return null;
@@ -247,33 +182,31 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
 
     this.filteredData = this.allData.filter(r => {
       let ok = true;
+      if (term) {
+        const appNo = (r.application_number ?? '').toString().toLowerCase();
+        const biz = (r.business ?? '').toString().toLowerCase();
+        const email = (r.email_id ?? '').toString().toLowerCase();
+        const mobile = (r.mobile_no ?? '').toString().toLowerCase();
 
-      if (name) {
-        ok = ok && (
-          (r.userName || '').toLowerCase().includes(name) ||
-          (r.businessName || '').toLowerCase().includes(name) ||
-          (r.email || '').toLowerCase().includes(name) ||
-          (r.invoiceId || '').toLowerCase().includes(name)
-        );
+        ok = ok && (appNo.includes(term) || biz.includes(term) || email.includes(term) || mobile.includes(term));
       }
 
       if (from) {
-        const due = r.dueDate ? new Date(r.dueDate) : null;
-        if (due) ok = ok && due >= from;
+        const d = r.expiry_date ? new Date(r.expiry_date) : null;
+        if (d) ok = ok && d >= from;
       }
       if (to) {
-        const due = r.dueDate ? new Date(r.dueDate) : null;
-        if (due) ok = ok && due <= to;
+        const d = r.expiry_date ? new Date(r.expiry_date) : null;
+        if (d) ok = ok && d <= to;
       }
-
       if (amtMin !== null && !Number.isNaN(amtMin)) {
-        ok = ok && r.amount >= amtMin;
+        ok = ok && (Number(r.amount) >= amtMin);
       }
       if (amtMax !== null && !Number.isNaN(amtMax)) {
-        ok = ok && r.amount <= amtMax;
+        ok = ok && (Number(r.amount) <= amtMax);
       }
       if ((mobileMin !== null && !Number.isNaN(mobileMin)) || (mobileMax !== null && !Number.isNaN(mobileMax))) {
-        const digits = onlyDigits(r.phone);
+        const digits = onlyDigits(r.mobile_no ?? '');
         if (!digits) return false;
         const numeric = Number(digits);
         if (mobileMin !== null && !Number.isNaN(mobileMin)) ok = ok && numeric >= mobileMin;
@@ -288,6 +221,9 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
     }
     this.currentPage = 1;
     this.updateDisplayedData();
+  }
+  toNumber(val: any): number {
+    return Number(val);
   }
   formatCurrency(amount: number, currency = 'INR') {
     try {
@@ -360,113 +296,229 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   }
   markAsPaid(record: PaymentRecord) {
     if (!record) return;
-
-    if (record.status === 'Paid') {
+    const statusNormalized = (record.status || '').toString().toLowerCase();
+    if (statusNormalized === 'paid') {
       Swal.fire({
         icon: 'info',
         title: 'Already Paid',
-        text: `${record.userName} - Invoice ${record.invoiceId} is already marked as paid.`,
+        text: `${record.business || '—'} - Application ${record.application_number} is already marked as paid.`,
         timer: 2200,
         showConfirmButton: false
       });
       return;
     }
     Swal.fire({
-      title: `Mark invoice ${record.invoiceId} as paid?`,
-      html:
-        `<div style="text-align:left">
-          <p>Client: <strong>${record.userName}</strong></p>
-          <p>Invoice: <strong>${record.invoiceId}</strong></p>
-          <p>Outstanding amount: <strong>${record.currency || 'INR'} ${record.amount.toFixed(2)}</strong></p>
-        </div>`,
-      input: 'number',
-      inputLabel: 'Enter amount received',
-      inputValue: record.amount,
-      inputAttributes: {
-        min: '0',
-        step: '0.01'
-      },
+      title: `Mark application ${record.application_number} as paid?`,
+      html: `
+  <div class="swal-form-wrapper">
+
+      <div class="swal-info fadeSlideIn">
+        <p><strong>Business:</strong> ${record.business || '—'}</p>
+        <p><strong>Application:</strong> ${record.application_number}</p>
+        <p><strong>Amount:</strong> <span class="amount">₹ ${Number(record.amount || 0).toFixed(2)}</span></p>
+      </div>
+
+      <hr class="swal-divider" />
+
+      <div class="swal-field fadeSlideIn">
+        <label for="swal-grn" class="swal-label">GRN Number <span class="required">*</span></label>
+        <input id="swal-grn" class="swal2-input swal-input" placeholder="Enter GRN number (required)" />
+      </div>
+
+      <div class="swal-field fadeSlideIn">
+        <label for="swal-remark" class="swal-label">Remarks</label>
+        <textarea 
+          id="swal-remark" 
+          class="swal2-textarea swal-textarea" 
+          placeholder="Enter remark/remarks (optional)">
+        </textarea>
+      </div>
+
+  </div>
+
+  <style>
+      .swal-form-wrapper {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        text-align: center;
+        animation: fadeIn 0.45s ease;
+      }
+
+      .swal-info p {
+        margin: 6px 0;
+        font-size: 14px;
+        color: #263238;
+        text-align: center;
+      }
+
+      .amount {
+        font-weight: 700;
+        color: #003c5b;
+      }
+
+      .swal-divider {
+        margin: 14px auto;
+        width: 85%;
+        border: 0;
+        border-top: 1px solid #e6eef6;
+      }
+
+      .swal-field {
+        margin: 12px auto;
+        text-align: center;
+        width: 100%;
+      }
+
+      .swal-label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: block;
+        text-align: center !important;
+        color: #003c5b;
+      }
+
+      .required {
+        color: #d32f2f;
+      }
+
+      .swal-input,
+      .swal-textarea {
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0 auto;
+      }
+
+      .swal-textarea {
+        min-height: 90px !important;
+        resize: vertical;
+      }
+
+      /* Smooth fade + slide animation */
+      .fadeSlideIn {
+        animation: fadeSlide 0.5s ease both;
+      }
+
+      @keyframes fadeSlide {
+        0% { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+
+      @media (max-width: 480px) {
+        .swal-form-wrapper {
+          max-width: 100%;
+          padding: 0 4px;
+        }
+      }
+  </style>
+`,
+      focusConfirm: false,
       showCancelButton: true,
-      confirmButtonText: 'Proceed & mark paid',
+      confirmButtonText: 'Mark Paid',
       cancelButtonText: 'Cancel',
       showLoaderOnConfirm: true,
       customClass: {
-        popup: 'swal-custom'
+        popup: 'swal-custom-popup',
+        title: 'swal-custom-title'
       },
-      showCloseButton: true,
-      backdrop: true,
-      preConfirm: (enteredValue) => {
-        const val = Number(enteredValue);
-        if (Number.isNaN(val) || val <= 0) {
-          Swal.showValidationMessage('Please enter a valid positive amount.');
+      willOpen: () => {
+        const grnEl = (document.getElementById('swal-grn') as HTMLInputElement | null);
+        if (grnEl) grnEl.focus();
+      },
+      preConfirm: () => {
+        const grnEl = (document.getElementById('swal-grn') as HTMLInputElement | null);
+        const remarkEl = (document.getElementById('swal-remark') as HTMLTextAreaElement | null);
+        const grn = grnEl ? (grnEl.value || '').toString().trim() : '';
+        const remark = remarkEl ? remarkEl.value.trim() : '';
+        if (!grn) {
+          Swal.showValidationMessage('GRN number is required.');
           return;
         }
-        return { amountPaid: val };
-      },
-      didOpen: () => {
+        return { grn, remark };
       }
     }).then((result) => {
-      if (result.isConfirmed && result.value && (result.value as any).amountPaid != null) {
-        const amountPaid = (result.value as any).amountPaid;
-        this.isLoading = true;
-        this.loaderService.showLoader();
+      if (!result.isConfirmed || !result.value) return;
 
-        const payload = {
-          id: record.id,
-          amountPaid
-        };
+      const { grn, remark } = result.value as { grn: string; remark: string };
 
-        const subs = this.genericService.getByConditions(payload, 'mark-payment-paid')
-          .pipe(finalize(() => {
-            this.isLoading = false;
-            this.loaderService.hideLoader();
-          }), catchError(err => {
-            console.error('mark-payment-paid failed', err);
+      this.isLoading = true;
+      this.loaderService.showLoader();
+
+      const payload = {
+        application_id: record.id,
+        GRN_number: grn,
+        comments: remark || 'paid by admin'
+      };
+
+      const subs = this.genericService.getByConditions(payload, 'api/admin/mark-application-paid')
+        .pipe(finalize(() => {
+          this.isLoading = false;
+          this.loaderService.hideLoader();
+        }), catchError(err => {
+          console.error('mark-payment-paid failed', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Mark as Paid failed',
+            html: `<div style="text-align:left">Could not mark application as paid. Please try again.<br/><small style="color:#64748b">${err?.message || ''}</small></div>`,
+            confirmButtonText: 'OK',
+            customClass: { popup: 'swal-error-popup' }
+          });
+          return of({ success: false });
+        }))
+        .subscribe((apiRes: any) => {
+          const ok = apiRes && (apiRes.success === true || apiRes.status === 1 || apiRes?.message?.toLowerCase?.().includes('success'));
+          if (!ok && apiRes && apiRes.success === false) {
             Swal.fire({
               icon: 'error',
               title: 'Failed',
-              text: 'Could not mark as paid. Please try again.',
+              text: apiRes.message || 'Could not mark as paid. Try again.'
             });
-            return of({ success: false });
-          }))
-          .subscribe((apiRes: any) => {
-            if (apiRes && apiRes.success === false) {
-              return;
-            }
-            record.status = 'Paid';
-            record.paidAt = new Date().toISOString();
-            record.notes = (record.notes ? record.notes + ' | ' : '') + `Marked paid (${amountPaid})`;
-            Swal.fire({
-              icon: 'success',
-              title: 'Marked Paid',
-              text: `${record.userName} invoice ${record.invoiceId} marked paid (${record.currency || 'INR'} ${amountPaid.toFixed(2)}).`,
-              timer: 2500,
-              showConfirmButton: false
-            });
-            this.applyFilters();
+            return;
+          }
+          record.status = 'Paid';
+          record.paidAt = new Date().toISOString();
+          record.comments = (record.comments ? record.comments + ' | ' : '') + `GRN:${grn}${remark ? ' | ' + remark : ''}`;
+          Swal.fire({
+            icon: 'success',
+            title: 'Marked Paid',
+            html: `<div style="text-align:left">
+                   <p><strong>Application:</strong> ${record.application_number}</p>
+                   <p><strong>GRN:</strong> ${grn}</p>
+                   <p><strong>Amount:</strong> <span style="font-weight:600">₹ ${Number(record.amount || 0).toFixed(2)}</span></p>
+                 </div>`,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            backdrop: true,
+            customClass: { popup: 'swal-success-popup' },
+            showCloseButton: false,
+          }).then(() => {
+            this.loadUserPaymentList();
           });
+          this.applyFilters();
+        });
 
-        this.subs.add(subs);
-      }
+      this.subs.add(subs);
     });
   }
   exportToExcel(useFiltered = true) {
     this.isExporting = true;
     try {
-      const dataToExport = (useFiltered ? this.filteredData : this.allData).map(r => ({
-        'Invoice ID': r.invoiceId,
-        'Client Name': r.userName,
-        'Business': r.businessName,
-        'Email': r.email,
-        'Phone': r.phone,
-        'Amount': r.amount,
-        'Currency': r.currency,
-        'Due Date': r.dueDate ? new Date(r.dueDate).toLocaleDateString() : '',
-        'Created At': r.createdAt ? new Date(r.createdAt).toLocaleString() : '',
-        'Status': r.status,
-        'Payment Method': r.paymentMethod,
-        'Notes': r.notes,
-        'Paid At': r.paidAt ? new Date(r.paidAt).toLocaleString() : ''
+      const dataToExport = (useFiltered ? this.filteredData : this.allData).map((r: any) => ({
+        'Application No': r.application_number,
+        'Business': r.business,
+        'Email': r.email_id || '',
+        'Phone': r.mobile_no || '',
+        'Amount': Number(r.amount || 0),
+        'Expiry Date': r.expiry_date ? new Date(r.expiry_date).toLocaleDateString() : '',
+          'Status': r.status || '',
+          'Method': r.method || '',
+        'Comments': r.comments || ''
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -482,5 +534,19 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
     } finally {
       this.isExporting = false;
     }
+  }
+  public statusClass(status?: string | null): string {
+    const s = (status ?? '').toString().trim().toLowerCase();
+    switch (s) {
+      case 'paid': return 'pill-paid';
+      case 'pending': return 'pill-pending';
+      case 'overdue': return 'pill-overdue';
+      case 'rejected': return 'pill-rejected';
+      case 'approved': return 'pill-approved';
+      default: return 'pill-default';
+    }
+  }
+  public isPaid(status?: string | null): boolean {
+    return (status ?? '').toString().trim().toLowerCase() === 'paid';
   }
 }
