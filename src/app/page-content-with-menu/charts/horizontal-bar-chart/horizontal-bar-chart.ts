@@ -46,8 +46,16 @@ export class HorizontalBarChartComponent implements OnChanges {
   }
 
   private prepareChartData() {
-    const categories = this.data?.map(item => item.service_name) ?? [];
-    const seriesData = this.data?.map(item => item.application_count) ?? [];
+    const categories = Array.isArray(this.data)
+      ? this.data.map(item => item?.service_name ?? '')
+      : [];
+    const seriesData = Array.isArray(this.data)
+      ? this.data.map(item => Number(item?.application_count) || 0)
+      : [];
+    const perItemHeight = 36;
+    const paddingForTitleAndAxes = 120;
+    const dynamicHeight = Math.max(350, categories.length * perItemHeight + paddingForTitleAndAxes);
+    const barHeightPx = `${Math.max(10, perItemHeight - 12)}px`;
 
     this.chartOptions = {
       series: [
@@ -58,24 +66,26 @@ export class HorizontalBarChartComponent implements OnChanges {
       ],
       chart: {
         type: 'bar',
-        height: 450,
-        toolbar: { show: false }
+        height: dynamicHeight,
+        toolbar: { show: true },
+        animations: { enabled: true }
       },
       colors: ['#3B82F6'],
       plotOptions: {
         bar: {
           horizontal: true,
           borderRadius: 6,
-          barHeight: '60%'
+          barHeight: barHeightPx
         }
       },
       dataLabels: {
         enabled: true,
         style: {
-          fontSize: '12px',
+          fontSize: '11px',
           fontWeight: '600',
           colors: ['#fff']
-        }
+        },
+        formatter: (val: any) => String(val)
       },
       grid: {
         borderColor: '#e5e7eb'
@@ -85,12 +95,19 @@ export class HorizontalBarChartComponent implements OnChanges {
         title: {
           text: 'Application Count',
           style: { fontSize: '14px', fontWeight: 600 }
+        },
+        labels: {
+          style: { fontSize: '12px' }
         }
       },
       yaxis: {
         title: {
           text: 'Services',
           style: { fontSize: '14px', fontWeight: 600 }
+        },
+        labels: {
+          style: { fontSize: '12px' },
+          formatter: (val: any) => String(val)
         }
       },
       title: {
@@ -103,5 +120,6 @@ export class HorizontalBarChartComponent implements OnChanges {
         }
       }
     };
+    (this.chartOptions as any)._viewportMaxHeight = 600;
   }
 }

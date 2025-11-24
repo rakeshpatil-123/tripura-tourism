@@ -47,8 +47,13 @@ export class BarChartComponent implements OnChanges {
     }
   }
   prepareChart() {
-    const serviceNames = this.data?.map((item: any) => item.service_name ?? []);
-    const serviceCounts = this.data?.map((item: any) => item.application_count ?? []);
+    const serviceNames = Array.isArray(this.data)
+      ? this.data.map(item => item?.service_name ?? '')
+      : [];
+
+    const serviceCounts = Array.isArray(this.data)
+      ? this.data.map(item => Number(item?.application_count) || 0)
+      : [];
 
     this.chartOptions = {
       series: [

@@ -216,28 +216,6 @@ $gold: #f7b500;
           background: $danger;
         }
 
-        .actions {
-          .btn.mark {
-            padding: 8px 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 800;
-            cursor: pointer;
-            background: linear-gradient(180deg, #ff7a59 0%, #ff5a3a 100%);
-            color: #fff;
-            box-shadow: 0 10px 20px rgba(255, 90, 58, 0.18);
-            transition: transform .12s ease;
-          }
-
-          .btn.mark[disabled] {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            background: linear-gradient(180deg, #e6eef0 0%, #f0f5f6 100%);
-            color: darken($muted, 15%);
-            box-shadow: none;
-          }
-        }
       }
 
       .no-data {
@@ -883,4 +861,191 @@ $shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.08);
     background-position: 0% 50%;
     box-shadow: $shadow-soft;
   }
+}
+.swal-custom .swal2-header {
+  background: linear-gradient(135deg, #003c5b, #fda00f);
+  padding: 1rem;
+  border-radius: 12px 12px 0 0;
+}
+
+.pill-paid {
+  background: $success !important;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(46, 164, 79, 0.12);
+}
+
+.pill-pending {
+  background: linear-gradient(90deg, #ffd58a 0%, #fda00f 100%);
+  color: #032b36;
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(253, 160, 15, 0.10);
+}
+
+.pill-overdue {
+  background: $danger !important;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(255, 107, 107, 0.12);
+}
+
+.pill-rejected {
+  background: #6b7280;
+  color: #fff;
+  box-shadow: none;
+}
+
+.pill-approved {
+  background: $gold;
+  color: #042332;
+  box-shadow: 0 6px 14px rgba(247, 181, 0, 0.10);
+}
+
+.pill-default {
+  background: $muted;
+  color: #fff;
+}
+
+.pill {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  text-transform: none;
+}
+
+.pill {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+  min-width: 68px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.06);
+}
+
+.pill-paid {
+  background: $success !important;
+}
+
+.pill-pending {
+  background: linear-gradient(90deg, $accent 0%, $accent-2 100%) !important;
+}
+
+.pill-overdue {
+  background: $danger !important;
+}
+
+.pill-approved {
+  background: $gold !important;
+  color: #0b3a00;
+}
+
+.pill-rejected {
+  background: linear-gradient(90deg, darken($danger, 6%), $danger) !important;
+}
+
+.pill-default {
+  background: $muted !important;
+}
+
+.btn.mark {
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .15s ease, opacity .12s ease;
+}
+
+.btn-mark {
+  background: linear-gradient(180deg, #ff7a59 0%, #ff5a3a 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 8px 22px rgba(255, 90, 58, 0.16);
+}
+
+.btn-mark:hover:not([disabled]) {
+  transform: translateY(-2px);
+}
+
+.btn-paid,
+.btn-mark[disabled] {
+  background: linear-gradient(180deg, #e6eef0 0%, #f0f5f6 100%);
+  color: darken($muted, 15%);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.85;
+}
+
+td.status {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.action-btn {
+  transition: all 0.25s ease;
+  font-size: 0.9rem;
+  padding: 8px 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-mark {
+  background: #003c5b;
+  color: #fda00f;
+  box-shadow: 0 2px 6px rgba(0, 60, 91, 0.3);
+}
+
+.btn-mark:hover {
+  background: #004b72;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 60, 91, 0.4);
+}
+
+.btn-mark:active {
+  transform: scale(0.97);
+}
+
+.btn-paid {
+  background: #cfd8dc;
+  color: #455a64;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.btn-paid:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .action-btn {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-btn {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.refresh-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.refresh-btn {
+  padding: 8px 14px;
+  font-weight: 600;
 }
