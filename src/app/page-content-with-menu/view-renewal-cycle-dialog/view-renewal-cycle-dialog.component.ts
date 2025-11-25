@@ -107,10 +107,8 @@ export class ViewRenewalCycleDialogComponent
     'fixed_renewal_end_date',
     'late_fee_applicable',
     'late_fee_fixed_amount',
-    'late_fee_calculated_amount',
-    'late_fee_start_type',
-    'late_fee_start_date',
     'allow_renewal_input_form',
+    'late_fee_calculation_dynamic',
     'is_active',
     'created_at',
     'updated_at',
@@ -151,6 +149,13 @@ export class ViewRenewalCycleDialogComponent
 
   close(): void {
     this.dialogRef.close();
+  }
+  formatEnum(value: string): string {
+    if (!value) return '';
+    return value
+      .split('_')
+      .map(v => v.charAt(0).toUpperCase() + v.slice(1))
+      .join(' ');
   }
 
   fetchRenewalCycles(serviceId: number): void {

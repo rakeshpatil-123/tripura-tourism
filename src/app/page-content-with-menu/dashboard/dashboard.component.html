@@ -44,9 +44,13 @@
     <app-button [type]="'danger'" [size]="'small'">Delete All</app-button>
     <app-button [type]="'ghost'" [size]="'small'">ghost</app-button>
   </div> -->
-<!-- ------------------------------------------------------------------------- -->
-    <app-user-dashboard *ngIf="userRole === 'individual'"></app-user-dashboard>
-    <app-departmental-user-dashboard *ngIf="userRole === 'department'"></app-departmental-user-dashboard>
-    <app-admin-dashboard *ngIf="userRole === 'admin'"></app-admin-dashboard>
-<!-- ----------------------------------------------------------------------------->
+<ng-container *ngIf="userRole !== null; else loadingRole">
+  <app-user-dashboard *ngIf="userRole === 'individual'"></app-user-dashboard>
+  <app-departmental-user-dashboard *ngIf="userRole === 'department'"></app-departmental-user-dashboard>
+  <app-admin-dashboard *ngIf="userRole === 'admin'"></app-admin-dashboard>
+</ng-container>
+
+<ng-template #loadingRole>
+  <div class="dashboard-loading">Loading dashboard…</div>
+</ng-template>
 </div>

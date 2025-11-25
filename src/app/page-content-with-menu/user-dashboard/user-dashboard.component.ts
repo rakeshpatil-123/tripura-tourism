@@ -8,6 +8,7 @@ import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-dashboard',
+  standalone: true,
   imports: [
     CommonModule,
     SummaryCardsComponent,
@@ -15,7 +16,7 @@ import { Route, Router } from '@angular/router';
     DynamicTableComponent,
   ],
   templateUrl: './user-dashboard.component.html',
-  styleUrl: './user-dashboard.component.scss',
+  styleUrls: ['./user-dashboard.component.scss'],
 })
 export class UserDashboardComponent implements OnInit {
   clarification_required: any[] = [];
