@@ -1,4 +1,3 @@
-// activity-log.component.ts
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { TableModule } from 'primeng/table';

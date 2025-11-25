@@ -1,18 +1,102 @@
-<div class="certificate-wrapper">
+<div class="certificate-wrapper" role="dialog" aria-labelledby="serviceTitle">
   <div class="header">
-    <h2 class="service-title">{{ serviceName }}</h2>
-    <button type="button" class="close-btn" (click)="closeDialog()">✕</button>
-  </div>
-  <div class="editor-section">
-  <label class="editor-label">Edit Certificate Template</label> <ckeditor #editor [editor]="Editor" [(ngModel)]="formTemplate" [config]="config" (ready)="onReady($event)"
-      (change)="onChange($event)"></ckeditor>
-  </div>
-  <div class="footer">
-    <button pButton type="button" class="p-button-outlined" (click)="previewTemplate()">Preview</button>
-    <button pButton type="button" class="p-button-secondary" (click)="downloadTemplate()">Download</button>
-    <button pButton type="button" class="p-button-success" (click)="saveTemplate()">Save Template</button>
-  </div>
+    <div class="header-left">
+      <h2 id="serviceTitle" class="service-title">{{ serviceName }}</h2>
+      <div class="meta">
+        <span class="meta-item">Service: {{ serviceName || '--' }}</span>
+      </div>
+    </div>
 
-  <h3>Preview:</h3>
-  <div class="preview ck-content" [innerHTML]="formTemplate"></div>
+    <div class="header-actions">
+      <button type="button" class="icon-btn close-btn" title="Close" aria-label="Close" (click)="closeDialog()">
+        ✕
+      </button>
+    </div>
+  </div>
+  <div class="custom-toolbar" role="toolbar" aria-label="Editor toolbar">
+    <div class="toolbar-left">
+      <label class="toolbar-control">
+        <span class="label-text">Font</span>
+        <select (change)="applyFontFamily(getValue($event))" class="control-select">
+          <option value="">— default —</option>
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Verdana">Verdana</option>
+          <option value="Roboto">Roboto</option>
+        </select>
+      </label>
+      <label class="toolbar-control">
+        <span class="label-text">Size (px)</span>
+        <input class="control-input" type="number" min="8" max="72" [value]="fontSize"
+          (change)="applyFontSize(getNumberValue($event))" />
+      </label>
+
+      <label class="toolbar-control">
+        <span class="label-text">Text color</span>
+        <input class="control-color" type="color" (input)="applyTextColor(getValue($event))" />
+      </label>
+      <label class="toolbar-control">
+        <span class="label-text">Cell bg</span>
+        <input class="control-color" type="color" (input)="applyCellBackground(getValue($event))" />
+      </label>
+    </div>
+    <div class="toolbar-right">
+      <label class="toolbar-control toolbar-file">
+        <span class="label-text">Image</span>
+        <input type="file" accept="image/*" (change)="onImageSelected($event)" class="file-input" />
+      </label>
+
+      <div class="image-controls" *ngIf="selectedImageId">
+        <label class="toolbar-control">
+          <span class="label-text">W (px)</span>
+          <input type="number" min="0" [(ngModel)]="imageWidth" class="control-input small" />
+        </label>
+        <label class="toolbar-control">
+          <span class="label-text">H (px)</span>
+          <input type="number" min="0" [(ngModel)]="imageHeight" class="control-input small" />
+        </label>
+
+        <button pButton type="button" class="p-button btn-apply"
+          (click)="applyImageSize(imageWidth, imageHeight)">Apply</button>
+        <button pButton type="button" class="p-button btn-reset" (click)="resetImageSize()">Reset</button>
+      </div>
+
+      <button pButton type="button" class="p-button btn-clear" (click)="removeInlineStyles()">Clear styles</button>
+    </div>
+  </div>
+  <div class="editor-container">
+    <ngx-editor-menu [editor]="editor" [toolbar]="toolbar" [customMenuRef]="tableMenu"
+      class="ngx-menu"></ngx-editor-menu>
+
+    <ngx-editor [editor]="editor" [(ngModel)]="formTemplate" (ngModelChange)="onContentChange($event)"
+      [placeholder]="'Type your certificate content here...'" class="ngx-editor-host"
+      aria-label="Certificate editor"></ngx-editor>
+
+    <ng-template #tableMenu>
+      <div class="NgxEditor__Seperator"></div>
+      <div class="NgxEditor__MenuItem custom-menu" style="display:flex;gap:8px;align-items:center;">
+        <button type="button" class="p-button small" (click)="insertTable(3,3,true)">Insert 3×3</button>
+        <button type="button" class="p-button small" (click)="insertTable(4,2,false)">Insert 4×2</button>
+        <button type="button" class="p-button small" (click)="addRow()">Add Row</button>
+        <button type="button" class="p-button small" (click)="addColumn()">Add Column</button>
+        <button type="button" class="p-button small" (click)="deleteTable()">Delete Table</button>
+      </div>
+    </ng-template>
+  </div>
+  <div class="preview-block">
+    <div class="preview-header">
+      <h3>Preview</h3>
+      <div class="preview-actions btn-spacing">
+        <div class="footer">
+          <button pButton type="button" class="p-button-success save-btn" (click)="saveTemplate()">Save
+            Template</button>
+        </div>
+        <button pButton type="button" class="p-button-outlined p-mr-10" (click)="previewTemplate()">Preview in new
+          window</button>
+        <button pButton type="button" class="p-button-secondary" (click)="downloadTemplate()">Download PDF</button>
+      </div>
+    </div>
+    <div class="preview NgxEditor__Content" [innerHTML]="formTemplate"></div>
+  </div>
 </div>

@@ -58,7 +58,7 @@ export class RenewalCycleComponent implements OnInit {
       late_fee_applicable: ['no'],
       late_fee_start_type: ['date_of_expiry'],
       late_fee_start_date: [null], 
-      late_fee_calculation_dynamic: ['no'],
+      late_fee_calculation_dynamic: ['none'],
       late_fee_fixed_amount: ['0'],
       late_fee_calculated_amount: ['0'],
       allow_renewal_input_form: ['yes'],
@@ -76,6 +76,7 @@ export class RenewalCycleComponent implements OnInit {
         fixed_renewal_start_date: cycle.fixed_renewal_start_date ? moment(cycle.fixed_renewal_start_date) : null,
         fixed_renewal_end_date: cycle.fixed_renewal_end_date ? moment(cycle.fixed_renewal_end_date) : null,
         late_fee_start_date: cycle.late_fee_start_date ? moment(cycle.late_fee_start_date) : null,
+        late_fee_calculation_dynamic: cycle.late_fee_calculation_dynamic || 'none',
       });
 
       this.showLateFeeFields = cycle.late_fee_applicable === 'yes';
@@ -168,6 +169,7 @@ export class RenewalCycleComponent implements OnInit {
       late_fee_calculated_amount: '0',
       late_fee_start_type: 'date_of_expiry',
       late_fee_start_date: null,
+      late_fee_calculation_dynamic: 'none',
     });
   }
 }

@@ -57,7 +57,9 @@ mat-form-field {
 }
 
 .renewal-container {
-  overflow: visible;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .dialog-header {
@@ -67,7 +69,7 @@ mat-form-field {
 }
 
 ::ng-deep .mat-mdc-dialog-surface {
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 .submit-btn {

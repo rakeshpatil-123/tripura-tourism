@@ -774,3 +774,34 @@ body.sidebar-open {
     color: #000000 !important;
   }
 }
+.ngx-editor-host table,
+.ngx-editor-host th,
+.ngx-editor-host td,
+.NgxEditor__Content table,
+.NgxEditor__Content th,
+.NgxEditor__Content td,
+.ngx-editor-host .prosemirror-table,
+.Ngx-editor .prosemirror-table {
+  border-collapse: collapse;
+  border: 1px solid #d8dbe0;
+}
+
+.ngx-editor-host table,
+.NgxEditor__Content table,
+.ngx-editor-host .prosemirror-table {
+  width: 100%;
+}
+
+.ngx-editor-host th,
+.ngx-editor-host td,
+.NgxEditor__Content th,
+.NgxEditor__Content td {
+  padding: 8px 10px;
+  vertical-align: middle;
+  border: 1px solid #d8dbe0;
+}
+
+.ngx-editor-host th {
+  font-weight: 600;
+  background: transparent;
+}

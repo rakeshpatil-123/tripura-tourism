@@ -112,6 +112,16 @@
       <mat-option value="fixed_date">Fixed Date</mat-option>
     </mat-select>
   </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Late Fee Calculation Type</mat-label>
+    <mat-select formControlName="late_fee_calculation_dynamic">
+      <mat-option value="none">None</mat-option>
+      <mat-option value="fixed">Fixed</mat-option>
+      <mat-option value="percentage">Percentage</mat-option>
+      <mat-option value="per_day">Per Day</mat-option>
+      <mat-option value="per_month">Per Month</mat-option>
+    </mat-select>
+  </mat-form-field>
 <mat-form-field *ngIf="renewalForm.get('late_fee_start_type')?.value === 'fixed_date'" appearance="outline">
   <mat-label>Select Fixed Date</mat-label>
   <input matInput [matDatepicker]="lateFeePicker" formControlName="late_fee_start_date" />

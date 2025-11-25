@@ -13,6 +13,7 @@ const DUMMY_DATA = {};
 
 @Component({
   selector: 'app-admin-dashboard',
+  standalone: true,
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss'],
   imports: [SummaryCardsComponent,
