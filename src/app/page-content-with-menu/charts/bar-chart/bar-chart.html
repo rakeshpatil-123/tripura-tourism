@@ -1,6 +1,12 @@
-<div class="chart-container" *ngIf="chartOptions">
-  <apx-chart #chart [series]="chartOptions.series!" [chart]="chartOptions.chart!" [xaxis]="chartOptions.xaxis!"
-    [yaxis]="chartOptions.yaxis!" [dataLabels]="chartOptions.dataLabels!" [plotOptions]="chartOptions.plotOptions!"
-    [colors]="chartOptions.colors || ['#fda00f', '#003c5b']" [grid]="chartOptions.grid!" [legend]="chartOptions.legend!"
-    [title]="chartOptions.title!"></apx-chart>
-</div>
+<ng-container *ngIf="hasChartData(); else noData">
+  <div class="chart-container">
+  <apx-chart #chart [series]="chartOptions!.series!" [chart]="chartOptions!.chart!" [xaxis]="chartOptions!.xaxis!"
+    [yaxis]="chartOptions!.yaxis!" [dataLabels]="chartOptions!.dataLabels!" [plotOptions]="chartOptions!.plotOptions!"
+    [colors]="chartOptions!.colors || ['#fda00f', '#003c5b']" [grid]="chartOptions!.grid!" [legend]="chartOptions!.legend!" [title]="chartOptions!.title!"></apx-chart>
+  </div>
+</ng-container>
+<ng-template #noData>
+  <div class="chart-empty" style="padding: 28px; text-align:center; color:#6b7280;">
+    No data to display.
+  </div>
+</ng-template>

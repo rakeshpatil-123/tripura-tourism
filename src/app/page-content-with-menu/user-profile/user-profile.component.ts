@@ -124,11 +124,10 @@ export class UserProfileComponent implements OnInit {
 
       const profile = this.backendProfile;
       const [first, ...last] = (profile.authorized_person_name || '').split(' ');
-
       this.profileForm.patchValue({
         enterpriseName: profile.name_of_enterprise,
-        firstName: profile.authorized_person_name || '',
-        lastName: last.join(' ') || '',
+        authorized_person_name: profile.authorized_person_name || '',
+        // lastName: last.join(' ') || '',
         email: profile.email_id,
         phone: profile.mobile_no,
         address: profile.registered_enterprise_address,
@@ -166,8 +165,8 @@ export class UserProfileComponent implements OnInit {
   initForms(): void {
     this.profileForm = this.fb.group({
       enterpriseName: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      authorized_person_name: ['', Validators.required],
+      // lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
       address: ['', Validators.required],
@@ -202,7 +201,7 @@ export class UserProfileComponent implements OnInit {
     let payload: BackendProfile = {
       id: userId,
       name_of_enterprise: val.enterpriseName,
-      authorized_person_name: `${val.firstName} ${val.lastName}`.trim(),
+      authorized_person_name: `${val.authorized_person_name}`.trim(),
       email_id: val.email,
       mobile_no: val.phone.toString(),
       registered_enterprise_address: val.address,
@@ -214,6 +213,18 @@ export class UserProfileComponent implements OnInit {
     if (val.userType === 'individual') {
       delete payload.hierarchy_level;
       delete payload.department_id;
+      if (val.district_code) {
+        payload.district_id = val.district_code;
+      }
+      if (val.subdivision_code) {
+        payload.subdivision_id = val.subdivision_code;
+      }
+      if (val.ulb_code) {
+        payload.ulb_id = val.ulb_code;
+      }
+      if (val.ward_code) {
+        payload.ward_id = val.ward_code;
+      }
     }
 
     switch (val.hierarchy_level) {

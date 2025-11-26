@@ -111,6 +111,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy, AfterViewInit 
   selectedNocType: string | null = null;
   displayedColumns: string[] = [
     'sno',
+    'id',
     'name',
     'department',
     'noc_type',

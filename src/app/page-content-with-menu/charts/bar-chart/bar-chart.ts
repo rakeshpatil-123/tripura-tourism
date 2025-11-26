@@ -42,24 +42,32 @@ export class BarChartComponent implements OnChanges {
   public chartOptions!: Partial<BarChartOptions>;
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['data'] && this.data) {
-      this.prepareChart();
+    if (changes['data']) {
+      if (!this.data || !Array.isArray(this.data) || this.data.length === 0) {
+        this.chartOptions = undefined as any;
+      } else {
+        this.prepareChart();
+      }
     }
   }
   prepareChart() {
-    const serviceNames = Array.isArray(this.data)
-      ? this.data.map(item => item?.service_name ?? '')
-      : [];
-
-    const serviceCounts = Array.isArray(this.data)
-      ? this.data.map(item => Number(item?.application_count) || 0)
-      : [];
+    const arr = Array.isArray(this.data) ? this.data : [];
+    const serviceNames = arr.map(item => {
+      return item?.service_name ?? item?.service?.name ?? item?.name ?? '';
+    });
+    const serviceCounts = arr.map(item => {
+      const v = item?.licenses_issued ?? item?.application_count ?? item?.count ?? 0;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    });
+    const hasLicenses = arr.some(item => item && Object.prototype.hasOwnProperty.call(item, 'licenses_issued'));
+    const seriesLabel = hasLicenses ? 'Licenses Issued' : 'Applications';
 
     this.chartOptions = {
       series: [
         {
-          name: 'Applications',
-          data: Array.isArray(serviceCounts) ? serviceCounts : []
+          name: seriesLabel,
+          data: serviceCounts
         }
       ],
       chart: {
@@ -103,12 +111,12 @@ export class BarChartComponent implements OnChanges {
         }
       },
       yaxis: {
-        title: { text: 'Application Count' },
+        title: { text: seriesLabel },
         min: 0
       },
       legend: { show: false },
       title: {
-        text: 'Applications per Service',
+        text: `${seriesLabel} per Service`,
         align: 'left',
         style: {
           fontSize: '18px',
@@ -117,5 +125,23 @@ export class BarChartComponent implements OnChanges {
         }
       }
     };
+  }
+  public hasChartData(): boolean {
+    const opts = this.chartOptions as unknown as {
+      series?: Array<{ data?: any }>;
+    } | undefined;
+
+    if (!opts?.series || !Array.isArray(opts.series) || opts.series.length === 0) {
+      return false;
+    }
+    const firstSeries = opts.series[0];
+    if (!firstSeries) {
+      return false;
+    }
+
+    if (Array.isArray(firstSeries.data)) {
+      return firstSeries.data.length > 0;
+    }
+    return firstSeries.data !== undefined && firstSeries.data !== null;
   }
 }

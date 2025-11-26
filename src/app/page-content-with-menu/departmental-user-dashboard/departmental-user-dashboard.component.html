@@ -57,7 +57,7 @@
   <section class="dashboard-section charts-section">
     <div class="charts-grid" [ngClass]="!sidebarCollapsed ? 'two-column' : 'single-column'">
       <div class="chart-item">
-        <app-bar-chart [data]="dashboardData?.application_count_per_service"></app-bar-chart>
+        <app-bar-chart [data]="dashboardData?.license_issued_per_service"></app-bar-chart>
       </div>
       <div class="chart-item">
         <app-pie-chart [data]="dashboardData?.district_wise_application_in_department"></app-pie-chart>
@@ -67,7 +67,21 @@
   <section class="dashboard-section charts-section">
     <div class="charts-grid single-column">
       <div class="chart-item">
+        <app-group-bar-chart [data]="dashboardData?.district_wise_application_per_service"></app-group-bar-chart>
+      </div>
+    </div>
+  </section>
+  <section class="dashboard-section charts-section">
+    <div class="charts-grid single-column">
+      <div class="chart-item">
         <app-horizontal-bar-chart [data]="dashboardData?.application_count_per_service"></app-horizontal-bar-chart>
+      </div>
+    </div>
+  </section>
+  <section class="dashboard-section charts-section">
+    <div class="charts-grid single-column">
+      <div class="chart-item">
+        <app-bar-graph-dept-user [data]="dashboardData?.avg_approval_time_per_service"></app-bar-graph-dept-user>
       </div>
     </div>
   </section>

@@ -1,5 +1,20 @@
-<div class="chart-container" *ngIf="chartOptions"><apx-chart #chart [series]="chartOptions.series!"
-    [chart]="chartOptions.chart!" [labels]="chartOptions.labels!"
-    [colors]="chartOptions.colors || ['#fda00f', '#003c5b']" [legend]="chartOptions.legend!"
-    [responsive]="chartOptions.responsive!" [title]="chartOptions.title!"></apx-chart>
-</div>
+<!-- Only render chart container when chartOptions is prepared -->
+<ng-container *ngIf="chartOptions; else noData">
+  <div #container class="chart-container" [@reveal]="visible ? 'visible' : 'hidden'" role="region"
+    aria-label="Pie chart visualization">
+    <div class="chart-header" *ngIf="chartOptions!.title?.text">
+      <h4>{{ chartOptions!.title.text }}</h4>
+    </div>
+
+    <apx-chart #chart [series]="chartOptions!.series" [chart]="chartOptions!.chart" [labels]="chartOptions!.labels"
+      [colors]="chartOptions!.colors" [legend]="chartOptions!.legend" [responsive]="chartOptions!.responsive"
+      [tooltip]="chartOptions!.tooltip">
+    </apx-chart>
+  </div>
+</ng-container>
+
+<ng-template #noData>
+  <div class="chart-empty" style="padding: 28px; text-align:center; color:#6b7280;">
+    No data to display.
+  </div>
+</ng-template>

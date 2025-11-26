@@ -68,6 +68,7 @@ export class ActivityLogComponent implements OnInit {
 
   constructor(private genericService: GenericService, private loaderService: LoaderService) { }
   ngOnInit() {
+    this.getActivityLogData();
     this.activityData = [
       { date: new Date(Date.now() - 200000000), action: 'Create', by: 'Rohan', forWhom: 'Kavita', module: 'User', platform: 'Web', oldValue: '', newValue: 'New user account created.' },
       { date: new Date(Date.now() - 220000000), action: 'Update', by: 'Priya', forWhom: 'Amit', module: 'Service', platform: 'Android', oldValue: 'Plan: Basic', newValue: 'Plan: Premium' },

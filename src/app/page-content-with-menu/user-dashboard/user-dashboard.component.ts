@@ -5,6 +5,8 @@ import { DynamicTableComponent } from '../../shared/component/table/table.compon
 import { DashboardService } from './dashboard-service/dashboard-service';
 import { LineChartComponent } from './line-chart/line-chart.component';
 import { Route, Router } from '@angular/router';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -50,19 +52,23 @@ export class UserDashboardComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    private router: Router
+    private router: Router,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
+    this.loaderService.showLoader();
     this.dashboardService.dashboardData$.subscribe({
       next: (data: any) => {
         if (data) {
           this.clarification_required = data.clarification_required || [];
+          this.loaderService.hideLoader();
         }
       },
       error: (error) => {
         console.error('Error fetching dashboard data', error);
         this.clarification_required = [];
+        this.loaderService.hideLoader();
       },
     });
   }

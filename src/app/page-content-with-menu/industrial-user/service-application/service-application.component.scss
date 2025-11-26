@@ -40,13 +40,117 @@ border-bottom: 3px solid #fda00f;
     margin-top: 8px;
 }
 
-.btnss{
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    align-items: center;
+.m-4.btnss {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-sizing: border-box;
 }
 
+.m-4.btnss .fee-actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.m-4.btnss .submit-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.calculate-btn {
+  padding: 10px 26px;
+  border-radius: 10px !important;
+  font-weight: 600;
+  font-size: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.15s ease;
+  margin: 0 auto;
+  display: inline-block;
+  min-width: 160px;
+}
+
+.calculate-btn:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.calculate-btn:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.20);
+}
+
+.calculate-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  margin-bottom: 12px;
+}
+
+.fee-container {
+  text-align: center;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fee-details {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.fee-horizontal {
+  flex-direction: row !important;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fee-box {
+  background: #f1f3f5;
+  padding: 12px 20px;
+  width: fit-content;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.35s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 520px) {
+  .fee-horizontal {
+    flex-direction: column !important;
+    gap: 10px;
+  }
+
+  .calculate-btn {
+    min-width: 140px;
+    padding: 10px 18px;
+  }
+}
 
 .table-responsive {
   overflow-x: auto;

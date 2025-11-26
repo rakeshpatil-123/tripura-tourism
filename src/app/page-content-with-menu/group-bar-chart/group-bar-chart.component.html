@@ -1,0 +1,16 @@
+<div class="chart-wrapper" *ngIf="chartOptions">
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3 class="chart-title">Applications per Service (district-wise)</h3>
+    </div>
+    <div class="chart-scroll" role="region" aria-label="Applications per service chart">
+      <apx-chart #chart [series]="chartOptions.series!" [chart]="chartOptions.chart!"
+        [plotOptions]="chartOptions.plotOptions!" [xaxis]="chartOptions.xaxis!" [yaxis]="chartOptions.yaxis!"
+        [dataLabels]="chartOptions.dataLabels!" [colors]="chartOptions.colors!" [grid]="chartOptions.grid!"
+        [legend]="chartOptions.legend!" [tooltip]="chartOptions.tooltip!" [stroke]="chartOptions.stroke!"
+        [fill]="chartOptions.fill!" [responsive]="chartOptions.responsive!"
+        [style.height.px]="chartOptions.chart?.height">
+      </apx-chart>
+    </div>
+  </div>
+</div>
