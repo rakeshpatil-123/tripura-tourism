@@ -8,6 +8,10 @@ import { GenericService } from '../../_service/generic/generic.service';
 import { ClarificationTableComponent } from "../tables/clarification-table/clarification-table";
 // import { ClaimStatusTableComponent } from '../tables/claim-status-table/claim-status-table';
 import { CommonModule } from '@angular/common';
+import { GroupBarChartComponent } from '../group-bar-chart/group-bar-chart.component';
+import { BarGraphDeptUserComponent } from '../bar-graph-dept-user/bar-graph-dept-user.component';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-departmental-user-dashboard',
@@ -17,8 +21,10 @@ import { CommonModule } from '@angular/common';
     BarChartComponent,
     PieChartsComponent,
     HorizontalBarChartComponent,
+    BarGraphDeptUserComponent,
     // LineChartComponent,
     ClarificationTableComponent,
+    GroupBarChartComponent,
     // ClaimStatusTableComponent,
     CommonModule
   ],
@@ -33,7 +39,7 @@ export class DepartmentalUserDashboardComponent implements OnInit, OnDestroy, On
   nocIssuedList: any = null;
   pagination: any = null;
 
-  constructor(private genericService: GenericService) { }
+  constructor(private genericService: GenericService, private loaderService: LoaderService) { }
 
   ngOnInit(): void {
     this.deptId = localStorage.getItem('deptId');
@@ -46,7 +52,8 @@ export class DepartmentalUserDashboardComponent implements OnInit, OnDestroy, On
   }
 
   loadDashboardData() {
-    this.genericService.getDashboardData(this.deptId).subscribe({
+    this.loaderService.showLoader();
+    this.genericService.getDashboardData(this.deptId).pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
       next: (res: any) => {
         if (res?.status === 1) {
           this.dashboardData = res;
@@ -58,9 +65,7 @@ export class DepartmentalUserDashboardComponent implements OnInit, OnDestroy, On
     });
   }
 
-  ngDoCheck() {
-    console.log("sidebarCollapsed =", this.sidebarCollapsed);
-  }
+  ngDoCheck() { }
 
   loadNocIssued(page: number) {
     const payload = { deptId: this.deptId, page: page, limit: 10 };

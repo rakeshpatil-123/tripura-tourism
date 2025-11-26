@@ -28,7 +28,10 @@
       <thead>
         <tr>
           <th>Application ID</th>
-          <th>NOC Number</th>
+          <th>Service Name</th>
+          <th>Remark</th>
+          <th>Application Date</th>
+          <th>Clarification Date</th>
           <th>Status</th>
           <th class="text-center">View File</th>
         </tr>
@@ -41,8 +44,17 @@
           <td title="Application ID: {{ item.applicationId }}">
             <span class="app-id-badge">{{ item.applicationId }}</span>
           </td>
-          <td title="NOC Number: {{ item.noc }}">
-            {{ item.noc }}
+          <td title="Service Name: {{ item.service_name }}">
+            <span class="app-id-badge">{{ item.service_name }}</span>
+          </td>
+          <td title="Remark: {{ item.remark }}">
+            <span class="app-id-badge">{{ item.remark }}</span>
+          </td>
+          <td title="Application Date: {{ item.application_date }}">
+            <span class="app-id-badge">{{ item.application_date }}</span>
+          </td>
+          <td title="Clarification Date: {{ item.clarification_raised_date }}">
+            <span class="app-id-badge">{{ item.clarification_raised_date }}</span>
           </td>
           <td [ngClass]="{
         '': item.status === 'missing',

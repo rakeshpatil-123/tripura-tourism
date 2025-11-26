@@ -1,0 +1,79 @@
+.chart-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 4px;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.chart-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 720px;
+  padding-right: 8px;
+}
+
+.apexcharts-legend-marker {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+  margin-right: 8px !important;
+  vertical-align: middle !important;
+}
+
+.apexcharts-legend text,
+.apexcharts-legend .apexcharts-legend-text {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.apexcharts-xaxis-label,
+.apexcharts-yaxis-label,
+.apexcharts-legend {
+  font-size: 12px !important;
+}
+
+.apexcharts-gridline {
+  stroke-width: 1px;
+  opacity: 0.85;
+}
+
+.apexcharts-bar-area {
+  shape-rendering: geometricPrecision;
+}
+
+@media (max-width: 720px) {
+  .chart-card {
+    padding: 8px;
+  }
+
+  .chart-title {
+    font-size: 13px;
+  }
+
+  .apexcharts-legend-marker {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}

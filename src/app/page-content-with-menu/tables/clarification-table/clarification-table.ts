@@ -63,7 +63,10 @@ export class ClarificationTableComponent implements OnChanges {
 
       return {
         applicationId: item.applicationId || item.application_id || 'N/A',
-        noc: item.NOC_letter_number || 'N/A',
+        service_name: item.service_name,
+        remark: item.remark,
+        application_date: item.application_date,
+        clarification_raised_date: item.clarification_raised_date,
         status: isUploaded ? 'uploaded' : 'missing',
         documentName: isUploaded ? item.status_file.split('/').pop() : null,
         status_file: item.status_file
@@ -174,8 +177,11 @@ export class ClarificationTableComponent implements OnChanges {
 
         const exportData = this.filteredData.map(item => ({
           'Application ID': item.applicationId,
-          'NOC Number': item.noc,
-          'Status': item.status === 'uploaded' ? 'Document Uploaded' : 'Clarification Required',
+          'Service Name': item.service_name,
+          'Remark': item.remark,
+          'Application Date': item.application_date,
+          'Clarification Date': item.clarification_raised_date,
+          'Status': item.status === 'uploaded' ? 'Document Uploaded' : 'Clarification Raised',
           'Document Name': item.documentName || 'N/A',
           'File URL': item.status_file || 'N/A'
         }));

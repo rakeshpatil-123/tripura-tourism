@@ -116,6 +116,8 @@ export class ServiceApplicationComponent implements OnInit {
   existingFileUrls: { [questionId: number]: string } = {};
   public Object = Object;
   calculatedFee: number | null = null;
+  previousPaid: number | null = null;
+  effectiveFee: number | null = null;
   feeCalculating = false;
   applicationId: number | null = null;
   appId2: number | null = null;
@@ -1192,6 +1194,8 @@ export class ServiceApplicationComponent implements OnInit {
         next: (res: any) => {
           if (res?.status === 1) {
             this.calculatedFee = Number(res.data.final_fee);
+            this.effectiveFee = Number(res.data.effective_fee);
+            this.previousPaid = Number(res.data.previous_paid)
             this.visible = true;
             this.formModifiedAfterFeeCalculation = false;
             this.apiService.openSnackBar(
