@@ -1,0 +1,65 @@
+<div class="feedback-details-container">
+  <!-- Summary Header -->
+  <div class="summary-card" *ngIf="summary">
+    <h2>{{ summary?.department_name?.toUpperCase() }}</h2>
+    <div class="summary-stats">
+      <div class="rating">
+        <strong>Average Rating :</strong>
+        <span class="rating-value"> {{ summary?.avg_rating }}/5</span>
+      </div>
+      <div class="reviews-count">
+        <strong>Total Reviews : </strong>
+        <span>{{ summary?.ratings_count }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Cards -->
+  <div class="feedback-cards" *ngIf="paginatedFeedbacks.length > 0; else noData">
+    <div class="feedback-card" *ngFor="let item of paginatedFeedbacks">
+      <div class="card-header">
+        <h3 class="user-name">{{ item.user_name.toUpperCase() }}</h3>
+        <span class="rating-badge">{{ getRatingDisplay(item.rating) }}</span>
+      </div>
+      <div class="card-body">
+        <p class="feedback-text"><strong>Feedback : </strong>{{ item.feedback }}</p>
+        <p class="feedback-text" *ngIf="item.suggestions">
+          <strong>Suggestions :</strong> {{ item.suggestions }}
+        </p>
+      </div>
+      <div class="card-footer">
+        <small class="date">{{ item.created_at }}</small>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noData>
+    <div class="no-data-message">
+      <p>No feedback available for this department.</p>
+    </div>
+  </ng-template>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button 
+      class="pagination-btn" 
+      (click)="prevPage()" 
+      [disabled]="currentPage === 1">
+      &laquo; Prev
+    </button>
+
+    <button 
+      *ngFor="let page of pages" 
+      class="pagination-btn" 
+      [class.active]="page === currentPage" 
+      (click)="goToPage(page)">
+      {{ page }}
+    </button>
+
+    <button 
+      class="pagination-btn" 
+      (click)="nextPage()" 
+      [disabled]="currentPage === totalPages">
+      Next &raquo;
+    </button>
+  </div>
+</div>

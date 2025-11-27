@@ -392,6 +392,20 @@ export class GenericService {
     );
   }
 
+   postAsText(endpoint: string, body: any): Observable<string> {
+    const url = `${this.baseUrl}/${endpoint}`;
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      headers = headers.set(
+        'Authorization',
+        `Bearer ${this.decryptData(token)}`
+      );
+    }
+    return this.http.post(url, body, { headers, responseType: 'text' });
+  }
+
   private handleUnauthenticated(): void {
     localStorage.clear();
     this.setLoginStatus(false);

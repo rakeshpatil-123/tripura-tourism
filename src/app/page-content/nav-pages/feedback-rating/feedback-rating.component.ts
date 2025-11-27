@@ -1,12 +1,21 @@
+
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
-import { IlogiSelectComponent, SelectOption } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
+import {
+  IlogiSelectComponent,
+  SelectOption,
+} from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { MatButtonModule } from '@angular/material/button';
 import { GenericService } from '../../../_service/generic/generic.service';
+import { Router } from '@angular/router';
 
 interface Department {
   id: number;
@@ -14,22 +23,34 @@ interface Department {
   details: string;
 }
 
+interface FeedbackListItem {
+  department_id: number;
+  department_name: string;
+  avg_rating: number;
+  ratings_count: number;
+}
+
 @Component({
   selector: 'app-feedback-rating',
   standalone: true,
-  imports: [ CommonModule,
+  imports: [
+    CommonModule,
     ReactiveFormsModule,
     IlogiInputComponent,
     IlogiSelectComponent,
-    MatButtonModule,],
+    MatButtonModule,
+  ],
   templateUrl: './feedback-rating.component.html',
-  styleUrls: ['./feedback-rating.component.scss']
+  styleUrls: ['./feedback-rating.component.scss'],
 })
 export class FeedbackRatingComponent {
- 
- feedbackForm!: FormGroup;
+  feedbackForm!: FormGroup;
   departments: SelectOption[] = [];
   isSubmitting = false;
+  currentPage = 1;
+  itemsPerPage = 5;
+  totalPages = 0;
+  feedbackList: FeedbackListItem[] = [];
 
   satisfactionOptions: SelectOption[] = [
     { id: 5, name: 'Very Satisfied (5)' },
@@ -39,7 +60,7 @@ export class FeedbackRatingComponent {
     { id: 1, name: 'Very Dissatisfied (1)' },
   ];
 
-  constructor(private fb: FormBuilder, private apiService: GenericService) {
+  constructor(private fb: FormBuilder, private apiService: GenericService, private router: Router) {
     this.feedbackForm = this.fb.group({
       user_name: ['', [Validators.required, Validators.maxLength(255)]],
       email: [
@@ -55,6 +76,7 @@ export class FeedbackRatingComponent {
 
   ngOnInit(): void {
     this.loadDepartments();
+    this.getList();
   }
 
   loadDepartments(): void {
@@ -100,14 +122,15 @@ export class FeedbackRatingComponent {
           this.isSubmitting = false;
           if (res?.status === 1) {
             this.apiService.openSnackBar(
-              res.message ||
-              'Thank you for your feedback!', 'success'
+              res.message || 'Thank you for your feedback!',
+              'success'
             );
             this.feedbackForm.reset();
+            this.getList();
           } else {
             this.apiService.openSnackBar(
-              res.message ||
-              'Kindly Check your Username and Emali', 'error'
+              res.message || 'Kindly Check your Username and Email',
+              'error'
             );
           }
         },
@@ -115,15 +138,61 @@ export class FeedbackRatingComponent {
           this.isSubmitting = false;
           console.error('Feedback submission error:', err);
           this.apiService.openSnackBar(
-              err.error.message ||
-              'Kindly Check your Username and Emali', 'error'
-            );
+            err.error.message || 'Kindly Check your Username and Email',
+            'error'
+          );
         },
       });
+  }
+
+  getList(): void {
+    this.apiService.postPublicApi({}, 'api/user-feedback-list').subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.feedbackList = res.data;
+          this.currentPage = 1; 
+            this.calculateTotalPages();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching feedback list:', err);
+      },
+    });
+  }
+    calculateTotalPages(): void {
+    this.totalPages = Math.ceil(this.feedbackList.length / this.itemsPerPage);
+  }
+   get paginatedFeedbackList(): FeedbackListItem[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.feedbackList.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+   nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+   get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
   get f() {
     return this.feedbackForm.controls;
   }
-}
 
+  goToDetails(id: number): void {
+    this.router.navigate(['/page/feedback-details', id]);
+    
+  }
+}
