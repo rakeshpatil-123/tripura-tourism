@@ -57,6 +57,11 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                     import('./nav-pages/feedback-rating/feedback-rating.component').then(m => m.FeedbackRatingComponent)
             },
             {
+                path: 'feedback-details/:id',
+                loadComponent: () =>
+                    import('./nav-pages/feedback-details/feedback-details.component').then(m => m.FeedbackDetailsComponent)
+            },
+            {
                 path: 'incentive-calculator',
                 loadComponent: () =>
                     import('./nav-pages/incentive-calculator/incentive-calculator.component').then(m => m.IncentiveCalculatorComponent)

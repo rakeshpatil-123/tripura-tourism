@@ -2,17 +2,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { GenericService } from '../../../_service/generic/generic.service';
 
 interface Payment {
-  id: number;
   slNo: number;
   serviceName: string;
-  applicationId: string;
+  applicationId: string; 
   applicationDate: string;
   paymentType: string;
   status: string;
   amount: number;
   grnNumber?: string;
+   user_service_application_id: number;
 }
 
 @Component({
@@ -29,74 +30,79 @@ export class AllPaymentsComponent implements OnInit {
   currentPageCompleted = 1;
   itemsPerPagePending = 5;
   itemsPerPageCompleted = 5;
-  selectedPayments: Set<number> = new Set();
+  selectedPayments: Set<number> = new Set(); 
   totalSelectedAmount = 0;
   pageSizes = [5, 10, 20, 50];
+
+  constructor(private apiService: GenericService, ) {}
+
   ngOnInit(): void {
-    this.loadMockData();
+    this.paidPayments();
+    this.unpaidPayments();
   }
 
-  private loadMockData(): void {
-    this.pendingPayments = [
-      {
-        id: 1,
-        slNo: 1,
-        serviceName: 'Inspection Fee',
-        applicationId: 'APP-001',
-        applicationDate: '2025-11-01',
-        paymentType: 'Application Fee Payment',
-        status: 'Pending',
-        amount: 300,
+ unpaidPayments(): void {
+  this.apiService
+    .getByConditions(
+      { payment_status: 'pending' },
+      'api/user/user-service-applications-by-payment-status'
+    )
+    .subscribe({
+      next: (response: any) => {
+        if (response?.status === 1 && Array.isArray(response.data)) {
+          this.pendingPayments = response.data.map((item: any, index: number) => ({
+            slNo: index + 1,
+            serviceName: item.service_title_or_description || 'N/A',
+            applicationId: item.application_id || 'N/A',
+            applicationDate: item.application_date
+              ? item.application_date.split(' ')[0]
+              : 'N/A',
+            paymentType: item.payment_type || 'Application Fee Payment',
+            status: 'Pending',
+            amount: item.amount ? parseFloat(item.amount) : 0,
+            user_service_application_id: item.user_service_application_id, 
+          }));
+        } else {
+          this.pendingPayments = [];
+        }
       },
-      {
-        id: 2,
-        slNo: 2,
-        serviceName: 'Legal Metrology Fee',
-        applicationId: 'APP-002',
-        applicationDate: '2025-11-05',
-        paymentType: 'Extra Payment Raised',
-        status: 'Pending',
-        amount: 450,
-      },
-      {
-        id: 3,
-        slNo: 3,
-        serviceName: 'Labour Department Fee',
-        applicationId: 'APP-003',
-        applicationDate: '2025-11-10',
-        paymentType: 'Application Fee Payment',
-        status: 'Pending',
-        amount: 200,
-      },
-    ];
+      error: () => {
+        this.pendingPayments = [];
+      }
+    });
+}
 
-    this.completedPayments = [
-      {
-        id: 4,
-        slNo: 1,
-        serviceName: 'Inspection Fee',
-        applicationDate: 'Inspection Fee',
-        applicationId: 'APP-001',
-        paymentType: 'Application Fee Payment',
-        status: 'paid',
-        amount: 300,
-        grnNumber: 'GRN-2025-001',
+paidPayments(): void {
+  this.apiService
+    .getByConditions(
+      { payment_status: 'paid' },
+      'api/user/user-service-applications-by-payment-status'
+    )
+    .subscribe({
+      next: (response: any) => {
+        if (response?.status === 1 && Array.isArray(response.data)) {
+          this.completedPayments = response.data.map((item: any, index: number) => ({
+            slNo: index + 1,
+            serviceName: item.service_title_or_description || 'N/A',
+            applicationId: item.application_id || 'N/A',
+            applicationDate: item.application_date
+              ? item.application_date.split(' ')[0]
+              : 'N/A',
+            paymentType: item.payment_type || 'N/A',
+            status: 'Paid',
+            amount: item.amount ? parseFloat(item.amount) : 0,
+            grnNumber: item.grn_number || `GRN-${(index + 1).toString().padStart(4, '0')}`,
+            user_service_application_id: item.user_service_application_id,
+          }));
+        } else {
+          this.completedPayments = [];
+        }
       },
-      {
-        id: 5,
-        slNo: 2,
-        serviceName: 'Legal Metrology Fee',
-        applicationDate: 'Legal Metrology Fee',
-        applicationId: 'APP-002',
-        paymentType: 'Extra Payment Raised',
-        status: 'paid',
-        amount: 450,
-        grnNumber: 'GRN-2025-002',
-      },
-    ];
-  }
-
-  // pending table
+      error: () => {
+        this.completedPayments = [];
+      }
+    });
+}
 
   get paginatedPendingPayments() {
     const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
@@ -130,20 +136,13 @@ export class AllPaymentsComponent implements OnInit {
     this.currentPagePending = 1;
   }
 
-  // complete table
-
   get paginatedCompletedPayments() {
     const start = (this.currentPageCompleted - 1) * this.itemsPerPageCompleted;
-    return this.completedPayments.slice(
-      start,
-      start + this.itemsPerPageCompleted
-    );
+    return this.completedPayments.slice(start, start + this.itemsPerPageCompleted);
   }
 
   get totalPagesCompleted(): number {
-    return Math.ceil(
-      this.completedPayments.length / this.itemsPerPageCompleted
-    );
+    return Math.ceil(this.completedPayments.length / this.itemsPerPageCompleted);
   }
 
   goToPageCompleted(page: number): void {
@@ -169,53 +168,87 @@ export class AllPaymentsComponent implements OnInit {
     this.currentPageCompleted = 1;
   }
 
-  toggleSelection(paymentId: number): void {
-    if (this.selectedPayments.has(paymentId)) {
-      this.selectedPayments.delete(paymentId);
+ toggleSelection(id: number): void {
+  if (this.selectedPayments.has(id)) {
+    this.selectedPayments.delete(id);
+  } else {
+    if (this.selectedPayments.size < 5) {
+      this.selectedPayments.add(id);
     } else {
-      this.selectedPayments.add(paymentId);
+      alert('You can select a maximum of 5 payments.');
+      return;
     }
-    this.calculateTotal();
   }
+  this.calculateTotal();
+}
 
-  isSelected(paymentId: number): boolean {
-    return this.selectedPayments.has(paymentId);
+isSelected(id: number): boolean {
+  return this.selectedPayments.has(id);
+}
+
+calculateTotal(): void {
+  this.totalSelectedAmount = Array.from(this.selectedPayments)
+    .map(id => this.pendingPayments.find(p => p.user_service_application_id === id)?.amount || 0)
+    .reduce((sum, amt) => sum + amt, 0);
+}
+
+toggleAllSelection(): void {
+  if (this.isAllSelected()) {
+    this.selectedPayments.clear();
+  } else {
+    this.selectedPayments.clear();
+    this.pendingPayments.slice(0, 5).forEach(p => this.selectedPayments.add(p.user_service_application_id));
   }
+  this.calculateTotal();
+}
 
-  calculateTotal(): void {
-    this.totalSelectedAmount = Array.from(this.selectedPayments)
-      .map((id) => this.pendingPayments.find((p) => p.id === id)?.amount || 0)
-      .reduce((sum, amt) => sum + amt, 0);
-  }
+isAllSelected(): boolean {
+  return this.pendingPayments.length > 0 &&
+         this.selectedPayments.size === this.pendingPayments.length;
+}
 
-  payNow(): void {
-    console.log(
-      'Paying:',
-      this.totalSelectedAmount,
-      'for',
-      this.selectedPayments.size,
-      'items'
-    );
-    alert(
-      `Proceeding to pay ₹${this.totalSelectedAmount} for ${this.selectedPayments.size} item(s)`
-    );
-  }
+get maxSelectionReached(): boolean {
+  return this.selectedPayments.size >= 5;
+}
 
-  isAllSelected(): boolean {
-    return (
-      this.pendingPayments.length > 0 &&
-      this.selectedPayments.size === this.pendingPayments.length
-    );
-  }
 
-  toggleAllSelection(): void {
-    if (this.isAllSelected()) {
-      this.selectedPayments.clear();
-    } else {
-      this.pendingPayments.forEach((payment) => {
-        this.selectedPayments.add(payment.id);
-      });
+
+payNow(): void {
+  if (this.selectedPayments.size === 0) return;
+
+  const payload = {
+    application_id: Array.from(this.selectedPayments) 
+  };
+
+  this.apiService.postAsText('api/user/update-payment', payload).subscribe({
+    next: (htmlResponse: string) => {
+      this.submitToEgras(htmlResponse);
+    },
+    error: (error: any) => {
+      console.error('Failed to generate e-GRAS form', error);
+      alert('Payment initiation failed. Please try again.');
     }
-    this.calculateTotal();
+  });
+}
+
+private submitToEgras(html: string): void {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html.trim();
+
+  const form = tempDiv.querySelector('form#egrasForm') as HTMLFormElement;
+  if (!form) {
+    alert('Invalid payment form received from server.');
+    return;
   }
+
+  form.method = 'POST';
+  form.action = 'https://www.egras.tripura.gov.in/DeptPrePaymentReqHandler.aspx';
+
+  document.body.appendChild(form);
+
+  setTimeout(() => {
+    form.submit();
+    document.body.removeChild(form);
+  }, 100);
+}
 }
