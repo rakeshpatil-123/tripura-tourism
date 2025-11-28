@@ -37,30 +37,40 @@
         <input class="control-color" type="color" (input)="applyTextColor(getValue($event))" />
       </label>
       <label class="toolbar-control">
-        <span class="label-text">Cell bg</span>
+        <span class="label-text">Text BG</span>
+        <input class="control-color" type="color" (input)="applyTextBackground(getValue($event))" />
+        </label>
+        <label class="toolbar-control">
+        <span class="label-text">Cell BG</span>
         <input class="control-color" type="color" (input)="applyCellBackground(getValue($event))" />
       </label>
     </div>
     <div class="toolbar-right">
-      <label class="toolbar-control toolbar-file">
+      <label class="toolbar-control toolbar-file" style="display:flex; flex-direction:column; width:120px;">
         <span class="label-text">Image</span>
-        <input type="file" accept="image/*" (change)="onImageSelected($event)" class="file-input" />
+        <input type="file" accept="image/*" (change)="onImageSelected($event)" class="file-input" style="width:100%;" />
       </label>
 
       <div class="image-controls" *ngIf="selectedImageId">
-        <label class="toolbar-control">
-          <span class="label-text">W (px)</span>
-          <input type="number" min="0" [(ngModel)]="imageWidth" class="control-input small" />
-        </label>
-        <label class="toolbar-control">
-          <span class="label-text">H (px)</span>
-          <input type="number" min="0" [(ngModel)]="imageHeight" class="control-input small" />
-        </label>
-
-        <button pButton type="button" class="p-button btn-apply"
-          (click)="applyImageSize(imageWidth, imageHeight)">Apply</button>
-        <button pButton type="button" class="p-button btn-reset" (click)="resetImageSize()">Reset</button>
-      </div>
+  <div class="control-row">
+  
+    <label class="toolbar-control">
+      <span>W (px)</span>
+      <input type="number" min="0" [(ngModel)]="imageWidth" />
+    </label>
+  
+    <label class="toolbar-control">
+      <span>H (px)</span>
+      <input type="number" min="0" [(ngModel)]="imageHeight" />
+    </label>
+    <button pButton type="button" class="p-button" (click)="applyImageSize(imageWidth, imageHeight)">Apply
+</button>
+  
+    <button pButton type="button" class="p-button p-button-secondary" (click)="resetImageSize()">
+      Reset
+    </button>
+  </div>
+  </div>
 
       <button pButton type="button" class="p-button btn-clear mt-10" (click)="removeInlineStyles()">Clear styles</button>
     </div>
@@ -80,6 +90,8 @@
         <button type="button" class="p-button small" (click)="insertTable(4,2,false)">Insert 4×2</button>
         <button type="button" class="p-button small" (click)="addRow()">Add Row</button>
         <button type="button" class="p-button small" (click)="addColumn()">Add Column</button>
+        <button type="button" class="p-button small" (click)="deleteColumn()">Delete Column</button>
+        <button type="button" class="p-button small" (click)="deleteCell()">Delete Cell</button>
         <button type="button" class="p-button small" (click)="deleteTable()">Delete Table</button>
       </div>
     </ng-template>
@@ -97,6 +109,6 @@
         <button pButton type="button" class="p-button-secondary" (click)="downloadTemplate()">Download PDF</button>
       </div>
     </div>
-    <div class="preview NgxEditor__Content" [innerHTML]="formTemplate"></div>
+    <div class="preview NgxEditor__Content" [innerHTML]="previewHtmlSafe"></div>
   </div>
 </div>

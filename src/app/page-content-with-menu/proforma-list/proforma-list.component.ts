@@ -114,7 +114,7 @@ export class ProformaListComponent implements OnInit {
         { label: 'View', onClick: (row) => this.viewProforma(row) },
         { label: 'Edit', onClick: (row) => this.openProformaDialog(row) },
         { label: 'Delete', color: 'warn', onClick: (row) => this.deleteProforma(row) },
-        { label: 'Add Questions', color: 'accent', onClick: (row) => this.goToQuestions(row) }
+        { label: 'Go to Questions', color: 'accent', onClick: (row) => this.goToQuestions(row) }
       ]
     }
   ];
@@ -210,6 +210,13 @@ export class ProformaListComponent implements OnInit {
 
 
   openProformaDialog(p: any | null = null) {
+    Object.keys(this.proformaForm.controls).forEach((key) => {
+      const ctrl = this.proformaForm.get(key);
+      if (ctrl?.errors && ctrl.errors['serverError']) {
+        const { serverError, ...remaining } = ctrl.errors;
+        ctrl.setErrors(Object.keys(remaining).length ? remaining : null);
+      }
+    });
     if (p) {
       this.isEditMode = true;
       this.editingProformaId = p.id;
@@ -234,7 +241,7 @@ export class ProformaListComponent implements OnInit {
         depends_on_proforma_ids: []
       });
     }
-    this.showProformaDialog = true; // opens the dialog
+    this.showProformaDialog = true;
   }
   goToQuestions(proforma: any) {
     if (!proforma?.id) return;
@@ -295,18 +302,17 @@ export class ProformaListComponent implements OnInit {
         this.loadProformas();
       },
       error: (err: any) => {
-        this.showProformaDialog = false;
-        let errorMessage = `Failed to ${this.isEditMode ? 'update' : 'create'} proforma.`;
-        if (err?.error?.errors) {
-          const messages = Object.values(err.error.errors)
-            .flat()
-            .join('\n');
-          errorMessage = messages;
-        } else if (err?.error?.message) {
-          errorMessage = err.error.message;
+        const serverErrs = err?.error?.errors || err?.errors;
+        if (serverErrs) {
+          this.handleProformaValidationErrors(serverErrs);
+          return;
         }
-
-        Swal.fire('Error', errorMessage, 'error');
+        const fallbackMsg = err?.error?.message || err?.message || `Failed to ${this.isEditMode ? 'update' : 'create'} proforma.`;
+        if (this.genericService && typeof this.genericService.openSnackBar === 'function') {
+          this.genericService.openSnackBar(fallbackMsg, 'error');
+        } else {
+        Swal.fire('Error', fallbackMsg, 'error');
+        }
       }
     });
   }
@@ -375,5 +381,51 @@ export class ProformaListComponent implements OnInit {
   }
   goToSchemes(): void {
     this.router.navigate(['/dashboard/admin-incentive']);
+  }
+  private handleProformaValidationErrors(serverErrors: any) {
+    serverErrors = serverErrors || {};
+    Object.keys(this.proformaForm.controls).forEach((key) => {
+      const ctrl = this.proformaForm.get(key);
+      if (ctrl?.errors && ctrl.errors['serverError']) {
+        const { serverError, ...remaining } = ctrl.errors;
+        const hasOther = Object.keys(remaining).length > 0;
+        ctrl.setErrors(hasOther ? remaining : null);
+      }
+    });
+    let mappedAny = false;
+    const otherMessages: string[] = [];
+
+    for (const key in serverErrors) {
+      if (!Object.prototype.hasOwnProperty.call(serverErrors, key)) continue;
+      const raw = serverErrors[key];
+      const msg = Array.isArray(raw) ? raw[0] : raw;
+
+      if (this.proformaForm.contains(key)) {
+        const ctrl = this.proformaForm.get(key);
+        ctrl?.setErrors({ ...(ctrl.errors || {}), serverError: msg });
+        ctrl?.markAsTouched();
+        mappedAny = true;
+      } else {
+        otherMessages.push(msg);
+      }
+    }
+    const inlineMessages = Object.values(serverErrors)
+      .map(v => Array.isArray(v) ? v.join(', ') : String(v))
+      .join('\n');
+    const snackbarMessage = inlineMessages || otherMessages.join('\n') || 'Validation failed.';
+
+    if (this.genericService && typeof this.genericService.openSnackBar === 'function') {
+      this.genericService.openSnackBar(snackbarMessage, 'error');
+    } else {
+      Swal.fire('Validation failed', snackbarMessage, 'error');
+    }
+    this.showProformaDialog = true;
+    if (mappedAny) {
+      Object.keys(serverErrors).forEach(k => {
+        if (this.proformaForm.contains(k)) {
+          this.proformaForm.get(k)?.markAsTouched();
+        }
+      });
+    }
   }
 }

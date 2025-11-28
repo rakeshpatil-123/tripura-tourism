@@ -5,6 +5,7 @@ import {
   Inject,
   NgZone
 } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { MarkSpec } from 'prosemirror-model';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,8 @@ import {
 } from 'ngx-editor';
 
 import { Schema } from 'prosemirror-model';
-import { TextSelection } from 'prosemirror-state';
+import { Plugin as PMPlugin } from "prosemirror-state";
+import { TextSelection } from "prosemirror-state";
 import {
   tableNodes,
   tableEditing,
@@ -25,6 +27,8 @@ import {
   addColumnAfter,
   addRowAfter,
   deleteTable,
+  deleteColumn,
+  deleteRow, 
   TableNodesOptions
 } from 'prosemirror-tables';
 import { ButtonModule } from 'primeng/button';
@@ -55,6 +59,7 @@ export class ServiceCertificateComponent implements OnInit {
   public borderColor = '#d8dbe0';
   public borderWidth = 1;
   formTemplate = '';
+  previewHtmlSafe!: SafeHtml;
   selectedImageId: string | null = null;
   imageWidth: number | null = null;
   imageHeight: number | null = null;
@@ -68,7 +73,8 @@ export class ServiceCertificateComponent implements OnInit {
     private genericService: GenericService,
     private dialogRef: MatDialogRef<ServiceCertificateComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private zone: NgZone
+    private zone: NgZone,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -82,7 +88,11 @@ export class ServiceCertificateComponent implements OnInit {
         style: { default: null }
       }
     } as TableNodesOptions);
-    const nodes = { ...basicNodes, ...tableNodeSpec };
+    const nodes = {
+      ...basicNodes,
+      image: basicNodes.image,
+      ...tableNodeSpec
+    };
     const styleMark: MarkSpec = {
       attrs: { style: { default: '' } },
       parseDOM: [{
@@ -94,15 +104,78 @@ export class ServiceCertificateComponent implements OnInit {
       }],
       toDOM: (mark: any) => ['span', { style: mark.attrs['style'] }, 0]
     };
-
-    const marks = { ...basicMarks, style: styleMark };
+    const highlightMark: MarkSpec = {
+      attrs: { color: { default: '' } },
+      parseDOM: [{
+        tag: 'span[style]',
+        getAttrs: (dom: any) => {
+          const st = dom.getAttribute('style') || '';
+          const bg = /background-color:\s*([^;]+)/.exec(st);
+          return bg ? { color: bg[1].trim() } : false;
+        }
+      }],
+      toDOM(mark: any) {
+        const color = mark.attrs.color || '';
+        return ['span', { style: `background-color:${color};` }, 0];
+      }
+    };
+    const marks = {
+      ...basicMarks,
+      style: styleMark,
+      highlight: highlightMark
+    };
     const schema = new Schema({ nodes, marks });
     this.editor = new Editor({
       content: this.formTemplate || '',
       schema,
       plugins: [
         columnResizing(),
-        tableEditing()
+        tableEditing(),
+        new PMPlugin({
+          props: {
+            handleDOMEvents: {
+              mousedown: (view, event) => {
+                const target = event.target as HTMLElement;
+                if (!view.dom.contains(target)) return false;
+
+                const pos = view.posAtCoords({
+                  left: event.clientX,
+                  top: event.clientY
+                });
+                if (target && target.tagName === 'IMG' && target.dataset['editorId']) {
+                  const imgEl = target as HTMLImageElement;
+                  const id = imgEl.dataset['editorId'];
+                  this.selectedImageId = id || null;
+                  this.imageWidth = imgEl.width || null;
+                  this.imageHeight = imgEl.height || null;
+                  if (pos) {
+                    const tr = view.state.tr.setSelection(
+                      TextSelection.create(view.state.doc, pos.pos)
+                    );
+                    view.dispatch(tr);
+                  }
+                  return false;
+                }
+                if (pos) {
+                  const tr = view.state.tr.setSelection(
+                    TextSelection.create(view.state.doc, pos.pos)
+                  );
+                  view.dispatch(tr);
+                }
+                return false;
+              }
+            }
+          }
+        }),
+        new PMPlugin({
+          appendTransaction(_, __, newState) {
+            const doc = newState.doc;
+            const last = doc.lastChild;
+            if (last && last.type.name === 'paragraph') return null;
+            const para = newState.schema.nodes['paragraph'].create();
+            return newState.tr.insert(doc.content.size, para);
+          }
+        })
       ]
     });
     const view = (this.editor as any)?.view;
@@ -157,10 +230,12 @@ export class ServiceCertificateComponent implements OnInit {
     if (this.editor) this.editor.destroy();
   }
 
-  private loadTemplate(serviceId: number): void {
+    private loadTemplate(serviceId: number): void {
     this.genericService.getServiceCertificateView(serviceId).subscribe({
       next: (res: any) => {
         this.formTemplate = res?.status === 1 ? res.data?.form_template || '' : '';
+        // update safe preview HTML
+        this.previewHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.formTemplate || '');
         if (this.editor) {
           try {
             (this.editor as any).setContent(this.formTemplate);
@@ -170,6 +245,21 @@ export class ServiceCertificateComponent implements OnInit {
       },
       error: (err: any) => console.error('Load template error', err)
     });
+  }
+  applyTextBackground(color: string) {
+    const view = this.getView();
+    if (!view) return;
+    const { state, dispatch } = view;
+    const { from, to } = state.selection;
+    if (from === to) return;
+
+    const markType = state.schema.marks.highlight;
+    if (!markType) return;
+
+    const mark = markType.create({ color });
+    dispatch(state.tr.addMark(from, to, mark).scrollIntoView());
+    view.focus();
+    this.updateModelFromEditor();
   }
   private getView() {
     return (this.editor as any)?.view;
@@ -187,23 +277,37 @@ export class ServiceCertificateComponent implements OnInit {
   private updateModelFromEditor() {
     this.zone.run(() => {
       this.formTemplate = this.getEditorHTML();
+      this.previewHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.formTemplate || '');
     });
   }
   insertTable(rows = 3, cols = 3, withHeader = true): void {
     const view = this.getView();
     if (!view) return;
-    const { state, dispatch, schema } = view;
+    const state = (view as any).state;
+    const dispatch = ((view as any).dispatch && (view as any).dispatch.bind(view)) || ((tr: any) => (view as any).dispatch(tr));
+    const schema = state?.schema;
 
-    const tableType = schema.nodes.table;
-    const rowType = schema.nodes.table_row;
-    const cellType = schema.nodes.table_cell || schema.nodes.tableCell || schema.nodes['table_cell'];
-    const headerCellType = schema.nodes.table_header || schema.nodes.tableHeader || cellType;
+    if (!state || !schema) {
+      console.error('Editor view/state/schema not available; cannot insert table.');
+      return;
+    }
+    const tableType = schema.nodes['table'];
+    const rowType = schema.nodes['table_row'];
+    const cellType = schema.nodes['table_cell'];
+    const headerCellType = schema.nodes['table_header'];
+
+    if (!tableType || !rowType || !cellType) {
+      console.error('Table node types missing from schema; cannot insert table.');
+      return;
+    }
     const rowsNodes: any[] = [];
     for (let r = 0; r < rows; r++) {
       const cells: any[] = [];
       for (let c = 0; c < cols; c++) {
-        const isHeader = withHeader && r === 0;
-        const cellParagraph = schema.nodes.paragraph.create(null, schema.text(''));
+        const isHeader = withHeader && r === 0 && !!headerCellType;
+        const cellParagraph =
+          schema.nodes.paragraph.createAndFill() ||
+          schema.nodes.paragraph.create(null, schema.text('\u2060'));
         const cellNode = (isHeader ? headerCellType : cellType).create(null, cellParagraph);
         cells.push(cellNode);
       }
@@ -213,9 +317,9 @@ export class ServiceCertificateComponent implements OnInit {
     const tableNode = tableType.create(null, rowsNodes);
     const tr = state.tr.replaceSelectionWith(tableNode).scrollIntoView();
     dispatch(tr);
-    view.focus();
+    (view as any).focus();
     setTimeout(() => {
-      const root = view.dom as HTMLElement;
+      const root = (view.dom as HTMLElement).querySelector('.NgxEditor__Content') as HTMLElement || (view.dom as HTMLElement);
       this.applyTableBorderStyling(root);
       const firstCell = root.querySelector('table td, table th') as HTMLElement | null;
       if (firstCell) {
@@ -232,11 +336,10 @@ export class ServiceCertificateComponent implements OnInit {
           sel.addRange(range);
         }
         try {
-          const docPos = view.state.doc;
-          const tablePos = view.dom.querySelector('table') ? view.state.selection.from : view.state.selection.from;
-          const resolved = view.state.doc.resolve(Math.max(1, view.state.selection.from));
-          const textSel = TextSelection.create(view.state.doc, Math.max(0, resolved.start));
-          dispatch(view.state.tr.setSelection(textSel));
+          const pos = Math.max(1, state.selection.from);
+          const resolved = state.doc.resolve(pos);
+          const pmSelection = TextSelection.create(state.doc, resolved.start);
+          dispatch(state.tr.setSelection(pmSelection));
         } catch (e) {
         }
       }
@@ -304,19 +407,20 @@ export class ServiceCertificateComponent implements OnInit {
   }
 
   private applyTableBorderStyling(root: HTMLElement) {
+    if (!root) return;
     const tables = Array.from(root.querySelectorAll('table'));
     if (!tables.length) return;
 
     tables.forEach((table) => {
       const t = table as HTMLElement;
       t.classList.add('prosemirror-table');
-      t.style.borderCollapse = 'collapse';
-      t.style.border = `${this.borderWidth}px solid ${this.borderColor}`;
+      t.style.setProperty('border-collapse', 'collapse', 'important');
+      t.style.setProperty('border', `${this.borderWidth}px solid ${this.borderColor}`, 'important');
       t.style.width = t.style.width || '100%';
       t.querySelectorAll('th, td').forEach((cell: Element) => {
         const el = cell as HTMLElement;
-        el.style.border = `${this.borderWidth}px solid ${this.borderColor}`;
-        el.style.padding = '8px 10px';
+        el.style.setProperty('border', `${this.borderWidth}px solid ${this.borderColor}`, 'important');
+        el.style.setProperty('padding', '8px 10px', 'important');
         el.style.verticalAlign = 'middle';
         if (!el.querySelector('p')) {
           const p = document.createElement('p');
@@ -407,94 +511,113 @@ export class ServiceCertificateComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  private insertImageAtSelection(src: string, alt = '') {
-    const view = this.getView();
-    if (!view) return;
-    const { state, dispatch, schema } = view;
-    const imageNodeType = schema.nodes.image || schema.nodes['image'];
-
-    if (imageNodeType) {
-      const imgNode = imageNodeType.create({
-        src,
-        alt,
-        style: 'max-width:100%; height:auto; cursor:move;'
-      });
-      dispatch(state.tr.replaceSelectionWith(imgNode).scrollIntoView());
-    } else {
-      const paragraph = schema.nodes.paragraph.create(null, schema.text(''));
-      dispatch(state.tr.replaceSelectionWith(paragraph).scrollIntoView());
-    }
-    const imgs = Array.from((view.dom as HTMLElement).querySelectorAll('img')) as HTMLImageElement[];
-    const targetImg = [...imgs].reverse().find(img => !img.hasAttribute('data-editor-id'));
-    if (targetImg) {
-      const id = 'img_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-      targetImg.setAttribute('data-editor-id', id);
-      targetImg.style.maxWidth = targetImg.style.maxWidth || '100%';
-      targetImg.style.height = targetImg.style.height || 'auto';
-      targetImg.style.cursor = targetImg.style.cursor || 'move';
-
-      if (!targetImg.getAttribute('data-natural-width')) targetImg.setAttribute('data-natural-width', String(targetImg.naturalWidth || targetImg.width || ''));
-      if (!targetImg.getAttribute('data-natural-height')) targetImg.setAttribute('data-natural-height', String(targetImg.naturalHeight || targetImg.height || ''));
-
-      this.zone.run(() => {
-        this.selectedImageId = id;
-        this.imageWidth = targetImg.width || (targetImg.naturalWidth ? Number(targetImg.getAttribute('data-natural-width')) : null);
-        this.imageHeight = targetImg.height || (targetImg.naturalHeight ? Number(targetImg.getAttribute('data-natural-height')) : null);
-      });
-
-      this.updateModelFromEditor();
-    } else {
-      this.updateModelFromEditor();
-    }
-
-  }
-
-  applyImageSize(width?: number | null, height?: number | null) {
-    if (!this.selectedImageId) {
-      Swal.fire('No image selected', 'Please click the image inside the editor to select it first.', 'info');
-      return;
-    }
+  insertImageAtSelection(src: string, alt: string): void {
     const view = this.getView();
     if (!view) return;
 
-    const img = view.dom.querySelector(`img[data-editor-id="${this.selectedImageId}"]`) as HTMLImageElement | null;
-    if (!img) {
-      Swal.fire('Image not found', 'Selected image could not be found in the editor DOM.', 'error');
+    const { state, dispatch } = view;
+    const schema = state.schema;
+
+    const imageNodeType = schema.nodes['image'];
+    if (!imageNodeType) {
+      console.error("Image node missing from schema");
       return;
     }
 
-    if (width && width > 0) {
-      img.style.width = `${width}px`;
-    } else {
-      img.style.removeProperty('width');
-    }
+    const uniqueId = 'img-' + Date.now();
 
-    if (height && height > 0) {
-      img.style.height = `${height}px`;
-    } else {
-      img.style.removeProperty('height');
-    }
-
-    this.zone.run(() => {
-      this.imageWidth = img.style.width ? Number(img.style.width.replace('px', '')) : (img.width || null);
-      this.imageHeight = img.style.height ? Number(img.style.height.replace('px', '')) : (img.height || null);
+    const imgNode = imageNodeType.create({
+      src,
+      alt,
+      'data-editor-id': uniqueId,
+      style: 'max-width:100%; height:auto; cursor:pointer;'
     });
-    this.updateModelFromEditor();
+
+    dispatch(state.tr.replaceSelectionWith(imgNode).scrollIntoView());
+
+    // Select it immediately
+    this.selectedImageId = uniqueId;
   }
-  resetImageSize() {
+
+
+
+  applyImageSize(width?: number | null, height?: number | null): void {
+    if (!this.selectedImageId) {
+      Swal.fire('No image selected', 'Please click an image first.', 'info');
+      return;
+    }
+    const view = this.getView();
+    if (!view) return;
+
+    const { state, dispatch } = view;
+    let imagePos = -1;
+    state.doc.descendants((node: import('prosemirror-model').Node, pos: number) => {
+      if (node.type.name === 'image' && node.attrs['data-editor-id'] === this.selectedImageId) {
+        imagePos = pos;
+      }
+    });
+    const node = state.doc.nodeAt(imagePos);
+    if (!node) return;
+    const existingStyle = node.attrs.style || '';
+    const cleanedStyle = existingStyle
+      .split(';')
+      .filter((s: any) => s.trim() && !s.includes('width') && !s.includes('height'))
+      .join('; ');
+
+    const newStyle = [
+      cleanedStyle,
+      'cursor:pointer',
+      'max-width:100%',
+      width ? `width:${width}px` : '',
+      height ? `height:${height}px` : 'auto'
+    ].filter(Boolean).join('; ');
+
+    dispatch(
+      state.tr.setNodeMarkup(imagePos, undefined, { ...node.attrs, style: newStyle }).scrollIntoView()
+    );
+    this.zone.run(() => {
+      this.imageWidth = width || null;
+      this.imageHeight = height || null;
+    });
+  }
+  resetImageSize(): void {
     if (!this.selectedImageId) return;
     const view = this.getView();
     if (!view) return;
-    const img = view.dom.querySelector(`img[data-editor-id="${this.selectedImageId}"]`) as HTMLImageElement | null;
-    if (!img) return;
-    img.style.removeProperty('width');
-    img.style.removeProperty('height');
-    img.style.height = 'auto';
+    const { state, dispatch } = view;
+
+    let imagePos = -1;
+
+    state.doc.descendants((node: import('prosemirror-model').Node, pos: number) => {
+      if (node.type.name === 'image' && node.attrs['data-editor-id'] === this.selectedImageId) {
+        imagePos = pos;
+      }
+    });
+    if (imagePos === -1) return;
+
+    const node = state.doc.nodeAt(imagePos);
+    if (!node) return;
+
+    const existingStyle = node.attrs.style || '';
+    const cleanedStyle = existingStyle
+      .split(';')
+      .filter((s: any) => s.trim() && !s.includes('width') && !s.includes('height'))
+      .join('; ');
+
+    const newStyle = [
+      cleanedStyle,
+      'cursor:pointer',
+      'max-width:100%',
+      'height:auto'
+    ].filter(Boolean).join('; ');
+
+    dispatch(
+      state.tr.setNodeMarkup(imagePos, undefined, { ...node.attrs, style: newStyle }).scrollIntoView()
+    );
     this.zone.run(() => {
       this.imageWidth = null;
       this.imageHeight = null;
     });
-    this.updateModelFromEditor();
   }
 
   insertLink(href: string) {
@@ -561,6 +684,7 @@ export class ServiceCertificateComponent implements OnInit {
   }
   onContentChange(html: string): void {
     this.formTemplate = html;
+    this.previewHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(html || '');
   }
 
   saveTemplate(): void {
@@ -601,6 +725,47 @@ export class ServiceCertificateComponent implements OnInit {
   `);
       previewWindow.document.close();
     }
+  }
+  deleteColumn(): void {
+    const view = this.getView();
+    if (!view) return;
+
+    try {
+      deleteColumn(view.state, view.dispatch);
+    } catch (err) {
+      console.error("deleteColumn failed", err);
+    }
+
+    setTimeout(() => {
+      this.applyTableBorderStyling(view.dom as HTMLElement);
+    }, 20);
+
+    this.updateModelFromEditor();
+  }
+  deleteCell(): void {
+    const view = this.getView();
+    if (!view) return;
+
+    const { state, dispatch } = view;
+    const sel = state.selection;
+    const $pos = sel.$from;
+
+    const cellPos = $pos.start($pos.depth);
+    const cellNode = $pos.node($pos.depth);
+
+    if (!cellNode || (cellNode.type.name !== "table_cell" && cellNode.type.name !== "table_header")) {
+      return;
+    }
+    const emptyPara = state.schema.nodes.paragraph.createAndFill();
+
+    const tr = state.tr.replaceWith(
+      cellPos + 1,
+      cellPos + cellNode.nodeSize - 1,
+      emptyPara
+    );
+
+    dispatch(tr.scrollIntoView());
+    this.updateModelFromEditor();
   }
 
   downloadTemplate(): void {

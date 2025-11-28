@@ -280,3 +280,19 @@
   color: #999;
   font-style: italic;
 }
+.raw-html-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.raw-html-wrapper table td {
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+.raw-html-wrapper input[type="text"] {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+}
