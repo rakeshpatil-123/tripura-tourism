@@ -143,7 +143,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Services',
       icon: 'work',
       route: '/dashboard/services',
-      roles: ['individual', 'department', 'user', 'moderator', 'guest'],
+      roles: ['individual'],
     },
     {
       id: 'incentive',

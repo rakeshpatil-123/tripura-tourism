@@ -826,3 +826,10 @@
 .btn.btn-back .material-icons {
   font-size: 20px;
 }
+::ng-deep .custom-proforma-dialog .p-dialog .p-dialog-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%) !important;
+  color: #111827 !important;
+}
+::ng-deep .p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}

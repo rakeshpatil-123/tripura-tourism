@@ -5,9 +5,31 @@ import {
   SimpleChanges,
   AfterViewInit,
   OnDestroy,
-  HostBinding
+  HostBinding,
+  ViewChildren,
+  ElementRef,
+  QueryList,
+  ChangeDetectorRef,
+  NgZone,
+  ElementRef as NgElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  trigger,
+  transition,
+  style,
+  animate,
+  query,
+  stagger
+} from '@angular/animations';
+
+export interface ApprovalItem {
+  service_id: number;
+  service_name: string;
+  avg_approval_days: number;
+  pct?: number;
+  delayMs?: number;
+}
 
 @Component({
   selector: 'app-bar-graph-dept-user',
@@ -15,31 +37,50 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './bar-graph-dept-user.component.html',
   styleUrls: ['./bar-graph-dept-user.component.scss'],
+  animations: [
+    trigger('listAnim', [
+      transition('* => *', [
+        query(
+          ':enter',
+          [
+            style({ opacity: 0, transform: 'translateY(12px) scale(.995)' }),
+            stagger(90, [
+              animate(
+                '420ms cubic-bezier(.2,.9,.2,1)',
+                style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+              )
+            ])
+          ],
+          { optional: true }
+        )
+      ])
+    ])
+  ]
 })
 export class BarGraphDeptUserComponent implements OnChanges, AfterViewInit, OnDestroy {
-  @Input() data: Array<{ service_id: number; service_name: string; avg_approval_days: number; }> = [];
-  items: Array<{
-    service_id: number;
-    service_name: string;
-    avg_approval_days: number;
-    pct: number;
-    delayMs: number;
-  }> = [];
+  @Input() data: ApprovalItem[] = [];
+
+  items: ApprovalItem[] = [];
+
+  @HostBinding('class.in-view') inView = false;
 
   private observer?: IntersectionObserver;
   private _animatedOnce = false;
-  @HostBinding('class.in-view') inView = false;
 
-  constructor() { }
+  @ViewChildren('barFill', { read: NgElementRef }) barFillEls!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('barValue', { read: NgElementRef }) barValueEls!: QueryList<ElementRef<HTMLElement>>;
+
+  constructor(
+    private host: ElementRef<HTMLElement>,
+    private cd: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if ('data' in changes) {
       this.prepareItems();
-      if (!this._animatedOnce) {
-        setTimeout(() => {
-          this.startAnimationsIfReady();
-        }, 40);
-      }
+      this._animatedOnce = false;
+      setTimeout(() => this.startAnimationsIfReady(), 20);
     }
   }
 
@@ -54,12 +95,13 @@ export class BarGraphDeptUserComponent implements OnChanges, AfterViewInit, OnDe
             }
           }
         },
-        { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.12 }
+        { root: null, rootMargin: '0px 0px -12% 0px', threshold: 0.12 }
       );
       try {
-        const hostEl = document.querySelector('app-bar-graph-dept-user') as Element | null;
-        if (hostEl) this.observer.observe(hostEl);
+        const el = this.host.nativeElement;
+        this.observer.observe(el);
       } catch {
+        this.startAnimationsIfReady();
       }
     } else {
       this.startAnimationsIfReady();
@@ -80,82 +122,81 @@ export class BarGraphDeptUserComponent implements OnChanges, AfterViewInit, OnDe
       return;
     }
 
-    const max = arr.reduce((m, it) => Math.max(m, (it.avg_approval_days || 0)), 0) || 1;
     arr.sort((a, b) => (b.avg_approval_days || 0) - (a.avg_approval_days || 0));
+    const max = Math.max(...arr.map(it => Math.max(0, it.avg_approval_days)), 1);
 
     this.items = arr.map((it, idx) => {
       const pct = +(((it.avg_approval_days || 0) / max) * 100).toFixed(2);
-      const delayMs = 130 + idx * 110;
       return {
-        service_id: it.service_id,
-        service_name: it.service_name,
-        avg_approval_days: +(it.avg_approval_days || 0),
+        ...it,
         pct,
-        delayMs
+        delayMs: 110 + idx * 90
       };
     });
+
+    this.cd.markForCheck();
   }
 
   private startAnimationsIfReady() {
     if (this._animatedOnce) return;
-    if (!this.items || !this.items.length) {
-      return;
-    }
-    this.inView = true;
-    this._animatedOnce = true;
+    if (!this.items || !this.items.length) return;
     setTimeout(() => {
-      this.items.forEach((item, index) => {
-        const startDelay = item.delayMs + 60;
-        this.animateNumberAfterDelay(item.service_id, 0, item.avg_approval_days, 700, startDelay);
+      this.ngZone.runOutsideAngular(() => {
+        this.inView = true;
+        this._animatedOnce = true;
+
+        this.items.forEach((item, idx) => {
+          const delay = item.delayMs ?? idx * 80;
+          setTimeout(() => {
+            const fillEl = this.barFillEls.toArray()[idx]?.nativeElement as HTMLElement | undefined;
+            const valueEl = this.barValueEls.toArray()[idx]?.nativeElement as HTMLElement | undefined;
+
+            if (fillEl) {
+              fillEl.style.width = `${item.pct}%`;
+              fillEl.classList.add('animate-filled');
+            }
+
+            if (valueEl) {
+              this.animateNumberElement(valueEl, 0, item.avg_approval_days, 850);
+            }
+          }, delay);
+        });
       });
-    }, 80);
-  }
-  private animateNumberAfterDelay(serviceId: number, from: number, to: number, duration = 600, delay = 0) {
-    setTimeout(() => {
-      this.animateNumber(serviceId, from, to, duration);
-    }, delay);
+    }, 30);
   }
 
-  private animateNumber(serviceId: number, from: number, to: number, duration = 600) {
-    const selector = `#bar-value-${serviceId}`;
-    const el = document.querySelector(selector) as HTMLElement | null;
-    if (!el) {
-      return;
-    }
-
+  private animateNumberElement(el: HTMLElement, from: number, to: number, duration = 700) {
     const start = performance.now();
-
-    const step = (now: number) => {
+    const tick = (now: number) => {
       const t = Math.max(0, Math.min(1, (now - start) / duration));
-      const eased = 1 - Math.pow(1 - t, 3);
+      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
       const current = from + (to - from) * eased;
       el.textContent = this.formatDays(current);
-      if (t < 1) {
-        requestAnimationFrame(step);
-      } else {
-        el.textContent = this.formatDays(to);
-      }
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = this.formatDays(to);
     };
-
-    requestAnimationFrame(step);
+    requestAnimationFrame(tick);
   }
 
   formatDays(v: number) {
-    if (Math.abs(v - Math.round(v)) < 0.005) return `${Math.round(v)}d`;
-    return `${+v.toFixed(2)}d`;
+    if (v <= 0.01) return '0d';
+    if (v < 1) return `${v.toFixed(2)}d`;
+    if (Math.abs(v - Math.round(v)) < 0.01) return `${Math.round(v)}d`;
+    return `${v.toFixed(1)}d`;
   }
-  onKeyPress(e: KeyboardEvent, el: any) {
+  getSeverityClass(days: number | undefined): 'low' | 'mid' | 'high' {
+    const v = typeof days === 'number' ? days : 0;
+    if (v <= 2) return 'low';
+    if (v <= 7) return 'mid';
+    return 'high';
+  }
+  onKeyPress(e: KeyboardEvent, target: HTMLElement | null) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      const element = (el as HTMLElement) || null;
-      if (element) {
-        try {
-          element.focus();
-          element.classList.add('kbd-activ');
-          setTimeout(() => element.classList.remove('kbd-activ'), 300);
-        } catch {
-        }
-      }
+      if (!target) return;
+      target.classList.add('kbd-activ');
+      target.focus();
+      setTimeout(() => target.classList.remove('kbd-activ'), 260);
     }
   }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GenericService } from '../../../_service/generic/generic.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 interface Payment {
   slNo: number;
@@ -34,7 +35,7 @@ export class AllPaymentsComponent implements OnInit {
   totalSelectedAmount = 0;
   pageSizes = [5, 10, 20, 50];
 
-  constructor(private apiService: GenericService, ) {}
+  constructor(private apiService: GenericService, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     this.paidPayments();
@@ -217,12 +218,12 @@ payNow(): void {
   if (this.selectedPayments.size === 0) return;
 
   const payload = {
-    application_id: Array.from(this.selectedPayments) 
+    application_id: Array.from(this.selectedPayments)
   };
 
   this.apiService.postAsText('api/user/update-payment', payload).subscribe({
     next: (htmlResponse: string) => {
-      this.submitToEgras(htmlResponse);
+      this.showPaymentForm(htmlResponse);
     },
     error: (error: any) => {
       console.error('Failed to generate e-GRAS form', error);
@@ -231,24 +232,10 @@ payNow(): void {
   });
 }
 
-private submitToEgras(html: string): void {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = html.trim();
-
-  const form = tempDiv.querySelector('form#egrasForm') as HTMLFormElement;
-  if (!form) {
-    alert('Invalid payment form received from server.');
-    return;
+  htmlToShow: any = '';
+  formSubmitted: boolean = false;
+  private showPaymentForm(html: string): void {
+    this.htmlToShow = this.sanitizer.bypassSecurityTrustHtml(html);
+    this.formSubmitted = false;
   }
-
-  form.method = 'POST';
-  form.action = 'https://www.egras.tripura.gov.in/DeptPrePaymentReqHandler.aspx';
-
-  document.body.appendChild(form);
-
-  setTimeout(() => {
-    form.submit();
-    document.body.removeChild(form);
-  }, 100);
-}
 }

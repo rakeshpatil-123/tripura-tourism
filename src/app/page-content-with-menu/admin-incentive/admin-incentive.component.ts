@@ -400,12 +400,17 @@ export class AdminIncentiveComponent implements OnInit {
 
         this.resetSchemeForm();
       },
-      error: (err) => {
-        this.loaderService.hideLoader();
-
+      error: (err: any) => {
+        const serverErrs = err?.error?.errors || err?.errors;
+        if (serverErrs) {
+          this.handleServerValidationErrors(serverErrs);
+          return;
+        }
+        const msg = err?.error?.message || err?.message || 'Failed to save scheme. Please try again.';
+        this.genericService.openSnackBar(msg, 'error');
         Swal.fire({
           title: 'Error!',
-          text: 'Failed to save scheme. Please try again.',
+          text: msg,
           icon: 'error',
           confirmButtonText: 'OK',
           showClass: { popup: 'animate__animated animate__fadeInDown' },
@@ -415,6 +420,52 @@ export class AdminIncentiveComponent implements OnInit {
     });
   }
 
+  private handleServerValidationErrors(serverErrors: any) {
+    serverErrors = serverErrors || {};
+    Object.keys(this.addSchemeForm.controls).forEach((key) => {
+      const ctrl = this.addSchemeForm.get(key);
+      if (ctrl?.errors && ctrl.errors['serverError']) {
+        const { serverError, ...remainingErrors } = ctrl.errors;
+        const hasOtherErrors = Object.keys(remainingErrors).length > 0;
+        ctrl.setErrors(hasOtherErrors ? remainingErrors : null);
+      }
+    });
+    let mappedAny = false;
+    const otherMessages: string[] = [];
+
+    for (const key in serverErrors) {
+      if (!Object.prototype.hasOwnProperty.call(serverErrors, key)) continue;
+      const raw = serverErrors[key];
+      const msg = Array.isArray(raw) ? raw[0] : raw;
+
+      if (this.addSchemeForm.contains(key)) {
+        const ctrl = this.addSchemeForm.get(key);
+        ctrl?.setErrors({ ...(ctrl.errors || {}), serverError: msg });
+        ctrl?.markAsTouched();
+        mappedAny = true;
+      } else {
+        otherMessages.push(msg);
+      }
+    }
+    const inlineMessages = Object.values(serverErrors)
+      .map(v => Array.isArray(v) ? v.join(', ') : String(v))
+      .join('<br/>');
+
+    const snackbarMessage = inlineMessages || otherMessages.join(', ') || 'Validation failed.';
+    if (this.genericService && typeof this.genericService.openSnackBar === 'function') {
+      this.genericService.openSnackBar(snackbarMessage.replace(/<br\/>/g, '\n'), 'error');
+    } else {
+      this.msg.add({ severity: 'error', summary: 'Validation failed', detail: snackbarMessage.replace(/<br\/>/g, '\n') });
+    }
+    this.showAddSchemeDialog = true;
+    if (mappedAny) {
+      Object.keys(serverErrors).forEach(k => {
+        if (this.addSchemeForm.contains(k)) {
+          this.addSchemeForm.get(k)?.markAsTouched();
+        }
+      });
+    }
+  }
 
   private resetSchemeForm() {
     this.showAddSchemeDialog = false;
