@@ -1,0 +1,228 @@
+<div class="swgt-container">
+  @if(loading){
+  <app-loader></app-loader>
+  }@else{
+
+  <!-- Add this at the bottom of your template -->
+  <app-confirmation-modal [isVisible]="showConfirmModal" [title]="modalConfig.title" [message]="modalConfig.message"
+    [confirmButtonText]="modalConfig.confirmButtonText" [cancelButtonText]="modalConfig.cancelButtonText"
+    [confirmButtonClass]="modalConfig.confirmButtonClass" [cancelButtonClass]="modalConfig.cancelButtonClass"
+    (confirm)="handleConfirmSubmission()" (cancel)="showConfirmModal = false" (close)="showConfirmModal = false">
+  </app-confirmation-modal>
+  <ng-container *ngIf="loading; else formTemplate">
+    <div class="text-center">Loading form...</div>
+  </ng-container>
+  <ng-template #formTemplate>
+    <form [formGroup]="serviceForm" class="service-application-form">
+      <div class="h-style">
+        <h1 class="">Renewal Application</h1>
+      </div>
+
+      <!-- Regular grouped questions -->
+      <div *ngFor="let group of Object.keys(groupedQuestions)" class="p-4">
+        <h5 class="mb-2 info-head">{{ group }}</h5>
+        <hr>
+        <div class="row">
+          <ng-container *ngFor="let q of groupedQuestions[group]">
+            <div class="mb-3" [style.width]="q.display_width || '100%'" *ngIf="isQuestionVisible(q.id) && 
+              q.question_type !== 'date_mmdd' && 
+              q.question_type !== 'date_yyyymmdd'">
+              <!-- Text / Number / Email / Textarea -->
+              <app-ilogi-input *ngIf="
+                q.question_type === 'text' ||
+                q.question_type === 'number' ||
+                q.question_type === 'email' ||
+                q.question_type === 'textarea'
+                " [formControlName]="q.id" [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                [type]="q.question_type" [errorMessages]="{
+                  pattern: q.validation_rule?.errorMessage || 'Invalid input.'
+                }"></app-ilogi-input>
+
+              <!-- Date -->
+              <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
+                [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                [submitted]="serviceForm.touched"></app-ilogi-input-date>
+
+              <!-- <app-ilogi-input-date *ngIf="q.question_type === 'date_mmdd'" [formControlName]="q.id"
+                [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" [submitted]="serviceForm.touched"
+                [readonly]="true">
+              </app-ilogi-input-date>
+              <app-ilogi-input-date *ngIf="q.question_type === 'date_yyyymmdd'" [formControlName]="q.id"
+              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'" [submitted]="serviceForm.touched"
+              [readonly]="true">
+            </app-ilogi-input-date> -->
+              <!-- File Upload -->
+              <ng-container *ngIf="q.question_type === 'file'">
+                <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
+                  [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024"
+                  [fileUrl]="getDefaultFileUrl(q.id)">
+                </app-ilogi-file-upload>
+                <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button" class="sample"
+                  (click)="downloadSample(q.sample_format)">
+                  Download Sample
+                </button>
+              </ng-container>
+
+              <!-- Radio -->
+              <app-ilogi-radio *ngIf="q.question_type === 'radio'" [formControlName]="q.id"
+                [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                [radioOptions]="q.parsedOptions || []"></app-ilogi-radio>
+
+              <!-- Select -->
+              <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
+                [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                [selectOptions]="convertToSelectOptionFormat(q.parsedOptions || [])"
+                placeholder="Select..."></app-ilogi-select>
+
+              <!-- Checkbox -->
+              <app-ilogi-checkbox *ngIf="q.question_type === 'checkbox'" [formControlName]="q.id"
+                [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                [checkboxOptions]="q.parsedOptions || []"></app-ilogi-checkbox>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Section-based questions (table format) -->
+      <div *ngFor="let section of sectionGroups" class="p-4">
+        <h5 class="mb-2 info-head">{{ section.sectionName }}</h5>
+        <hr>
+        <div class="mb-5">
+          <div class="container large-container grid-container no-padding-first-last">
+            <div class="table-container">
+              <div class="table-responsive">
+                <table class="table table-bordered grid-table">
+                  <thead>
+                    <tr>
+
+                      <th>SL No</th>
+                      <ng-container *ngFor="let q of section.questions">
+                        <th class="no-wrap">{{ stripHtmlTags(q.question_label) }}
+                          <span *ngIf="q.is_required === 'yes'" class="text-danger">*</span>
+                        </th>
+                      </ng-container>
+                      <th class="no-wrap" style="width: 100px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="{{section.sectionName}}">
+                    <tr *ngFor="let row of getSectionFormArray(section.sectionName).controls; let i = index"
+                      [formGroupName]="i">
+                      <td>{{ i + 1 }}</td>
+                      <ng-container *ngFor="let q of section.questions">
+                        <td *ngIf="isQuestionVisible(q.id, section.sectionName, i)&& 
+             q.question_type !== 'date_mmdd' && 
+             q.question_type !== 'date_yyyymmdd'" class="no-wrap">
+                          <!-- Text / Number / Email / Textarea -->
+                          <app-ilogi-input *ngIf="
+                            q.question_type === 'text' ||
+                            q.question_type === 'number' ||
+                            q.question_type === 'email' ||
+                            q.question_type === 'textarea'
+                            " [formControlName]="q.id" [fieldLabel]="q.question_label"
+                            [mandatory]="q.is_required === 'yes'" [type]="q.question_type" [errorMessages]="{
+                              pattern: q.validation_rule?.errorMessage || 'Invalid input.'
+                            }"></app-ilogi-input>
+
+                          <!-- Date -->
+                          <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
+                            [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                            [submitted]="serviceForm.touched"></app-ilogi-input-date>
+
+                          <!-- <app-ilogi-input-date *ngIf="q.question_type === 'date_mmdd'" [formControlName]="q.id"
+                          [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                          [submitted]="serviceForm.touched" [readonly]="true">
+                        </app-ilogi-input-date>
+
+                        <app-ilogi-input-date *ngIf="q.question_type === 'date_yyyymmdd'" [formControlName]="q.id"
+                            [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                            [submitted]="serviceForm.touched" [readonly]="false">
+                          </app-ilogi-input-date> -->
+                          <!-- File Upload -->
+                          <ng-container *ngIf="q.question_type === 'file'">
+                            <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
+                              [fileUrl]="getDefaultFileUrl(q.id)" [accept]="q.validation_rule?.pattern || '*'"
+                              [maxFileSize]="5 * 1024 * 1024">
+                            </app-ilogi-file-upload>
+                            <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button"
+                              class="sample" (click)="downloadSample(q.sample_format)">
+                              Download Sample
+                            </button>
+                          </ng-container>
+
+                          <!-- Radio -->
+                          <app-ilogi-radio *ngIf="q.question_type === 'radio'" [formControlName]="q.id"
+                            [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                            [radioOptions]="q.parsedOptions || []"></app-ilogi-radio>
+
+                          <!-- Select -->
+                          <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
+                            [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                            [selectOptions]="convertToSelectOptionFormat(q.parsedOptions || [])"
+                            placeholder="Select..."></app-ilogi-select>
+
+                          <!-- Checkbox -->
+                          <app-ilogi-checkbox *ngIf="q.question_type === 'checkbox'" [formControlName]="q.id"
+                            [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                            [checkboxOptions]="q.parsedOptions || []"></app-ilogi-checkbox>
+                        </td>
+                      </ng-container>
+                      <td class="no-wrap">
+                        <button type="button" class="btn btn-danger btn-sm"
+                          (click)="removeSectionRow(section.sectionName, i)"
+                          [disabled]="getSectionFormArray(section.sectionName).length <= 1">
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="pull-right mt-2 color-666666 clkable">
+            <span class="add ml-2" (click)="addSectionRow(section.sectionName)">+ ADD NEW</span>
+          </div>
+        </div>
+      </div>
+      <div class="m-4 btnss">
+        @if(calculatedFee === null || formModifiedAfterFeeCalculation) {
+        <div class="fee-actions">
+          <button type="button" class="btn btn-success calculate-btn" (click)="calFee()" [disabled]="feeCalculating">
+            {{ feeCalculating ? 'Calculating...' : 'Calculate Renewal Fee' }}
+          </button>
+        </div>
+        }
+        @if(calculatedFee !== null && !formModifiedAfterFeeCalculation) {
+
+        <div class="fee-container">
+          @if(visible && !formModifiedAfterFeeCalculation) {
+          <div class="submit-wrap">
+            <button type="button" class="btn btn-success calculate-btn submit-btn"
+              (click)="showSubmitConfirmation()">Renew</button>
+          </div>
+          }
+          <div class="fee-details fee-horizontal">
+            <div class="fee-box fade-in">
+              <strong>Renewal Fee:</strong> ₹{{ calculatedFee }}
+            </div>
+            <!-- @if(late_fee !== 0 && late_fee !== null) {
+            <div class="fee-box fade-in">
+              <strong>Late Fee:</strong> ₹{{ late_fee }}
+            </div>
+            }
+            @if(calculatedFee !== effectiveFee) {
+            <div class="fee-box fade-in">
+              <strong>Effective Fee:</strong> ₹{{ effectiveFee }}
+            </div>
+            } -->
+          </div>
+
+        </div>
+
+        }
+
+      </div>
+    </form>
+  </ng-template>
+  }
+</div>

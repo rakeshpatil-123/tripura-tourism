@@ -170,21 +170,22 @@ export class ServicesComponent {
     //   },
     // });
 
-    columns.push({
-      key: 'apply_icon',
-      label: 'Feedback',
-      type: 'icon',
-      icon: 'star',
-      width: '60px',
-      onClick: (row: any) => {
-      this.router.navigate(
-                [`/dashboard/service-feedback`, row.id],
+    // columns.push({
+    //   key: 'renew',
+    //     label: 'Feedback',
+    //     type: 'button',
+    //     width: '120px',
+    //     buttonText: 'Feedback',
+    //     buttonColor: 'btn-success',
+    //   onClick: (row: any) => {
+    //   this.router.navigate(
+    //             [`/dashboard/service-feedback`, row.id],
             
-              );
+    //           );
         
-      },
+    //   },
     
-    });
+    // });
     columns.push({
       key: 'apply_icon',
       label: 'Apply',

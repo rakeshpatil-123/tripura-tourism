@@ -165,7 +165,7 @@ $bg-dark: #ffffff;
       font-size: 0.75rem;
       color: $primary-color;
       font-weight: 500;
-      margin-right: 0.25rem;
+      // margin-right: 0.25rem;
     }
     
     .value {
@@ -455,7 +455,6 @@ $bg-dark: #ffffff;
 .user-detail {
   display: flex;
   align-items: center;
-  gap: 8px;
   font-size: 15px;
 }
 

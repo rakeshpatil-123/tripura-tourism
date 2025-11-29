@@ -322,16 +322,19 @@ export class ApplicationSearchPageComponent implements OnInit {
         cellClass: () => 'input-large-custom wid-cus',
       },
       {
-        key: 'feedback',
+         key: 'renew',
         label: 'Feedback',
-        type: 'icon',
-        icon: 'star',
-        width: '60px',
+        type: 'button',
+        width: '120px',
+        buttonText: 'Feedback',
+        buttonColor: 'btn-success',
+        buttonVisible: (row: any) => row.payment_status.toLowerCase() === 'paid',
         onClick: (row: any) => {
             this.router.navigate(
-                [`/dashboard/service-feedback`, row.service_id],
+                [`/dashboard/service-feedback`, row.id],
             
               );
+            
         },
       },
       {

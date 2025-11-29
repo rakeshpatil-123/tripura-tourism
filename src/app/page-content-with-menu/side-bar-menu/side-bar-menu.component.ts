@@ -192,7 +192,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       id: 'Renewal List',
       title: 'Renewal List',
       icon: 'description',
-      route: '/dashboard/renewal-list',
+      route: '/dashboard/renewal-application-list',
       roles: ['individual'],
     },
     {
