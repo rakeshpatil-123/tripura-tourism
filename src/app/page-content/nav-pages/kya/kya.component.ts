@@ -121,11 +121,11 @@ export class KYAComponent implements OnInit {
           // Set industry questions
           this.industryQuestions = response.industry || [];
           
-          // Set utility questions - convert strings to objects with id
+          // Set utility questions - they are now objects with id, question, etc.
           if (response.utility && Array.isArray(response.utility)) {
-            this.utilityQuestions = response.utility.map((question: string, index: number) => ({
-              id: index + 1,
-              question: question,
+            this.utilityQuestions = response.utility.map((utilityItem: any) => ({
+              id: utilityItem.id,
+              question: utilityItem.question,
               answer: undefined
             }));
           }
@@ -179,6 +179,9 @@ export class KYAComponent implements OnInit {
           this.approvalDetails = response.records || [];
           this.utilitiesData = response.utilities_data || [];
           this.showApprovalDetails = true;
+          
+          // Scroll to top
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         this.loading = false;
       },
