@@ -37,11 +37,29 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['individual'] }
       },
       {
-        path: 'renewal-list',
+        path: 'renewal-application-list',
         loadComponent: () =>
           import(
             './industrial-user/renewal-of-licance/renewal-of-licance.component'
           ).then((m) => m.RenewalOfLicanceComponent),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
+      },
+      {
+        path: 'renewal-list/:serviceId/:appId',
+        loadComponent: () =>
+          import(
+            './industrial-user/renewal-list/renewal-list.component'
+          ).then((m) => m.RenewalListComponent),
+        canActivate: [authGuard],
+        data: { roles: ['individual'] }
+      },
+      {
+        path: 'renewal-application-submission/:sId/:appId/:renID',
+        loadComponent: () =>
+          import(
+            './industrial-user/renewal-application-submission/renewal-application-submission.component'
+          ).then((m) => m.RenewalApplicationSubmissionComponent),
         canActivate: [authGuard],
         data: { roles: ['individual'] }
       },

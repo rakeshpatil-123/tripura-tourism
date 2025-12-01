@@ -86,9 +86,25 @@
               [innerHTML]="formatValue(row[col.key], col, row)"
               [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"></div> -->
             <!-- Regular Cells -->
-            <div *ngIf="!isCustomComponentColumn(col) && col.type !== 'action' && col.type !== 'icon'"
+            <div *ngIf="!isCustomComponentColumn(col) && col.type !== 'action' && col.type !== 'icon' && col.type !== 'button'"
               [innerHTML]="formatValue(row[col.key], col, row)"
               [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"></div>
+
+            <div *ngIf="col.type === 'button'" class="button-cell text-center"
+              [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''">
+              <button *ngIf="!col.buttonVisible || col.buttonVisible(row)"
+                (click)="col.onClick ? col.onClick(row) : null"
+                class="btn btn-success" type="button">
+                {{
+                (typeof col.buttonText === 'function')
+                ? col.buttonText(row)
+                : (col.buttonText || 'Action')
+                }}
+              </button>
+              <ng-container *ngIf="col.buttonVisible && !col.buttonVisible(row)">
+                <span class="text-muted">—</span>
+              </ng-container>
+            </div>
 
             <!-- Action Dropdown using mat-menu -->
             <div *ngIf="col.type === 'action'" class="action-dropdown text-center">

@@ -34,7 +34,8 @@ export type ColumnType =
   | 'action'
   | 'custom'
   | 'icon'
-  | 'view-link';
+  | 'view-link'
+  | 'button';
 
 export interface TableColumn {
   key: string;
@@ -48,7 +49,9 @@ export interface TableColumn {
   linkQueryParams?: (row: any) => { [key: string]: any };
   icon?: string;
   onClick?: (row: any) => void;
-
+  buttonText?: string | ((row: any) => string);
+  buttonColor?: string;
+  buttonVisible?: (row: any) => boolean;
   actions?: Array<{
     label: string;
     action?: string;
@@ -350,7 +353,7 @@ export class DynamicTableComponent implements OnChanges {
         const text = column.linkText
           ? column.linkText(row)
           : String(value || href);
-            let fullHref = href;
+        let fullHref = href;
         if (Object.keys(queryParams).length > 0) {
           const queryString = new URLSearchParams(queryParams).toString();
           fullHref = queryString ? `${href}?${queryString}` : href;
@@ -381,6 +384,23 @@ export class DynamicTableComponent implements OnChanges {
         return this.sanitizer.bypassSecurityTrustHtml(
           '<span class="text-muted">—</span>'
         );
+      case 'button': {
+        const isVisible = column.buttonVisible
+          ? column.buttonVisible(row)
+          : true;
+        if (!isVisible) {
+          return this.sanitizer.bypassSecurityTrustHtml(
+            '<span class="text-muted">—</span>'
+          );
+        }
+
+        const text =
+          typeof column.buttonText === 'function'
+            ? column.buttonText(row)
+            : column.buttonText || 'Click';
+        const colorClass = column.buttonColor || 'success';
+        return '__BUTTON_PLACEHOLDER__';
+      }
 
       default:
         return value != null
