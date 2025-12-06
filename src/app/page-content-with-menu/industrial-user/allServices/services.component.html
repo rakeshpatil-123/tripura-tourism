@@ -8,8 +8,25 @@
       <h1 class="page-head">List All Services</h1>
     </div>
     
-    
-    
+    <div class="row-filter">
+  <!-- Department Filter -->
+  <app-ilogi-select
+    [selectOptions]="departmentOptions"
+    [(ngModel)]="selectedDepartment"
+    (ngModelChange)="applyFilters()"
+    fieldLabel="Filter by Department"
+    placeholder="Select Department">
+  </app-ilogi-select>
+
+  <!-- NOC Type Filter -->
+  <app-ilogi-select
+    [selectOptions]="nocTypeOptions"
+    [(ngModel)]="selectedNocType"
+    (ngModelChange)="applyFilters()"
+    fieldLabel="Filter by NOC Type"
+    placeholder="Select NOC Type">
+  </app-ilogi-select>
+</div>
     <app-dynamic-table
     [data]="ApplicationData"
     [columns]="ApplicationColumns"
@@ -17,10 +34,6 @@
     [pageSize]="5"
     [showPagination]="true"
     (rowAction)="handleRowAction($event)"
-    [filterColumnKey]="'noc_type'"
-    [filterOptions]="filterOptions"
-    [selectedFilterValue]="selectedNocType"
-    fieldLabel="Filter by NOC Type"
     >
   </app-dynamic-table>
 }

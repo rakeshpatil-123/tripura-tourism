@@ -103,7 +103,7 @@ export class BarChartComponent implements OnChanges {
         categories: serviceNames,
         title: { text: 'Services' },
         labels: {
-          rotate: -45,
+          rotate: -90,
           style: {
             fontSize: '12px',
             fontWeight: 500

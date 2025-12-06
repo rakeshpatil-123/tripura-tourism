@@ -40,7 +40,11 @@
         </div>
         <div class="field" *ngIf="!isThirdParty">
           <label>Current Step</label>
-          <span>Step {{ application?.current_step_number || '—' }}</span>
+          <span> {{ historyDetails[0]?.step_number || '—' }}</span>
+        </div>
+        <div class="field" *ngIf="!isThirdParty">
+          <label>Current Step Name</label>
+          <span class="capitalize" > {{ historyDetails[0]?.step_type || '—' }}</span>
         </div>
         <div class="field" *ngIf="!isThirdParty">
           <label>Base Fee</label>
@@ -159,37 +163,20 @@
       </div>
     </section>
 
-    <section class="section" *ngIf="application?.history_data?.status_file">
-      <h2>Remarks</h2>
-      <div class="grid">
-        <div class="field">
-          <label>Document Status</label>
-          <div class="file-display">
-            <span>{{ getFileNameFromUrl(application?.history_data?.status_file) }}</span>
-            <button type="button" class="btn-view btn-success btn-sm"
-              (click)="previewFile(application?.history_data?.status_file!)">
-              View
-            </button>
-          </div>
-        </div>
+    
+<section class="section" >
+  <h2>Application History</h2>
+  <app-dynamic-table
+    [searchable]="false"
+    [columns]="historyColumns"
+    [data]="historyDetails">
+  </app-dynamic-table>
+</section>
 
-        <div class="field" *ngIf="application?.history_data?.remarks">
-          <label>Remarks</label>
-          <span>{{ application?.history_data?.remarks }}</span>
-        </div>
+    <section class="section">
+      <h2>Payment Details</h2>
 
-        <div class="field">
-          <label>Action Taken At</label>
-          <span>{{ formatDate(application?.history_data?.action_taken_at) }}</span>
-        </div>
-
-        <div class="field">
-          <label>Status</label>
-          <span [ngClass]="getStatusBadgeClass(application?.history_data?.status || '')">
-            {{ (application?.history_data?.status || '') | titlecase }}
-          </span>
-        </div>
-      </div>
+      <app-dynamic-table [searchable]="false" [columns]="transactionColumns" [data]="transactionDetails"  ></app-dynamic-table>
     </section>
   </div>
 </div>

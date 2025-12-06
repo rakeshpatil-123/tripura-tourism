@@ -5,18 +5,21 @@ import { GenericService } from '../../../_service/generic/generic.service';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { LoaderComponent } from '../../../page-template/loader/loader.component';
-
+import {
+  DynamicTableComponent,
+  TableColumn,
+} from '../../../shared/component/table/table.component';
 
 interface HistoryData {
   id: number;
   step_number: number;
   status: string;
   remarks: string | null;
-  status_file: string | null; 
+  status_file: string | null;
   action_taken_at: string;
   action_taken_by: number;
+  step_type: string;
 }
-
 
 interface ApplicationDetail {
   approved_fee: string;
@@ -31,7 +34,7 @@ interface ApplicationDetail {
   }[];
   payment_status: string | null;
   final_fee: string;
-  extra_payment?: string; 
+  extra_payment?: string;
   total_fee?: string;
   current_step_number: string;
   max_processing_date: string;
@@ -44,17 +47,15 @@ interface ApplicationDetail {
   payment_time?: string | null;
   GRN_number?: string | null;
   NOC_penalty_amount?: string | null;
-  history_data?: HistoryData | null;
-
+  history_data?: HistoryData[];
 }
-
 
 @Component({
   selector: 'app-user-application-view',
   templateUrl: './user-application-view.component.html',
   styleUrls: ['./user-application-view.component.scss'],
   standalone: true,
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, DynamicTableComponent],
 })
 export class UserApplicationViewComponent implements OnInit {
   serviceId: number | null = null;
@@ -64,7 +65,11 @@ export class UserApplicationViewComponent implements OnInit {
   isLoading: boolean = false;
   error: string | null = null;
   isThirdParty: boolean = false;
-hasDownloadUrl: boolean = false; 
+  hasDownloadUrl: boolean = false;
+  transactionDetails: any[] = [];
+  transactionColumns: TableColumn[] = [];
+  historyDetails: HistoryData[] = [];
+  historyColumns: TableColumn[] = [];
   fieldLabelMap: Record<string, string> = {
     '17': 'Applicant Name',
     '18': 'Business Name',
@@ -74,6 +79,23 @@ hasDownloadUrl: boolean = false;
     '22': 'Sub Division',
     '23': 'S-S Division',
   };
+  defineHistoryColumns(): void {
+  this.historyColumns = [
+    { key: 'step_number', label: 'Step #', type: 'text' },
+    { key: 'step_type', label: 'Step Type', type: 'text' },
+    { key: 'status', label: 'Status', type: 'text' }, 
+    { key: 'remarks', label: 'Remarks', type: 'text' },
+    { key: 'action_taken_at', label: 'Action Taken At', type: 'text' },
+      {
+      key: 'status_file',
+      label: 'Status File',
+      type: 'view-link',
+       viewLinkText: 'View Dept. Uploaded Doc',
+    },
+  ];
+}
+
+
 
   constructor(
     private route: ActivatedRoute,
@@ -83,10 +105,23 @@ hasDownloadUrl: boolean = false;
   ngOnInit(): void {
     this.loadRouteParams();
     this.checkThirdPartyService();
+    this.defineColumns();
+     this.defineHistoryColumns();
   }
-  
-checkThirdPartyService(): void {
-    this.route.queryParams.subscribe(params => {
+
+  defineColumns(): void {
+    this.transactionColumns = [
+      { key: 'transaction_id', label: 'Transaction ID', type: 'text' },
+      { key: 'GRN_number', label: 'GRN Number', type: 'text' },
+      { key: 'gateway', label: 'Status', type: 'text' },
+      { key: 'payment_datetime', label: 'Payment Date', type: 'text' },
+      { key: 'payment_amount', label: 'Amount', type: 'text' },
+      { key: 'payment_status', label: 'Status', type: 'text' },
+    ];
+  }
+
+  checkThirdPartyService(): void {
+    this.route.queryParams.subscribe((params) => {
       this.isThirdParty = params['service'] === 'third_party';
     });
   }
@@ -95,27 +130,13 @@ checkThirdPartyService(): void {
     const baseUrl = 'http://swaagatstaging.tripura.cloud/';
     this.apiService.downloadServiceCertificate(this.appId).subscribe({
       next: (res: any) => {
-        this.hasDownloadUrl = !!(res?.download_url); 
+        this.hasDownloadUrl = !!res?.download_url;
       },
       error: () => {
         this.hasDownloadUrl = false;
-      }
+      },
     });
   }
-
-  // loadRouteParams(): void {
-  //   const serviceIdParam = this.route.snapshot.paramMap.get('serviceId');
-  //   const appIdParam = this.route.snapshot.paramMap.get('appId');
-
-  //   this.serviceId = serviceIdParam ? +serviceIdParam : null;
-  //   this.appId = appIdParam ? +appIdParam : null;
-
-  //   if (this.serviceId && this.appId) {
-  //     this.fetchApplicationDetails();
-  //   } else {
-  //     this.error = 'Invalid or missing route parameters.';
-  //   }
-  // }
 
   loadRouteParams(): void {
     const serviceIdParam = this.route.snapshot.paramMap.get('serviceId');
@@ -130,7 +151,76 @@ checkThirdPartyService(): void {
       this.error = 'Invalid or missing route parameters.';
     }
   }
-  fetchApplicationDetails(): void {
+//   fetchApplicationDetails(): void {
+//     this.isLoading = true;
+//     this.error = null;
+
+//     const payload = {
+//       service_id: this.serviceId,
+//       application_id: this.appId,
+//     };
+
+//     this.apiService
+//       .getByConditions(
+//         payload,
+//         'api/user/get-details-user-service-applications'
+//       )
+//       .subscribe({
+//         next: (res: any) => {
+//           this.isLoading = false;
+//           if (res?.status === 1 && res.data && typeof res.data === 'object') {
+//             this.transactionDetails = res.payment_details.map((item: any) => {
+//               return {
+//                 transaction_id: item.transaction_id,
+//                 GRN_number: item.GRN_number,
+//                 gateway: item.gateway,
+//                 payment_datetime: item.payment_datetime,
+//                 payment_amount: item.payment_amount,
+//                 payment_status: item.payment_status,
+//               };
+//             });
+//             this.serviceName = res?.service_name;
+//             const appData = res?.data;
+
+//             this.application = {
+//               ...appData,
+//               application_data:
+//                 res.application_data || appData.application_data || {},
+//               application_data_structured: Array.isArray(res.application_data)
+//                 ? res.application_data.map((item: any) => ({
+//                     id: item.id,
+//                     question: item.question,
+//                     answer: item.answer || '—',
+//                   }))
+//                 : [],
+//               extra_payment: appData.extra_payment || '0',
+//               total_fee: appData.total_fee || '0',
+//               history_data: Array.isArray(res.history_data) ? res.history_data : [],
+
+// this.historyDetails = (res.history_data || []).map((h: any) => ({
+//   step_number: h.step_number,
+//   step_type: h.step_type || '—',
+//   status: h.status || '—',
+//   remarks: h.remarks || '—',
+//   action_taken_at: this.formatDate(h.action_taken_at),
+//   file_name: h.status_file ? this.getFileNameFromUrl(h.status_file) : '—',
+//   status_file_url: h.status_file, 
+// }))
+//             };
+//             this.checkDownloadUrlAvailability();
+//           } else {
+//             this.error = res?.message || 'No application details found.';
+//           }
+//         },
+//         error: (err) => {
+//           this.isLoading = false;
+//           this.error = 'Failed to load application. Please try again later.';
+//           console.error('API Error:', err);
+//         },
+//       });
+//   }
+
+fetchApplicationDetails(): void {
   this.isLoading = true;
   this.error = null;
 
@@ -147,18 +237,25 @@ checkThirdPartyService(): void {
     .subscribe({
       next: (res: any) => {
         this.isLoading = false;
-        if (
-          res?.status === 1 &&
-          res.data &&
-          typeof res.data === 'object'
-        ) {
+        if (res?.status === 1 && res.data && typeof res.data === 'object') {
+          this.transactionDetails = res.payment_details.map((item: any) => {
+            return {
+              transaction_id: item.transaction_id,
+              GRN_number: item.GRN_number,
+              gateway: item.gateway,
+              payment_datetime: item.payment_datetime,
+              payment_amount: item.payment_amount,
+              payment_status: item.payment_status,
+            };
+          });
 
-          this.serviceName= res?.service_name;
-          const appData = res?.data;;
+          this.serviceName = res?.service_name;
+          const appData = res?.data;
 
           this.application = {
             ...appData,
-            application_data: res.application_data || appData.application_data || {},
+            application_data:
+              res.application_data || appData.application_data || {},
             application_data_structured: Array.isArray(res.application_data)
               ? res.application_data.map((item: any) => ({
                   id: item.id,
@@ -168,9 +265,19 @@ checkThirdPartyService(): void {
               : [],
             extra_payment: appData.extra_payment || '0',
             total_fee: appData.total_fee || '0',
-             history_data: res.history_data || null,
+            history_data: Array.isArray(res.history_data) ? res.history_data : [], 
           };
-             this.checkDownloadUrlAvailability();
+
+          this.historyDetails = (res.history_data || []).map((h: any) => ({
+            step_number: h.step_number,
+            step_type: h.step_type || '—',
+            status: h.status || '—',
+            remarks: h.remarks || '—',
+            action_taken_at: this.formatDate(h.action_taken_at),
+            status_file: h.status_file,
+          }));
+
+          this.checkDownloadUrlAvailability();
         } else {
           this.error = res?.message || 'No application details found.';
         }
@@ -183,21 +290,25 @@ checkThirdPartyService(): void {
     });
 }
 
-getFileNameFromUrl(url: string | null | undefined): string {
-  if (!url) return '';
-  try {
-    const urlWithoutParams = url.split('?')[0];
-    return decodeURIComponent(urlWithoutParams.substring(urlWithoutParams.lastIndexOf('/') + 1)) || 'document.pdf';
-  } catch {
-    return 'document.pdf';
+  getFileNameFromUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    try {
+      const urlWithoutParams = url.split('?')[0];
+      return (
+        decodeURIComponent(
+          urlWithoutParams.substring(urlWithoutParams.lastIndexOf('/') + 1)
+        ) || 'document.pdf'
+      );
+    } catch {
+      return 'document.pdf';
+    }
   }
-}
 
-previewFile(url: string): void {
-  if (url) {
-    window.open(url, '_blank');
+  previewFile(url: string): void {
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
-}
 
   getLabel(key: string): string {
     return this.fieldLabelMap[key] || `Field ${key}`;
@@ -226,14 +337,12 @@ previewFile(url: string): void {
   }
 
   get hasExtraPayment(): boolean {
-  if (!this.application?.extra_payment) return false;
-  const amount = parseFloat(this.application.extra_payment);
-  return !isNaN(amount) && amount > 0;
+    if (!this.application?.extra_payment) return false;
+    const amount = parseFloat(this.application.extra_payment);
+    return !isNaN(amount) && amount > 0;
   }
 
-   downloadCertificate(): void {
-    
-    
+  downloadCertificate(): void {
     const baseUrl = 'http://swaagatstaging.tripura.cloud/';
     this.apiService.downloadServiceCertificate(this.appId).subscribe({
       next: (res: any) => {
@@ -245,7 +354,7 @@ previewFile(url: string): void {
             icon: 'error',
             title: 'Error',
             text: 'PDF URL not found. Please try again.',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
           });
         }
       },
@@ -254,38 +363,38 @@ previewFile(url: string): void {
           icon: 'error',
           title: 'Download Failed',
           text: 'Something went wrong while fetching the certificate.',
-          confirmButtonText: 'Retry'
+          confirmButtonText: 'Retry',
         });
-      }
+      },
     });
   }
   formatAnswerForDisplay(answer: any): string {
-  if (!answer) return '—';
+    if (!answer) return '—';
 
-  if (typeof answer === 'string') {
-    if (answer.startsWith('http') || answer.includes('uploads/')) {
-      const url = new URL(answer, 'http://dummy.base'); 
-      return url.pathname.split('/').pop() || answer;
-    }
-    return answer;
-  }
-
-  if (Array.isArray(answer)) {
-    const flatValues: string[] = [];
-    for (const item of answer) {
-      if (typeof item === 'object' && item !== null) {
-        flatValues.push(...Object.values(item).map(v => String(v)));
-      } else {
-        flatValues.push(String(item));
+    if (typeof answer === 'string') {
+      if (answer.startsWith('http') || answer.includes('uploads/')) {
+        const url = new URL(answer, 'http://dummy.base');
+        return url.pathname.split('/').pop() || answer;
       }
+      return answer;
     }
-    return flatValues.join(', ');
-  }
 
-  if (typeof answer === 'object') {
-    return Object.values(answer).join(', ');
-  }
+    if (Array.isArray(answer)) {
+      const flatValues: string[] = [];
+      for (const item of answer) {
+        if (typeof item === 'object' && item !== null) {
+          flatValues.push(...Object.values(item).map((v) => String(v)));
+        } else {
+          flatValues.push(String(item));
+        }
+      }
+      return flatValues.join(', ');
+    }
 
-  return String(answer);
-}
+    if (typeof answer === 'object') {
+      return Object.values(answer).join(', ');
+    }
+
+    return String(answer);
+  }
 }

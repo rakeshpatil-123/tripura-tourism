@@ -109,14 +109,14 @@ export class NewNavComponent implements OnDestroy {
           dropdownOpen: false,
           children: []
         },
-        {
-          label: 'Query/Feedback',
-          path: '/page/query-feedback',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
+        // {
+        //   label: 'Query/Feedback',
+        //   path: '/page/query-feedback',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
         {
           label: 'Investor Query',
           path: '/page/investor-query',
@@ -184,7 +184,7 @@ export class NewNavComponent implements OnDestroy {
       children: []
     },
     {
-      label: 'Feedback & Rating',
+      label: 'Feedback & Query',
       path: '/page/feedback-rating',
       hasDropdown: false,
       isActive: false,

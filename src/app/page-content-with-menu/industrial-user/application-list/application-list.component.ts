@@ -323,10 +323,10 @@ export class ApplicationSearchPageComponent implements OnInit {
       },
       {
          key: 'renew',
-        label: 'Feedback',
+        label: 'Query & Feedback',
         type: 'button',
         width: '120px',
-        buttonText: 'Feedback',
+        buttonText: 'Rating',
         buttonColor: 'btn-success',
         buttonVisible: (row: any) => row.payment_status.toLowerCase() === 'paid',
         onClick: (row: any) => {

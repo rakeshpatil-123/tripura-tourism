@@ -42,7 +42,7 @@ label {
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
-  padding-right: 3rem; // Space for calendar icon
+  padding-right: 3rem;
 
   &:focus {
     outline: none;
@@ -149,3 +149,12 @@ label{
   background: #fff!important;
 }
 
+::ng-deep .mat-calendar-body-label{
+  color: #003c5b!important;
+  font-weight: bold;
+}
+::ng-deep .mat-datepicker-content{
+background-color: #fff!important;
+// border: 1px solid #b8b8b8!important;
+box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px!important;
+}

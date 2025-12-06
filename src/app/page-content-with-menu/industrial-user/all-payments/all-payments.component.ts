@@ -8,13 +8,13 @@ import { DomSanitizer } from '@angular/platform-browser';
 interface Payment {
   slNo: number;
   serviceName: string;
-  applicationId: string; 
+  applicationId: string;
   applicationDate: string;
   paymentType: string;
   status: string;
   amount: number;
   grnNumber?: string;
-   user_service_application_id: number;
+  user_service_application_id: number;
 }
 
 @Component({
@@ -31,7 +31,7 @@ export class AllPaymentsComponent implements OnInit {
   currentPageCompleted = 1;
   itemsPerPagePending = 5;
   itemsPerPageCompleted = 5;
-  selectedPayments: Set<number> = new Set(); 
+  selectedPayments: Set<number> = new Set();
   totalSelectedAmount = 0;
   pageSizes = [5, 10, 20, 50];
 
@@ -42,68 +42,74 @@ export class AllPaymentsComponent implements OnInit {
     this.unpaidPayments();
   }
 
- unpaidPayments(): void {
-  this.apiService
-    .getByConditions(
-      { payment_status: 'pending' },
-      'api/user/user-service-applications-by-payment-status'
-    )
-    .subscribe({
-      next: (response: any) => {
-        if (response?.status === 1 && Array.isArray(response.data)) {
-          this.pendingPayments = response.data.map((item: any, index: number) => ({
-            slNo: index + 1,
-            serviceName: item.service_title_or_description || 'N/A',
-            applicationId: item.application_id || 'N/A',
-            applicationDate: item.application_date
-              ? item.application_date.split(' ')[0]
-              : 'N/A',
-            paymentType: item.payment_type || 'Application Fee Payment',
-            status: 'Pending',
-            amount: item.amount ? parseFloat(item.amount) : 0,
-            user_service_application_id: item.user_service_application_id, 
-          }));
-        } else {
+  unpaidPayments(): void {
+    this.apiService
+      .getByConditions(
+        { payment_status: 'pending' },
+        'api/user/user-service-applications-by-payment-status'
+      )
+      .subscribe({
+        next: (response: any) => {
+          if (response?.status === 1 && Array.isArray(response.data)) {
+            this.pendingPayments = response.data.map(
+              (item: any, index: number) => ({
+                slNo: index + 1,
+                serviceName: item.service_title_or_description || 'N/A',
+                applicationId: item.application_id || 'N/A',
+                applicationDate: item.application_date
+                  ? item.application_date.split(' ')[0]
+                  : 'N/A',
+                paymentType: item.payment_type || 'Application Fee Payment',
+                status: 'Pending',
+                amount: item.amount ? parseFloat(item.amount) : 0,
+                user_service_application_id: item.user_service_application_id,
+              })
+            );
+          } else {
+            this.pendingPayments = [];
+          }
+        },
+        error: () => {
           this.pendingPayments = [];
-        }
-      },
-      error: () => {
-        this.pendingPayments = [];
-      }
-    });
-}
+        },
+      });
+  }
 
-paidPayments(): void {
-  this.apiService
-    .getByConditions(
-      { payment_status: 'paid' },
-      'api/user/user-service-applications-by-payment-status'
-    )
-    .subscribe({
-      next: (response: any) => {
-        if (response?.status === 1 && Array.isArray(response.data)) {
-          this.completedPayments = response.data.map((item: any, index: number) => ({
-            slNo: index + 1,
-            serviceName: item.service_title_or_description || 'N/A',
-            applicationId: item.application_id || 'N/A',
-            applicationDate: item.application_date
-              ? item.application_date.split(' ')[0]
-              : 'N/A',
-            paymentType: item.payment_type || 'N/A',
-            status: 'Paid',
-            amount: item.amount ? parseFloat(item.amount) : 0,
-            grnNumber: item.grn_number || `GRN-${(index + 1).toString().padStart(4, '0')}`,
-            user_service_application_id: item.user_service_application_id,
-          }));
-        } else {
+  paidPayments(): void {
+    this.apiService
+      .getByConditions(
+        { payment_status: 'paid' },
+        'api/user/user-service-applications-by-payment-status'
+      )
+      .subscribe({
+        next: (response: any) => {
+          if (response?.status === 1 && Array.isArray(response.data)) {
+            this.completedPayments = response.data.map(
+              (item: any, index: number) => ({
+                slNo: index + 1,
+                serviceName: item.service_title_or_description || 'N/A',
+                applicationId: item.application_id || 'N/A',
+                applicationDate: item.application_date
+                  ? item.application_date.split(' ')[0]
+                  : 'N/A',
+                paymentType: item.payment_type || 'N/A',
+                status: 'Paid',
+                amount: item.amount ? parseFloat(item.amount) : 0,
+                grnNumber:
+                  item.grn_number ||
+                  `GRN-${(index + 1).toString().padStart(4, '0')}`,
+                user_service_application_id: item.user_service_application_id,
+              })
+            );
+          } else {
+            this.completedPayments = [];
+          }
+        },
+        error: () => {
           this.completedPayments = [];
-        }
-      },
-      error: () => {
-        this.completedPayments = [];
-      }
-    });
-}
+        },
+      });
+  }
 
   get paginatedPendingPayments() {
     const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
@@ -139,11 +145,16 @@ paidPayments(): void {
 
   get paginatedCompletedPayments() {
     const start = (this.currentPageCompleted - 1) * this.itemsPerPageCompleted;
-    return this.completedPayments.slice(start, start + this.itemsPerPageCompleted);
+    return this.completedPayments.slice(
+      start,
+      start + this.itemsPerPageCompleted
+    );
   }
 
   get totalPagesCompleted(): number {
-    return Math.ceil(this.completedPayments.length / this.itemsPerPageCompleted);
+    return Math.ceil(
+      this.completedPayments.length / this.itemsPerPageCompleted
+    );
   }
 
   goToPageCompleted(page: number): void {
@@ -169,53 +180,54 @@ paidPayments(): void {
     this.currentPageCompleted = 1;
   }
 
- toggleSelection(id: number): void {
-  if (this.selectedPayments.has(id)) {
-    this.selectedPayments.delete(id);
-  } else {
-    if (this.selectedPayments.size < 5) {
-      this.selectedPayments.add(id);
+  toggleSelection(id: number): void {
+    if (this.selectedPayments.has(id)) {
+      this.selectedPayments.delete(id);
     } else {
-      alert('You can select a maximum of 5 payments.');
-      return;
+      if (this.selectedPayments.size < 5) {
+        this.selectedPayments.add(id);
+      } else {
+        alert('You can select a maximum of 5 payments.');
+        return;
+      }
     }
+    this.calculateTotal();
   }
-  this.calculateTotal();
-}
 
-isSelected(id: number): boolean {
-  return this.selectedPayments.has(id);
-}
-
-calculateTotal(): void {
-  this.totalSelectedAmount = Array.from(this.selectedPayments)
-    .map(id => this.pendingPayments.find(p => p.user_service_application_id === id)?.amount || 0)
-    .reduce((sum, amt) => sum + amt, 0);
-}
-
-toggleAllSelection(): void {
-  if (this.isAllSelected()) {
-    this.selectedPayments.clear();
-  } else {
-    this.selectedPayments.clear();
-    this.pendingPayments.slice(0, 5).forEach(p => this.selectedPayments.add(p.user_service_application_id));
+  isSelected(id: number): boolean {
+    return this.selectedPayments.has(id);
   }
-  this.calculateTotal();
-}
 
-isAllSelected(): boolean {
-  return this.pendingPayments.length > 0 &&
-         this.selectedPayments.size === this.pendingPayments.length;
-}
+  calculateTotal(): void {
+    this.totalSelectedAmount = Array.from(this.selectedPayments)
+      .map(
+        (id) =>
+          this.pendingPayments.find((p) => p.user_service_application_id === id)
+            ?.amount || 0
+      )
+      .reduce((sum, amt) => sum + amt, 0);
+  }
 
-get maxSelectionReached(): boolean {
-  return this.selectedPayments.size >= 5;
-}
+  toggleAllSelection(): void {
+    if (this.isAllSelected()) {
+      this.selectedPayments.clear();
+    } else {
+      this.selectedPayments.clear();
+      this.pendingPayments
+        .slice(0, 5)
+        .forEach((p) =>
+          this.selectedPayments.add(p.user_service_application_id)
+        );
+    }
+    this.calculateTotal();
+  }
 
-
-
-payNow(): void {
-  if (this.selectedPayments.size === 0) return;
+  isAllSelected(): boolean {
+    return (
+      this.pendingPayments.length > 0 &&
+      this.selectedPayments.size === this.pendingPayments.length
+    );
+  }
 
   const payload = {
     application_id: Array.from(this.selectedPayments)

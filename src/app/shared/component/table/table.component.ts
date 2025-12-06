@@ -47,6 +47,7 @@ export interface TableColumn {
   linkHref?: (row: any) => string;
   linkText?: (row: any) => string;
   linkQueryParams?: (row: any) => { [key: string]: any };
+   viewLinkText?: string | ((row: any) => string);
   icon?: string;
   onClick?: (row: any) => void;
   buttonText?: string | ((row: any) => string);
@@ -352,7 +353,7 @@ export class DynamicTableComponent implements OnChanges {
           : {};
         const text = column.linkText
           ? column.linkText(row)
-          : String(value || href);
+          : String(value || '_');
         let fullHref = href;
         if (Object.keys(queryParams).length > 0) {
           const queryString = new URLSearchParams(queryParams).toString();
@@ -374,16 +375,23 @@ export class DynamicTableComponent implements OnChanges {
         );
 
       case 'view-link':
-        if (value) {
-          return this.sanitizer.bypassSecurityTrustHtml(
-            `<button class="btn btn-success" onclick="window.open('${this.sanitizeUrl(
-              value
-            )}', '_blank')" type="button">View</button>`
-          );
-        }
-        return this.sanitizer.bypassSecurityTrustHtml(
-          '<span class="text-muted">—</span>'
-        );
+  if (value) {
+    let buttonText: string;
+    if (typeof column.viewLinkText === 'function') {
+      buttonText = column.viewLinkText(row);
+    } else if (typeof column.viewLinkText === 'string') {
+      buttonText = column.viewLinkText;
+    } else {
+      buttonText = 'View'; 
+    }
+
+    return this.sanitizer.bypassSecurityTrustHtml(
+      `<button class="btn btn-success" onclick="window.open('${this.sanitizeUrl(value)}', '_blank')" type="button">${buttonText}</button>`
+    );
+  }
+  return this.sanitizer.bypassSecurityTrustHtml(
+    '<span class="text-muted">—</span>'
+  );
       case 'button': {
         const isVisible = column.buttonVisible
           ? column.buttonVisible(row)

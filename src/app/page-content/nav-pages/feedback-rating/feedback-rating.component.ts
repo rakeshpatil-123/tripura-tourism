@@ -1,5 +1,3 @@
-
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -44,6 +42,9 @@ interface FeedbackListItem {
   styleUrls: ['./feedback-rating.component.scss'],
 })
 export class FeedbackRatingComponent {
+get reversedSatisfactionOptions(): SelectOption[] {
+  return [...this.satisfactionOptions].reverse();
+}
   feedbackForm!: FormGroup;
   departments: SelectOption[] = [];
   isSubmitting = false;
@@ -51,16 +52,20 @@ export class FeedbackRatingComponent {
   itemsPerPage = 5;
   totalPages = 0;
   feedbackList: FeedbackListItem[] = [];
+  hoveredIndex: number | null = null;
+ satisfactionOptions: SelectOption[] = [
+  { id: 1, name: 'Very Dissatisfied (1)' },
+  { id: 2, name: 'Dissatisfied (2)' },
+  { id: 3, name: 'Neutral (3)' },
+  { id: 4, name: 'Satisfied (4)' },
+  { id: 5, name: 'Very Satisfied (5)' },
+];
 
-  satisfactionOptions: SelectOption[] = [
-    { id: 5, name: 'Very Satisfied (5)' },
-    { id: 4, name: 'Satisfied (4)' },
-    { id: 3, name: 'Neutral (3)' },
-    { id: 2, name: 'Dissatisfied (2)' },
-    { id: 1, name: 'Very Dissatisfied (1)' },
-  ];
-
-  constructor(private fb: FormBuilder, private apiService: GenericService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private apiService: GenericService,
+    private router: Router
+  ) {
     this.feedbackForm = this.fb.group({
       user_name: ['', [Validators.required, Validators.maxLength(255)]],
       email: [
@@ -150,8 +155,8 @@ export class FeedbackRatingComponent {
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.feedbackList = res.data;
-          this.currentPage = 1; 
-            this.calculateTotalPages();
+          this.currentPage = 1;
+          this.calculateTotalPages();
         }
       },
       error: (err) => {
@@ -159,10 +164,10 @@ export class FeedbackRatingComponent {
       },
     });
   }
-    calculateTotalPages(): void {
+  calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.feedbackList.length / this.itemsPerPage);
   }
-   get paginatedFeedbackList(): FeedbackListItem[] {
+  get paginatedFeedbackList(): FeedbackListItem[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.feedbackList.slice(startIndex, startIndex + this.itemsPerPage);
   }
@@ -172,7 +177,7 @@ export class FeedbackRatingComponent {
     }
   }
 
-   nextPage(): void {
+  nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
     }
@@ -183,7 +188,7 @@ export class FeedbackRatingComponent {
       this.currentPage--;
     }
   }
-   get pages(): number[] {
+  get pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
@@ -193,6 +198,18 @@ export class FeedbackRatingComponent {
 
   goToDetails(id: number): void {
     this.router.navigate(['/page/feedback-details', id]);
-    
   }
+onStarHover(index: number): void {
+  this.hoveredIndex = index;
+}
+
+onStarLeave(): void {
+  this.hoveredIndex = null;
+}
+
+setRating(rating: number): void {
+  this.feedbackForm.get('satisfaction')?.setValue(rating);
+}
+
+
 }

@@ -15,7 +15,7 @@
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -41,50 +41,54 @@
   }
 
   &[data-color="blue"] {
-    --card-color: #1976D2;
-    
+    --card-color: #1976d2;
+
     .icon {
-      background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+      background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
     }
 
     .card-body .value {
-      color: #1976D2;
+      color: #1976d2;
     }
   }
 
   &[data-color="green"] {
-    --card-color: #4CAF50; //hover effect color
-    
+    --card-color: #4caf50; //hover effect color
+
     .icon {
-      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%); //icon background gradient
+      background: linear-gradient(
+        135deg,
+        #4caf50 0%,
+        #81c784 100%
+      ); //icon background gradient
     }
 
     .card-body .value {
-      color: #4CAF50;  //text color for value
+      color: #4caf50; //text color for value
     }
   }
 
   &[data-color="orange"] {
-    --card-color: #FF9800;
-    
+    --card-color: #ff9800;
+
     .icon {
-      background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+      background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
     }
 
     .card-body .value {
-      color: #FF9800;
+      color: #ff9800;
     }
   }
 
   &[data-color="red"] {
-    --card-color: #F44336;
-    
+    --card-color: #f44336;
+
     .icon {
-      background: linear-gradient(135deg, #F44336 0%, #E57373 100%);
+      background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
     }
 
     .card-body .value {
-      color: #F44336;
+      color: #f44336;
     }
   }
 }
@@ -125,9 +129,9 @@
   }
 
   .change {
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: #94a3b8;
-    font-weight: 500;
+    font-weight: 800;
   }
 }
 

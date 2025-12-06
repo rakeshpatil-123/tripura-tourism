@@ -1,18 +1,11 @@
-
-
-<div class="form-group"  >
+<div class="form-group">
   <label *ngIf="!hideLabel" [for]="fieldId" [class.bold-label]="readonly">
     {{ fieldLabel }}
     <span *ngIf="mandatory" class="required-indicator">*</span>
   </label>
 
   <!-- Readonly display -->
-  <div
-    *ngIf="readonly"
-    class="readonly-display"
-    [attr.id]="fieldId"
-    [attr.aria-label]="fieldLabel"
-  >
+  <div *ngIf="readonly" class="readonly-display" [attr.id]="fieldId" [attr.aria-label]="fieldLabel">
     <ng-container *ngIf="fieldExactVal; else defaultDisplay">
       {{ fieldExactVal }}
     </ng-container>
@@ -23,44 +16,16 @@
 
   <!-- Editable dropdown -->
   <ng-container *ngIf="!readonly">
-    <div
-      class="w-100 select-form-field"
-      [ngClass]="{ 'is-invalid': submitted && errors }"
-    >
-      <!-- <p-select
-        [inputId]="fieldId"
-        [options]="selectOptions"
-        optionLabel="name"
-        [(ngModel)]="value"   
-        optionValue="id"
-        [placeholder]="placeholder"
-        [disabled]="isDisabled"
-        (onChange)="onChangeControl($event.value)"
-        (onFocus)="showErrorOnFieldHover()"
-        (onBlur)="onBlur()"
-        [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
-        [attr.aria-describedby]="errorFieldId"
-        styleClass="w-full"
-      >
-        <ng-template let-option pTemplate="item"  >
-          <span
-            [title]="option.name"
-          >
-            {{
-              option.name.length > 70
-                ? option.name.substring(0, 70) + "..."
-                : option.name
-            }}
-          </span>
-        </ng-template>
-      </p-select> -->
-      <p-select [inputId]="fieldId" [options]="filteredOptions" optionLabel="name" [(ngModel)]="value" optionValue="id"
-        [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false" (onShow)="onDropdownShow()"
-        (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()" (onBlur)="onBlur()"
-        [attr.aria-invalid]="submitted && errors ? 'true' : 'false'" [attr.aria-describedby]="errorFieldId"
-        styleClass="w-full">
+    <div class="w-100 select-form-field" [ngClass]="{ 'is-invalid': submitted && errors }">
+
+      <p-select appendTo="body" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name" [(ngModel)]="value"
+        optionValue="id" [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false"
+        (onShow)="onDropdownShow()" (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()"
+        (onBlur)="onBlur()" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+        [attr.aria-describedby]="errorFieldId" styleClass="w-full">
+        padding: 5px;
         <ng-template pTemplate="header" *ngIf="enableSearch">
-          <input #searchInput type="text" class="p-inputtext p-component w-full p-2 text-sm w-200" placeholder="Search..."
+          <input #searchInput type="text" class="p-inputtext p-component " placeholder="Search..."
             [(ngModel)]="searchTerm" (ngModelChange)="onSearch($event)" style="background-color: #fff; color: #000;" />
         </ng-template>
         <ng-template let-option pTemplate="item">
@@ -78,12 +43,8 @@
 
 
 
-  <div
-    *ngIf="submitted && hasErrors"
-    class="invalid-input"
-    [id]="errorFieldId"
-    [ngClass]="{ 'show-error': isHovered || submitted }"
-  >
+  <div *ngIf="submitted && hasErrors" class="invalid-input" [id]="errorFieldId"
+    [ngClass]="{ 'show-error': isHovered || submitted }">
     <ng-container *ngFor="let item of errors | keyvalue; let i = index">
       <div *ngIf="i === 0" class="x-error-msg-text">
         {{ errorMessages[item.key] || item.value?.message }}

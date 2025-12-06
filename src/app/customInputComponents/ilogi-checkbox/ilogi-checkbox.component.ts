@@ -74,4 +74,19 @@ export class IlogiCheckboxComponent implements ControlValueAccessor {
     this.showError = show;
     this.errorMessage = message;
   }
+
+isDropdownOpen = false;
+
+toggleDropdown(): void {
+  this.isDropdownOpen = !this.isDropdownOpen;
+}
+
+getSelectedNames(): string {
+  const selected = this.checkboxOptions
+    .filter(opt => this.selectedValues.includes(opt.value))
+    .map(opt => opt.name);
+  return selected.length > 0 ? selected.join(', ') : '';
+}
+
+
 }
