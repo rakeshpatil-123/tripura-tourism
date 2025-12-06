@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GenericService } from '../../../_service/generic/generic.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface Payment {
   slNo: number;
@@ -34,6 +34,14 @@ export class AllPaymentsComponent implements OnInit {
   selectedPayments: Set<number> = new Set();
   totalSelectedAmount = 0;
   pageSizes = [5, 10, 20, 50];
+
+  // UI state for returned payment HTML
+  htmlToShow: SafeHtml | string | null = '';
+  formSubmitted = false;
+  loading = false;
+
+  // maximum number of selectable payments (your code used 5)
+  readonly maxSelectable = 5;
 
   constructor(private apiService: GenericService, private sanitizer: DomSanitizer) {}
 
@@ -111,6 +119,7 @@ export class AllPaymentsComponent implements OnInit {
       });
   }
 
+  /* ---------- Pagination helpers (Pending) ---------- */
   get paginatedPendingPayments() {
     const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
     return this.pendingPayments.slice(start, start + this.itemsPerPagePending);
@@ -143,6 +152,7 @@ export class AllPaymentsComponent implements OnInit {
     this.currentPagePending = 1;
   }
 
+  /* ---------- Pagination helpers (Completed) ---------- */
   get paginatedCompletedPayments() {
     const start = (this.currentPageCompleted - 1) * this.itemsPerPageCompleted;
     return this.completedPayments.slice(
@@ -180,14 +190,15 @@ export class AllPaymentsComponent implements OnInit {
     this.currentPageCompleted = 1;
   }
 
+  /* ---------- Selection logic ---------- */
   toggleSelection(id: number): void {
     if (this.selectedPayments.has(id)) {
       this.selectedPayments.delete(id);
     } else {
-      if (this.selectedPayments.size < 5) {
+      if (this.selectedPayments.size < this.maxSelectable) {
         this.selectedPayments.add(id);
       } else {
-        alert('You can select a maximum of 5 payments.');
+        alert(`You can select a maximum of ${this.maxSelectable} payments.`);
         return;
       }
     }
@@ -213,11 +224,10 @@ export class AllPaymentsComponent implements OnInit {
       this.selectedPayments.clear();
     } else {
       this.selectedPayments.clear();
-      this.pendingPayments
-        .slice(0, 5)
-        .forEach((p) =>
-          this.selectedPayments.add(p.user_service_application_id)
-        );
+      // select up to maxSelectable from pendingPayments (you previously used slice(0,5))
+      this.pendingPayments.slice(0, this.maxSelectable).forEach((p) =>
+        this.selectedPayments.add(p.user_service_application_id)
+      );
     }
     this.calculateTotal();
   }
@@ -225,29 +235,51 @@ export class AllPaymentsComponent implements OnInit {
   isAllSelected(): boolean {
     return (
       this.pendingPayments.length > 0 &&
-      this.selectedPayments.size === this.pendingPayments.length
+      this.selectedPayments.size === Math.min(this.pendingPayments.length, this.maxSelectable)
     );
   }
 
-  const payload = {
-    application_id: Array.from(this.selectedPayments)
-  };
+  /* Getter used by templates that referenced maxSelectionReached */
+  get maxSelectionReached(): boolean {
+    return this.selectedPayments.size >= this.maxSelectable;
+  }
 
-  this.apiService.postAsText('api/user/update-payment', payload).subscribe({
-    next: (htmlResponse: string) => {
-      this.showPaymentForm(htmlResponse);
-    },
-    error: (error: any) => {
-      console.error('Failed to generate e-GRAS form', error);
-      alert('Payment initiation failed. Please try again.');
+  /* ---------- Payment initiation ---------- */
+  payNow(): void {
+    if (this.selectedPayments.size === 0) {
+      alert('Please select at least one payment to proceed.');
+      return;
     }
-  });
-}
 
-  htmlToShow: any = '';
-  formSubmitted: boolean = false;
+    const payload = {
+      application_id: Array.from(this.selectedPayments)
+    };
+
+    this.loading = true;
+
+    // assume postAsText returns Observable<string> containing HTML form
+    this.apiService.postAsText('api/user/update-payment', payload).subscribe({
+      next: (htmlResponse: string) => {
+        this.showPaymentForm(htmlResponse);
+      },
+      error: (error: any) => {
+        console.error('Failed to generate e-GRAS form', error);
+        alert('Payment initiation failed. Please try again.');
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  // Display the returned HTML safely in the template
   private showPaymentForm(html: string): void {
     this.htmlToShow = this.sanitizer.bypassSecurityTrustHtml(html);
     this.formSubmitted = false;
+  }
+
+  // call from template if payment iframe/form submits
+  markFormSubmitted(): void {
+    this.formSubmitted = true;
   }
 }
