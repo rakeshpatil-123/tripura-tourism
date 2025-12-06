@@ -327,3 +327,45 @@ ngx-editor-menu,
 .mt-10 {
   margin-top: 20px;
 }
+.NgxEditor__Content table.prosemirror-table,
+.NgxEditor__Content table.prosemirror-table th,
+.NgxEditor__Content table.prosemirror-table td {
+  border: 1px solid #d8dbe0 !important;
+  border-collapse: collapse !important;
+  padding: 8px 10px !important;
+}
+
+.NgxEditor__Content table,
+.NgxEditor__Content th,
+.NgxEditor__Content td {
+  border-collapse: collapse !important;
+}
+
+.image-controls {
+  padding: 6px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+}
+
+.control-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.toolbar-control {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.toolbar-control input {
+  width: 70px;
+  padding: 4px;
+}

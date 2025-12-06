@@ -25,6 +25,10 @@
         <small class="error-msg" *ngIf="addSchemeForm.get('code')?.invalid && addSchemeForm.get('code')?.touched">
           Scheme Code is required
         </small>
+      <small class="error-msg"
+        *ngIf="addSchemeForm.get('code')?.errors?.['serverError'] && addSchemeForm.get('code')?.touched">
+        {{ addSchemeForm.get('code')?.errors?.['serverError'] }}
+      </small>
       </div>
       <div class="form-field">
         <label for="schemeTitle">Scheme Title</label>
@@ -32,6 +36,10 @@
           class="p-inputtext" />
         <small class="error-msg" *ngIf="addSchemeForm.get('title')?.invalid && addSchemeForm.get('title')?.touched">
           Scheme Title is required
+        </small>
+        <small class="error-msg"
+          *ngIf="addSchemeForm.get('title')?.errors?.['serverError'] && addSchemeForm.get('title')?.touched">
+          {{ addSchemeForm.get('title')?.errors?.['serverError'] }}
         </small>
       </div>
 

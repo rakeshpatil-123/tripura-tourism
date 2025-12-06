@@ -78,12 +78,13 @@
       </div>
     </div>
   </section>
-  <section class="dashboard-section charts-section">
+</div>
+<app-clarification-table class="reduce-gap-next"
+  [data]="dashboardData?.clarification_required"></app-clarification-table>
+    <section class="dashboard-section charts-section reduce-gap">
     <div class="charts-grid single-column">
       <div class="chart-item">
         <app-bar-graph-dept-user [data]="dashboardData?.avg_approval_time_per_service"></app-bar-graph-dept-user>
       </div>
     </div>
   </section>
-</div>
-<app-clarification-table [data]="dashboardData?.clarification_required"></app-clarification-table>

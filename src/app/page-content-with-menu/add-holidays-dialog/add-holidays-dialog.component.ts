@@ -116,7 +116,7 @@ export class AddHolidaysDialogComponent implements OnInit {
         error: (err: any) => {
           this.dialogRef.close();
           this.isSubmitting = false;
-          const errorMsg = err.error?.message || 'Failed to create holiday.';
+          const errorMsg = err.error?.error || 'Failed to create holiday.';
           Swal.fire({
             title: 'Error!',
             text: errorMsg,
@@ -144,12 +144,16 @@ export class AddHolidaysDialogComponent implements OnInit {
             customClass: { confirmButton: 'swal2-confirm-btn' }
           }).then(() => this.dialogRef.close('updated'));
         },
-        error: () => {
+        error: (err: any) => {
           this.dialogRef.close();
           this.isSubmitting = false;
+          const errorMsg =
+            err.error?.error ||
+            err.error?.message ||
+            'Failed to update holiday.';
           Swal.fire({
             title: 'Error!',
-            text: 'Failed to update holiday.',
+            text: errorMsg,
             icon: 'error',
             showClass: { popup: 'animate__animated animate__fadeInDown' },
             hideClass: { popup: 'animate__animated animate__fadeOutUp' },

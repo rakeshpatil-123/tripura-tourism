@@ -35,10 +35,7 @@ export class AllPaymentsComponent implements OnInit {
   totalSelectedAmount = 0;
   pageSizes = [5, 10, 20, 50];
 
-  constructor(
-    private apiService: GenericService,
-    private sanitizer: DomSanitizer
-  ) {}
+  constructor(private apiService: GenericService, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     this.paidPayments();
@@ -232,34 +229,25 @@ export class AllPaymentsComponent implements OnInit {
     );
   }
 
-  get maxSelectionReached(): boolean {
-    return this.selectedPayments.size >= 5;
-  }
+  const payload = {
+    application_id: Array.from(this.selectedPayments)
+  };
 
-  payNow(): void {
-    if (this.selectedPayments.size === 0) return;
-
-    const payload = {
-      application_id: Array.from(this.selectedPayments),
-    };
-
-    this.apiService.postAsText('api/user/update-payment', payload).subscribe({
-      next: (htmlResponse: string) => {
-        this.showPaymentForm(htmlResponse);
-      },
-      error: (error: any) => {
-        console.error('Failed to generate e-GRAS form', error);
-        alert('Payment initiation failed. Please try again.');
-      },
-    });
-  }
+  this.apiService.postAsText('api/user/update-payment', payload).subscribe({
+    next: (htmlResponse: string) => {
+      this.showPaymentForm(htmlResponse);
+    },
+    error: (error: any) => {
+      console.error('Failed to generate e-GRAS form', error);
+      alert('Payment initiation failed. Please try again.');
+    }
+  });
+}
 
   htmlToShow: any = '';
   formSubmitted: boolean = false;
   private showPaymentForm(html: string): void {
     this.htmlToShow = this.sanitizer.bypassSecurityTrustHtml(html);
-    console.log(this.htmlToShow);
-
     this.formSubmitted = false;
   }
 }

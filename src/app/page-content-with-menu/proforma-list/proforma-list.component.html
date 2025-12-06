@@ -14,7 +14,7 @@
   <app-dynamic-table [data]="proformas" [columns]="columns" [showPagination]="true" [pageSize]="5" [searchable]="true"
     (rowAction)="onRowAction($event)">
   </app-dynamic-table>
-  <p-dialog [(visible)]="showProformaDialog" [modal]="true"
+  <p-dialog appendTo="body" [(visible)]="showProformaDialog" [modal]="true"
     [style]="{ width: '720px', maxWidth: '95vw', minHeight: '520px', height: 'auto' }" [draggable]="false"
     [resizable]="false" [closable]="true" [dismissableMask]="true" styleClass="custom-proforma-dialog">
     <form [formGroup]="proformaForm" (ngSubmit)="saveProforma()" class="proforma-form">
@@ -29,14 +29,22 @@
             *ngIf="proformaForm.get('title')?.invalid && (proformaForm.get('title')?.touched || proformaForm.get('title')?.dirty)">
             Title is required
           </small>
+          <small class="error-message"
+            *ngIf="proformaForm.get('title')?.errors?.['serverError'] && (proformaForm.get('title')?.touched || proformaForm.get('title')?.dirty)">
+            {{ proformaForm.get('title')?.errors?.['serverError'] }}
+          </small>
         </div>
 
         <div class="form-group">
           <label>Code</label>
           <input pInputText formControlName="code" placeholder="Enter code" />
           <small class="error-message"
-            *ngIf="proformaForm.get('code')?.invalid && (proformaForm.get('code')?.touched || proformaForm.get('code')?.dirty)">
+            *ngIf="proformaForm.get('code')?.hasError('required') && (proformaForm.get('code')?.touched || proformaForm.get('code')?.dirty)">
             Code is required
+          </small>
+          <small class="error-message"
+            *ngIf="proformaForm.get('code')?.errors?.['serverError'] && !proformaForm.get('code')?.hasError('required') && (proformaForm.get('code')?.touched || proformaForm.get('code')?.dirty)">
+            {{ proformaForm.get('code')?.errors?.['serverError'] }}
           </small>
         </div>
 
@@ -61,6 +69,10 @@
             *ngIf="proformaForm.get('claim_type')?.invalid && (proformaForm.get('claim_type')?.touched || proformaForm.get('claim_type')?.dirty)">
             Claim Type is required
           </small>
+          <small class="error-message"
+            *ngIf="proformaForm.get('claim_type')?.errors?.['serverError'] && (proformaForm.get('claim_type')?.touched || proformaForm.get('claim_type')?.dirty)">
+            {{ proformaForm.get('claim_type')?.errors?.['serverError'] }}
+          </small>
         </div>
         <div *ngIf="proformaForm.get('proforma_type')?.value === 'claim'" [formGroup]="proformaForm" class="card flex justify-center w-full">
           <label class="w-full font-medium mb-1 block">Depends On Proformas</label>
@@ -71,6 +83,10 @@
           <small class="error-message"
             *ngIf="proformaForm.get('depends_on_proforma_ids')?.invalid && (proformaForm.get('depends_on_proforma_ids')?.touched || proformaForm.get('depends_on_proforma_ids')?.dirty)">
             Depends On Proformas is required
+          </small>
+          <small class="error-message"
+            *ngIf="proformaForm.get('depends_on_proforma_ids')?.errors?.['serverError'] && (proformaForm.get('depends_on_proforma_ids')?.touched || proformaForm.get('depends_on_proforma_ids')?.dirty)">
+            {{ proformaForm.get('depends_on_proforma_ids')?.errors?.['serverError'] }}
           </small>
         </div>
         <div *ngIf="proformaForm.get('proforma_type')?.value === 'claim'" class="form-group">
@@ -83,6 +99,10 @@
           <small class="error-message"
             *ngIf="proformaForm.get('max_claim_count')?.hasError('min') && (proformaForm.get('max_claim_count')?.touched || proformaForm.get('max_claim_count')?.dirty)">
             Max Claim Count must be a positive number
+          </small>
+          <small class="error-message"
+            *ngIf="proformaForm.get('max_claim_count')?.errors?.['serverError'] && (proformaForm.get('max_claim_count')?.touched || proformaForm.get('max_claim_count')?.dirty)">
+            {{ proformaForm.get('max_claim_count')?.errors?.['serverError'] }}
           </small>
         </div>
 
@@ -115,7 +135,7 @@
   </p-dialog>
 
 
-  <p-dialog header="Proforma Details" [(visible)]="showProformaDetailsDialog" [modal]="true"
+  <p-dialog appendTo="body" header="Proforma Details" [(visible)]="showProformaDetailsDialog" [modal]="true"
     [style]="{ width: '700px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="true"
     [dismissableMask]="true" styleClass="proforma-details-dialog animate__animated animate__fadeInDown">
     <div *ngIf="selectedProforma" class="proforma-details">

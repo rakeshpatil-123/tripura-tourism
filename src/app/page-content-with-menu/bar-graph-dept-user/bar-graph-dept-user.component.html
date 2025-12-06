@@ -1,26 +1,35 @@
-<section class="bar-graph-wrap" role="region" aria-label="Average approval time per service">
+<section class="bar-graph-wrap" role="region" aria-label="Average approval time per service" [@listAnim]="items.length">
   <header class="bg-header">
-    <h3 class="title">Average Approval Time (days) — per Service</h3>
+    <div class="head-left">
+      <h3 class="title">Average Approval Time</h3>
+      <div class="subtitle">Per service — displayed in days</div>
+    </div>
+
+    <div class="legend" aria-hidden="true">
+      <div class="legend-pill">
+        <span class="legend-swatch"></span>
+        <span class="legend-text">Average days</span>
+      </div>
+    </div>
   </header>
-  <div class="bars-list" *ngIf="items && items.length; else noData">
+  <div class="bars-list" *ngIf="items?.length; else noData">
     <ng-container *ngFor="let it of items; let i = index">
       <div class="bar-row" tabindex="0" role="button"
         aria-label="{{ it.service_name }}: {{ it.avg_approval_days }} days"
-        (keydown)="onKeyPress($event, $any($event.currentTarget))" [style.transitionDelay]="it.delayMs + 'ms'">
+        (keydown)="onKeyPress($event, $any($event.currentTarget))" [style.transitionDelay]="(it.delayMs ?? (i*80)) + 'ms'">
         <div class="left">
-          <div class="service-name" title="{{ it.service_name }}">{{ it.service_name }}</div>
+          <div class="service-name" [title]="it.service_name">{{ it.service_name }}</div>
         </div>
         <div class="right">
-          <div class="bar-outer" [attr.data-pct]="it.pct" [style.--target-width]="it.pct + '%'"
-            [style.transitionDelay]="it.delayMs + 'ms'">
-            <div class="bar-inner" aria-hidden="true">
-              <div class="bar-fill" aria-hidden="true" [style.width]="it.pct + '%'"
-                [style.transitionDelay]="it.delayMs + 'ms'"></div>
+          <div class="bar-outer" aria-hidden="true">
+            <div class="bar-inner">
+              <div #barFill class="bar-fill" [ngClass]="getSeverityClass(it.avg_approval_days)" [attr.data-pct]="it.pct"
+                aria-hidden="true" style="width:0%"></div>
 
-              <div class="bar-shimmer" aria-hidden="true" [style.transitionDelay]="(it.delayMs + 200) + 'ms'"></div>
+              <div class="bar-shimmer" aria-hidden="true"></div>
             </div>
 
-            <div class="bar-value" id="bar-value-{{it.service_id}}" aria-hidden="false">0d</div>
+            <div #barValue class="bar-value" aria-live="polite">0d</div>
           </div>
         </div>
       </div>
