@@ -15,13 +15,14 @@
   <ng-template #formTemplate>
     <form [formGroup]="serviceForm" class="service-application-form">
       <div class="h-style">
-        <h1 class="">Service Application</h1>
+        <h1 class="">{{serviceName}}</h1>
       </div>
 
       <!-- Regular grouped questions -->
       <div *ngFor="let group of Object.keys(groupedQuestions)" class="p-4">
-        <h5 class="mb-2 info-head">{{ group }}</h5>
-        <hr>
+        <h5 class="mrg2 info-head">{{ group }}</h5>
+        <hr class="mrg2">
+
         <div class="row">
           <ng-container *ngFor="let q of groupedQuestions[group]">
             <div class="mb-3" [style.width]="q.display_width || '100%'" *ngIf="isQuestionVisible(q.id) && 
@@ -69,10 +70,13 @@
                 [radioOptions]="q.parsedOptions || []"></app-ilogi-radio>
 
               <!-- Select -->
-              <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
-                [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
-                [selectOptions]="convertToSelectOptionFormat(q.parsedOptions || [])"
-                placeholder="Select..."></app-ilogi-select>
+              <div [ngClass]="q.question_type === 'select' ? 'mrg ' : ''">
+
+                <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
+                  [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                  [selectOptions]="convertToSelectOptionFormat(q.parsedOptions || [])" [enableSearch]="true"
+                  placeholder="Select..."></app-ilogi-select>
+              </div>
 
               <!-- Checkbox -->
               <app-ilogi-checkbox *ngIf="q.question_type === 'checkbox'" [formControlName]="q.id"
@@ -89,8 +93,9 @@
         <hr>
         <div class="mb-5">
           <div class="container large-container grid-container no-padding-first-last">
-            <div class="table-container">
-              <div class="table-responsive">
+            <div class="scroll-wrapper">
+              <div class="table-container">
+
                 <table class="table table-bordered grid-table">
                   <thead>
                     <tr>
@@ -155,11 +160,13 @@
                             [radioOptions]="q.parsedOptions || []"></app-ilogi-radio>
 
                           <!-- Select -->
-                          <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
-                            [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
-                            [selectOptions]="convertToSelectOptionFormat(q.parsedOptions || [])"
-                            placeholder="Select..."></app-ilogi-select>
+                          <div [ngClass]="q.question_type === 'select' ? 'mrg3 ' : ''">
 
+                            <app-ilogi-select *ngIf="q.question_type === 'select'" [formControlName]="q.id"
+                              [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
+                              [selectOptions]="convertToSelectOptionFormat(q.parsedOptions || [])" [enableSearch]="true"
+                              placeholder="Select..."></app-ilogi-select>
+                          </div>
                           <!-- Checkbox -->
                           <app-ilogi-checkbox *ngIf="q.question_type === 'checkbox'" [formControlName]="q.id"
                             [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
@@ -176,6 +183,7 @@
                     </tr>
                   </tbody>
                 </table>
+
               </div>
             </div>
           </div>
@@ -184,45 +192,45 @@
           </div>
         </div>
       </div>
-    <div class="m-4 btnss">
-      @if(calculatedFee === null || formModifiedAfterFeeCalculation) {
-      <div class="fee-actions">
-        <button type="button" class="btn btn-success calculate-btn" (click)="calFee()" [disabled]="feeCalculating">
-          {{ feeCalculating ? 'Calculating...' : 'Calculate Fee' }}
-        </button>
-      </div>
-      }
-      @if(calculatedFee !== null && !formModifiedAfterFeeCalculation) {
-    
-      <div class="fee-container">
-        @if(visible && !formModifiedAfterFeeCalculation) {
-        <div class="submit-wrap">
-          <button type="button" class="btn btn-success calculate-btn submit-btn"
-            (click)="showSubmitConfirmation()">Submit</button>
+      <div class="m-4 btnss">
+        @if(calculatedFee === null || formModifiedAfterFeeCalculation) {
+        <div class="fee-actions">
+          <button type="button" class="btn btn-success calculate-btn" (click)="calFee()" [disabled]="feeCalculating">
+            {{ feeCalculating ? 'Calculating...' : 'Calculate Fee' }}
+          </button>
         </div>
         }
-        <div class="fee-details fee-horizontal">
-          <div class="fee-box fade-in">
-            <strong>Final Fee:</strong> ₹{{ calculatedFee }}
-          </div>
-    
-          @if(previousPaid !== 0 && previousPaid !== null) {
-          <div class="fee-box fade-in">
-            <strong>Previous Paid:</strong> ₹{{ previousPaid }}
-          </div>
-          }
-          @if(calculatedFee !== effectiveFee) {
-          <div class="fee-box fade-in">
-            <strong>Effective Fee:</strong> ₹{{ effectiveFee }}
+        @if(calculatedFee !== null && !formModifiedAfterFeeCalculation) {
+
+        <div class="fee-container">
+          @if(visible && !formModifiedAfterFeeCalculation) {
+          <div class="submit-wrap">
+            <button type="button" class="btn btn-success calculate-btn submit-btn"
+              (click)="showSubmitConfirmation()">Submit</button>
           </div>
           }
+          <div class="fee-details fee-horizontal">
+            <div class="fee-box fade-in">
+              <strong>Final Fee:</strong> ₹{{ calculatedFee }}
+            </div>
+
+            @if(previousPaid !== 0 && previousPaid !== null) {
+            <div class="fee-box fade-in">
+              <strong>Previous Paid:</strong> ₹{{ previousPaid }}
+            </div>
+            }
+            @if(calculatedFee !== effectiveFee) {
+            <div class="fee-box fade-in">
+              <strong>Effective Fee:</strong> ₹{{ effectiveFee }}
+            </div>
+            }
+          </div>
+
         </div>
-    
+
+        }
+
       </div>
-    
-      }
-    
-    </div>
     </form>
   </ng-template>
   }

@@ -1,52 +1,54 @@
-<div class="feedback-container">
-  <h1 class="page-head">Service Feedback</h1>
+<div class="feedback-wrapper">
+  <div class="feedback-card">
+    <h2 class="title">Share Your Feedback</h2>
+    <div class="card">
+      <p class="subtitle">Your opinion helps us improve!</p>
 
-  <form [formGroup]="feedbackForm" class="feedback-form" (ngSubmit)="submitFeedback()">
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-select
-          formControlName="satisfaction"
-          fieldLabel="Satisfaction Level"
-          [mandatory]="true"
-          [selectOptions]="satisfactionOptions"
-          placeholder="How satisfied are you?">
-        </app-ilogi-select>
+      <div class="rating-box">
+        <label class="label">Rate Your Experience</label>
+        <div class="stars">
+          <ng-container *ngFor="let s of [1,2,3,4,5]">
+            <span class="star" [class.active]="s <= rating" (click)="setRating(s)">★</span>
+          </ng-container>
+        </div>
+
+        <p class="rating-text">
+          {{
+          rating === 5 ? 'Very Satisfied' :
+          rating === 4 ? 'Satisfied' :
+          rating === 3 ? 'Neutral' :
+          rating === 2 ? 'Dissatisfied' :
+          rating === 1 ? 'Very Dissatisfied' :
+          'Tap a star to rate'
+          }}
+        </p>
       </div>
-    </div>
 
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-input
-          formControlName="feedback"
-          fieldLabel="Feedback"
-          [mandatory]="true"
-          [type]="'textarea'"
-          placeholder="Please share your feedback about our service"
-          [errorMessages]="{ required: 'Feedback is required', maxlength: 'Maximum 1000 characters allowed' }">
-        </app-ilogi-input>
-      </div>
-    </div>
+      <form [formGroup]="feedbackForm" (ngSubmit)="submitFeedback()"  >
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input formControlName="feedback" fieldLabel="Feedback" [mandatory]="true" [type]="'textarea'"
+              placeholder="Please share your feedback about our service"
+              [errorMessages]="{ required: 'Feedback is required', maxlength: 'Maximum 1000 characters allowed' }">
+            </app-ilogi-input>
+          </div>
+        </div>
 
-    <div class="form-row">
-      <div class= "form-field">
-        <app-ilogi-input
-          formControlName="suggestions"
-          fieldLabel="Suggestions"
-          [mandatory]="false"
-          [type]="'textarea'"
-          placeholder="Any suggestions for improvement? (Optional)"
-          [errorMessages]="{ maxlength: 'Maximum 1000 characters allowed' }">
-        </app-ilogi-input>
-      </div>
-    </div>
+        <div class="form-row">
+          <div class="form-field">
+            <app-ilogi-input formControlName="suggestions" fieldLabel="Suggestions" [mandatory]="false"
+              [type]="'textarea'" placeholder="Any suggestions for improvement? (Optional)"
+              [errorMessages]="{ maxlength: 'Maximum 1000 characters allowed' }">
+            </app-ilogi-input>
+          </div>
+        </div>
 
-    <div class="form-actions">
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="feedbackForm.invalid || isSubmitting">
-        {{ isSubmitting ? 'Submitting...' : 'Submit Feedback' }}
-      </button>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="feedbackForm.invalid || isSubmitting">
+            {{ isSubmitting ? 'Submitting...' : 'Submit Feedback' }}
+          </button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>

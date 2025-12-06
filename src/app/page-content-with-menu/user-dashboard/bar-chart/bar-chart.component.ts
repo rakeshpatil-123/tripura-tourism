@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule, ChartComponent, ApexChart, ApexXAxis, ApexYAxis, ApexDataLabels, ApexPlotOptions, ApexGrid, ApexTitleSubtitle, ApexLegend } from 'ng-apexcharts';
-import { GenericService } from '../../../_service/generic/generic.service';
 import { DashboardService } from '../dashboard-service/dashboard-service';
 
 export type BarChartOptions = {
@@ -25,7 +24,7 @@ export type BarChartOptions = {
   styleUrl: './bar-chart.component.scss'
 })
 export class BarChartComponent implements OnInit {
-   @ViewChild('chart') chart!: ChartComponent;
+  @ViewChild('chart') chart!: ChartComponent;
   public chartOptions!: Partial<BarChartOptions>;
   dashboardData: any = null;
 
@@ -47,82 +46,168 @@ export class BarChartComponent implements OnInit {
   }
 
   initializeChart(): void {
-    const approved = this.dashboardData?.total_count_approved_application_in_user || 0;
-    const pending = this.dashboardData?.total_count_pending_application_in_user || 0;
-    const total = this.dashboardData?.total_applications_for_this_user || 0;
-    
-    const rejected = this.dashboardData?.$total_count_rejected_application_in_department || 0;
+    if (this.dashboardData?.noc_issued_per_service) {
+      const nonZeroNocServices = this.dashboardData.noc_issued_per_service.filter((service: any) => service.noc_issued > 0);
+      
+      const servicesToShow = nonZeroNocServices.length > 0 ? nonZeroNocServices : this.dashboardData.noc_issued_per_service;
+      
+      const topServices = servicesToShow.slice(0, 10);
+      
+      const categories = topServices.map((service: any) => service.service_name);
+      const seriesData = topServices.map((service: any) => service.noc_issued);
 
-
-    this.chartOptions = {
-      series: [
-        {
-          name: 'Applications',
-          data: [approved, pending, rejected] 
-        }
-      ],
-      chart: {
-        type: 'bar',
-        height: 350,
-        toolbar: {
-          show: true
-        }
-      },
-      colors: ['#4CAF50', '#FF9800', '#F44336'],
-      plotOptions: {
-        bar: {
-          distributed: true,
-          borderRadius: 8,
-          horizontal: false,
-          columnWidth: '50%',
-        }
-      },
-      dataLabels: {
-        enabled: true,
-        style: {
-          fontSize: '14px',
-          fontWeight: 600,
-          colors: ['#fff']
-        }
-      },
-      grid: {
-        borderColor: '#e7e7e7',
-        row: {
-          colors: ['#f3f3f3', 'transparent'],
-          opacity: 0.5
-        }
-      },
-      xaxis: {
-        categories: ['Approved', 'Pending', 'Rejected'],
-        title: {
-          text: 'Status'
+      this.chartOptions = {
+        series: [
+          {
+            name: 'NOCs Issued',
+            data: seriesData
+          }
+        ],
+        chart: {
+          type: 'bar',
+          height: 500,
+          toolbar: {
+            show: true
+          }
         },
-        labels: {
+        colors: ['#4CAF50'],
+        plotOptions: {
+          bar: {
+            distributed: true,
+            borderRadius: 2,
+            horizontal: false,
+            columnWidth: '60%',
+          }
+        },
+        dataLabels: {
+          enabled: true,
           style: {
-            fontSize: '12px',
-            fontWeight: 500
+            fontSize: '18px',
+            fontWeight: 600,
+            colors: ['#fff']
+          },
+            formatter: (val: number) => {
+            return val > 0 ? val.toString() : '';
+          }
+        },
+        grid: {
+          borderColor: '#e7e7e7',
+          row: {
+            colors: ['#f3f3f3', 'transparent'],
+            opacity: 0.5
+          }
+        },
+        xaxis: {
+          categories: categories,
+          title: {
+            text: 'NOC Issued'
+          },
+          tickPlacement: 'on',
+          labels: {
+            rotate: -90,
+            rotateAlways: true,
+            maxHeight: 450,
+            style: {
+              fontSize: '10px',
+              cssClass: 'apexcharts-xaxis-label'
+            }
+          },
+           axisBorder: {
+            show: true
+          },
+          axisTicks: {
+            show: true
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'NOCs Issued Count'
+          },
+          min: 0,
+        },
+        legend: {
+          show: false
+        },
+        title: {
+          text: 'NOCs Issued per Service',
+          align: 'left',
+          style: {
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#1e293b'
           }
         }
-      },
-      yaxis: {
-        title: {
-          text: 'Count'
+      };
+    } else {
+      this.chartOptions = {
+        series: [
+          {
+            name: 'NOCs Issued',
+            data: []
+          }
+        ],
+        chart: {
+          type: 'bar',
+          height: 350,
+          toolbar: {
+            show: true
+          }
         },
-        min: 0,
-      },
-      legend: {
-        show: false
-      },
-      title: {
-        text: 'Application Status Breakdown',
-        align: 'left',
-        style: {
-          fontSize: '18px',
-          fontWeight: '600',
-          color: '#1e293b'
+        colors: ['#4CAF50'],
+        plotOptions: {
+          bar: {
+            distributed: true,
+            borderRadius: 8,
+            horizontal: false,
+            columnWidth: '50%',
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          style: {
+            fontSize: '14px',
+            fontWeight: 600,
+            colors: ['#fff']
+          }
+        },
+        grid: {
+          borderColor: '#e7e7e7',
+          row: {
+            colors: ['#f3f3f3', 'transparent'],
+            opacity: 0.5
+          }
+        },
+        xaxis: {
+          categories: [],
+          title: {
+            text: 'Services'
+          },
+          labels: {
+            rotate: -45,
+            style: {
+              fontSize: '10px'
+            }
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'NOCs Issued Count'
+          },
+          min: 0,
+        },
+        legend: {
+          show: false
+        },
+        title: {
+          text: 'NOCs Issued per Service',
+          align: 'left',
+          style: {
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#1e293b'
+          }
         }
-      }
-    };
+      };
+    }
   }
 }
-

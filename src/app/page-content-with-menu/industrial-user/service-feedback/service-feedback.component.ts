@@ -1,15 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
-import { IlogiSelectComponent, SelectOption } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
+import {
+  IlogiSelectComponent,
+  SelectOption,
+} from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-service-feedback',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IlogiInputComponent, IlogiSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, IlogiInputComponent],
   templateUrl: './service-feedback.component.html',
   styleUrl: './service-feedback.component.scss',
 })
@@ -17,7 +25,9 @@ export class ServiceFeedbackComponent implements OnInit {
   applicationId: number | null = null;
   feedbackForm!: FormGroup;
   isSubmitting = false;
-
+  get rating(): number {
+    return this.feedbackForm.get('satisfaction')?.value || 0;
+  }
   satisfactionOptions: SelectOption[] = [
     { id: 5, name: 'Very Satisfied (5)' },
     { id: 4, name: 'Satisfied (4)' },
@@ -50,6 +60,9 @@ export class ServiceFeedbackComponent implements OnInit {
       suggestions: ['', [Validators.maxLength(1000)]],
     });
   }
+  setRating(value: number): void {
+  this.feedbackForm.get('satisfaction')?.setValue(value);
+}
 
   submitFeedback(): void {
     if (this.feedbackForm.invalid || this.applicationId === null) {
@@ -64,7 +77,7 @@ export class ServiceFeedbackComponent implements OnInit {
       application_id: this.applicationId,
       satisfaction: this.feedbackForm.get('satisfaction')?.value,
       feedback: this.feedbackForm.get('feedback')?.value,
-      suggestions: this.feedbackForm.get('suggestions')?.value || '', 
+      suggestions: this.feedbackForm.get('suggestions')?.value || '',
     };
 
     this.apiService
@@ -95,6 +108,7 @@ export class ServiceFeedbackComponent implements OnInit {
         },
       });
   }
+  
 
   get f() {
     return this.feedbackForm.controls;

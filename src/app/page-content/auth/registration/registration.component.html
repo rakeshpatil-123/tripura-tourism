@@ -18,25 +18,50 @@
           <!-- Email -->
           <app-ilogi-input fieldId="email_id" fieldLabel="Email ID" [mandatory]="true" formControlName="email_id"
             placeholder="Enter email" type="email"></app-ilogi-input>
+          <div>
+            <!-- Mobile -->
+            <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true"
+              formControlName="mobile_no" placeholder="Enter mobile number" type="text"></app-ilogi-input>
 
-          <!-- Mobile -->
-          <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
-            placeholder="Enter mobile number" type="text"></app-ilogi-input>
+            <!-- OTP  -->
+            <div
+              *ngIf="!editMode && sourcePage !== 'departmental-users' && registrationForm.get('mobile_no')?.value?.toString().trim().length >= 10"
+              class="otp-section mb-2">
+              <button type="button" class="btn-otp" (click)="sendOtp()"
+                [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid">
+                {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
+              </button>
+              <!-- <small class="text-muted ml-2"> We’ll send a 6-digit code to verify your number.</small> -->
+            </div>
 
+            <!-- OTP Input + Verify Button -->
+            <div *ngIf="otpSent && !otpVerified && !editMode && sourcePage !== 'departmental-users'"
+              class="otp-section mt-2">
+              <app-ilogi-input fieldId="otp" fieldLabel="Enter OTP" [mandatory]="true" [formControl]="otpControl"
+                placeholder="Enter 6-digit OTP"></app-ilogi-input>
+              <button type="button" class="btn-verify" (click)="verifyOtp()" [disabled]="!otpControl.valid">Verify
+                OTP</button>
+            </div>
+
+            <div *ngIf="otpVerified && !editMode && sourcePage !== 'departmental-users'" class="otp-verified mt-1">
+              ✅ Mobile number verified.
+            </div>
+          </div>
           <!-- Username -->
           <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
             placeholder="Choose a username"></app-ilogi-input>
 
           <!-- City -->
-          <app-ilogi-input *ngIf="!(sourcePage === 'departmental-users')" fieldId="registered_enterprise_city" fieldLabel="City" [mandatory]="true"
-            formControlName="registered_enterprise_city" placeholder="Enter city"></app-ilogi-input>
+          <app-ilogi-input *ngIf="!(sourcePage === 'departmental-users')" fieldId="registered_enterprise_city"
+            fieldLabel="City" [mandatory]="true" formControlName="registered_enterprise_city"
+            placeholder="Enter city"></app-ilogi-input>
         </div>
 
         <div *ngIf="!(sourcePage === 'departmental-users')" class="single-field">
           <!-- Address -->
-          <app-ilogi-input class="height-20" fieldId="registered_enterprise_address" fieldLabel="Registered Enterprise Address"
-            [mandatory]="true" formControlName="registered_enterprise_address"
-            placeholder="Enter full address"></app-ilogi-input>
+          <app-ilogi-input class="height-20" fieldId="registered_enterprise_address"
+            fieldLabel="Registered Enterprise Address" [mandatory]="true"
+            formControlName="registered_enterprise_address" placeholder="Enter full address"></app-ilogi-input>
         </div>
         <div *ngIf="(sourcePage === 'departmental-users')">
           <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" [mandatory]="true"
@@ -44,39 +69,35 @@
           </app-ilogi-select>
           <app-ilogi-radio formControlName="inspector" fieldLabel="Is Inspector">
           </app-ilogi-radio>
-          <app-ilogi-select class="mb-10" fieldId="department_id" fieldLabel="Department" [mandatory]="true" formControlName="department_id"
-            [selectOptions]="departments" placeholder="Select department">
+          <app-ilogi-select class="mb-10" fieldId="department_id" fieldLabel="Department" [mandatory]="true"
+            formControlName="department_id" [selectOptions]="departments" placeholder="Select department">
           </app-ilogi-select>
-          <app-ilogi-input fieldId="designation" fieldLabel="Designation" [mandatory]="true" formControlName="designation"
-            placeholder="Enter designation">
+          <app-ilogi-input fieldId="designation" fieldLabel="Designation" [mandatory]="true"
+            formControlName="designation" placeholder="Enter designation">
           </app-ilogi-input>
         </div>
-          <!-- District -->
-          <app-ilogi-select *ngIf="shouldShow('district')" fieldId="district_id" fieldLabel="District" [mandatory]="true" 
-            formControlName="district_id" [selectOptions]="districts" 
-           placeholder="Select district">
-          </app-ilogi-select>
+        <!-- District -->
+        <app-ilogi-select *ngIf="shouldShow('district')" fieldId="district_id" fieldLabel="District" [mandatory]="true"
+          formControlName="district_id" [selectOptions]="districts" placeholder="Select district">
+        </app-ilogi-select>
 
-          <!-- Subdivision -->
-          <app-ilogi-select *ngIf="shouldShow('subdivision')" fieldId="subdivision_id" fieldLabel="Subdivision" [mandatory]="true" 
-            formControlName="subdivision_id" [selectOptions]="subdivisions" 
-             placeholder="Select subdivision" 
-            [disabled]="!districts.length || loadingDistricts">
-          </app-ilogi-select>
+        <!-- Subdivision -->
+        <app-ilogi-select *ngIf="shouldShow('subdivision')" fieldId="subdivision_id" fieldLabel="Subdivision"
+          [mandatory]="true" formControlName="subdivision_id" [selectOptions]="subdivisions"
+          placeholder="Select subdivision" [disabled]="!districts.length || loadingDistricts">
+        </app-ilogi-select>
 
-          <!-- ULB -->
-          <app-ilogi-select *ngIf="shouldShow('block')" fieldId="ulb_id" fieldLabel="ULB/Block" [mandatory]="true" 
-            formControlName="ulb_id" [selectOptions]="ulbs" 
-             placeholder="Select ULB/Block" 
-            [disabled]="!subdivisions.length || loadingSubdivisions">
-          </app-ilogi-select>
+        <!-- ULB -->
+        <app-ilogi-select *ngIf="shouldShow('block')" fieldId="ulb_id" fieldLabel="ULB/Block" [mandatory]="true"
+          formControlName="ulb_id" [selectOptions]="ulbs" placeholder="Select ULB/Block"
+          [disabled]="!subdivisions.length || loadingSubdivisions">
+        </app-ilogi-select>
 
-          <!-- Ward -->
-          <app-ilogi-select *ngIf="shouldShow('ward')" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true" 
-            formControlName="ward_id" [selectOptions]="wards" 
-             placeholder="Select ward" 
-            [disabled]="!ulbs.length || loadingUlbs">
-          </app-ilogi-select>
+        <!-- Ward -->
+        <app-ilogi-select *ngIf="shouldShow('ward')" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true"
+          formControlName="ward_id" [selectOptions]="wards" placeholder="Select ward"
+          [disabled]="!ulbs.length || loadingUlbs">
+        </app-ilogi-select>
 
         <div class="enterprise-form">
           <!-- Password -->
@@ -92,12 +113,13 @@
         <!-- Submit Button -->
         <div class="form-actions">
           <button type="submit" class="btn-submit btn btn-primary" [disabled]="!registrationForm.valid">
-           {{editMode ? 'Update' : 'Register'}}
+            {{editMode ? 'Update' : 'Register'}}
           </button>
         </div>
       </form>
 
-      <span *ngIf="!(sourcePage === 'departmental-users')" class="text-center small mt-2">Already Registered? <a href="/page/login">Login</a></span>
+      <span *ngIf="!(sourcePage === 'departmental-users')" class="text-center small mt-2">Already Registered? <a
+          href="/page/login">Login</a></span>
     </div>
   </div>
 </div>

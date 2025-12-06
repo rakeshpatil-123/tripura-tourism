@@ -24,6 +24,9 @@
     margin-top: 0.5rem;
   }
 }
+.capitalize{
+  text-transform: capitalize;
+}
 
 .loading,
 .error-card {
@@ -180,7 +183,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 12px 0px;
   background: #f9fafb;
   border-bottom: 1px solid #e5e7eb;
 }

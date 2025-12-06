@@ -1,4 +1,4 @@
-<div class="ilogi-form-group">
+<!-- <div class="ilogi-form-group">
   <label class="ilogi-checkbox-label">
     {{ fieldLabel }}
     <span *ngIf="mandatory" class="ilogi-required">*</span>
@@ -21,6 +21,49 @@
     </div>
   </div>
   
+  <div *ngIf="showError" class="ilogi-error-message">
+    {{ errorMessage }}
+  </div>
+</div> -->
+
+<div class="ilogi-form-group">
+  <label class="ilogi-checkbox-label">
+    {{ fieldLabel }}
+    <span *ngIf="mandatory" class="ilogi-required">*</span>
+  </label>
+
+  <!-- Case 1: ≤4 options → show checkboxes directly -->
+  <div *ngIf="checkboxOptions.length <= 4" class="ilogi-checkbox-container">
+    <div *ngFor="let option of checkboxOptions" class="ilogi-checkbox-option">
+      <input type="checkbox" class="ilogi-checkbox-input" [id]="fieldLabel + '_' + option.value" [value]="option.value"
+        [checked]="isSelected(option.value)" (change)="onCheckboxChange(option.value, $event)"
+        [disabled]="isDisabled" />
+      <label class="ilogi-checkbox-option-label" [for]="fieldLabel + '_' + option.value">
+        {{ option.name }}
+      </label>
+    </div>
+  </div>
+
+  <div *ngIf="checkboxOptions.length > 4" class="ilogi-checkbox-dropdown">
+    <button type="button" class="ilogi-dropdown-toggle" (click)="toggleDropdown()" [disabled]="isDisabled">
+      <span class="ilogi-dropdown-text">
+        {{ getSelectedNames() || 'Select options...' }}
+      </span>
+      <span class="ilogi-caret" [class.ilogi-caret-up]="isDropdownOpen">▼</span>
+    </button>
+
+    <div *ngIf="isDropdownOpen" class="ilogi-dropdown-panel">
+      <div *ngFor="let option of checkboxOptions" class="ilogi-checkbox-option">
+        <input type="checkbox" class="ilogi-checkbox-input" [id]="fieldLabel + '_' + option.value"
+          [value]="option.value" [checked]="isSelected(option.value)" (change)="onCheckboxChange(option.value, $event)"
+          [disabled]="isDisabled" />
+        <label class="ilogi-checkbox-option-label" [for]="fieldLabel + '_' + option.value">
+          {{ option.name }}
+        </label>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="showError" class="ilogi-error-message">
     {{ errorMessage }}
   </div>

@@ -131,6 +131,7 @@
   background-color: transparent !important;
   color: #3b3b3b;
   border: 1px solid #b8b8b8;
+
 }
 
 /* Search input inside dropdown panel */
@@ -154,6 +155,7 @@
 :host ::ng-deep .ng-star-inserted .p-select-option {
   font-size: 0.8rem;
   color: #000;
+
 }
 
 :host ::ng-deep .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus{
@@ -203,6 +205,7 @@ label{
   color: var(--color-poppy-red, #dc3545);
   margin-left: 0.25rem;
 }
-.w-200 {
-  width: 20vw;
+.p-component{
+  width: 100%;
 }
+

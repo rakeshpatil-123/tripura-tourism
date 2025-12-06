@@ -242,3 +242,60 @@ app-ilogi-input, app-ilogi-select {
     }
   }
 }
+
+/* Star Rating Styles */
+.star-rating-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 4rem;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.star {
+  transition: color 0.2s, transform 0.2s;
+}
+
+.star.selected {
+  color: #ffc107;
+}
+
+.star.hovered {
+  color: #ff9800; 
+  transform: scale(1.1);
+}
+
+.rating-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #495057;
+  min-height: 1.4rem;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.form-label {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: #506fad;
+  width: 100%;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+.mandatory {
+  color: red;
+}

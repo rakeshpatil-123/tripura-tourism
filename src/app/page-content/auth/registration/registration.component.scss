@@ -15,7 +15,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 2rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 700px;
   border: 1px solid #e9ecef;
 }
 
@@ -104,4 +104,83 @@ row-gap: 6px;
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
   }
+}
+
+
+.otp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+
+  .btn-otp,
+  .btn-verify {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: fit-content;
+    min-width: 100px;
+
+    &:hover:not(:disabled) {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-verify {
+    background-color: #28a745;
+    border-color: #28a745;
+
+    &:hover:not(:disabled) {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+  }
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 0.8125rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.otp-verified {
+  color: #28a745;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (max-width: 576px) {
+  .otp-section {
+    button {
+      width: 100%;
+    }
+    .text-muted {
+      text-align: center;
+    }
+  }
+}
+
+app-ilogi-input + .otp-section {
+  margin-top: 0.75rem;
 }

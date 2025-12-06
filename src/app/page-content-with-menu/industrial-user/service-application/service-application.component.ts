@@ -130,6 +130,7 @@ export class ServiceApplicationComponent implements OnInit {
   visible = false;
   readonlyFields: { [key: number]: boolean } = {};
   extraPayment: string | number | null = null;
+  serviceName: string | null = null;
   private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
@@ -183,6 +184,7 @@ export class ServiceApplicationComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data)) {
+            this.serviceName = res.service_name || null;
             this.questions = res.data
               .filter((q: ServiceQuestion) => q.status === 1)
               .map((q: any) => ({

@@ -1,100 +1,5 @@
-<!-- <div class="feedback-container">
-  <h1 class="page-head">Feedback & Ratings</h1>
-  
-  <form [formGroup]="feedbackForm" class="feedback-form" (ngSubmit)="submitFeedback()">
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-input
-          formControlName="user_name"
-          fieldLabel="Full Name"
-          [mandatory]="true"
-          [type]="'text'"
-          placeholder="Enter your full name"
-          [errorMessages]="{ required: 'Name is required', maxlength: 'Maximum 255 characters allowed' }">
-        </app-ilogi-input>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-input
-          formControlName="email"
-          fieldLabel="Email Address"
-          [mandatory]="true"
-          [type]="'email'"
-          placeholder="Enter your email address"
-          [errorMessages]="{
-            required: 'Email is required',
-            email: 'Please enter a valid email address',
-            maxlength: 'Maximum 255 characters allowed'
-          }">
-        </app-ilogi-input>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-select
-          formControlName="department_id"
-          fieldLabel="Department"
-          [mandatory]="true"
-          [selectOptions]="departments"
-          placeholder="Select Department">
-        </app-ilogi-select>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-select
-          formControlName="satisfaction"
-          fieldLabel="Satisfaction Level"
-          [mandatory]="true"
-          [selectOptions]="satisfactionOptions"
-          placeholder="How satisfied are you?">
-        </app-ilogi-select>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-input
-          formControlName="feedback"
-          fieldLabel="Feedback"
-          [mandatory]="true"
-          [type]="'textarea'"
-          placeholder="Please share your feedback about our service"
-          [errorMessages]="{ required: 'Feedback is required', maxlength: 'Maximum 1000 characters allowed' }">
-        </app-ilogi-input>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-field">
-        <app-ilogi-input
-          formControlName="suggestions"Fe
-          fieldLabel="Suggestions"
-          [mandatory]="false"
-          [type]="'textarea'"
-          placeholder="Any suggestions for improvement? (Optional)"
-          [errorMessages]="{ maxlength: 'Maximum 1000 characters allowed' }">
-        </app-ilogi-input>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button 
-        type="submit" 
-        class="btn btn-primary" 
-        [disabled]="feedbackForm.invalid || isSubmitting">
-        {{ isSubmitting ? 'Submitting...' : 'Submit Feedback' }}
-      </button>
-    </div>
-  </form>
-</div> -->
-
 <div class="feedback-container">
-  <h1 class="page-head">Feedback & Ratings</h1>
+  <h1 class="page-head">Feedback/Query</h1>
 
   <form [formGroup]="feedbackForm" class="feedback-form" (ngSubmit)="submitFeedback()">
     <div class="form-row">
@@ -128,9 +33,31 @@
 
     <div class="form-row">
       <div class="form-field">
-        <app-ilogi-select formControlName="satisfaction" fieldLabel="Satisfaction Level" [mandatory]="true"
-          [selectOptions]="satisfactionOptions" placeholder="How satisfied are you?">
-        </app-ilogi-select>
+        <label class="form-label">
+          Satisfaction Level &nbsp;<span class="mandatory"> *</span>
+        </label>
+        <div class="star-rating-container">
+          <div class="stars" (mouseleave)="hoveredIndex = null">
+            <span *ngFor="let option of satisfactionOptions; let i = index" class="star"
+              [class.selected]="option.id <= feedbackForm.get('satisfaction')?.value"
+              [class.hovered]="hoveredIndex === i" (mouseenter)="hoveredIndex = i" (click)="setRating(option.id)">
+              ★
+            </span>
+          </div>
+          <div class="rating-label">
+            {{
+            feedbackForm.get('satisfaction')?.value === 5 ? 'Very Satisfied' :
+            feedbackForm.get('satisfaction')?.value === 4 ? 'Satisfied' :
+            feedbackForm.get('satisfaction')?.value === 3 ? 'Neutral' :
+            feedbackForm.get('satisfaction')?.value === 2 ? 'Dissatisfied' :
+            feedbackForm.get('satisfaction')?.value === 1 ? 'Very Dissatisfied' :
+            'Tap a star to rate'
+            }}
+          </div>
+        </div>
+        <div *ngIf="f['satisfaction'].touched && f['satisfaction'].invalid" class="error-message">
+          Satisfaction level is required.
+        </div>
       </div>
     </div>
 

@@ -137,11 +137,11 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                 loadComponent: () =>
                     import('./nav-pages/list-of-services/list-of-services.component').then(m => m.ListOfServicesComponent)
             },
-            {
-                path: 'query-feedback',
-                loadComponent: () =>
-                    import('./nav-pages/query-feedback/query-feedback.component').then(m => m.QueryFeedbackFormComponent)
-            },
+            // {
+            //     path: 'query-feedback',
+            //     loadComponent: () =>
+            //         import('./nav-pages/query-feedback/query-feedback.component').then(m => m.QueryFeedbackFormComponent)
+            // },
             {
                 path: 'investor-query',
                 loadComponent: () =>

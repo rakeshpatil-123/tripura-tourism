@@ -48,10 +48,7 @@ export class SummaryCardsComponent implements OnInit {
           value: this.dashboardData.total_applications_for_this_user || 0,
           icon: 'description',
           color: 'blue',
-          change:
-            `+${Math.round(
-              this.dashboardData.percentage_total_application
-            )}% from last month ` || 0,
+         change:'',
         },
         {
           title: 'Approved',
@@ -59,10 +56,7 @@ export class SummaryCardsComponent implements OnInit {
             this.dashboardData.total_count_approved_application_in_user || 0,
           icon: 'check_circle',
           color: 'green',
-          change:
-            `+${Math.round(
-              this.dashboardData.percentage_approved_application
-            )}% from last month ` || 0,
+          change:'',
         },
         {
           title: 'Pending',
@@ -70,22 +64,16 @@ export class SummaryCardsComponent implements OnInit {
             this.dashboardData.total_count_pending_application_in_user || 0,
           icon: 'hourglass_empty',
           color: 'orange',
-          change:
-            `+${Math.round(
-              this.dashboardData.percentage_pending_application
-            )}% from last month ` || 0,
+          change:''
         },
         {
           title: 'Rejected',
           value:
-              this.dashboardData.$total_count_rejected_application_in_department
+              this.dashboardData.total_count_rejected_application_in_user
              || 0,
           icon: 'cancel',
           color: 'red',
-          change:
-            `+${Math.round(
-              this.dashboardData.percentage_rejected_application
-            )}% from last month ` || 0,
+          change:''
         },
       ];
     }
