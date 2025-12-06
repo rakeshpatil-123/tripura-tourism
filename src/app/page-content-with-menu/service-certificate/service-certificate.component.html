@@ -27,22 +27,24 @@
         </select>
       </label>
       <label class="toolbar-control">
-        <span class="label-text">Size (px)</span>
-        <input class="control-input" type="number" min="8" max="72" [value]="fontSize"
-          (change)="applyFontSize(getNumberValue($event))" />
+        <span class="label-text">Page size</span>
+        <select class="control-select" [value]="pageSizeKey" (change)="applyPageSize(getValue($event))"
+          aria-label="Select page size">
+          <option *ngFor="let k of pageSizeKeys" [value]="k">{{ pageSizes[k].label }}</option>
+        </select>
+      </label>
+      <label class="toolbar-control">
+        <span class="label-text">Variables</span>
+        <select class="control-select" (change)="onVariableSelect($event)" aria-label="Insert certificate variable">
+          <option value="">— insert variable —</option>
+          <option *ngFor="let v of variableList" [value]="v.key">{{ v.label }}</option>
+        </select>
       </label>
 
       <label class="toolbar-control">
-        <span class="label-text">Text color</span>
-        <input class="control-color" type="color" (input)="applyTextColor(getValue($event))" />
-      </label>
-      <label class="toolbar-control">
-        <span class="label-text">Text BG</span>
-        <input class="control-color" type="color" (input)="applyTextBackground(getValue($event))" />
-        </label>
-        <label class="toolbar-control">
-        <span class="label-text">Cell BG</span>
-        <input class="control-color" type="color" (input)="applyCellBackground(getValue($event))" />
+        <span class="label-text">Size (px)</span>
+        <input class="control-input" type="number" min="8" max="72" [value]="fontSize"
+          (change)="applyFontSize(getNumberValue($event))" />
       </label>
     </div>
     <div class="toolbar-right">
@@ -50,29 +52,35 @@
         <span class="label-text">Image</span>
         <input type="file" accept="image/*" (change)="onImageSelected($event)" class="file-input" style="width:100%;" />
       </label>
+      <div style="display:flex; align-items:center; gap:8px; margin-left:10px;" class="mt-10">
+        <button pButton type="button" class="p-button" title="Insert page break" (click)="insertPageBreak()">
+          Page break
+        </button>
+      </div>
 
       <div class="image-controls" *ngIf="selectedImageId">
-  <div class="control-row">
-  
-    <label class="toolbar-control">
-      <span>W (px)</span>
-      <input type="number" min="0" [(ngModel)]="imageWidth" />
-    </label>
-  
-    <label class="toolbar-control">
-      <span>H (px)</span>
-      <input type="number" min="0" [(ngModel)]="imageHeight" />
-    </label>
-    <button pButton type="button" class="p-button" (click)="applyImageSize(imageWidth, imageHeight)">Apply
-</button>
-  
-    <button pButton type="button" class="p-button p-button-secondary" (click)="resetImageSize()">
-      Reset
-    </button>
-  </div>
-  </div>
+        <div class="control-row">
 
-      <button pButton type="button" class="p-button btn-clear mt-10" (click)="removeInlineStyles()">Clear styles</button>
+          <label class="toolbar-control">
+            <span>W (px)</span>
+            <input type="number" min="0" [(ngModel)]="imageWidth" />
+          </label>
+
+          <label class="toolbar-control">
+            <span>H (px)</span>
+            <input type="number" min="0" [(ngModel)]="imageHeight" />
+          </label>
+          <button pButton type="button" class="p-button" (click)="applyImageSize(imageWidth, imageHeight)">Apply
+          </button>
+
+          <button pButton type="button" class="p-button p-button-secondary" (click)="resetImageSize()">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <button pButton type="button" class="p-button btn-clear mt-10" (click)="removeInlineStyles()">Clear
+        styles</button>
     </div>
   </div>
   <div class="editor-container">
@@ -98,17 +106,26 @@
   </div>
   <div class="preview-block">
     <div class="preview-header">
-      <h3>Preview</h3>
-      <div class="preview-actions btn-spacing">
-        <div class="footer">
-          <button pButton type="button" class="p-button-success save-btn" (click)="saveTemplate()">Save
-            Template</button>
-        </div>
-        <button pButton type="button" class="p-button-outlined p-mr-10" (click)="previewTemplate()">Preview in new
-          window</button>
-        <button pButton type="button" class="p-button-secondary" (click)="downloadTemplate()">Download PDF</button>
+
+      <div class="preview-actions footer-actions">
+        <button pButton type="button" class="p-button-success save-btn" (click)="saveTemplate()">
+          Save Template
+        </button>
+
+        <button pButton type="button" class="p-button-outlined" (click)="previewTemplate()">
+          Preview in new window
+        </button>
+        <!--
+      <button
+        pButton
+        type="button"
+        class="p-button-secondary"
+        (click)="downloadTemplate()"
+      >
+        Download PDF
+      </button>
+      -->
       </div>
+
     </div>
-    <div class="preview NgxEditor__Content" [innerHTML]="previewHtmlSafe"></div>
   </div>
-</div>

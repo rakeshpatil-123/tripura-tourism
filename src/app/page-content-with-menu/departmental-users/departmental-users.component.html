@@ -3,34 +3,44 @@
     <i class="pi pi-users title-icon"></i>
     Departmental Users
   </h2>
-  <div class="action-bar">
+  <div class="action-bar department-action-bar" style="z-index:31000;">
     <div class="filter-box">
-      <app-ilogi-select fieldId="department_id" fieldLabel="Department" [selectOptions]="departments"
-        placeholder="Select department" [(ngModel)]="selectedDepartment" (ngModelChange)="filterByDepartment($event)">
-      </app-ilogi-select>
+      <div class="w-100">
+      <app-ilogi-input fieldId="search" fieldLabel="Search" placeholder="Search by name or email" [(ngModel)]="filters.search"
+        (ngModelChange)="searchChanged.next($event)">
+      </app-ilogi-input>
+      </div>
+      <div *ngIf="userRole==='admin'" class="mb-20" style="position: relative; z-index: 31005;">
+        <app-ilogi-select fieldId="department_id" fieldLabel="Department" [selectOptions]="departments"
+          placeholder="Select department" appendTo="body" [(ngModel)]="selectedDepartment" (ngModelChange)="filterByDepartment($event)">
+        </app-ilogi-select>
+      </div>
     </div>
+    <button pButton type="button" icon="pi pi-file-excel" label="Download Excel" class="p-button-success fancy-btn"
+      (click)="confirmExportExcel()">
+    </button>
     <button pButton type="button" icon="pi pi-plus" label="Add Departmental User" class="p-button-add fancy-btn"
       (click)="openDialog()">
     </button>
   </div>
 </div>
 <div class="p-4">
-  <p-table [value]="users" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 20]" [loading]="loading"
-    (onPage)="onPageChange($event)" class="p-datatable-gridlines p-mb-4 animated-table" [responsiveLayout]="'scroll'">
+  <p-table [value]="users" [paginator]="true" [rows]="pagination.row_count" [rowsPerPageOptions]="[5, 10, 20]" [loading]="loading" [lazy]="true" [totalRecords]="pagination.total"
+    [first]="(pagination.current_page - 1) * pagination.row_count" (onPage)="onPageChange($event)" class="p-datatable-gridlines p-mb-4 animated-table" [responsiveLayout]="'scroll'">
 
     <ng-template pTemplate="header">
       <tr class="header-bg-color">
         <th>
-          <div class="header-wrapper">Serial No.</div>
+          <div class="header-wrapper">#</div>
         </th>
         <th>
-          <div class="header-wrapper">ID</div>
+          <div class="header-wrapper">User ID</div>
         </th>
-        <th>
+        <!-- <th>
           <div class="header-wrapper">Enterprise Name</div>
-        </th>
+        </th> -->
         <th>
-          <div class="header-wrapper">Authorized Person</div>
+          <div class="header-wrapper">Registered Name</div>
         </th>
         <th>
           <div class="header-wrapper">Email</div>
@@ -66,10 +76,16 @@
           <div class="header-wrapper">Status</div>
         </th>
         <th>
+          <div class="header-wrapper">Created At</div>
+        </th>
+        <th>
+          <div class="header-wrapper">Updated At</div>
+        </th>
+        <th>
           <div class="header-wrapper">Created By</div>
         </th>
         <th>
-          <div class="header-wrapper">Updated By</div>
+          <div class="header-wrapper">Updated At</div>
         </th>
         <th>
           <div class="header-wrapper">Action</div>
@@ -78,11 +94,11 @@
     </ng-template>
     <ng-template pTemplate="body" let-user let-rowIndex="rowIndex">
       <tr [ngClass]="'table-row-animate'">
-        <td>{{ rowIndex+1 }}</td>
+        <td>{{ (pagination.current_page - 1) * pagination.row_count + rowIndex + 1 }}</td>
         <td>{{ user.id || '----' }}</td>
-        <td pTooltip="{{ user.name_of_enterprise }}" tooltipPosition="right">
+        <!-- <td pTooltip="{{ user.name_of_enterprise }}" tooltipPosition="right">
           {{ user.name_of_enterprise || '----' }}
-        </td>
+        </td> -->
         <td pTooltip="{{ user.authorized_person_name }}" tooltipPosition="right">
           {{ user.authorized_person_name || '----' }}
         </td>
@@ -122,8 +138,14 @@
             </p-toggleswitch>
           </form>
         </td>
+        <td pTooltip="{{ user.created_at }}" tooltipPosition="right">
+          {{ ( user.created_at  | date ) || '----' }}
+        </td>
+        <td pTooltip="{{ user.updated_at }}" tooltipPosition="right">
+          {{ ( user.updated_at | date) || '----' }}
+        </td>
         <td pTooltip="{{ user.created_by }}" tooltipPosition="right">
-          {{ user.created_by || '----' }}
+          {{ ( user.created_by ) || '----' }}
         </td>
         <td pTooltip="{{ user.updated_by }}" tooltipPosition="right">
           {{ user.updated_by || '----' }}
@@ -152,7 +174,7 @@
   </p-table>
 </div>
 <p-dialog [header]="selectedUser ? 'Edit Departmental User' : 'Register Departmental User'" [(visible)]="displayDialog"
- [modal]="true" [closable]="true" [style]="{width: '55vw'}" [draggable]="false" [resizable]="false" [baseZIndex]="10000" [dismissableMask]="true" [contentStyle]="{'border-radius': '12px'}" (onHide)="closeDialog()" class="custom-dialog">
+[modal]="true" [closable]="true" [style]="{width: '55vw'}" [draggable]="false" [resizable]="false" [baseZIndex]="10000" [dismissableMask]="true" [contentStyle]="{'border-radius': '12px'}" (onHide)="closeDialog()" class="custom-dialog">
  <ng-container *ngIf="displayDialog">
   <app-registration [sourcePage]="'departmental-users'" [editData]="selectedUser" [editMode]="editMode"(registrationSuccess)="handleRegistrationSuccess()">
   </app-registration>

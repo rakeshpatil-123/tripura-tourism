@@ -45,10 +45,10 @@
     </div>
     <div class="form-row">
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>NOC Name</mat-label>
-        <input matInput formControlName="noc_name">
-        <mat-error *ngIf="serviceForm.get('noc_name')?.hasError('required')">
-          NOC Name is required
+        <mat-label>Application ID Format</mat-label>
+        <input matInput formControlName="noc_short_name">
+        <mat-error *ngIf="serviceForm.get('noc_short_name')?.hasError('required')">
+          NOC Short Name is required
         </mat-error>
       </mat-form-field>
 
@@ -80,7 +80,7 @@
         </div>
     <div *ngIf="serviceForm.get('service_mode')?.value !== 'third_party'" class="form-row">
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Generated ID Format</mat-label>
+        <mat-label>Generated License ID</mat-label>
         <input matInput formControlName="generated_id_format" placeholder="e.g. CL/WR/SWS/{{ '{YEAR}' }}/{{ '{SEQ}' }}">
         <mat-hint>Use {{ '{YEAR}' }} for current year & {{ '{SEQ}' }} for sequence</mat-hint>
       </mat-form-field>
@@ -97,13 +97,16 @@
 
     <div class="form-row">
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>NOC Short Name</mat-label>
-        <input matInput formControlName="noc_short_name">
-        <mat-error *ngIf="serviceForm.get('noc_short_name')?.hasError('required')">
-          NOC Short Name is required
+        <mat-label>NOC Name</mat-label>
+        <input matInput formControlName="noc_name">
+        <mat-error *ngIf="serviceForm.get('noc_name')?.hasError('required')">
+          NOC Name is required
         </mat-error>
       </mat-form-field>
-
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>EGRAS Scheme Code</mat-label>
+        <input matInput formControlName="egras_scheme_code" placeholder="e.g. 1475-00-106-21-06" />
+      </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>NOC Validity (days)</mat-label>

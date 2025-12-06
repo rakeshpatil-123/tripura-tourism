@@ -200,6 +200,24 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['department', ] }
       },
       {
+        path: 'my-departmental-applications',
+        loadComponent: () =>
+          import(
+            '../page-content-with-menu/my-departmental-applications/my-departmental-applications.component'
+          ).then((m) => m.MyDepartmentalApplicationsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department',] }
+      },
+      {
+        path: 'json-to-excel',
+        loadComponent: () =>
+          import(
+            '../page-content-with-menu/sales-report/sales-report.component'
+          ).then((m) => m.SalesReportComponent),
+        canActivate: [authGuard],
+        data: { roles: ['department', 'individual', 'admin'] }
+      },
+      {
         path: 'all-service-application/:departmentId/:serviceId',
         loadComponent: () =>
           import(
@@ -282,6 +300,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         loadComponent: () =>
           import('./feedback-dashboard/feedback-dashboard.component').then(
             (m) => m.FeedbackDashboardComponent
+          ),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'department'] }
+      },
+      {
+        path: 'service-feedback',
+        loadComponent: () =>
+          import('./service-feedback/service-feedback.component').then(
+            (m) => m.ServiceFeedbackComponent
           ),
         canActivate: [authGuard],
         data: { roles: ['admin', 'department'] }

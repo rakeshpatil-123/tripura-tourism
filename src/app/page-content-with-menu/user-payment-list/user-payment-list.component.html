@@ -8,34 +8,50 @@
   </div>
   <form [formGroup]="filterForm" class="controls" (ngSubmit)="$event.preventDefault()">
     <div class="filters-and-actions">
-      <div class="filters-row" role="region" aria-label="Filters (single row)">
-        <div class="filter-item filter-user mt-10">
+      <div class="filters-grid" role="region" aria-label="Filters">
+        <div class="grid-item item-user">
           <app-ilogi-input fieldId="user_name" fieldLabel="Username or Email" [mandatory]="false"
             formControlName="user_name" type="text" placeholder="Enter username or email">
           </app-ilogi-input>
         </div>
-        <!-- <div class="filter-item filter-date mb-10">
+        <div class="grid-item item-grn">
+          <app-ilogi-input fieldId="grn_number" fieldLabel="GRN Number" [mandatory]="false" formControlName="grn_number"
+            type="text" placeholder="Enter GRN Number">
+          </app-ilogi-input>
+        </div>
+        <div class="grid-item item-mobile">
+          <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="false" formControlName="mobile_no"
+            type="text" placeholder="Enter Mobile Number">
+          </app-ilogi-input>
+        </div>
+        
+        <div class="grid-item item-status">
+          <app-ilogi-select fieldId="status" fieldLabel="Payment status" formControlName="status"
+            [selectOptions]="paymentStatus" placeholder="Select Payment Status"
+            class="filter-select dropdown-fix"></app-ilogi-select>
+        </div>
+        <div class="grid-item item-from">
           <app-ilogi-input-date formControlName="fromDate" fieldLabel="From Date" [monthsRange]="24"
             [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false" [readonly]="false">
           </app-ilogi-input-date>
         </div>
-        <div class="filter-item filter-date mb-10">
+        <div class="grid-item item-to">
           <app-ilogi-input-date formControlName="toDate" fieldLabel="To Date" [monthsRange]="24"
             [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false" [readonly]="false">
           </app-ilogi-input-date>
-        </div> -->
-        <div class="filter-item filter-amt mt-10">
+        </div>
+        <div class="grid-item item-amt-min">
           <label class="sr-only" for="amountMin">Amount min</label>
           <input id="amountMin" type="number" placeholder="Min amount" formControlName="amountMin"
-            (input)="applyFilters()" aria-label="Minimum amount" />
+            (input)="applyFilters()" aria-label="Minimum amount" class="compact-input" />
         </div>
-        <div class="filter-item filter-amt mt-10">
+        <div class="grid-item item-amt-max">
           <label class="sr-only" for="amountMax">Amount max</label>
           <input id="amountMax" type="number" placeholder="Max amount" formControlName="amountMax"
-            (input)="applyFilters()" aria-label="Maximum amount" />
+            (input)="applyFilters()" aria-label="Maximum amount" class="compact-input" />
         </div>
-      <div class="actions-row  mt-10" role="region" aria-label="Actions">
-        <div class="actions-inner">
+      <div class="grid-item actions-group item-actions" role="region" aria-label="Actions">
+        <div class="actions-row-inner">
           <button type="button" class="btn export" (click)="exportToExcel(true)" [disabled]="isExporting"
             aria-label="Export filtered">
             Export (Filtered)
@@ -44,24 +60,21 @@
             aria-label="Export all">
             Export (All)
           </button>
+
+      <button type="button" class="btn ghost refresh-btn action-refresh" (click)="refreshList()" title="Refresh list"
+          aria-label="Refresh list">
+          ⟳ Refresh
+        </button>
+
+        <div class="rows-select-wrap" aria-hidden="false">
           <label for="rowsSelect" class="rows-label">Rows:</label>
-          <select id="rowsSelect" formControlName="rows" aria-label="Rows per page">
+          <select id="rowsSelect" formControlName="rows" aria-label="Rows per page" class="rows-select">
           <option *ngFor="let p of pageSizes" [value]="p">{{ p }}</option>
           </select>
-          
         </div>
       </div>
-      
     </div>
-<div class="refresh-wrapper">
-<button type="button" class="btn ghost refresh-btn"
-  (click)="refreshList()"
-  title="Refresh list"
-  aria-label="Refresh list">
-  ⟳ Refresh
-</button>
 </div>
-
     </div>
   </form>
   <div class="table-wrap">
@@ -69,25 +82,34 @@
       <thead>
         <tr>
           <th role="columnheader" tabindex="0" (click)="toggleSort('application_number')"
-             [class.sorted]="sortColumn==='application_number'">
-            Application No
-          <span class="sort-indicator" *ngIf="sortColumn==='application_number'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
-          </th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('business')" [class.sorted]="sortColumn==='business'">Business
+        [class.sorted]="sortColumn==='application_number'">
+        Application No
+          <span class="sort-indicator" *ngIf="sortColumn==='application_number'">{{ sortDirection==='asc' ? '▲' : '▼'
+        }}</span>
     </th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('email_id')" [class.sorted]="sortColumn==='email_id'">Email
+    <th role="columnheader" tabindex="0" (click)="toggleSort('business')"
+      [class.sorted]="sortColumn==='business'">Business
     </th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('mobile_no')" [class.sorted]="sortColumn==='mobile_no'">Phone
+    <th role="columnheader" tabindex="0" (click)="toggleSort('email_id')"
+      [class.sorted]="sortColumn==='email_id'">Email
     </th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('amount')" [class.sorted]="sortColumn==='amount'">Amount</th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('expiry_date')" [class.sorted]="sortColumn==='expiry_date'">
-      Expiry Date</th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('status')" [class.sorted]="sortColumn==='status'">Status</th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('method')" [class.sorted]="sortColumn==='method'">Method</th>
-    <th role="columnheader" tabindex="0" (click)="toggleSort('comments')" [class.sorted]="sortColumn==='comments'">Comments
+    <th role="columnheader" tabindex="0" (click)="toggleSort('mobile_no')"
+      [class.sorted]="sortColumn==='mobile_no'">Phone
       </th>
-      <th>Actions</th>
-      </tr>
+      <th role="columnheader" tabindex="0" (click)="toggleSort('amount')" [class.sorted]="sortColumn==='amount'">
+            Amount</th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('expiry_date')"
+            [class.sorted]="sortColumn==='expiry_date'">
+            Expiry Date</th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('status')" [class.sorted]="sortColumn==='status'">
+            Status</th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('method')" [class.sorted]="sortColumn==='method'">
+            Method</th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('comments')"
+            [class.sorted]="sortColumn==='comments'">Comments
+          </th>
+          <th>Actions</th>
+        </tr>
       </thead>
       <tbody>
         <tr *ngFor="let r of displayedData" class="row-animate">
@@ -97,7 +119,6 @@
           <td class="phone">{{ r.mobile_no || '—' }}</td>
           <td class="amount">{{ formatCurrency(toNumber(r.amount || 0), r.currency || 'INR') }}</td>
           <td class="expiry">{{ r.expiry_date ? (r.expiry_date | date:'mediumDate') : '—' }}</td>
-      
           <td class="status">
             <span class="pill" [ngClass]="{
                 'pill-paid': (r.status || '').toLowerCase() === 'paid',
@@ -119,11 +140,11 @@
           <td class="method">{{ r.method || '—' }}</td>
           <td class="comments">{{ r.comments || '—' }}</td>
           <td class="actions">
-            <button class="btn mark action-btn" [ngClass]="{ 'btn-paid': isPaid(r.status), 'btn-mark': !isPaid(r.status) }"
-              (click)="markAsPaid(r)" [disabled]="isPaid(r.status)" [attr.aria-disabled]="isPaid(r.status)">
+            <button class="btn mark action-btn"
+ [ngClass]="{ 'btn-paid': isPaid(r.status), 'btn-mark': !isPaid(r.status) }" (click)="markAsPaid(r)" [disabled]="isPaid(r.status)" [attr.aria-disabled]="isPaid(r.status)">
               {{ isPaid(r.status) ? 'Paid' : 'Mark as Paid' }}
             </button>
-          </td>  
+          </td>
         </tr>
         <tr *ngIf="displayedData.length === 0">
           <td colspan="10" class="no-data">No records found — try adjusting filters</td>
@@ -131,12 +152,12 @@
       </tbody>
     </table>
   </div>
-  <div class="pagination-wrapper" *ngIf="filteredData.length > pageSize">
+  <div class="pagination-wrapper" *ngIf="totalPages > 1">
     <div class="pagination-container">
       <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPage === 1">
         ◀ Prev
       </button>
-      <ng-container *ngFor="let p of totalPagesArray">
+      <ng-container *ngFor="let p of visiblePages">
         <button class="pagination-number" [class.active]="p === currentPage" (click)="goToPage(p)">
           {{ p }}
         </button>

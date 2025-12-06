@@ -55,6 +55,8 @@ export class ViewThirdPartyParamsComponent implements OnInit, AfterViewInit {
     'description',
     'created_at',
     'updated_at',
+    'created_by',
+    'updated_by',
     'actions'
   ];
   loading = false;

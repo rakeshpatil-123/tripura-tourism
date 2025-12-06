@@ -1,52 +1,39 @@
 <div class="page-container">
-  <h2 class="page-title">Sales Report</h2>
-  <div class="responsive-filter">
-    <div class="form-group small">
-      <app-ilogi-input-date [(ngModel)]="fromDate" fieldId="fromDate" fieldLabel="From Date" placeholder="DD-MM-YYYY"
-        [allowFutureDates]="true">
-      </app-ilogi-input-date>
+  <h2 class="page-title">JSON → Excel converter</h2>
+  <div class="controls">
+    <div class="left">
+      <input #fileInput type="file" accept=".json,application/json" (change)="onFileChange($event)" />
+      <span class="file-name" *ngIf="fileName">{{ fileName }}</span>
     </div>
-    <div class="form-group small">
-      <app-ilogi-input-date [(ngModel)]="toDate" fieldId="toDate" fieldLabel="To Date" placeholder="DD-MM-YYYY"
-        [allowFutureDates]="true">
-      </app-ilogi-input-date>
-    </div>
-    <div class="form-group small">
-      <app-ilogi-select [selectOptions]="products" fieldId="product" fieldLabel="Select Product"
-        placeholder="Select Product" [(ngModel)]="selectedProduct">
-      </app-ilogi-select>
-    </div>
-    <div class="form-group small">
-      <app-ilogi-select [selectOptions]="regions" fieldId="region" fieldLabel="Select Region"
-        placeholder="Select Region" [(ngModel)]="selectedRegion">
-      </app-ilogi-select>
-    </div>
-    <div class="form-group button-group">
-      <button class="btn primary" (click)="search()">Search</button>
-      <button class="btn secondary" (click)="reset()">Reset</button>
+    <div class="right">
+      <input placeholder="Search" [(ngModel)]="searchTerm" (keyup.enter)="search()" />
+      <button class="btn" (click)="search()">Search</button>
+
+      <input placeholder="Replace from" [(ngModel)]="replaceFrom" />
+      <input placeholder="Replace to" [(ngModel)]="replaceTo" />
+      <button class="btn export" (click)="exportExcelFile()" [disabled]="!previewData.length">Download Excel</button>
+
+      <button class="btn" (click)="replaceAll()">Replace with all</button>
     </div>
   </div>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Region</th>
-          <th>Date</th>
-          <th>Quantity</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of filteredSales">
-          <td>{{ item.product }}</td>
-          <td>{{ item.region }}</td>
-          <td>{{ item.date }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ item.amount }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="preview" *ngIf="filteredData && filteredData.length">
+    <h3>Preview ({{ filteredData.length }} rows)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumns">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredData; let i = index">
+            <td *ngFor="let col of displayedColumns" [innerHTML]="getHighlighted(row[col])"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <button class="export-button" (click)="exportData()">Export</button>
+  <div class="empty" *ngIf="!previewData.length">
+    No file loaded yet — import a JSON file to preview.
+  </div>
 </div>

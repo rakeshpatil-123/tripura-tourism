@@ -197,8 +197,10 @@ export class ProformaListComponent implements OnInit {
               value: res.data.status === 1 ? 'Active' : 'Inactive',
               class: res.data.status === 1 ? 'status-active' : 'status-inactive'
             },
-            // { label: 'Created At', value: res.data.created_at | date:'dd MMM yyyy, hh:mm a' },
-            // { label: 'Updated At', value: res.data.updated_at | date:'dd MMM yyyy, hh:mm a' }
+            { label: 'Created At', value: res.data.created_at  },
+            { label: 'Updated At', value: res.data.updated_at  },
+            { label: 'Created By', value: res.data.created_by  },
+            { label: 'Updated By', value: res.data.updated_by  },
           ];
 
           this.showProformaDetailsDialog = true;

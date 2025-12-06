@@ -16,6 +16,8 @@ import { MatButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { InspectionReportComponent } from '../inspection-report/inspection-report.component';
 import { EditableCertificateGenerationComponent } from '../editable-certificate-generation/editable-certificate-generation.component';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { finalize } from 'rxjs';
 
 interface StatusActionModal {
   visible: boolean;
@@ -63,6 +65,7 @@ export class ServiceViewComponent implements OnInit {
     private apiService: GenericService,
     private fb: FormBuilder,
     public dialog: MatDialog,
+    private loaderService : LoaderService,
     private cdr: ChangeDetectorRef
   ) {
     this.remarkForm = this.fb.group({
@@ -374,8 +377,9 @@ onSubmitStatus(): void {
   this.closeModal();
 }
 updateApplicationStatus(applicationId: number, payload: any, displayAction: string = 'updated'): void {
+  this.loaderService.showLoader();
   this.apiService
-    .getByConditions(payload, `api/department/applications/${applicationId}/status`)
+    .getByConditions(payload, `api/department/applications/${applicationId}/status`).pipe(finalize(()=> this.loaderService.hideLoader()))
     .subscribe({
       next: (res: any) => {
         if (res?.status === 1) {
