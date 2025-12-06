@@ -176,10 +176,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
     {
       id: 'all-departmental-applications',
-      title: 'All departmental applications',
+      title: 'Departmental All Applications',
       icon: 'assignment',
       route: '/dashboard/all-departmental-applications',
       roles: ['department'],
+    },
+    {
+      id: 'my-departmental-applications',
+      title: 'Pending Applications',
+      icon: 'folders',
+      route: '/dashboard/my-departmental-applications',
+      roles: ['department'],
+    },
+    {
+      id: 'jsontoexcel',
+      title: 'Json to Excel',
+      icon: 'folders',
+      route: '/dashboard/json-to-excel',
+      roles: ['department', 'individual', 'admin'],
     },
     {
       id: 'Upload Existing Licence',
@@ -313,6 +327,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Feedback',
       icon: 'feedback',
       route: '/dashboard/feedback',
+      roles: ['admin', 'department'],
+    },
+    {
+      id: 'serviceFeedback',
+      title: 'Query & Feedback',
+      icon: 'reviews',
+      route: '/dashboard/service-feedback',
       roles: ['admin', 'department'],
     },
     {

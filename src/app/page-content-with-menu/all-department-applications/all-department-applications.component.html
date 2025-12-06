@@ -1,15 +1,237 @@
-<div class="page-header">
-  <h1 class="page-head">Departmental Services</h1>
-  <button mat-raised-button color="primary" (click)="exportAllApplicationExportExcel()">
-    <mat-icon>download</mat-icon> Export Applications Excel
-  </button>
-</div>
+<div class="business-users-wrapper">
+  <h2 class="title">
+    <i class="pi pi-briefcase title-icon"></i>
+    Departmental Services
+  </h2>
 
-  <app-dynamic-table 
- [data]="services" 
- [columns]="serviceColumns"
- [pageSize]="10"
- [showPagination]="true"
- [searchable]="true"
->
-</app-dynamic-table>
+  <div class="action-bar">
+    <div class="search-box" role="search" aria-label="Search services">
+      <input pInputText type="text" placeholder="Search by service name, applications count..." [(ngModel)]="searchText"
+        (keydown.enter)="applyClientSearch(dt)" class="server-search-input" aria-label="Search services" />
+
+      <button pButton type="button" class="btn btn-search" (click)="applyClientSearch(dt)" aria-label="Search">
+        <i class="pi pi-search"></i>
+        <span class="btn-text">Search</span>
+      </button>
+
+      <button pButton type="button" class="btn btn-clear" (click)="clearClientSearch(dt)" aria-label="Clear search">
+        <i class="pi pi-times"></i>
+        <span class="btn-text">Clear</span>
+      </button>
+
+    </div>
+
+    <div class="download-box">
+      <button pButton type="button" class="download-btn" (click)="confirmDownload()" aria-label="Download Excel">
+        <i class="pi pi-download"></i>
+        <span class="btn-text">Export Applications Excel</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="p-4 fade-in">
+    <p-table #dt [value]="services" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[5, 10, 20]"
+      [loading]="isLoading" [responsiveLayout]="'scroll'" [globalFilterFields]="globalFilterFields"
+      [totalRecords]="services.length" class="p-datatable-gridlines p-mb-4 animated-table">
+
+      <ng-template pTemplate="header">
+        <tr class="header-bg-color">
+          <th class="col-serial">No.</th>
+
+          <!-- Render each column header in order; actions column will not be sortable -->
+          <th *ngFor="let col of displayedColumns" [ngClass]="{
+              'col-ward': col.field === 'ward',
+              'col-ulb': col.field === 'ulb',
+              'col-address': col.field === 'registered_enterprise_address',
+              'col-normal': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address',
+              'col-service': col.field === 'service_name',
+              'col-numeric': col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days',
+              'col-action': col.field === 'actions'
+            }" [pSortableColumn]="col.field !== 'actions' ? col.field : undefined" style="vertical-align:middle">
+            <div class="header-wrapper" [style.justifyContent]="col.field === 'service_name' ? 'flex-start' : 'center'">
+              {{ col.header }}
+              <p-sortIcon *ngIf="col.field !== 'actions'" [field]="col.field"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+        <tr class="table-row-animate" [@rowAnimation]>
+          <!-- serial number -->
+          <td class="col-serial" style="text-align:center">{{ (currentPage - 1) * rows + rowIndex + 1 }}</td>
+
+          <td *ngFor="let col of displayedColumns; let idx = index" [ngClass]="{
+              'col-ward nowrap': col.field === 'ward',
+              'col-ulb nowrap': col.field === 'ulb',
+              'col-address wrap': col.field === 'registered_enterprise_address',
+              'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address',
+              'col-service': col.field === 'service_name',
+              'col-numeric': col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days',
+              'col-action': col.field === 'actions'
+            }" [pTooltip]="getTooltip(row, col.field)" tooltipPosition="top" style="vertical-align:middle">
+            <ng-container *ngIf="col.field === 'service_name'">
+              <a class="service-link" (click)="onServiceNameClick(row)" href="javascript:void(0)"
+                [title]="row.service_name"
+                style="display:flex; align-items:center; gap:8px; font-weight:600; word-break:break-word">
+                <span class="service-title">
+                  {{ row.service_name || '----' }}
+                </span>
+                <span class="service-id" *ngIf="row.service_id" style="opacity:0.7; font-size:0.85rem;">
+                  ({{ row.service_id }})
+                </span>
+              </a>
+            </ng-container>
+            <ng-container
+              *ngIf="col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days'">
+              <div class="numeric-cell" [ngClass]="
+                  col.field === 'pending_applications'
+                    ? ( (+(row.pending_applications ?? 0) === 0) ? 'pending-zero' : 'pending-nonzero' )
+                    : ''
+                ">
+                {{ row[col.field] ?? '0' }}
+              </div>
+            </ng-container>
+            <ng-container *ngIf="col.field === 'actions'">
+              <div class="action-cell">
+                <button pButton type="button" class="p-button p-component p-button-raised p-button-sm btn-view"
+                  (click)="viewApplications(row)" pTooltip="Open applications" tooltipPosition="top">
+                  <span class="p-button-icon pi pi-eye" aria-hidden="true"></span>
+                  <span class="p-button-label">Go</span>
+                </button>
+              </div>
+            </ng-container>
+
+            <ng-container
+              *ngIf="col.field !== 'service_name' && col.field !== 'actions' && col.field !== 'total_applications' && col.field !== 'pending_applications' && col.field !== 'target_days'">
+              {{ row[col.field] || '----' }}
+            </ng-container>
+          </td>
+        </tr>
+      </ng-template>
+
+
+      <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+        <tr class="table-row-animate" [@rowAnimation]>
+          <td style="width:58px; text-align:center">{{ (currentPage - 1) * rows + rowIndex + 1 }}</td>
+
+          <td *ngFor="let col of displayedColumns; let idx = index" [ngClass]="{
+              'col-ward nowrap': col.field === 'ward',
+              'col-ulb nowrap': col.field === 'ulb',
+              'col-address wrap': col.field === 'registered_enterprise_address',
+              'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address'
+            }" [pTooltip]="getTooltip(row, col.field)" tooltipPosition="top"
+            [style.width.px]="col.field === 'service_name' ? 420 : (col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days' ? 80 : null)"
+            [style.text-align]="(col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days') ? 'center' : 'left'"
+            style="vertical-align:middle">
+            <ng-container *ngIf="col.field === 'service_name'">
+              <a class="service-link" (click)="onServiceNameClick(row)" href="javascript:void(0)"
+                [title]="row.service_name" role="button" (keydown.enter)="onServiceNameClick(row)">
+                <span class="service-title">
+                  {{ row.service_name || '----' }}
+                </span>
+                <span class="service-id" *ngIf="row.service_id" aria-hidden="true">
+                  ({{ row.service_id }})
+                </span>
+              </a>
+            </ng-container>
+            <ng-container
+              *ngIf="col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days'">
+              <div style="width:100%; display:flex; justify-content:center; align-items:center; font-weight:600;">
+                {{ row[col.field] ?? '0' }}
+              </div>
+            </ng-container>
+            <ng-container *ngIf="col.field === 'actions'">
+              <div style="display:flex; justify-content:center; align-items:center;">
+                <button pButton type="button" class="p-button p-component p-button-raised p-button-sm btn-view"
+                  (click)="viewApplications(row)" pTooltip="Open applications" tooltipPosition="top"
+                  style="min-width:72px; padding:0.35rem 0.6rem; display:flex; align-items:center; gap:6px;">
+                  <span class="p-button-icon pi pi-eye" aria-hidden="true"></span>
+                  <span class="p-button-label">Go</span>
+                </button>
+              </div>
+            </ng-container>
+            <ng-container
+              *ngIf="col.field !== 'service_name' && col.field !== 'actions' && col.field !== 'total_applications' && col.field !== 'pending_applications' && col.field !== 'target_days'">
+              {{ row[col.field] || '----' }}
+            </ng-container>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+        <tr class="table-row-animate">
+          <td>{{ (currentPage - 1) * rows + rowIndex + 1 }}</td>
+
+          <td *ngFor="let col of displayedColumns; let idx = index" [ngClass]="{
+              'col-ward nowrap': col.field === 'ward',
+              'col-ulb nowrap': col.field === 'ulb',
+              'col-address wrap': col.field === 'registered_enterprise_address',
+              'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address'
+            }" pTooltip="{{ getCellText(row, col.field) }}" tooltipPosition="top">
+            <span *ngIf="col.field === 'service_name'">
+              <a class="service-link" (click)="onServiceNameClick(row)" href="javascript:void(0)"
+                [title]="row[col.field]">
+                {{ row.service_name || '----' }}
+                <small *ngIf="row.service_id"> ({{ row.service_id }})</small>
+              </a>
+            </span>
+            <span *ngIf="col.field === 'actions'">
+              <button pButton type="button" class="p-button p-component p-button-raised p-button-sm btn-view"
+                (click)="viewApplications(row)" pTooltip="Open applications" tooltipPosition="top"
+                style="min-width:90px;">
+                <span class="p-button-icon pi pi-eye" aria-hidden="true"></span>
+                <span class="p-button-label">Open</span>
+              </button>
+            </span>
+            <span *ngIf="col.field !== 'service_name' && col.field !== 'actions'">
+              {{ row[col.field] || '----' }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+
+
+      <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+        <tr class="table-row-animate">
+          <td>{{ (currentPage - 1) * rows + rowIndex + 1 }}</td>
+
+          <td *ngFor="let col of displayedColumns; let idx = index" [ngClass]="{
+              'col-ward nowrap': col.field === 'ward',
+              'col-ulb nowrap': col.field === 'ulb',
+              'col-address wrap': col.field === 'registered_enterprise_address',
+              'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address'
+            }" pTooltip="{{ getCellText(row, col.field) }}" tooltipPosition="top">
+            <span *ngIf="col.field === 'service_name'">
+              <a class="service-link" (click)="onServiceNameClick(row)" href="javascript:void(0)"
+                [title]="row[col.field]">
+                {{ row[col.field] || '----' }}
+              </a>
+            </span>
+            <span *ngIf="col.field === 'actions'">
+              <button pButton type="button" class="p-button p-component p-button-raised btn-view"
+                (click)="viewApplications(row)" pTooltip="View applications for this service" tooltipPosition="top">
+                <span class="p-button-icon pi pi-eye" aria-hidden="true"></span>
+                <span class="p-button-label">View</span>
+              </button>
+            </span>
+            <span *ngIf="col.field !== 'service_name' && col.field !== 'actions'">
+              {{ row[col.field] || '----' }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="displayedColumns.length + 1" class="no-data-cell">
+            <div class="no-data-wrapper">
+              <i class="pi pi-inbox no-data-icon"></i>
+              <h3>No Services Found</h3>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

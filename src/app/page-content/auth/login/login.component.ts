@@ -18,8 +18,9 @@ import { finalize } from 'rxjs';
 export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   loginForm: FormGroup;
   images: string[] = [
-    '../../../../assets/images/First_Department-list.png',
-    '../../../../assets/images/Second_Department-list.png'
+    // '../../../../assets/images/First_Department-list.png',
+    // '../../../../assets/images/Second_Department-list.png',
+    '../../../../assets/images/Login_ Page_ Banner.png'
   ];
   currentImageIndex = 0;
   previousImageIndex = 0;
@@ -28,7 +29,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('captchaCanvas') captchaCanvas!: ElementRef<HTMLCanvasElement>;
   captchaCode: string = '';
   length: number = 6; // standard captcha length
-  characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   captchaValid: boolean = false;
 
   constructor(
@@ -108,7 +109,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
             'Login failed. Please check your credentials.',
             'Error'
           );
-          if (err.status === 401 || err.status === 400) {
+          if (err.error.status === 0) {
+            this.genericService.openSnackBar(err.error.message, "Error");
+          }
+          if (err === 401 || err.status === 400) {
             this.loginForm.get('user_name')?.setErrors({ invalid: true });
             this.loginForm.get('password')?.setErrors({ invalid: true });
           }

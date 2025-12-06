@@ -4,6 +4,7 @@ import {
   HttpErrorResponse,
   HttpHeaders,
   HttpParams,
+  HttpResponse,
 } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, Observable, Subject, throwError } from 'rxjs';
@@ -270,7 +271,6 @@ export class GenericService {
         catchError((error: HttpErrorResponse) => {
           if (error.error && typeof error.error === 'object') {
             const message = error.error.message;
-
             if (
               message === 'Unauthenticated.' ||
               message === 'Unauthorised' ||
@@ -283,7 +283,6 @@ export class GenericService {
               this.handleUnauthenticated();
             }
           } else if (error.status === 401) {
-            console.warn('401 Unauthorized. Redirecting to login...');
             this.handleUnauthenticated();
           }
 
@@ -1500,20 +1499,58 @@ export class GenericService {
       { headers }
     );
   }
-  getDepartmentalUserProfile(): Observable<any> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/department/get-department-users`,
-      {},
-      { headers: this.getHeaders() }
-    );
-  }
-  getAdminDepartmentalUserProfile(): Observable<any> {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/admin/fetch-all-department-users`,
-      {},
-      { headers: this.getHeaders() }
-    );
-  }
+getDepartmentalUserProfile(params?: any): Observable<any> {
+  const body = params ?? {};
+  const headers = this.ensureJsonHeaders(this.getHeaders());
+  return this.http.post<any>(
+    `${this.baseUrl}/api/department/get-department-users`,
+    body,
+    { headers }
+  );
+}
+exportDepartmentalUsersExcelAdmin(params?: any): Observable<HttpResponse<Blob>> {
+  const body = { ...(params ?? {}), export: 'excel' };
+  const headers = this.ensureJsonHeaders(this.getHeaders());
+  return this.http.post(
+    `${this.baseUrl}/api/admin/fetch-all-department-users`,
+    body,
+    {
+      headers,
+      responseType: 'blob' as 'blob',
+      observe: 'response' as 'response'
+    }
+  );
+}
+
+exportDepartmentalUsersExcelDept(params?: any): Observable<HttpResponse<Blob>> {
+  const body = { ...(params ?? {}), export: 'excel' };
+  const headers = this.ensureJsonHeaders(this.getHeaders());
+  return this.http.post(
+    `${this.baseUrl}/api/department/get-department-users`,
+    body,
+    {
+      headers,
+      responseType: 'blob' as 'blob',
+      observe: 'response' as 'response'
+    }
+  );
+}
+
+
+getAdminDepartmentalUserProfile(params?: any): Observable<any> {
+  const body = params ?? {};
+  const headers = this.ensureJsonHeaders(this.getHeaders());
+  return this.http.post<any>(
+    `${this.baseUrl}/api/admin/fetch-all-department-users`,
+    body,
+    { headers }
+  );
+}
+
+  private ensureJsonHeaders(headers?: HttpHeaders): HttpHeaders {
+  const base = headers ?? this.getHeaders();
+  return base.has('Content-Type') ? base : base.set('Content-Type', 'application/json');
+}
   updateProfile(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.baseUrl}/api/user/profile-update`,
@@ -1535,13 +1572,38 @@ export class GenericService {
       { headers: this.getHeaders() }
     );
   }
-  getBusinessUsersDetails() {
-    return this.http.post<any>(
-      `${this.baseUrl}/api/admin/fetch-all-business-users`,
-      {},
-      { headers: this.getHeaders() }
-    );
+// inside GenericService
+getBusinessUsersDetails(page: number = 1, rowCount: number = 10, search?: string) {
+  const body: any = {
+    page,
+    row_count: rowCount
+  };
+
+  if (search && search.toString().trim()) {
+    body.search = search.toString().trim();
   }
+
+  return this.http.post<any>(
+    `${this.baseUrl}/api/admin/fetch-all-business-users`,
+    body,
+    { headers: this.getHeaders() }
+  );
+}
+
+/**
+ * Export business users Excel. Returns HttpResponse<Blob> so the component can
+ * examine headers & body (file or JSON error).
+ */
+exportBusinessUsersExcel(params?: any): Observable<HttpResponse<Blob>> {
+  const body = { ...(params ?? {}), export: 'excel' };
+  const headers = this.ensureJsonHeaders(this.getHeaders());
+  return this.http.post(`${this.baseUrl}/api/admin/fetch-all-business-users`, body, {
+    headers,
+    responseType: 'blob' as 'blob',
+    observe: 'response' as 'response'
+  });
+}
+
   addHoliday(body: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/api/holidays-store`, body, {
       headers: this.getHeaders(),
@@ -1820,6 +1882,51 @@ export class GenericService {
       }
     );
   }
+  exportApplicationsAsBlob(apiPath: string = 'api/admin/applications/export-full', payload: any = {}): Observable<HttpResponse<Blob>> {
+    const path = String(apiPath || '').replace(/^\/+/, '');
+    const url = `${this.baseUrl}/${path}`;
+    const headers = (typeof (this as any).getHeaders === 'function')
+      ? (this as any).getHeaders()
+      : new HttpHeaders({ 'Accept': 'application/json' });
+    return this.http.post(url, payload, {
+      headers,
+      observe: 'response' as const,
+      responseType: 'blob' as const
+    }) as unknown as Observable<HttpResponse<Blob>>;
+  }
+
+exportDepartmentalUsersExcel(payload: any): Observable<Blob> {
+  const form = new FormData();
+  form.append('export', 'excel');
+
+  if (payload?.search && payload.search.trim() !== '') {
+    form.append('search', payload.search.trim());
+  }
+
+  if (payload?.department_id !== undefined && payload.department_id !== null && payload.department_id !== '') {
+    form.append('department_id', String(payload.department_id));
+  } else if (payload?.deptId !== undefined && payload.deptId !== null && payload.deptId !== '') {
+    form.append('department_id', String(payload.deptId));
+  }
+
+  if (payload?.page !== undefined && payload.page !== null) {
+    form.append('page', String(payload.page));
+  }
+  if (payload?.per_page !== undefined && payload.per_page !== null) {
+    form.append('per_page', String(payload.per_page));
+  }
+  let headers = (typeof (this as any).getHeaders === 'function')
+    ? (this as any).getHeaders()
+    : new HttpHeaders({ 'Accept': 'application/json' });
+
+  if (headers.has('Content-Type')) {
+    headers = headers.delete('Content-Type');
+  }
+  return this.http.post(`${this.baseUrl}/api/admin/fetch-all-department-users`, form, {
+    headers,
+    responseType: 'blob' as 'blob'
+  });
+}
   getAllIncentiveApplications(): any {
     return this.http.post(
       `${this.baseUrl}/api/department/incentive/applications`,
@@ -1880,6 +1987,10 @@ export class GenericService {
     return this.http.post(
       `${this.baseUrl}/api/department/user-certificate-view`, { application_id: appId }, { headers: this.getHeaders() }
     )
+  }
+  previewCertificate(body: any): Observable<Blob> {
+    const url = `${this.baseUrl}/api/department/user-certificate-generate`;
+    return this.http.post(url, body, { responseType: 'blob', headers: this.getHeaders() }) as Observable<Blob>;
   }
   generateCertificate(payload: any): any {
     return this.http.post(

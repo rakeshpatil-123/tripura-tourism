@@ -55,7 +55,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           total_applications_for_this_department: res.total_applications,
           total_count_pending_application_in_department: res.total_count_pending_application,
           total_count_approved_application_in_department: res.total_count_approved_application,
-          $total_count_rejected_application_in_department: res.$total_count_rejected_application
+          total_count_rejected_application_in_department: res.total_count_rejected_application
         };
         this.isLoading = false;
       }, () => {

@@ -54,6 +54,73 @@
     <app-summary-cards [dashboardData]="dashboardData" [sidebarCollapsed]="sidebarCollapsed">
     </app-summary-cards>
   </section>
+  <section class="dashboard-section">
+    <div class="dept-totals-wrapper"
+      *ngIf="(dashboardData?.total_pending_for_me > 0) || (dashboardData?.total_approved_by_me > 0)">
+      <div class="dept-totals-card" role="region" aria-label="My application totals">
+        <div class="dept-totals-grid">
+          <div class="dept-card pending" *ngIf="dashboardData?.total_pending_for_me >= 0" role="group"
+            aria-live="polite" tabindex="0">
+            <div class="card-icon" aria-hidden="true" title="Pending approvals">
+              <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img"
+                focusable="false">
+                <defs>
+                  <linearGradient id="hgGrad" x1="0" x2="1">
+                    <stop offset="0" stop-color="#003c5b" stop-opacity="0.95" />
+                    <stop offset="1" stop-color="#fda00f" stop-opacity="0.95" />
+                  </linearGradient>
+                </defs>
+                <rect x="10" y="6" width="28" height="4" rx="2" fill="#e6eef7" />
+                <rect x="10" y="38" width="28" height="4" rx="2" fill="#e6eef7" />
+                <path d="M16 10 C22 18, 26 18, 32 10 L32 20 C26 26, 22 26, 16 20 Z" fill="url(#hgGrad)"
+                  opacity="0.12" />
+                <path d="M16 38 C22 30, 26 30, 32 38 L32 28 C26 22, 22 22, 16 28 Z" fill="url(#hgGrad)"
+                  opacity="0.12" />
+                <path d="M16 10 L16 18 C22 24, 26 24, 32 18 L32 10 M16 38 L16 30 C22 24, 26 24, 32 30 L32 38"
+                  stroke="#003c5b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                <path d="M18.5 12.6 C21 15, 27 15, 29.5 12.6 C27 13.8 21 13.8 18.5 12.6 Z" fill="#fda00f"
+                  opacity="0.95" />
+                <polygon points="24,20 22.2,23.8 25.8,23.8" fill="#fda00f" opacity="0.95" />
+                <path d="M20 32 C22 34, 26 34, 28 32 C25.5 33 22.5 33 20 32 Z" fill="#fda00f" opacity="0.95" />
+              </svg>
+            </div>
+
+            <div class="card-body">
+              <div class="card-title">Pending For Me</div>
+              <div class="card-value" aria-atomic="true">{{ dashboardData.total_pending_for_me || 0 }}</div>
+              <div class="card-desc">Applications Pending for my Approval</div>
+            </div>
+          </div>
+
+          <div class="dept-card approved" *ngIf="dashboardData?.total_approved_by_me > 0" role="group"
+            aria-live="polite" tabindex="0">
+            <div class="card-icon" aria-hidden="true" title="Approved by you">
+              <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img"
+                focusable="false">
+                <defs>
+                  <linearGradient id="chkGrad" x1="0" x2="1">
+                    <stop offset="0" stop-color="#003c5b" stop-opacity="0.95" />
+                    <stop offset="1" stop-color="#10b981" stop-opacity="0.95" />
+                  </linearGradient>
+                </defs>
+                <circle cx="24" cy="24" r="20" fill="url(#chkGrad)" opacity="0.12" />
+                <circle cx="24" cy="24" r="14" fill="#ffffff" stroke="#003c5b" stroke-width="1.25" />
+                <path d="M17 24.5 L22 29.5 L31.5 18.5" stroke="#10b981" stroke-width="3.6" stroke-linecap="round"
+                  stroke-linejoin="round" fill="none" />
+                <circle cx="33.5" cy="15.5" r="2.2" fill="#fda00f" opacity="0.92" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-title">Approved By Me</div>
+              <div class="card-value" aria-atomic="true">{{ dashboardData.total_approved_by_me }}</div>
+              <div class="card-desc">Approved/Scrutinised/Verified/Reviewed by Me</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="dashboard-section charts-section">
     <div class="charts-grid" [ngClass]="!sidebarCollapsed ? 'two-column' : 'single-column'">
       <div class="chart-item">
@@ -81,10 +148,10 @@
 </div>
 <app-clarification-table class="reduce-gap-next"
   [data]="dashboardData?.clarification_required"></app-clarification-table>
-    <section class="dashboard-section charts-section reduce-gap">
-    <div class="charts-grid single-column">
-      <div class="chart-item">
-        <app-bar-graph-dept-user [data]="dashboardData?.avg_approval_time_per_service"></app-bar-graph-dept-user>
-      </div>
+<section class="dashboard-section charts-section reduce-gap">
+  <div class="charts-grid single-column">
+    <div class="chart-item">
+      <app-bar-graph-dept-user [data]="dashboardData?.avg_approval_time_per_service"></app-bar-graph-dept-user>
     </div>
-  </section>
+  </div>
+</section>

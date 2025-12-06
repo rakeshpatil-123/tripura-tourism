@@ -259,8 +259,12 @@ $gold: #f7b500;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
   align-items: center;
   animation: fadeUp 0.35s ease both;
-}
-
+  flex-wrap: wrap;
+    justify-content: center;
+  }
+  .pagination-container>* {
+    margin-bottom: 6px;
+  }
 .pagination-btn,
 .pagination-number {
   padding: 8px 16px;
@@ -1048,4 +1052,106 @@ td.status {
 .refresh-btn {
   padding: 8px 14px;
   font-weight: 600;
+}
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 10px;
+  grid-auto-rows: auto;
+}
+
+.filters-grid .grid-item {
+  min-width: 0;
+}
+
+.compact-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid #d8e3ef;
+  font-size: 14px;
+}
+
+.filters-grid .item-actions {
+  grid-column: 3 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 6px;
+}
+
+.filters-grid .item-actions .actions-row-inner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.actions-row-inner .action-refresh {
+  margin-left: 4px;
+}
+
+.rows-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.filters-grid .item-refresh {
+  grid-column: 4 / 5;
+  justify-self: end;
+}
+
+.rows-select {
+  min-width: 84px;
+  padding: 6px 8px;
+}
+
+@media (max-width: 920px) {
+  .filters-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .filters-grid .item-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .filters-grid .item-user,
+  .filters-grid .item-grn,
+  .filters-grid .item-mobile,
+  .filters-grid .item-status,
+  .filters-grid .item-from,
+  .filters-grid .item-to,
+  .filters-grid .item-amt-min,
+  .filters-grid .item-amt-max {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-grid .item-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .actions-row-inner {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .rows-select-wrap {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
 }

@@ -67,11 +67,11 @@ export class SummaryCardsComponent implements OnInit, OnChanges {
         },
         {
           title: 'Rejected',
-          value: this.dashboardData.$total_count_rejected_application_in_department ?? 0,
+          value: this.dashboardData.total_count_rejected_application_in_department ?? 0,
           percentage: this.dashboardData.percentage_rejected_application ?? 0,
           icon: '❌',
           color: 'red',
-        }
+        },
       ];
     }
   }

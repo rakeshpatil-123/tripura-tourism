@@ -81,6 +81,7 @@ export class AddServiceDialogComponent implements OnInit {
     this.serviceForm = this.fb.group({
       department_id: ['', Validators.required],
       service_title_or_description: ['', Validators.required],
+      egras_scheme_code: [''],
       noc_name: ['', Validators.required],
       noc_short_name: ['', Validators.required],
       noc_type: [NocType.CFE, Validators.required],
@@ -111,7 +112,7 @@ export class AddServiceDialogComponent implements OnInit {
       third_party_redirect_url: [''],
       third_party_return_url: [''],
       third_party_status_api_url: [''],
-      third_party_payment_mode: ['unified'],
+      third_party_payment_mode: [''],
       verification_token: [''],
       is_special: ['no'],
     });
@@ -131,6 +132,7 @@ export class AddServiceDialogComponent implements OnInit {
             this.serviceForm.patchValue({
               department_id: s.department_id,
               service_title_or_description: s.service_title_or_description,
+              egras_scheme_code: s.egras_scheme_code,
               noc_name: s.noc_name,
               noc_short_name: s.noc_short_name,
               noc_type: s.noc_type,
@@ -220,6 +222,7 @@ export class AddServiceDialogComponent implements OnInit {
       const payload = {
         department_id: formValue.department_id,
         service_title_or_description: formValue.service_title_or_description,
+        egras_scheme_code: formValue.egras_scheme_code,
         noc_name: formValue.noc_name,
         noc_short_name: formValue.noc_short_name,
         noc_type: formValue.noc_type,
@@ -303,10 +306,12 @@ export class AddServiceDialogComponent implements OnInit {
                 }
               }).then(() => {
                 this.dialogRef.close(isUpdate ? 'updated' : 'created');
+                setTimeout(() => {
+                  this.loadServices();
+                }, 1000);
               });
             },
             error: (err) => {
-              console.error(err);
               Swal.fire({
                 title: 'Something went wrong',
                 text: 'Please try again later.',

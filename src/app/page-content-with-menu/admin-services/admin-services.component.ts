@@ -503,9 +503,43 @@ deleteService(service: Service): void {
   }
 
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.dataSource.filter = filterValue;
+  applyFilter(event: Event | string) {
+    const inputValue = typeof event === 'string' ? event : (event.target as HTMLInputElement).value;
+    const raw = (inputValue ?? '').toLowerCase();
+    const normalized = raw.replace(/\s+/g, ' ').trim();
+    const tokens = normalized.length ? normalized.split(' ') : [];
+    let filtered = [...this.allServices];
+    if (this.selectedDepartment) {
+      filtered = filtered.filter(s => +s.department_id === +this.selectedDepartment);
+    }
+
+    if (this.selectedNocType) {
+      filtered = filtered.filter(s => s.noc_type === this.selectedNocType);
+    }
+    if (this.selectedServiceMode) {
+      filtered = filtered.filter(s => s.service_mode === this.selectedServiceMode);
+    }
+    if (this.selectedStatus) {
+      filtered = filtered.filter(s => String(s.status) === String(this.selectedStatus));
+    }
+    if (tokens.length) {
+      filtered = filtered.filter(s => {
+        const haystack = `
+      ${s.service_title_or_description ?? ''} 
+      ${s.noc_name ?? ''} 
+      ${s.noc_short_name ?? ''} 
+      ${s.noc_type ?? ''} 
+      ${s.noc_payment_type ?? ''} 
+      ${s.service_mode ?? ''} 
+      ${s.department_id ?? ''} 
+    `.toLowerCase();
+        return tokens.every(t => haystack.includes(t));
+      });
+    }
+    this.dataSource.data = filtered;
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
   }
   loadDepartments(): void {
     this.loaderService.showLoader();
@@ -601,6 +635,7 @@ deleteService(service: Service): void {
                 newStatus === 1 ? 'Service activated successfully' : 'Service deactivated successfully',
                 'Success'
               );
+              this.loadServices();
             } else {
               element.status = newStatus === 1 ? 0 : 1;
               event.source.checked = element.status === 1;
@@ -611,6 +646,7 @@ deleteService(service: Service): void {
             element.status = newStatus === 1 ? 0 : 1;
             event.source.checked = element.status === 1;
             this.genericService.openSnackBar('Error while updating status', 'Error');
+            this.loadServices();
           }
         });
       }

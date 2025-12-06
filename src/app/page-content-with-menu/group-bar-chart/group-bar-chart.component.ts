@@ -62,7 +62,16 @@ interface ServiceEntry {
 export class GroupBarChartComponent implements OnChanges, AfterViewInit {
   @Input() data: ServiceEntry[] | null = null;
   @ViewChild('chart') chart!: ChartComponent;
-
+  districtColors: string[] = [
+    '#6ce5e8',
+    '#41b8d5',
+    '#5896bb',
+    '#5578b0',
+    '#6661ae',
+    '#8547a4',
+    '#a10e83',
+    '#c6005d'
+  ];
   public chartOptions: Partial<GroupedHorizontalOptions> | null = null;
 
   private services: string[] = [];
@@ -100,7 +109,7 @@ export class GroupBarChartComponent implements OnChanges, AfterViewInit {
     this.districts = Array.from(dSet).sort((a, b) => a.localeCompare(b));
     this.colorMap = {};
     for (let i = 0; i < this.districts.length; i++) {
-      this.colorMap[this.districts[i]] = this.generateColor(i, this.districts.length);
+      this.colorMap[this.districts[i]] = this.districtColors[i % this.districtColors.length];
     }
     let max = 1;
     for (const s of raw) {
@@ -261,6 +270,7 @@ export class GroupBarChartComponent implements OnChanges, AfterViewInit {
     const light = 54 - (index % 3) * 3;
     return `hsl(${hue} ${sat}% ${light}%)`;
   }
+  //need to use the colors don't need
 
   private formatNumberFull(n: any) {
     const num = Number(n || 0);

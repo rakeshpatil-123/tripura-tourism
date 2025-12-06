@@ -1,8 +1,8 @@
 <div class="dashboard-container" @fadeIn @pageFade>
   <div class="header">
     <div class="title-area">
-      <h2 @slideInHeader>Rating Dashboard</h2>
-      <p class="subtitle" @fadeUp>Department wise feedback &amp; ratings</p>
+      <h2 @slideInHeader>Query & Feedback Dashboard</h2>
+      <p class="subtitle" @fadeUp>Department wise service feedback &amp; ratings</p>
     </div>
     <div class="header-actions">
       <button class="refresh-btn" (click)="refreshDashboard()" aria-label="Refresh dashboard" title="Refresh dashboard"
@@ -18,6 +18,12 @@
         <app-ilogi-select formControlName="department_id" fieldId="department_id" fieldLabel="Department"
           [selectOptions]="departmentsList" [enableSearch]="true" placeholder="Select department"
           (change)="onDepartmentSelect(filterForm.value.department_id)">
+        </app-ilogi-select>
+      </div>
+      <div class="control-item dept-select stagger-item">
+        <app-ilogi-select formControlName="service_id" fieldId="service" fieldLabel="Service"
+          [selectOptions]="serviceList" [enableSearch]="true" placeholder="Select Service"
+          (change)="onDepartmentSelect(filterForm.value.serivce)">
         </app-ilogi-select>
       </div>
       <div class="control-item search-box stagger-item">
@@ -38,7 +44,7 @@
       <div class="control-item actions-slot stagger-item"></div>
     </form>
   </div>
-  <div class="stats-grid" @listStagger aria-live="polite">
+  <!-- <div class="stats-grid" @listStagger aria-live="polite">
     <div class="stat-card stat-card--glass" role="region" aria-label="Total feedbacks">
       <div class="stat-left">
         <div class="stat-label">Total Feedbacks</div>
@@ -72,8 +78,8 @@
       </div>
       <div class="stat-right stat-badge stat-badge--orange-strong" aria-hidden="true">💙</div>
     </div>
-  </div>
-  <div class="charts-root">
+  </div> -->
+  <!-- <div class="charts-root">
     <div class="hero">
       <h2 class="title" @slideInHeader>Ratings & Sentiment</h2>
     </div>
@@ -105,11 +111,11 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
   <div class="feedback-container" @listStagger>
     <div class="feedback-header" @slideInHeader>
       <div class="header-left">
-        <h3>Feedback Data</h3>
+        <h3>Query & Feedback Data</h3>
         <p class="muted">Detailed view for <strong>{{ summary.department_name || 'Selected Dept' }}</strong></p>
       </div>
       <div class="feedback-actions">
@@ -121,21 +127,23 @@
       </div>
     </div>
     <div class="table-wrapper clean-table">
-      <table class="simple-table" *ngIf="pagedFeedbacks?.length; else noData" role="table">
+      <table class="simple-table" *ngIf="displayedData?.length; else noData" role="table">
         <thead>
           <tr>
-            <th>#</th>
+            <th>S.No.</th>
             <th>User</th>
+            <th>Service</th>
             <th>Submitted On</th>
-            <th>Rating</th>
+            <th>Satisfaction</th>
             <th>Feedback</th>
             <th>Suggestions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let fb of pagedFeedbacks; let i = index" @listStagger>
-            <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <tr *ngFor="let fb of displayedData; let i = index" @listStagger>
+            <td>{{ ((currentPageSize - 1) * pageSize) + i + 1 }}</td>
             <td>{{ fb.user_name || '-' }}</td>
+            <td>{{ fb.service || '-' }}</td>
             <td>{{ formatDate(fb.created_at) }}</td>
             <td>{{ fb.rating ?? '-' }}</td>
             <td class="td-feedback">{{ fb.feedback || '-' }}</td>
@@ -151,14 +159,36 @@
         </div>
       </ng-template>
     </div>
-    <div class="pagination" *ngIf="totalPages > 1">
-      <p class="rows-count">{{ filteredFeedbacks?.length || 0 }} rows</p>
-      <div class="page-controls">
-        <div class="pagination-wrapper">
-          <div class="pagination-container" @fadeUp>
-            <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPage === 1"
-              aria-label="Previous page"></button>
-          </div>
+    <div class="pagination-wrapper" *ngIf="totalPages > 0" style="margin-top:12px;">
+      <div class="pagination-container" @fadeUp>
+        <!-- group containing prev / pages / next -->
+        <div class="pagination-group" role="navigation" aria-label="Pagination controls">
+          <button class="pagination-btn nav-btn" (click)="prevPage()" [disabled]="currentPageSize === 1"
+            aria-label="Previous page">
+            ◀ Prev
+          </button>
+
+          <ng-container *ngFor="let p of totalPagesArray">
+            <button class="pagination-number" [class.active]="p === currentPageSize" (click)="goToPage(p)"
+              [attr.aria-current]="p === currentPageSize ? 'page' : null">
+              {{ p }}
+            </button>
+          </ng-container>
+
+          <button class="pagination-btn nav-btn" (click)="nextPage()" [disabled]="currentPageSize === totalPages"
+            aria-label="Next page">
+            Next ▶
+          </button>
+        </div>
+
+        <!-- page-size pushed to the right within the container -->
+        <div class="page-size-wrapper" title="Rows per page">
+          <label for="pageSizeSelect">Rows per page:</label>
+          <select id="pageSizeSelect" [(ngModel)]="pageSize" (change)="onPageSizeChange()" aria-label="Rows per page">
+            <option *ngFor="let size of pageSizeOptions" [value]="size">
+              {{ size }}
+            </option>
+          </select>
         </div>
       </div>
     </div>

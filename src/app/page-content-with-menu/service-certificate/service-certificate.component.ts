@@ -8,6 +8,7 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { MarkSpec } from 'prosemirror-model';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import {
   NgxEditorMenuComponent,
@@ -28,7 +29,7 @@ import {
   addRowAfter,
   deleteTable,
   deleteColumn,
-  deleteRow, 
+  deleteRow,
   TableNodesOptions
 } from 'prosemirror-tables';
 import { ButtonModule } from 'primeng/button';
@@ -64,7 +65,15 @@ export class ServiceCertificateComponent implements OnInit {
   imageWidth: number | null = null;
   imageHeight: number | null = null;
 
-
+  pageSizeKey = 'A4';
+  pageSizes: { [key: string]: { label: string; width: string; height: string; padding: string } } = {
+    A4: { label: 'A4 (210 × 297 mm)', width: '210mm', height: '297mm', padding: '16mm' },
+    A5: { label: 'A5 (148 × 210 mm)', width: '148mm', height: '210mm', padding: '12mm' },
+    Letter: { label: 'Letter (8.5 × 11 in)', width: '215.9mm', height: '279.4mm', padding: '16mm' }
+  };
+  get pageSizeKeys() { return Object.keys(this.pageSizes); }
+  variableList: Array<{ key: string; label: string }> = [];
+  loadingVariables = false;
   serviceId!: number;
   serviceName = 'Service';
   fontSize = 14;
@@ -220,21 +229,186 @@ export class ServiceCertificateComponent implements OnInit {
       };
       view.dom.addEventListener('click', clickHandler);
     }
+    setTimeout(() => {
+      try {
+        this.applyPageSize(this.pageSizeKey);
+      } catch (e) {
+      }
+    }, 50);
+    setTimeout(() => {
+      try { this.loadVariables(); } catch (e) { }
+    }, 60);
     if (this.data) {
       this.serviceId = Number(this.data.service?.id || this.data.id || this.data.service_id);
       this.serviceName = this.data.service?.name || this.data.name || 'Unknown Service';
       if (this.serviceId) this.loadTemplate(this.serviceId);
     }
   }
+  private formatLabel(key: string): string {
+    if (!key || typeof key !== 'string') return key || '';
+    return key
+      .split('_')
+      .map(part => {
+        const p = part.toLowerCase();
+        if (['id', 'qr', 'url', 'no', 'pan', 'dob'].includes(p)) return p.toUpperCase();
+        return p.charAt(0).toUpperCase() + p.slice(1);
+      })
+      .join(' ');
+  }
+  private loadVariables(): void {
+    this.loadingVariables = true;
+    this.genericService.getCertificateGenerationVariables().subscribe({
+      next: (res: any) => {
+        let rawVars: any[] = [];
+        if (Array.isArray(res?.data)) rawVars = res.data;
+        else if (Array.isArray(res)) rawVars = res;
+        else if (res?.data?.variables) rawVars = res.data.variables;
+        else rawVars = [];
+        this.variableList = rawVars.map((v: any) => {
+          const key = typeof v === 'string' ? v : (v.key || v.name || v.variable || '');
+          const label = this.formatLabel(key);
+          return { key, label };
+        });
+        try {
+          const fn = (this as any).buildFormFromVariables;
+          if (typeof fn === 'function') fn.call(this);
+        } catch (e) { }
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Failed to load variables', err);
+        Swal.fire('Error', 'Failed to load certificate variables', 'error');
+      },
+      complete: () => (this.loadingVariables = false)
+    });
+  }
+  onVariableSelect(event: Event): void {
+    const key = this.getValue(event);
+    if (!key) return;
+    this.insertVariable(key);
+    try { (event.target as HTMLSelectElement).value = ''; } catch (e) { }
+  }
+  insertVariable(key: string): void {
+    if (!key) return;
+    const token = `{{${key}}}`;
+
+    const view = this.getView();
+    if (view && view.state && typeof view.dispatch === 'function') {
+      const { state, dispatch } = view;
+      try {
+        const { from, to } = state.selection;
+        dispatch(state.tr.insertText(token, from, to).scrollIntoView());
+        try { (view.dom as HTMLElement).focus(); } catch (e) { }
+        this.updateModelFromEditor();
+        return;
+      } catch (e) {
+        console.warn('ProseMirror insertText failed, falling back to DOM insert', e);
+      }
+    }
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const textNode = document.createTextNode(token);
+      range.insertNode(textNode);
+      const newRange = document.createRange();
+      newRange.setStartAfter(textNode);
+      newRange.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+      this.updateModelFromEditor();
+    } else {
+      const rootEl = document.querySelector('.NgxEditor__Content') as HTMLElement | null;
+      if (rootEl) {
+        rootEl.appendChild(document.createTextNode(token));
+        this.updateModelFromEditor();
+      }
+    }
+  }
+  applyPageSize(sizeKey: string): void {
+    if (!sizeKey) return;
+    this.pageSizeKey = sizeKey;
+    const size = this.pageSizes[sizeKey] || this.pageSizes['A4'];
+    const view = this.getView();
+    let root: HTMLElement | null = null;
+    if (view && view.dom) {
+      root = (view.dom as HTMLElement).querySelector('.a4-sheet') as HTMLElement
+        || (view.dom as HTMLElement).querySelector('.NgxEditor__Content') as HTMLElement
+        || (view.dom as HTMLElement);
+    } else {
+      root = document.querySelector('.a4-sheet') as HTMLElement
+        || document.querySelector('.NgxEditor__Content') as HTMLElement;
+    }
+    if (!root) return;
+    root.style.width = size.width;
+    root.style.height = size.height;
+    root.style.boxSizing = 'border-box';
+    root.style.padding = size.padding;
+    const innerEditor = root.querySelector('.ngx-editor-host, .a4-editor, .NgxEditor__Content, .ngx-editor') as HTMLElement | null;
+    if (innerEditor) {
+      innerEditor.style.minHeight = `calc(${size.height} - (${size.padding} * 2))`;
+      innerEditor.style.maxHeight = `calc(${size.height} - (${size.padding} * 2))`;
+      innerEditor.style.overflow = 'auto';
+    }
+    setTimeout(() => {
+      try { this.applyTableBorderStyling(root as HTMLElement); } catch (e) { }
+      try { this.paginateEditor(); } catch (e) { }
+    }, 20);
+  }
   ngOnDestroy(): void {
     if (this.editor) this.editor.destroy();
   }
+  paginateEditor(): void {
+    try {
+      const view = this.getView();
+      const root = (view && view.dom)
+        ? (view.dom as HTMLElement).querySelector('.a4-sheet') as HTMLElement
+        || (view.dom as HTMLElement).querySelector('.NgxEditor__Content') as HTMLElement
+        || (view.dom as HTMLElement)
+        : (document.querySelector('.a4-sheet') as HTMLElement || document.querySelector('.NgxEditor__Content') as HTMLElement);
 
-    private loadTemplate(serviceId: number): void {
+      if (!root) return;
+      Array.from(root.querySelectorAll('.auto-page-break, .auto-page-badge')).forEach(el => el.remove());
+      const mmToPx = 3.7795275591;
+      const size = this.pageSizes[this.pageSizeKey] || this.pageSizes['A4'];
+      const pageH_mm = parseFloat((size.height || '297').replace(/[^0-9.]/g, '')) || 297;
+      const pad_mm = parseFloat((size.padding || '16').replace(/[^0-9.]/g, '')) || 16;
+      const innerPx = (pageH_mm - pad_mm * 2) * mmToPx;
+      if (innerPx <= 10) return;
+      const children = Array.from(root.children) as HTMLElement[];
+      let currentPage = 1;
+
+      for (const child of children) {
+        if (child.getAttribute && child.getAttribute('data-manual') === 'true') {
+          currentPage++;
+          continue;
+        }
+
+        const relTop = child.offsetTop;
+        while (relTop >= currentPage * innerPx) {
+          const br = document.createElement('div');
+          br.className = 'page-break auto-page-break';
+          br.setAttribute('aria-hidden', 'true');
+
+          const pg = document.createElement('div');
+          pg.className = 'page-number-badge auto-page-badge';
+          pg.setAttribute('aria-hidden', 'true');
+          pg.textContent = `Page ${currentPage + 1}`;
+
+          root.insertBefore(br, child);
+          root.insertBefore(pg, child);
+
+          currentPage++;
+        }
+      }
+    } catch (err) {
+      console.warn('paginateEditor failed', err);
+    }
+  }
+
+  private loadTemplate(serviceId: number): void {
     this.genericService.getServiceCertificateView(serviceId).subscribe({
       next: (res: any) => {
         this.formTemplate = res?.status === 1 ? res.data?.form_template || '' : '';
-        // update safe preview HTML
         this.previewHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.formTemplate || '');
         if (this.editor) {
           try {
@@ -279,7 +453,11 @@ export class ServiceCertificateComponent implements OnInit {
       this.formTemplate = this.getEditorHTML();
       this.previewHtmlSafe = this.sanitizer.bypassSecurityTrustHtml(this.formTemplate || '');
     });
+    setTimeout(() => {
+      try { this.paginateEditor(); } catch (e) { }
+    }, 30);
   }
+
   insertTable(rows = 3, cols = 3, withHeader = true): void {
     const view = this.getView();
     if (!view) return;
@@ -523,9 +701,7 @@ export class ServiceCertificateComponent implements OnInit {
       console.error("Image node missing from schema");
       return;
     }
-
     const uniqueId = 'img-' + Date.now();
-
     const imgNode = imageNodeType.create({
       src,
       alt,
@@ -534,9 +710,67 @@ export class ServiceCertificateComponent implements OnInit {
     });
 
     dispatch(state.tr.replaceSelectionWith(imgNode).scrollIntoView());
-
-    // Select it immediately
     this.selectedImageId = uniqueId;
+  }
+  insertPageBreak(): void {
+    const view = this.getView();
+    if (!view || !view.dom) return;
+    try {
+      const root = (view.dom as HTMLElement).querySelector('.NgxEditor__Content') as HTMLElement || (view.dom as HTMLElement);
+      if (!root) return;
+
+      const sel = window.getSelection();
+      const existingBreaks = root.querySelectorAll('.page-break[data-manual]').length;
+      const newPageNumber = existingBreaks + 2;
+      const br = document.createElement('div');
+      br.className = 'page-break';
+      br.setAttribute('aria-hidden', 'true');
+      br.setAttribute('data-manual', 'true');
+      const pg = document.createElement('div');
+      pg.className = 'page-number-badge';
+      pg.setAttribute('aria-hidden', 'true');
+      pg.setAttribute('data-manual', 'true');
+      pg.textContent = `Page ${newPageNumber}`;
+      const p = document.createElement('p');
+      p.appendChild(document.createElement('br'));
+      const insertNodes = (range: Range | null) => {
+        if (!range) {
+          root.appendChild(br);
+          root.appendChild(pg);
+          root.appendChild(p);
+        } else {
+          range.collapse(false);
+          range.insertNode(p);
+          range.insertNode(pg);
+          range.insertNode(br);
+        }
+        const newRange = document.createRange();
+        newRange.setStart(p, 0);
+        newRange.collapse(true);
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }
+        try { (view.dom as HTMLElement).focus(); } catch (e) { }
+      };
+
+      if (!sel || sel.rangeCount === 0) {
+        insertNodes(null);
+      } else {
+        const range = sel.getRangeAt(0);
+        if (!root.contains(range.commonAncestorContainer)) {
+          insertNodes(null);
+        } else {
+          insertNodes(range);
+        }
+      }
+      setTimeout(() => this.applyTableBorderStyling(root), 20);
+      this.updateModelFromEditor();
+      setTimeout(() => this.paginateEditor(), 40);
+    } catch (err) {
+      console.error('insertPageBreak error', err);
+    }
   }
 
 
@@ -778,5 +1012,4 @@ export class ServiceCertificateComponent implements OnInit {
       width: 570
     });
   }
-
 }

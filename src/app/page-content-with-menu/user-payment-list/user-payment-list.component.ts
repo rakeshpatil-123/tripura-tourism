@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
 import { IlogiInputDateComponent } from '../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
+import { IlogiSelectComponent, SelectOption } from '../../customInputComponents/ilogi-select/ilogi-select.component';
+import { HttpResponse } from '@angular/common/http';
 
 interface PaymentRecord {
   id: string | number;
@@ -31,7 +33,7 @@ interface PaymentRecord {
   selector: 'app-user-payment-list',
   templateUrl: './user-payment-list.component.html',
   styleUrls: ['./user-payment-list.component.scss'],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, IlogiInputComponent, IlogiInputDateComponent]
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, IlogiInputComponent, IlogiInputDateComponent, IlogiSelectComponent]
 })
 export class UserPaymentListComponent implements OnInit, OnDestroy {
 
@@ -44,10 +46,17 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   pageSizes = [5, 10, 20, 50];
   currentPage = 1;
   totalPages = 1;
+  totalRecords = 0;
   totalPagesArray: number[] = [];
+  visiblePages: number[] = [];
+  private readonly PAGE_BUTTON_WINDOW = 10; 
   sortField = '';
   sortDir: 'asc' | 'desc' = 'asc';
-
+  paymentStatus : SelectOption[] = [
+    {id: '', name: 'All'},
+    {id: 'paid', name: 'Paid'},
+    {id: 'pending', name: 'Pending'}
+  ];
   sortColumn: keyof PaymentRecord | '' = '';
   sortDirection: 'asc' | 'desc' = 'asc';
   isLoading = false;
@@ -65,35 +74,80 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
       user_name: [''],
       mobile_min: [null],
       mobile_max: [null],
+      mobile_no: [''],
+      grn_number: [''],
       fromDate: [null],
       toDate: [null],
       amountMin: [null],
       amountMax: [null],
+      status: [''],
       rows: [this.pageSize],
     });
     const formSub = this.filterForm.valueChanges
-      .pipe(debounceTime(300))
-      .subscribe(() => this.applyFilters());
-    this.subs.add(formSub);
-    const rowsSub = this.filterForm.get('rows')!.valueChanges.subscribe((val: number) => {
-      if (val && !isNaN(val)) {
-        this.pageSize = Number(val);
-        this.updateDisplayedData();
-      }
-    });
-    this.subs.add(rowsSub);
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+       this.loadUserPaymentList(1);
+  });
+this.subs.add(formSub);
+const rowsSub = this.filterForm.get('rows')!.valueChanges.subscribe((val: number) => {
+  const newRows = (val && !isNaN(val)) ? Number(val) : this.pageSize;
+  this.pageSize = newRows;
+  this.loadUserPaymentList(1);
+});
+this.subs.add(rowsSub);
     this.loadUserPaymentList();
   }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
   }
-  loadUserPaymentList(): void {
+  loadUserPaymentList(page: number = 1): void {
     this.isLoading = true;
     this.loaderService.showLoader();
+    const formatToISODate = (d: any): string | null => {
+      if (!d) return null;
+      if (d instanceof Date && !isNaN(d.getTime())) {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      if (typeof d === 'string' && /^\d{2}\-\d{2}\-\d{4}$/.test(d)) {
+        const [dd, mm, yyyy] = d.split('-');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      const parsed = new Date(d);
+      return !isNaN(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : null;
+    };
+    const fv = this.filterForm?.value || {};
+    const payload: any = {
+      page: page,
+      per_page: Number(fv.rows) || this.pageSize
+    };
+
+    if (fv.user_name) {
+      payload.search = fv.user_name;
+      if (typeof fv.user_name === 'string' && /\S+@\S+\.\S+/.test(fv.user_name)) {
+        payload.email_id = fv.user_name;
+      }
+    }
+    if (fv.email_id) payload.email_id = fv.email_id;
+    if (fv.amountMin !== null && fv.amountMin !== '') payload.min_amount = fv.amountMin;
+    if (fv.amountMax !== null && fv.amountMax !== '') payload.max_amount = fv.amountMax;
+
+    const fromIso = formatToISODate(fv.fromDate);
+    const toIso = formatToISODate(fv.toDate);
+    if (fromIso) payload.from_date = fromIso;
+    if (toIso) payload.to_date = toIso;
+
+    if (fv.grn_number) payload.GRN_number = fv.grn_number;
+    if (fv.mobile_no) payload.mobile_no = fv.mobile_no;
+    if (fv.status !== null && fv.status !== undefined && String(fv.status).trim() !== '') {
+      payload.status = String(fv.status).trim().toLowerCase();
+    }
 
     const subs = this.genericService
-      .getByConditions({}, 'api/admin/get-all-applications-list')
+      .getByConditions(payload, 'api/admin/get-all-applications-list')
       .pipe(
         finalize(() => {
           this.isLoading = false;
@@ -101,16 +155,43 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
         }),
         catchError(err => {
           console.error('API fetch failed', err);
-          return of({ data: [] });
+          return of({ data: [], pagination: { current_page: 1, last_page: 1, per_page: this.pageSize, total: 0 } });
         })
       )
       .subscribe((res: any) => {
-        this.allData = (res && res.data) ? res.data.map((d: any) => this.normalizeRecord(d)) : [];
-        this.applyFilters();
-      });
+        const dataArray = (res && res.data) ? res.data : [];
+        this.allData = dataArray.map((d: any) => this.normalizeRecord(d));
+        this.filteredData = this.allData.slice();
+        this.displayedData = this.allData.slice();
+        const pag = res && res.pagination ? res.pagination : null;
 
-    this.subs.add(subs);
-  }
+  if (pag) {
+  this.currentPage = Number(pag.current_page) || page || 1;
+  this.pageSize = Number(pag.per_page) || this.pageSize || 10;
+  this.totalPages = Math.max(1, Number(pag.last_page) || 1);
+
+  const last = Number(pag.last_page) || 1;
+  this.totalPagesArray = Array.from({ length: last }, (_, i) => i + 1);
+
+  this.totalRecords = Number(pag.total) || dataArray.length || 0;
+} else {
+  this.currentPage = page;
+  this.totalPages = Math.max(
+    1,
+    Math.ceil((this.filteredData.length || 0) / (this.pageSize || 10))
+  );
+  this.totalPagesArray = Array.from(
+    { length: this.totalPages },
+    (_, i) => i + 1
+  );
+  this.totalRecords = this.filteredData.length || 0;
+}
+this.computeVisiblePages();
+
+    });
+
+  this.subs.add(subs);
+}
   toggleSort(column: string) {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -124,6 +205,267 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
     this.currentPage = 1;
     this.updateDisplayedData();
   }
+async exportToExcel(useFiltered = true) {
+  const confirm = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to download the Excel file?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Download',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    background: '#fff',
+    heightAuto: false,
+    showClass: { popup: 'animate__animated animate__zoomIn' },
+    hideClass: { popup: 'animate__animated animate__zoomOut' }
+  });
+
+  if (!confirm.isConfirmed) return;
+  this.isExporting = true;
+  this.loaderService.showLoader();
+
+  const swalAnim = {
+    showClass: { popup: 'animate__animated animate__zoomIn' },
+    hideClass: { popup: 'animate__animated animate__zoomOut' }
+  };
+
+  try {
+    const fv = this.filterForm?.value || {};
+    const isEmailLike = (s: string) =>
+      typeof s === 'string' && /\S+@\S+\.\S+/.test(s);
+
+    const formatToISODate = (d: any): string | null => {
+      if (!d) return null;
+      if (d instanceof Date && !isNaN(d.getTime())) {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      if (typeof d === 'string' && /^\d{2}\-\d{2}\-\d{4}$/.test(d)) {
+        const [dd, mm, yyyy] = d.split('-');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      const parsed = new Date(d);
+      return !isNaN(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : null;
+    };
+
+    const base64ToBlob = (b64: string, mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') => {
+      const stripped = b64.replace(/^data:.*;base64,/, '');
+      const byteChars = atob(stripped);
+      const byteNumbers = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) {
+        byteNumbers[i] = byteChars.charCodeAt(i);
+      }
+      return new Blob([new Uint8Array(byteNumbers)], { type: mime });
+    };
+
+    const isBlobLike = (x: any) =>
+      (typeof Blob !== 'undefined' && x instanceof Blob) ||
+      (x && typeof x === 'object' && 'size' in x && 'type' in x);
+
+    const findBase64 = (obj: any): string | null => {
+      if (!obj || typeof obj !== 'object') return null;
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        if (typeof v === 'string' && /^data:.*;base64,/.test(v)) return v;
+        if (typeof v === 'string' && /^[A-Za-z0-9+/=\s]+$/.test(v) && v.length > 200) return v;
+        if (typeof v === 'object') {
+          const nested = findBase64(v);
+          if (nested) return nested;
+        }
+      }
+      return null;
+    };
+    const params: any = {};
+    if (fv.user_name) {
+      params.name_of_enterprise = fv.user_name;
+      params.search = fv.user_name;
+      if (isEmailLike(fv.user_name)) params.email_id = fv.user_name;
+    }
+    if (fv.email_id) params.email_id = fv.email_id;
+    if (fv.amountMin !== null && fv.amountMin !== '') params.min_amount = fv.amountMin;
+    if (fv.amountMax !== null && fv.amountMax !== '') params.max_amount = fv.amountMax;
+
+    const fromIso = formatToISODate(fv.fromDate);
+    const toIso = formatToISODate(fv.toDate);
+    if (fromIso) params.from_date = fromIso;
+    if (toIso) params.to_date = toIso;
+
+    if (fv.GRN_number) params.GRN_number = fv.GRN_number;
+    if (fv.grn_number) params.GRN_number = fv.grn_number;
+    if (fv.mobile_no) params.mobile_no = fv.mobile_no;
+
+    if (fv.status !== null && fv.status !== undefined && String(fv.status).trim() !== '') {
+      params.status = String(fv.status).trim().toLowerCase();
+    }
+    const esc = encodeURIComponent;
+    const query = Object.keys(params)
+      .filter(k => params[k] !== '' && params[k] !== null && params[k] !== undefined)
+      .map(k => `${esc(k)}=${esc(String(params[k]))}`)
+      .join('&');
+
+    const endpoint = useFiltered
+      ? `api/admin/applications/export-filtered${query ? `?${query}` : ''}`
+       : `api/admin/applications/export-full`;
+    const subs = this.genericService.exportApplicationsAsBlob(endpoint, {})
+      .pipe(
+        finalize(() => {
+          this.isExporting = false;
+          this.loaderService.hideLoader();
+        }),
+        catchError(err => {
+          throw err;
+        })
+      )
+      .subscribe({
+        next: async (resp: HttpResponse<Blob>) => {
+          try {
+            const filenameFromResp = resp.headers?.get('content-disposition') || '';
+            let filename = `services_export_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            const m = filenameFromResp.match(/filename\*?=([^;]+)/i);
+            if (m && m[1]) {
+              filename = decodeURIComponent((m[1] || '').replace(/['"]/g, '').trim());
+            } else if ((resp as any)?.bodyFileName) {
+              filename = (resp as any).bodyFileName;
+            }
+
+            const bodyBlob = resp.body;
+
+            const mime = bodyBlob?.type || '';
+            const isExcelMime = /excel|spreadsheet|vnd.openxmlformats-officedocument|vnd.ms-excel|application\/octet-stream/i.test(mime);
+
+            if (bodyBlob && bodyBlob.size > 0 && isExcelMime) {
+              const urlObj = URL.createObjectURL(bodyBlob);
+              const a = document.createElement('a');
+              a.href = urlObj;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              URL.revokeObjectURL(urlObj);
+
+              await Swal.fire({
+                icon: 'success',
+                title: 'Exported!',
+                html: `Your Excel file <strong>${filename}</strong> has been downloaded successfully.`,
+                ...swalAnim,
+                timer: 1400,
+                showConfirmButton: false
+              });
+              return;
+            }
+            const contentTypeHeader = resp.headers.get('content-type') || '';
+            if (bodyBlob && bodyBlob.size > 0 && contentTypeHeader.includes('application/json')) {
+              const txt = await bodyBlob.text();
+              let parsed: any = null;
+              try {
+                parsed = JSON.parse(txt);
+              } catch (e) {
+              }
+
+              const url = parsed?.downloadUrl || parsed?.fileUrl || parsed?.url || parsed?.data?.downloadUrl || parsed?.data?.fileUrl;
+              const base64 =
+                parsed?.fileBase64 ||
+                parsed?.base64 ||
+                parsed?.data?.fileBase64 ||
+                parsed?.data?.base64 ||
+                null;
+
+              if (url) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                await Swal.fire({ icon: 'success', title: 'Downloaded!', html: `Your file <strong>${filename}</strong> has been downloaded.`, timer: 1400, showConfirmButton: false, ...swalAnim });
+                return;
+              }
+
+              if (base64) {
+                const b = base64ToBlob(base64);
+                if (b.size > 0) {
+                  const urlObj = URL.createObjectURL(b);
+                  const a = document.createElement('a');
+                  a.href = urlObj;
+                  a.download = filename;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  URL.revokeObjectURL(urlObj);
+                  await Swal.fire({ icon: 'success', title: 'Downloaded!', html: `Your file <strong>${filename}</strong> has been downloaded.`, timer: 1400, showConfirmButton: false, ...swalAnim });
+                  return;
+                }
+              }
+
+              if (parsed?.message) {
+                await Swal.fire({ icon: 'info', title: 'Info', text: parsed.message, ...swalAnim });
+                return;
+              }
+
+              await Swal.fire({ icon: 'info', title: 'No Data', text: 'The server did not return a downloadable file.', ...swalAnim });
+              return;
+            }
+
+            if (!bodyBlob || bodyBlob.size === 0) {
+              await Swal.fire({ icon: 'info', title: 'No Data', text: 'No records available for export.', ...swalAnim });
+              return;
+            }
+            try {
+              const txt = await bodyBlob.text();
+              const maybeBase64 = findBase64({ data: txt }) || (typeof txt === 'string' && /^[A-Za-z0-9+/=\s]+$/.test(txt) && txt.length > 200 ? txt : null);
+              if (maybeBase64) {
+                const blobFromBase64 = base64ToBlob(maybeBase64);
+                if (blobFromBase64.size > 0) {
+                  const urlObj = URL.createObjectURL(blobFromBase64);
+                  const a = document.createElement('a');
+                  a.href = urlObj;
+                  a.download = filename;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  URL.revokeObjectURL(urlObj);
+                  await Swal.fire({ icon: 'success', title: 'Downloaded!', html: `Your file <strong>${filename}</strong> has been downloaded.`, timer: 1400, showConfirmButton: false, ...swalAnim });
+                  return;
+                }
+              }
+            } catch (e) {
+              // ignore parsing fallback
+            }
+
+            await Swal.fire({ icon: 'info', title: 'No Data', text: 'The server did not return a downloadable file.', ...swalAnim });
+          } catch (e) {
+            console.error('Export download handling failed', e);
+            await Swal.fire({ icon: 'error', title: 'Export failed', text: 'Could not download the export file.', ...swalAnim });
+          }
+        },
+        error: async (err: any) => {
+          console.error('Export API failed', err);
+          await Swal.fire({
+            icon: 'error',
+            title: 'Export failed',
+            html: `<div style="text-align:left">Failed to export data. Please try again.<br/><small style="color:#64748b">${err?.message || ''}</small></div>`,
+            ...swalAnim
+          });
+        }
+      });
+
+    this.subs.add(subs);
+
+  } catch (e) {
+    console.error('Export failed', e);
+    await Swal.fire({
+      icon: 'error',
+      title: 'Export failed',
+      text: 'Could not export to Excel.',
+      ...swalAnim
+    });
+    this.isExporting = false;
+    this.loaderService.hideLoader();
+  }
+}
 
   private normalizeRecord(raw: any): PaymentRecord {
     const id = raw.id ?? raw._id ?? `id-${Math.random().toString(36).slice(2)}`;
@@ -180,6 +522,9 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
     const mobileMax = fv.mobile_max != null && fv.mobile_max !== '' ? Number(fv.mobile_max) : null;
     const onlyDigits = (phone?: string) => (phone ? phone.replace(/\D/g, '') : '');
 
+    const statusFilter = (fv.status !== null && fv.status !== undefined && String(fv.status).trim() !== '')
+      ? String(fv.status).toString().trim().toLowerCase()
+      : null;
     this.filteredData = this.allData.filter(r => {
       let ok = true;
       if (term) {
@@ -211,6 +556,10 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
         const numeric = Number(digits);
         if (mobileMin !== null && !Number.isNaN(mobileMin)) ok = ok && numeric >= mobileMin;
         if (mobileMax !== null && !Number.isNaN(mobileMax)) ok = ok && numeric <= mobileMax;
+        }
+      if (statusFilter) {
+        const recStatus = (r.status ?? '').toString().trim().toLowerCase();
+        ok = ok && recStatus === statusFilter;
       }
 
       return ok;
@@ -269,27 +618,26 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
 
   goToPage(page: number): void {
     if (page < 1 || page > this.totalPages) return;
-    this.currentPage = page;
-    this.updateDisplayedData();
+    this.loadUserPaymentList(page);
   }
 
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updateDisplayedData();
+        this.loadUserPaymentList(this.currentPage + 1);
     }
   }
 
   prevPage(): void {
     if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updateDisplayedData();
+      this.loadUserPaymentList(this.currentPage - 1);
     }
   }
   changePageSize(size: number) {
     this.pageSize = size;
-    this.currentPage = 1;
-    this.updateDisplayedData();
+    if (this.filterForm && this.filterForm.get('rows')) {
+      this.filterForm.get('rows')!.setValue(size, { emitEvent: false });
+    }
+    this.loadUserPaymentList(1);
   }
   refreshList() {
     this.loadUserPaymentList();
@@ -505,36 +853,7 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
 
       this.subs.add(subs);
     });
-  }
-  exportToExcel(useFiltered = true) {
-    this.isExporting = true;
-    try {
-      const dataToExport = (useFiltered ? this.filteredData : this.allData).map((r: any) => ({
-        'Application No': r.application_number,
-        'Business': r.business,
-        'Email': r.email_id || '',
-        'Phone': r.mobile_no || '',
-        'Amount': Number(r.amount || 0),
-        'Expiry Date': r.expiry_date ? new Date(r.expiry_date).toLocaleDateString() : '',
-          'Status': r.status || '',
-          'Method': r.method || '',
-        'Comments': r.comments || ''
-      }));
-
-      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Payments');
-
-      const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/octet-stream' });
-      saveAs(blob, `payments_export_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    } catch (e) {
-      console.error('Export failed', e);
-      Swal.fire({ icon: 'error', title: 'Export failed', text: 'Could not export to Excel.' });
-    } finally {
-      this.isExporting = false;
-    }
-  }
+}
   public statusClass(status?: string | null): string {
     const s = (status ?? '').toString().trim().toLowerCase();
     switch (s) {
@@ -548,5 +867,24 @@ export class UserPaymentListComponent implements OnInit, OnDestroy {
   }
   public isPaid(status?: string | null): boolean {
     return (status ?? '').toString().trim().toLowerCase() === 'paid';
+  }
+  private computeVisiblePages(): void {
+    const total = Math.max(1, Number(this.totalPages || 1));
+    const maxButtons = Math.max(1, this.PAGE_BUTTON_WINDOW);
+
+    if (total <= maxButtons) {
+      this.visiblePages = Array.from({ length: total }, (_, i) => i + 1);
+      return;
+    }
+    const half = Math.floor(maxButtons / 2);
+    let start = Math.max(1, this.currentPage - half);
+    let end = start + maxButtons - 1;
+
+    if (end > total) {
+      end = total;
+      start = Math.max(1, end - maxButtons + 1);
+    }
+
+    this.visiblePages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 }
