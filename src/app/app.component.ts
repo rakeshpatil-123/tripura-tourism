@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { HeaderNewComponent } from './page-template/header-new/header-new.component';
 import { NewNavComponent } from './page-template/new-nav/new-nav.component';
@@ -41,6 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
   protected title = 'swaagat_2';
   showLoader: boolean = true;
   isLoggedIn: boolean = false;
+  currentUrl: string = '';
   helpSidebarOpen = false; // Controls sidebar visibility
 
   private loaderSubscription!: Subscription;
@@ -50,13 +51,15 @@ export class AppComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private cdRef: ChangeDetectorRef,
     private genericService: GenericService,
-    private helpService: HelpService // Inject HelpService
+    private helpService: HelpService, // Inject HelpService,
+    private router : Router
   ) { }
 
   ngOnInit() {
     this.loaderSubscription = this.loaderService.getLoaderStatus().subscribe((status) => {
       this.showLoader = status;
       this.cdRef.detectChanges();
+      this.currentUrl = this.router.url;
     });
 
     this.genericService.getLoginStatus().subscribe((status) => {

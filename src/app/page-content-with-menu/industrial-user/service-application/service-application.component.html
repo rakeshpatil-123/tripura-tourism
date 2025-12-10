@@ -219,7 +219,7 @@
               <strong>Previous Paid:</strong> ₹{{ previousPaid }}
             </div>
             }
-            @if(calculatedFee !== effectiveFee) {
+            @if((calculatedFee !== effectiveFee && effectiveFee !== 0) || previousPaid !== 0) {
             <div class="fee-box fade-in">
               <strong>Effective Fee:</strong> ₹{{ effectiveFee }}
             </div>

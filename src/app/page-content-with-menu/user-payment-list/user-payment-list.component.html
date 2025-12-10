@@ -98,15 +98,18 @@
       </th>
       <th role="columnheader" tabindex="0" (click)="toggleSort('amount')" [class.sorted]="sortColumn==='amount'">
             Amount</th>
-          <th role="columnheader" tabindex="0" (click)="toggleSort('expiry_date')"
-            [class.sorted]="sortColumn==='expiry_date'">
-            Expiry Date</th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('payment_time')"
+            [class.sorted]="sortColumn==='payment_time'">
+            Payment Date</th>
           <th role="columnheader" tabindex="0" (click)="toggleSort('status')" [class.sorted]="sortColumn==='status'">
             Status</th>
           <th role="columnheader" tabindex="0" (click)="toggleSort('method')" [class.sorted]="sortColumn==='method'">
             Method</th>
           <th role="columnheader" tabindex="0" (click)="toggleSort('comments')"
             [class.sorted]="sortColumn==='comments'">Comments
+          </th>
+          <th role="columnheader" tabindex="0" (click)="toggleSort('grn_number')" [class.sorted]="sortColumn==='grn_number'">GRN
+            Number
           </th>
           <th>Actions</th>
         </tr>
@@ -118,7 +121,7 @@
           <td class="email">{{ r.email_id || '—' }}</td>
           <td class="phone">{{ r.mobile_no || '—' }}</td>
           <td class="amount">{{ formatCurrency(toNumber(r.amount || 0), r.currency || 'INR') }}</td>
-          <td class="expiry">{{ r.expiry_date ? (r.expiry_date | date:'mediumDate') : '—' }}</td>
+          <td class="expiry">{{ r.payment_time ? (r.payment_time | date:'mediumDate') : '—' }}</td>
           <td class="status">
             <span class="pill" [ngClass]="{
                 'pill-paid': (r.status || '').toLowerCase() === 'paid',
@@ -139,6 +142,7 @@
           </td>
           <td class="method">{{ r.method || '—' }}</td>
           <td class="comments">{{ r.comments || '—' }}</td>
+          <td class="grn_number">{{ r.grn_number || '—' }}</td>
           <td class="actions">
             <button class="btn mark action-btn"
  [ngClass]="{ 'btn-paid': isPaid(r.status), 'btn-mark': !isPaid(r.status) }" (click)="markAsPaid(r)" [disabled]="isPaid(r.status)" [attr.aria-disabled]="isPaid(r.status)">

@@ -708,3 +708,197 @@ p-table ::ng-deep .p-datatable-tbody>tr>td {
     font-size: 1rem;
   }
 }
+.department-action-bar,
+.table-header-wrapper .department-action-bar {
+  position: relative !important;
+  z-index: 9000 !important;
+}
+
+.department-action-bar,
+.department-action-bar>button,
+.department-action-bar .fancy-btn,
+.department-action-bar .filter-box,
+.department-action-bar .mb-20 {
+  z-index: 9000 !important;
+  position: relative !important;
+}
+
+.department-action-bar .p-dropdown-panel,
+.department-action-bar .p-select-panel,
+.department-action-bar .p-multiselect-panel,
+.department-action-bar .p-overlaypanel,
+.department-action-bar .p-autocomplete-panel,
+.department-action-bar .p-calendar,
+.department-action-bar .p-overlaypanel {
+  z-index: 9000 !important;
+}
+
+.table-header-wrapper [style*="z-index"],
+.department-action-bar [style*="z-index"] {
+  z-index: 9000 !important;
+  position: relative !important;
+}
+
+.col-district {
+  width: 350px;
+  min-width: 220px;
+  max-width: 450px;
+}
+
+.col-subdivision {
+  width: 300px;
+  min-width: 200px;
+  max-width: 420px;
+}
+
+.col-ulb {
+  width: 320px;
+  min-width: 200px;
+  max-width: 480px;
+}
+
+.large-data-cell {
+  vertical-align: top;
+  padding: 0.35rem;
+}
+
+.large-data-content {
+  display: block;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 0.4rem 0.5rem;
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.45;
+  font-size: 14px;
+  background: transparent;
+  border-radius: 4px;
+}
+
+.large-data-content br {
+  content: "";
+  display: block;
+  margin-bottom: 4px;
+}
+
+:host ::ng-deep .animated-table .p-paginator {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+:host ::ng-deep .animated-table .p-paginator .p-paginator-left {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-paginator-pages,
+:host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-paginator-element {
+  order: 1;
+}
+
+:host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-paginator-rpp,
+:host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-dropdown,
+:host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-paginator-items-per-page {
+  margin-left: auto !important;
+  order: 99;
+}
+
+:host ::ng-deep .animated-table .p-paginator .p-paginator-rpp .p-dropdown,
+:host ::ng-deep .animated-table .p-paginator .p-dropdown.p-paginator-rpp,
+:host ::ng-deep .animated-table .p-paginator .p-dropdown {
+  width: 4.5rem !important;
+  min-width: 4.5rem !important;
+  font-size: 0.875rem;
+  padding: 0.15rem 0.25rem;
+}
+
+:host ::ng-deep .animated-table .p-paginator .p-paginator-rpp .p-dropdown .p-dropdown-label {
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+  white-space: nowrap;
+  text-align: center;
+}
+
+:host ::ng-deep .animated-table .p-paginator .p-paginator-right {
+  flex: 0 0 auto;
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  :host ::ng-deep .animated-table .p-paginator {
+    flex-wrap: wrap;
+  }
+
+  :host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-paginator-rpp,
+  :host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-dropdown {
+    width: 5.25rem !important;
+    margin-left: auto !important;
+    order: 99;
+  }
+}
+
+:host ::ng-deep .department-action-bar {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap;
+  padding: 6px 8px;
+}
+
+:host ::ng-deep .department-action-bar .filter-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:host ::ng-deep .department-action-bar .filter-box .w-100 {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:host ::ng-deep .department-action-bar .mb-20 {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+:host ::ng-deep .department-action-bar>button,
+:host ::ng-deep .department-action-bar .fancy-btn,
+:host ::ng-deep .department-action-bar .p-button-add {
+  flex: 0 0 auto;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .department-action-bar,
+:host ::ng-deep .department-action-bar * {
+  z-index: inherit;
+}
+
+@media (max-width: 720px) {
+  :host ::ng-deep .department-action-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  :host ::ng-deep .department-action-bar .filter-box {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  :host ::ng-deep .department-action-bar>button,
+  :host ::ng-deep .department-action-bar .fancy-btn,
+  :host ::ng-deep .department-action-bar .p-button-add {
+    margin-left: 0;
+  }
+}

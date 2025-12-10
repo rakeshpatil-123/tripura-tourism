@@ -230,7 +230,7 @@ export class AddServiceDialogComponent implements OnInit {
         target_days: formValue.target_days,
         fixed_expiry_date: formValue.fixed_expiry_date ? moment(formValue.fixed_expiry_date).format('YYYY-MM-DD') : null,
         has_input_form: formValue.has_input_form ? 'yes' : 'no',
-        dpends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.filter((s: any) => s !== '').map((s: any) => `${s}`) : formValue.depends_on_services,
+        depends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.filter((s: any) => s !== '').map((s: any) => `${s}`) : formValue.depends_on_services,
         generate_id: formValue.generate_id ? 'yes' : 'no',
         generated_id_format: formValue.generated_id_format,
         generate_pdf: formValue.generate_pdf ? 'yes' : 'no',

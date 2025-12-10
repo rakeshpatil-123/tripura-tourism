@@ -10,7 +10,7 @@
         <p-tabpanel value="0">
           <form [formGroup]="profileForm" class="profile-form">
             <div class="profile-fields">
-              <app-ilogi-input fieldLabel="Enterprise Name" formControlName="enterpriseName"
+              <app-ilogi-input *ngIf="profileForm.get('userType')?.value !== 'department'" fieldLabel="Enterprise Name" formControlName="enterpriseName"
                 placeholder="Enter enterprise name"></app-ilogi-input>
               <app-ilogi-input fieldLabel="Authorized Person Name" formControlName="authorized_person_name"
                 placeholder="Enter first name"></app-ilogi-input>
@@ -32,17 +32,17 @@
                 [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
               </app-ilogi-select>
 
-              <app-ilogi-select *ngIf="shouldShow('district')" fieldId="district_code" fieldLabel="District"
+              <app-ilogi-select *ngIf="shouldShow('district')" [multiple]="isDepartmentUser" fieldId="district_code" fieldLabel="District"
                 formControlName="district_code" [selectOptions]="districts" placeholder="Select district"
                 [disabled]="loadingDistricts">
               </app-ilogi-select>
 
-              <app-ilogi-select *ngIf="shouldShow('subdivision')" fieldId="subdivision_code" fieldLabel="Subdivision"
+              <app-ilogi-select *ngIf="shouldShow('subdivision')" [multiple]="isDepartmentUser" fieldId="subdivision_code" fieldLabel="Subdivision"
                 formControlName="subdivision_code" [selectOptions]="subdivisions" placeholder="Select subdivision"
                 [disabled]="!districts.length || loadingSubdivisions">
               </app-ilogi-select>
 
-              <app-ilogi-select *ngIf="shouldShow('block')" fieldId="ulb_code" fieldLabel="ULB"
+              <app-ilogi-select *ngIf="shouldShow('block')" [multiple]="isDepartmentUser" fieldId="ulb_code" fieldLabel="ULB"
                 formControlName="ulb_code" [selectOptions]="ulbs" placeholder="Select ULB"
                 [disabled]="!subdivisions.length || loadingUlbs">
               </app-ilogi-select>
