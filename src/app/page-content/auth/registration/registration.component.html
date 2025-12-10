@@ -8,9 +8,10 @@
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form">
         <div class="enterprise-form">
           <!-- Enterprise Name -->
+          <ng-container *ngIf="sourcePage !== 'departmental-users'">
           <app-ilogi-input fieldId="name_of_enterprise" fieldLabel="Name of Enterprise" [mandatory]="true"
             formControlName="name_of_enterprise" placeholder="Enter enterprise name"></app-ilogi-input>
-
+          </ng-container>
           <!-- Authorized Person -->
           <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
             formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
@@ -77,24 +78,24 @@
           </app-ilogi-input>
         </div>
         <!-- District -->
-        <app-ilogi-select *ngIf="shouldShow('district')" fieldId="district_id" fieldLabel="District" [mandatory]="true"
+        <app-ilogi-select *ngIf="shouldShow('district')" [multiple]="sourcePage === 'departmental-users'" fieldId="district_id" fieldLabel="District" [mandatory]="true"
           formControlName="district_id" [selectOptions]="districts" placeholder="Select district">
         </app-ilogi-select>
 
         <!-- Subdivision -->
-        <app-ilogi-select *ngIf="shouldShow('subdivision')" fieldId="subdivision_id" fieldLabel="Subdivision"
+        <app-ilogi-select *ngIf="shouldShow('subdivision')" [multiple]="sourcePage === 'departmental-users'" fieldId="subdivision_id" fieldLabel="Subdivision"
           [mandatory]="true" formControlName="subdivision_id" [selectOptions]="subdivisions"
           placeholder="Select subdivision" [disabled]="!districts.length || loadingDistricts">
         </app-ilogi-select>
 
         <!-- ULB -->
-        <app-ilogi-select *ngIf="shouldShow('block')" fieldId="ulb_id" fieldLabel="ULB/Block" [mandatory]="true"
+        <app-ilogi-select *ngIf="shouldShow('block')" [multiple]="sourcePage === 'departmental-users'" fieldId="ulb_id" fieldLabel="ULB/Block" [mandatory]="true"
           formControlName="ulb_id" [selectOptions]="ulbs" placeholder="Select ULB/Block"
           [disabled]="!subdivisions.length || loadingSubdivisions">
         </app-ilogi-select>
 
         <!-- Ward -->
-        <app-ilogi-select *ngIf="shouldShow('ward')" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true"
+        <app-ilogi-select *ngIf="shouldShow('ward')" [multiple]="sourcePage === 'departmental-users'" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true"
           formControlName="ward_id" [selectOptions]="wards" placeholder="Select ward"
           [disabled]="!ulbs.length || loadingUlbs">
         </app-ilogi-select>

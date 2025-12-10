@@ -179,9 +179,9 @@ export class DepartmentalUsersComponent implements OnInit {
       mobile_no: user.mobile_no,
       user_name: user.user_name,
       hierarchy_level: user.hierarchy_level,
-      district_name: user.district_name,
-      subdivision_name: user.subdivision_name,
-      ulb_name: user.ulb_name,
+      district_name: user.districts_name,
+      subdivision_name: user.subdivisions_name,
+      ulb_name: user.blocks_name,
       ward_name: user.ward_name,
       bin: user.bin,
       registered_enterprise_address: user.registered_enterprise_address,
@@ -268,10 +268,17 @@ export class DepartmentalUsersComponent implements OnInit {
     this.selectedUser = null;
     this.loaderService.showLoader();
     const payload = { id: user.id };
-    this.genericService.getByConditions(payload, 'api/admin/get-department-user-details').pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
+  this.genericService.getByConditions(payload, 'api/admin/get-department-user-details')
+    .pipe(finalize(() => this.loaderService.hideLoader()))
+    .subscribe({
       next: (res: any) => {
         if (res?.success && res?.data) {
-          this.selectedUser = { ...res.data, user_id: user.id };
+          const locations = Array.isArray(res.locations)
+            ? res.locations
+            : Array.isArray(res.data?.locations)
+              ? res.data.locations
+              : [];
+          this.selectedUser = { ...res.data, user_id: user.id, locations };
           this.displayDialog = true;
         } else {
           this.genericService.openSnackBar('Failed to load user details.', 'Error');
@@ -283,7 +290,6 @@ export class DepartmentalUsersComponent implements OnInit {
       }
     });
   }
-
   closeDialog() {
     this.displayDialog = false;
     this.selectedUser = null;
@@ -476,5 +482,19 @@ export class DepartmentalUsersComponent implements OnInit {
           Swal.fire('Error', 'Failed to export Excel. Check console for details.', 'error');
         }
       });
+  }
+  formatListHtml(value: string | null | undefined): string {
+    if (!value) return '----';
+    const parts = String(value).split(',').map(p => p.trim()).filter(Boolean);
+    if (parts.length === 0) return '----';
+    return parts.map(p => this.escapeHtml(p) + ',').join('<br>');
+  }
+  escapeHtml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 }

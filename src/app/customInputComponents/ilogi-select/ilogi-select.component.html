@@ -17,28 +17,69 @@
   <!-- Editable dropdown -->
   <ng-container *ngIf="!readonly">
     <div class="w-100 select-form-field" [ngClass]="{ 'is-invalid': submitted && errors }">
-
-      <p-select appendTo="body" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name" [(ngModel)]="value"
-        optionValue="id" [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false"
-        (onShow)="onDropdownShow()" (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()"
-        (onBlur)="onBlur()" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
-        [attr.aria-describedby]="errorFieldId" styleClass="w-full">
-        padding: 5px;
-        <ng-template pTemplate="header" *ngIf="enableSearch">
-          <input #searchInput type="text" class="p-inputtext p-component " placeholder="Search..."
-            [(ngModel)]="searchTerm" (ngModelChange)="onSearch($event)" style="background-color: #fff; color: #000;" />
-        </ng-template>
-        <ng-template let-option pTemplate="item">
-          <span [title]="option.name">
-            {{
-            option.name.length > 70
-            ? option.name.substring(0, 70) + '...'
-            : option.name
-            }}
-          </span>
-        </ng-template>
-      </p-select>
-    </div>
+  <!-- <p-select appendTo="body" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name" [(ngModel)]="value"
+            optionValue="id" [multiple]="multiple" [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false"
+            (onShow)="onDropdownShow()" (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()"
+            (onBlur)="onBlur()" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+            [attr.aria-describedby]="errorFieldId" styleClass="w-full">
+            padding: 5px;
+            <ng-template pTemplate="header" *ngIf="enableSearch">
+              <input #searchInput type="text" class="p-inputtext p-component " placeholder="Search..."
+                [(ngModel)]="searchTerm" (ngModelChange)="onSearch($event)" style="background-color: #fff; color: #000;" />
+            </ng-template>
+            <ng-template let-option pTemplate="item">
+              <span [title]="option.name">
+                {{
+                option.name.length > 70
+                ? option.name.substring(0, 70) + '...'
+                : option.name
+                }}
+              </span>
+            </ng-template>
+          </p-select> -->
+  <!-- single-select when multiple is false -->
+  <p-select *ngIf="!multiple" appendTo="body" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name"
+    [(ngModel)]="value" optionValue="id" [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false"
+    (onShow)="onDropdownShow()" (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()"
+    (onBlur)="onBlur()" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+    [attr.aria-describedby]="errorFieldId" styleClass="w-full">
+    <ng-template pTemplate="header" *ngIf="enableSearch">
+      <input #searchInput type="text" class="p-inputtext p-component" placeholder="Search..." [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch($event)" style="background-color: #fff; color: #000;" />
+    </ng-template>
+    <ng-template let-option pTemplate="item">
+      <span [title]="option.name">
+        {{
+        option.name.length > 70
+        ? option.name.substring(0, 70) + '...'
+        : option.name
+        }}
+      </span>
+    </ng-template>
+  </p-select>
+  
+  <!-- multi-select when multiple is true -->
+  <p-multiSelect *ngIf="multiple" appendTo="body" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name"
+    [(ngModel)]="value" optionValue="id" [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false"
+    (onShow)="onDropdownShow()" (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()"
+    (onBlur)="onBlur()" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
+    [attr.aria-describedby]="errorFieldId" styleClass="w-full">
+    <ng-template pTemplate="header" *ngIf="enableSearch">
+      <input #searchInput type="text" class="p-inputtext p-component" placeholder="Search..." [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch($event)" style="background-color: #fff; color: #000;" />
+    </ng-template>
+    <ng-template let-option pTemplate="item">
+      <span [title]="option.name">
+        {{
+        option.name.length > 70
+        ? option.name.substring(0, 70) + '...'
+        : option.name
+        }}
+      </span>
+    </ng-template>
+  </p-multiSelect>
+  
+  </div>
   </ng-container>
 
 

@@ -5,13 +5,8 @@
   <div class="bg-element-1"></div>
 
   <div class="nav-container" [class.hidden]="isMobileMenuOpen">
-    <div
-      *ngFor="let item of navigationItems; let i = index"
-      class="dropdown-container"
-      [class.dropdown-open]="item.dropdownOpen"
-      (mouseenter)="onNavItemHover(item, i)"
-      (mouseleave)="onNavItemLeave()"
-    >
+    <div *ngFor="let item of visibleNavigationItems; let i = index" class="dropdown-container"
+      [class.dropdown-open]="item.dropdownOpen" (mouseenter)="onNavItemHover(item, i)" (mouseleave)="onNavItemLeave()">
       <button 
         class="nav-button"
         [class.active]="item.isActive"
@@ -66,10 +61,7 @@
     *ngIf="isMobileMenuOpen"
   >
     <div class="mobile-menu-content">
-      <div 
-        *ngFor="let item of navigationItems; let i = index"
-        class="mobile-menu-section"
-      >
+      <div *ngFor="let item of visibleNavigationItems; let i = index" class="mobile-menu-section">
         <button 
           class="mobile-nav-button"
           [class.active]="item.isActive"

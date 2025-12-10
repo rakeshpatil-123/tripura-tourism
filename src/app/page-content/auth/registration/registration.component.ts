@@ -63,6 +63,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
   isSpecialRequired(): boolean {
     return this.sourcePage === 'departmental-users';
   }
+  selectedDistricts: Array<{ id: string; subdivisions: Array<{ id: string; blocks: string[] }> }> = [];
   registrationForm: FormGroup;
   districts: SelectOption[] = [];
   subdivisions: SelectOption[] = [];
@@ -130,20 +131,27 @@ export class RegistrationComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadDistricts();
-    this.setupCascadingDropdowns();
     this.getAllDepartmentList();
     if (this.sourcePage === 'departmental-users') {
       this.registrationForm.patchValue({ user_type: 'department' });
-      this.registrationForm.addControl('inspector', this.fb.control([]));
-      this.registrationForm.addControl(
-        'hierarchy_level',
-        this.fb.control('', [])
-      );
-      this.registrationForm.addControl(
-        'department_id',
-        this.fb.control('', [])
-      );
-      this.registrationForm.addControl('designation', this.fb.control('', []));
+      ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'].forEach((ctrl) => {
+        if (this.registrationForm.contains(ctrl)) {
+          this.registrationForm.removeControl(ctrl);
+        }
+        this.registrationForm.addControl(ctrl, this.fb.control([]));
+      });
+      if (!this.registrationForm.contains('inspector')) {
+        this.registrationForm.addControl('inspector', this.fb.control('0'));
+      }
+      if (!this.registrationForm.contains('hierarchy_level')) {
+        this.registrationForm.addControl('hierarchy_level', this.fb.control(''));
+      }
+      if (!this.registrationForm.contains('department_id')) {
+        this.registrationForm.addControl('department_id', this.fb.control(''));
+      }
+      if (!this.registrationForm.contains('designation')) {
+      this.registrationForm.addControl('designation', this.fb.control(''));
+      }
     } else {
       this.registrationForm.patchValue({ user_type: 'individual' });
       ['hierarchy_level', 'inspector', 'department_id', 'designation'].forEach(
@@ -153,7 +161,14 @@ export class RegistrationComponent implements OnInit, OnChanges {
           }
         }
       );
+      ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'].forEach((ctrl) => {
+        if (this.registrationForm.contains(ctrl)) {
+          this.registrationForm.removeControl(ctrl);
+        }
+        this.registrationForm.addControl(ctrl, this.fb.control(''));
+      });
     }
+    this.setupCascadingDropdowns();
 
     this.registrationForm.get('mobile_no')?.valueChanges.subscribe(() => {
       this.otpSent = false;
@@ -181,6 +196,19 @@ export class RegistrationComponent implements OnInit, OnChanges {
     }
   }
 
+  private normalizeToArray(v: any): string[] {
+    if (v === null || v === undefined) return [];
+    if (Array.isArray(v)) return v.map((x) => String(x));
+    if (typeof v === 'string') {
+      const trimmed = v.trim();
+      if (!trimmed) return [];
+      if (trimmed.includes(',')) {
+        return trimmed.split(',').map((x) => x.trim()).filter(Boolean);
+      }
+      return [trimmed];
+    }
+    return [String(v)];
+  }
   prefillEditData(): void {
     const data = this.editData;
     if (!data) return;
@@ -195,127 +223,312 @@ export class RegistrationComponent implements OnInit, OnChanges {
       hierarchy_level: data.hierarchy_level || '',
       department_id: String(data.department_id) || '',
       designation: data.designation || '',
-      district_id: String(data.district_code) || '',
-      subdivision_id: String(data.subdivision_code) || '',
-      ulb_id: String(data.ulb_code) || '',
-      ward_id: String(data.ward_code) || '',
+      district_id: data.district_code ?? data.district_ids ?? '',
+      subdivision_id: data.subdivision_code ?? data.subdivision_ids ?? '',
+      ulb_id: data.ulb_code ?? data.ulb_ids ?? '',
+      ward_id: data.ward_code ?? data.ward_ids ?? '',
       user_type: data.user_type || 'department',
       inspector: data.inspector === 'yes' ? '1' : '0',
     };
+    this.registrationForm.patchValue({
+      name_of_enterprise: prefill.name_of_enterprise,
+      authorized_person_name: prefill.authorized_person_name,
+      email_id: prefill.email_id,
+      mobile_no: prefill.mobile_no,
+      user_name: prefill.user_name,
+      registered_enterprise_address: prefill.registered_enterprise_address,
+      registered_enterprise_city: prefill.registered_enterprise_city,
+      hierarchy_level: prefill.hierarchy_level,
+      department_id: prefill.department_id,
+      designation: prefill.designation,
+      user_type: prefill.user_type,
+      inspector: prefill.inspector,
+    });
+    const districtArrLegacy = this.normalizeToArray(prefill.district_id);
+    const subdivisionArrLegacy = this.normalizeToArray(prefill.subdivision_id);
+    const ulbArrLegacy = this.normalizeToArray(prefill.ulb_id);
+    const wardArrLegacy = this.normalizeToArray(prefill.ward_id);
+    const locations: any[] = Array.isArray(data.locations) ? data.locations : [];
 
-    this.registrationForm.patchValue(prefill);
-    const districtExists = this.districts.some(
-      (d) => d.id === prefill.district_id
-    );
-    if (!districtExists && prefill.district_id) {
-      this.districts.push({
-        id: prefill.district_id,
-        name: data.district || `District ${prefill.district_id}`,
-      });
-    }
-    if (prefill.district_id) {
-      this.loadSubdivisions(prefill.district_id);
-      const subInterval = setInterval(() => {
-        if (this.subdivisions.length > 0) {
-          clearInterval(subInterval);
+    if (this.sourcePage === 'departmental-users' && locations.length > 0) {
+      const districtSet = new Set<string>();
+      const subdivisionSet = new Set<string>();
+      const blockSet = new Set<string>();
 
-          const subExists = this.subdivisions.some(
-            (s) => s.id === prefill.subdivision_id
-          );
-          if (!subExists && prefill.subdivision_id) {
-            this.subdivisions.push({
-              id: prefill.subdivision_id,
-              name: data.subdivision || `Subdivision ${prefill.subdivision_id}`,
-            });
+      const grouped: Record<string, {
+        id: string;
+        name?: string;
+        subdivisionsMap: Record<string, { name?: string; blocks: Map<string, { name?: string }> }>;
+      }> = {};
+
+      locations.forEach((loc: any) => {
+        const dId = String(loc.district_id);
+        const sId = String(loc.subdivision_id);
+        const bId = String(loc.block_id);
+
+        const dName = loc.district_name ?? loc.district ?? undefined;
+        const sName = loc.subdivision_name ?? loc.subdivision ?? loc.sub_division ?? undefined;
+        const bName = loc.block_name ?? loc.block ?? loc.block_name ?? loc.ulb_name ?? undefined;
+
+        districtSet.add(dId);
+        subdivisionSet.add(sId);
+        blockSet.add(bId);
+
+        if (!grouped[dId]) {
+          grouped[dId] = { id: dId, name: dName, subdivisionsMap: {} };
+        } else if (!grouped[dId].name && dName) {
+          grouped[dId].name = dName;
+        }
+
+        if (!grouped[dId].subdivisionsMap[sId]) {
+          grouped[dId].subdivisionsMap[sId] = { name: sName, blocks: new Map() };
+        } else if (!grouped[dId].subdivisionsMap[sId].name && sName) {
+          grouped[dId].subdivisionsMap[sId].name = sName;
+        }
+
+        const blocksMap = grouped[dId].subdivisionsMap[sId].blocks;
+        if (!blocksMap.has(bId)) {
+          blocksMap.set(bId, { name: bName });
+        } else {
+          const existing = blocksMap.get(bId);
+          if (!existing?.name && bName) {
+            blocksMap.set(bId, { name: bName });
           }
-          this.registrationForm.patchValue({
-            subdivision_id: prefill.subdivision_id,
+        }
+      });
+      const districtIds = Array.from(districtSet).map(String);
+      const subdivisionIds = Array.from(subdivisionSet).map(String);
+      const ulbIds = Array.from(blockSet).map(String);
+      districtIds.forEach((dId) => {
+        if (!this.districts.some((d) => String(d.id) === dId)) {
+          const name = grouped[dId]?.name ?? `District ${dId}`;
+          this.districts.push({ id: dId, name });
+        }
+      });
+      subdivisionIds.forEach((sId) => {
+        const sNameCandidate = (() => {
+          for (const dKey of Object.keys(grouped)) {
+            const sm = grouped[dKey].subdivisionsMap[sId];
+            if (sm && sm.name) return sm.name;
+          }
+          return `Subdivision ${sId}`;
+        })();
+        if (!this.subdivisions.some((s) => String(s.id) === sId)) {
+          this.subdivisions.push({ id: sId, name: sNameCandidate });
+        }
+      });
+      ulbIds.forEach((uId) => {
+        const uNameCandidate = (() => {
+          for (const dKey of Object.keys(grouped)) {
+            for (const sKey of Object.keys(grouped[dKey].subdivisionsMap)) {
+              const b = grouped[dKey].subdivisionsMap[sKey].blocks.get(uId);
+              if (b && b.name) return b.name;
+            }
+          }
+          return `ULB ${uId}`;
+        })();
+        if (!this.ulbs.some((u) => String(u.id) === uId)) {
+          this.ulbs.push({ id: uId, name: uNameCandidate });
+        }
+      });
+      this.registrationForm.get('district_id')?.setValue(districtIds);
+      this.registrationForm.get('subdivision_id')?.setValue(subdivisionIds);
+      this.registrationForm.get('ulb_id')?.setValue(ulbIds);
+      this.selectedDistricts = Object.keys(grouped).map(dKey => {
+        const subdivs = Object.keys(grouped[dKey].subdivisionsMap).map(sKey => {
+          const blocks = Array.from(grouped[dKey].subdivisionsMap[sKey].blocks.keys());
+          return { id: sKey, blocks };
+        });
+        return { id: dKey, subdivisions: subdivs };
+      });
+      if (districtIds.length) this.loadSubdivisions(districtIds);
+      if (subdivisionIds.length) this.loadUlbs(subdivisionIds);
+      const wardIdsFromLocations: string[] = (locations.filter(l => l.ward_id).map(l => String(l.ward_id)));
+      if (wardIdsFromLocations.length > 0) {
+        const uniqueWardIds = Array.from(new Set(wardIdsFromLocations));
+        uniqueWardIds.forEach(wId => {
+          if (!this.wards.some(w => String(w.id) === wId)) {
+            const wName = (locations.find(l => String(l.ward_id) === wId)?.ward_name) ?? `Ward ${wId}`;
+            this.wards.push({ id: wId, name: wName });
+          }
+        });
+        this.registrationForm.get('ward_id')?.setValue(uniqueWardIds);
+      }
+
+    } else {
+      districtArrLegacy.forEach((dCode) => {
+        if (!this.districts.some((d) => String(d.id) === String(dCode))) {
+          this.districts.push({
+            id: dCode,
+            name: data.district || `District ${dCode}`,
           });
-          this.loadUlbs(prefill.subdivision_id);
-          const ulbInterval = setInterval(() => {
-            if (this.ulbs.length > 0) {
-              clearInterval(ulbInterval);
-
-              const ulbExists = this.ulbs.some((u) => u.id === prefill.ulb_id);
-              if (!ulbExists && prefill.ulb_id) {
-                this.ulbs.push({
-                  id: prefill.ulb_id,
-                  name: data.ulb || `ULB ${prefill.ulb_id}`,
-                });
-              }
-              this.registrationForm.patchValue({ ulb_id: prefill.ulb_id });
-              this.loadWards(prefill.ulb_id);
-              const wardInterval = setInterval(() => {
-                if (this.wards.length > 0) {
-                  clearInterval(wardInterval);
-
-                  const wardExists = this.wards.some(
-                    (w) => w.id === prefill.ward_id
-                  );
-                  if (!wardExists && prefill.ward_id) {
-                    this.wards.push({
-                      id: prefill.ward_id,
-                      name: data.ward || `Ward ${prefill.ward_id}`,
-                    });
-                  }
-
-                  this.registrationForm.patchValue({
-                    ward_id: prefill.ward_id,
-                  });
+        }
+      });
+      if (this.sourcePage === 'departmental-users') {
+        this.registrationForm.get('district_id')?.setValue(districtArrLegacy);
+        if (districtArrLegacy.length > 0) {
+          this.loadSubdivisions(districtArrLegacy);
+          const subInterval = setInterval(() => {
+            if (this.subdivisions.length > 0) {
+              clearInterval(subInterval);
+              subdivisionArrLegacy.forEach((sCode) => {
+                if (!this.subdivisions.some((s) => String(s.id) === String(sCode))) {
+                  this.subdivisions.push({ id: sCode, name: data.subdivision || `Subdivision ${sCode}` });
                 }
-              }, 300);
+              });
+              this.registrationForm.get('subdivision_id')?.setValue(subdivisionArrLegacy);
+
+              if (subdivisionArrLegacy.length > 0) {
+                this.loadUlbs(subdivisionArrLegacy);
+                const ulbInterval = setInterval(() => {
+                  if (this.ulbs.length > 0) {
+                    clearInterval(ulbInterval);
+                    ulbArrLegacy.forEach((uCode) => {
+                      if (!this.ulbs.some((u) => String(u.id) === String(uCode))) {
+                        this.ulbs.push({ id: uCode, name: data.ulb || `ULB ${uCode}` });
+                      }
+                    });
+                    this.registrationForm.get('ulb_id')?.setValue(ulbArrLegacy);
+
+                    wardArrLegacy.forEach((wCode) => {
+                      if (!this.wards.some((w) => String(w.id) === String(wCode))) {
+                        this.wards.push({ id: wCode, name: data.ward || `Ward ${wCode}` });
+                      }
+                    });
+                    this.registrationForm.get('ward_id')?.setValue(wardArrLegacy);
+                  }
+                }, 300);
+              }
             }
           }, 300);
         }
-      }, 300);
+      } else {
+        this.registrationForm.patchValue({
+          district_id: districtArrLegacy[0] ?? '',
+        });
+
+        if (districtArrLegacy[0]) {
+          this.loadSubdivisions(districtArrLegacy[0]);
+          const subInterval = setInterval(() => {
+            if (this.subdivisions.length > 0) {
+              clearInterval(subInterval);
+              if (subdivisionArrLegacy[0] && !this.subdivisions.some((s) => s.id === subdivisionArrLegacy[0])) {
+                this.subdivisions.push({
+                  id: subdivisionArrLegacy[0],
+                  name: data.subdivision || `Subdivision ${subdivisionArrLegacy[0]}`,
+                });
+              }
+              this.registrationForm.patchValue({ subdivision_id: subdivisionArrLegacy[0] ?? '' });
+              if (subdivisionArrLegacy[0]) {
+                this.loadUlbs(subdivisionArrLegacy[0]);
+                const ulbInterval = setInterval(() => {
+                  if (this.ulbs.length > 0) {
+                    clearInterval(ulbInterval);
+                    if (ulbArrLegacy[0] && !this.ulbs.some((u) => u.id === ulbArrLegacy[0])) {
+                      this.ulbs.push({
+                        id: ulbArrLegacy[0],
+                        name: data.ulb || `ULB ${ulbArrLegacy[0]}`,
+                      });
+                    }
+                    this.registrationForm.patchValue({ ulb_id: ulbArrLegacy[0] ?? '' });
+                    if (ulbArrLegacy[0]) {
+                      this.loadWards(ulbArrLegacy[0]);
+                      const wardInterval = setInterval(() => {
+                        if (this.wards.length > 0) {
+                          clearInterval(wardInterval);
+                          if (wardArrLegacy[0] && !this.wards.some((w) => w.id === wardArrLegacy[0])) {
+                            this.wards.push({
+                              id: wardArrLegacy[0],
+                              name: data.ward || `Ward ${wardArrLegacy[0]}`,
+                            });
+                          }
+                          this.registrationForm.patchValue({ ward_id: wardArrLegacy[0] ?? '' });
+                        }
+                      }, 300);
+                    }
+                  }
+                }, 300);
+              }
+            }
+          }, 300);
+        }
+      }
     }
     const departmentExists = this.departments.some(
       (dep) => String(dep.id) === String(prefill.department_id)
     );
     if (!departmentExists && prefill.department_id) {
       this.departments.push({
-        id: prefill.department_id,
+        id: String(prefill.department_id),
         name: data.department_name || `Department ${prefill.department_id}`,
       });
     }
-    setTimeout(() => this.registrationForm.patchValue(prefill), 1000);
+    setTimeout(() => {
+      this.registrationForm.patchValue({
+        name_of_enterprise: prefill.name_of_enterprise,
+        authorized_person_name: prefill.authorized_person_name,
+        email_id: prefill.email_id,
+        mobile_no: prefill.mobile_no,
+        user_name: prefill.user_name,
+        registered_enterprise_address: prefill.registered_enterprise_address,
+        registered_enterprise_city: prefill.registered_enterprise_city,
+        hierarchy_level: prefill.hierarchy_level,
+        department_id: prefill.department_id,
+        designation: prefill.designation,
+        user_type: prefill.user_type,
+        inspector: prefill.inspector,
+      });
+    }, 800);
   }
 
   setupCascadingDropdowns(): void {
-    this.registrationForm
-      .get('district_id')
-      ?.valueChanges.subscribe((district) => {
+    this.registrationForm.get('district_id')?.valueChanges.subscribe((district) => {
+      if (Array.isArray(district)) {
+        this.registrationForm.get('subdivision_id')?.setValue([]);
+        this.registrationForm.get('ulb_id')?.setValue([]);
+        this.registrationForm.get('ward_id')?.setValue([]);
+      } else {
         this.registrationForm.get('subdivision_id')?.reset();
         this.registrationForm.get('ulb_id')?.reset();
         this.registrationForm.get('ward_id')?.reset();
-        this.subdivisions = [];
-        this.ulbs = [];
-        this.wards = [];
-
-        if (district) {
-          this.loadSubdivisions(district);
-        }
-      });
-
-    this.registrationForm
-      .get('subdivision_id')
-      ?.valueChanges.subscribe((subdivision) => {
-        this.registrationForm.get('ulb_id')?.reset();
-        this.registrationForm.get('ward_id')?.reset();
-        this.ulbs = [];
-        this.wards = [];
-
-        if (subdivision) {
-          this.loadUlbs(subdivision);
-        }
-      });
-
-    this.registrationForm.get('ulb_id')?.valueChanges.subscribe((ulb) => {
-      this.registrationForm.get('ward_id')?.reset();
+      }
+      this.subdivisions = [];
+      this.ulbs = [];
       this.wards = [];
 
-      if (ulb) {
-        this.loadWards(ulb);
+      if (district && (Array.isArray(district) ? district.length > 0 : true)) {
+        this.loadSubdivisions(district);
+      }
+    });
+    this.registrationForm.get('subdivision_id')?.valueChanges.subscribe((subdivision) => {
+      if (Array.isArray(subdivision)) {
+        this.registrationForm.get('ulb_id')?.setValue([]);
+        this.registrationForm.get('ward_id')?.setValue([]);
+      } else {
+        this.registrationForm.get('ulb_id')?.reset();
+        this.registrationForm.get('ward_id')?.reset();
+      }
+
+      this.ulbs = [];
+      this.wards = [];
+
+      if (subdivision && (Array.isArray(subdivision) ? subdivision.length > 0 : true)) {
+        this.loadUlbs(subdivision);
+      }
+    });
+    this.registrationForm.get('ulb_id')?.valueChanges.subscribe((ulb) => {
+      if (Array.isArray(ulb)) {
+        this.registrationForm.get('ward_id')?.setValue([]);
+      } else {
+        this.registrationForm.get('ward_id')?.reset();
+      }
+      this.wards = [];
+
+      if (ulb && (Array.isArray(ulb) ? ulb.length > 0 : true)) {
+        if (this.sourcePage === 'departmental-users') {
+        } else {
+          this.loadWards(ulb);
+        }
       }
     });
   }
@@ -342,67 +555,91 @@ export class RegistrationComponent implements OnInit, OnChanges {
       });
   }
 
-  loadSubdivisions(districtCode: string): void {
+  loadSubdivisions(districtCodes: string | string[]): void {
     this.loadingSubdivisions = true;
-    // Find district name by code
-    const selectedDistrict = this.districts.find((d) => d.id === districtCode);
-    if (!selectedDistrict) {
-      this.loadingSubdivisions = false;
-      return;
+    const codes = Array.isArray(districtCodes) ? districtCodes : [districtCodes];
+
+    let payload: any;
+    let endpoint = 'api/tripura/get-sub-subdivisions';
+
+    if (this.sourcePage === 'departmental-users' && codes.length > 1) {
+      payload = { districts: codes.map((c) => Number(c)) };
+      endpoint = 'api/tripura/get-multiple-subdivisions';
+    } else {
+      payload = { district: codes[0] };
+      endpoint = 'api/tripura/get-sub-subdivisions';
     }
 
-    const payload = { district: selectedDistrict.name };
-
-    this.genericService
-      .getByConditions(payload, 'api/tripura/get-sub-subdivisions')
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1 && Array.isArray(res.subdivision)) {
-            this.subdivisions = res.subdivision.map((s: Subdivision) => ({
-              id: s.sub_lgd_code,
-              name: s.sub_division,
-            }));
-          }
-          this.loadingSubdivisions = false;
-        },
-        error: (err: any) => {
-          console.error('Failed to load subdivisions:', err);
-          this.genericService.openSnackBar(
-            'Failed to load subdivisions',
-            'Error'
-          );
-          this.loadingSubdivisions = false;
-        },
-      });
+    this.genericService.getByConditions(payload, endpoint).subscribe({
+      next: (res: any) => {
+        const list = res?.subdivision ?? res?.subdivisions ?? [];
+        if (res?.status === 1 && Array.isArray(list)) {
+          this.subdivisions = list.map((s: any) => ({
+            id:
+              String(s.sub_lgd_code ?? s.sub_division_code ?? s.subdivision_code ?? s.id ?? ''),
+            name:
+              String(s.sub_division ?? s.sub_division_name ?? s.subdivision_name ?? s.name ?? ''),
+          }));
+        } else {
+          this.subdivisions = [];
+        }
+        this.loadingSubdivisions = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to load subdivisions:', err);
+        this.genericService.openSnackBar('Failed to load subdivisions', 'Error');
+        this.loadingSubdivisions = false;
+      },
+    });
   }
 
-  loadUlbs(subdivision: string): void {
+
+
+  loadUlbs(subdivisionCodes: string | string[]): void {
     this.loadingUlbs = true;
-    const payload = { subdivision: subdivision };
+    const codes = Array.isArray(subdivisionCodes) ? subdivisionCodes : [subdivisionCodes];
 
-    this.genericService
-      .getByConditions(payload, 'api/tripura/get-block-names')
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1 && Array.isArray(res.ulbs)) {
-            this.ulbs = res.ulbs.map((u: ULB) => ({
-              id: u.ulb_lgd_code,
-              name: u.ulb_name,
-            }));
-          }
-          this.loadingUlbs = false;
-        },
-        error: (err: any) => {
-          console.error('Failed to load ULBs:', err);
-          this.genericService.openSnackBar('Failed to load ULBs', 'Error');
-          this.loadingUlbs = false;
-        },
-      });
+    let payload: any;
+    let endpoint = 'api/tripura/get-block-names';
+
+    if (this.sourcePage === 'departmental-users' && codes.length > 1) {
+      payload = { subdivisions: codes.map((c) => Number(c)) };
+      endpoint = 'api/tripura/get-multiple-block';
+    } else {
+      payload = { subdivision: codes[0] };
+      endpoint = 'api/tripura/get-block-names';
+    }
+
+    this.genericService.getByConditions(payload, endpoint).subscribe({
+      next: (res: any) => {
+        const list = res?.ulbs ?? res?.blocks ?? res?.data ?? [];
+        if (res?.status === 1 && Array.isArray(list)) {
+          this.ulbs = list.map((u: any) => ({
+            id: String(u.ulb_lgd_code ?? u.block_code ?? u.block_lgd_code ?? u.id ?? ''),
+            name: String(u.ulb_name ?? u.block_name ?? u.block_name ?? u.name ?? ''),
+          }));
+        } else {
+          this.ulbs = [];
+        }
+        this.loadingUlbs = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to load ULBs:', err);
+        this.genericService.openSnackBar('Failed to load ULBs', 'Error');
+        this.loadingUlbs = false;
+      },
+    });
   }
 
-  loadWards(ulb: string): void {
+
+
+  loadWards(ulbCodes: string | string[]): void {
     this.loadingWards = true;
-    const payload = { ulb: ulb };
+    const codes = Array.isArray(ulbCodes) ? ulbCodes : [ulbCodes];
+    const payload =
+      codes.length === 1
+        ? { ulb: codes[0] }
+        : { ulb: codes };
 
     this.genericService
       .getByConditions(payload, 'api/tripura/get-gp-vc-wards')
@@ -413,6 +650,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
               id: w.gp_vc_ward_lgd_code,
               name: w.name_of_gp_vc_or_ward,
             }));
+          } else {
+            this.wards = [];
           }
           this.loadingWards = false;
         },
@@ -430,7 +669,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
     return password === confirmPassword ? null : { mismatch: true };
   }
 
-  onSubmit(): void {
+    onSubmit(): void {
     if (
       !this.editMode &&
       this.sourcePage !== 'departmental-users' &&
@@ -442,43 +681,81 @@ export class RegistrationComponent implements OnInit, OnChanges {
       );
       return;
     }
-    if (this.registrationForm.valid) {
-      const { confirmPassword, ...payload } = this.registrationForm.value;
+
+    if (!this.registrationForm.valid) {
+      this.genericService.openSnackBar('Please fill all required fields.', 'Error');
+      return;
+    }
+    try {
+      const { confirmPassword, ...raw } = this.registrationForm.value;
+      const payload: any = { ...raw }
       if (payload.hasOwnProperty('inspector')) {
-        if (payload.inspector === '1' || payload.inspector === 1) {
+        const ins = payload.inspector;
+        if (ins === '1' || ins === 1 || String(ins).toLowerCase() === 'yes') {
           payload.inspector = 'yes';
-        } else if (payload.inspector === '0' || payload.inspector === 0) {
+        } else {
           payload.inspector = 'no';
         }
       }
-      const hierarchyFields = [
-        'district_id',
-        'subdivision_id',
-        'ulb_id',
-        'ward_id',
-      ];
-      hierarchyFields.forEach((field) => {
-        const base = field.replace('_id', '');
-        if (!this.shouldShow(base)) {
-          delete payload[field];
-        }
-      });
 
+      const cascadeFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
+
+      if (this.sourcePage === 'departmental-users') {
+        let locations: any[] = [];
+        if (typeof (this as any).getLocationsPayload === 'function') {
+          locations = (this as any).getLocationsPayload();
+        }
+        if (!Array.isArray(locations) || locations.length === 0) {
+          const distArr = this.normalizeToArray(payload.district_id);
+          const subArr = this.normalizeToArray(payload.subdivision_id);
+          const blockArr = this.normalizeToArray(payload.ulb_id);
+          distArr.forEach((d) => {
+            subArr.forEach((s) => {
+              blockArr.forEach((b) => {
+                locations.push({
+                  district_id: Number(d),
+                  subdivision_id: Number(s),
+                  block_id: Number(b),
+                });
+              });
+            });
+          });
+        }
+
+        payload.locations = locations;
+        cascadeFields.forEach((f) => delete payload[f]);
+      } else {
+        cascadeFields.forEach((field) => {
+          const v = payload[field];
+          if (Array.isArray(v)) {
+            payload[field] = v.length > 0 ? String(v[0]).trim() : '';
+          } else if (v === null || v === undefined) {
+            payload[field] = '';
+          } else {
+            payload[field] = String(v).trim();
+          }
+        });
+      }
       if (payload.user_type === 'individual') {
         delete payload.department_id;
         delete payload.designation;
         delete payload.hierarchy_level;
         delete payload.inspector;
       }
+      const hierarchyFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
+      hierarchyFields.forEach((field) => {
+        const base = field.replace('_id', '');
+        if (!this.shouldShow(base) && payload.hasOwnProperty(field)) {
+          delete payload[field];
+        }
+      });
+
       if (this.editMode && this.editData?.user_id) {
         const payloadWithId = { ...payload, id: this.editData.user_id };
 
         this.genericService.updateProfile(payloadWithId).subscribe({
           next: (res: any) => {
-            this.genericService.openSnackBar(
-              'User updated successfully!',
-              'Success'
-            );
+            this.genericService.openSnackBar('User updated successfully!', 'Success');
             this.registrationSuccess.emit();
           },
           error: (err: any) => {
@@ -490,11 +767,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
       } else {
         this.registerNewUser(payload);
       }
-    } else {
-      this.genericService.openSnackBar(
-        'Please fill all required fields.',
-        'Error'
-      );
+    } catch (ex) {
+      this.genericService.openSnackBar('Something went wrong. Please try again.', 'Error');
     }
   }
 
@@ -528,7 +802,94 @@ export class RegistrationComponent implements OnInit, OnChanges {
       },
     });
   }
+  getLocationsPayload(): any[] {
+    const locations: Array<{ district_id: number | null; subdivision_id: number | null; block_id: number | null }> = [];
+    const rawDistrict = this.registrationForm.get('district_id')?.value;
+    const rawSubdivision = this.registrationForm.get('subdivision_id')?.value;
+    const rawUlb = this.registrationForm.get('ulb_id')?.value;
+    const toArr = (v: any): string[] => {
+      if (v === null || v === undefined) return [];
+      if (Array.isArray(v)) return v.map(x => String(x)).filter(Boolean);
+      const s = String(v).trim();
+      if (!s) return [];
+      return s.includes(',') ? s.split(',').map(x => x.trim()).filter(Boolean) : [s];
+    };
 
+    const distArr = toArr(rawDistrict);
+    const subArr = toArr(rawSubdivision);
+    const blockArr = toArr(rawUlb);
+    const subdivToDistrict = new Map<string, string>();
+    (this.subdivisions || []).forEach((s: any) => {
+      if (s && s.id) subdivToDistrict.set(String(s.id), String((s as any).district_code ?? ''));
+    });
+
+    const ulbToSubdivision = new Map<string, string>();
+    (this.ulbs || []).forEach((u: any) => {
+      if (u && u.id) ulbToSubdivision.set(String(u.id), String((u as any).subdivision_code ?? ''));
+    });
+    if (distArr.length > 0 && subArr.length > 0 && blockArr.length > 0) {
+      distArr.forEach(d => {
+        subArr.forEach(s => {
+          blockArr.forEach(b => {
+            locations.push({ district_id: Number(d), subdivision_id: Number(s), block_id: Number(b) });
+          });
+        });
+      });
+    }
+    else if (distArr.length > 0 && subArr.length > 0) {
+      distArr.forEach(d => {
+        subArr.forEach(s => locations.push({ district_id: Number(d), subdivision_id: Number(s), block_id: null }));
+      });
+    }
+    else if (subArr.length > 0 && blockArr.length > 0) {
+      subArr.forEach(s => {
+        const resolvedDistrict = subdivToDistrict.get(String(s)) ?? null;
+        blockArr.forEach(b => {
+          const blockParentSub = ulbToSubdivision.get(String(b));
+          const finalSub = blockParentSub ?? s;
+          const finalDistrict = subdivToDistrict.get(String(finalSub)) ?? resolvedDistrict ?? null;
+          locations.push({
+            district_id: finalDistrict ? Number(finalDistrict) : null,
+            subdivision_id: finalSub ? Number(finalSub) : Number(s),
+            block_id: Number(b)
+          });
+        });
+      });
+    }
+    else if (blockArr.length > 0) {
+      blockArr.forEach(b => {
+        const resolvedSub = ulbToSubdivision.get(String(b)) ?? null;
+        const resolvedDistrict = resolvedSub ? (subdivToDistrict.get(String(resolvedSub)) ?? null) : null;
+        locations.push({
+          district_id: resolvedDistrict ? Number(resolvedDistrict) : null,
+          subdivision_id: resolvedSub ? Number(resolvedSub) : null,
+          block_id: Number(b)
+        });
+      });
+    }
+    else if (subArr.length > 0) {
+      subArr.forEach(s => {
+        const resolvedDistrict = subdivToDistrict.get(String(s)) ?? null;
+        locations.push({ district_id: resolvedDistrict ? Number(resolvedDistrict) : null, subdivision_id: Number(s), block_id: null });
+      });
+    }
+    else if (distArr.length > 0) {
+      distArr.forEach(d => locations.push({ district_id: Number(d), subdivision_id: null, block_id: null }));
+    }
+    const uniq = new Map<string, { district_id: number | null; subdivision_id: number | null; block_id: number | null }>();
+    locations.forEach(loc => {
+      const key = `${loc.district_id ?? ''}|${loc.subdivision_id ?? ''}|${loc.block_id ?? ''}`;
+      if (!uniq.has(key)) {
+        uniq.set(key, {
+          district_id: loc.district_id === null ? null : Number(loc.district_id),
+          subdivision_id: loc.subdivision_id === null ? null : Number(loc.subdivision_id),
+          block_id: loc.block_id === null ? null : Number(loc.block_id)
+        });
+      }
+    });
+
+    return Array.from(uniq.values());
+  }
   private extractErrorMessage(err: any): string {
     if (err?.error?.errors) {
       const messages: string[] = [];
