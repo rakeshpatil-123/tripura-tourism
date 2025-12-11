@@ -20,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 export interface SelectOption {
   id: any;
@@ -34,6 +35,7 @@ export interface SelectOption {
     FormsModule,
     FloatLabelModule,
     SelectModule, 
+    MultiSelectModule
   ],
   templateUrl: './ilogi-select.component.html',
   styleUrls: ['./ilogi-select.component.scss'],
@@ -127,14 +129,32 @@ export class IlogiSelectComponent
   //   this.value = value;
   //   this.cdr.detectChanges();
   // }
+  //   writeValue(value: any): void {
+  //   if (value !== undefined && value !== null) {
+  //   this.value = value;
+  //   setTimeout(() => {
+  //     this.value = value;
+  //     this.cdr.detectChanges();
+  //   });
+  //   }
+  // }
   writeValue(value: any): void {
-  if (value !== undefined && value !== null) {
-  this.value = value;
-  setTimeout(() => {
+  if (value === undefined) {
+  this.value = this.multiple ? [] : null;
+      this.cdr.detectChanges();
+      return;
+    }
     this.value = value;
-    this.cdr.detectChanges();
-  });
-  }
+    if (this.multiple) {
+      if (!Array.isArray(this.value)) {
+        this.value = this.value ? [this.value] : [];
+      }
+    } else {
+      if (Array.isArray(this.value)) {
+        this.value = this.value.length ? this.value[0] : null;
+      }
+    }
+    setTimeout(() => this.cdr.detectChanges());
 }
 
   registerOnChange(fn: (value: any) => void): void {
@@ -173,9 +193,23 @@ export class IlogiSelectComponent
     this.blur.emit();
   }
 
+  // getDisplayName(value: any): string {
+  //   if (value === null || value === undefined) return '';
+
+  //   const option = this.selectOptions.find((opt) => opt.id === value);
+  //   return option ? option.name : '';
+  // }
   getDisplayName(value: any): string {
     if (value === null || value === undefined) return '';
-
+    if (this.multiple && Array.isArray(value)) {
+      const names = value
+        .map((val: any) => {
+          const opt = this.selectOptions.find((o) => o.id === val);
+          return opt ? opt.name : '';
+        })
+        .filter((n) => !!n);
+      return names.join(', ');
+    }
     const option = this.selectOptions.find((opt) => opt.id === value);
     return option ? option.name : '';
   }

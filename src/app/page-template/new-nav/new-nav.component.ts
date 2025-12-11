@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
@@ -18,9 +18,9 @@ interface NavigationItem {
   templateUrl: './new-nav.component.html',
   styleUrls: ['./new-nav.component.scss']
 })
-export class NewNavComponent implements OnDestroy {
+export class NewNavComponent implements OnDestroy, OnInit {
   constructor(private router: Router) {}
-
+  @Input() isLogged: boolean = false;
   navigationItems: NavigationItem[] = [
     {
       label: 'Home',
@@ -219,6 +219,14 @@ export class NewNavComponent implements OnDestroy {
 
   isMobileMenuOpen = false;
   private hoverTimeout: any = null;
+  ngOnInit(): void {
+    this.isLogged
+  }
+
+  get visibleNavigationItems(): NavigationItem[] {
+    if (!this.isLogged) return this.navigationItems;
+    return this.navigationItems.filter(item => item.label !== 'Login' && item.label !== 'Register');
+  }
 
   ngOnDestroy(): void {
     this.clearHoverTimeout();
@@ -264,14 +272,18 @@ export class NewNavComponent implements OnDestroy {
       item.dropdownOpen = false;
     });
   }
+  setActiveItemByItem(selectedItem: NavigationItem): void {
+    this.navigationItems.forEach(item => {
+      item.isActive = item === selectedItem;
+    });
+  }
 
   onNavItemClick(item: NavigationItem, index: number): void {
   if (item.hasDropdown) {
     item.dropdownOpen = !item.dropdownOpen;
   } else {
-    this.setActiveItem(index);
+    this.setActiveItemByItem(item);
     if (item.path) {
-      // Check if the path is an external URL
       if (item.path.startsWith('http://') || item.path.startsWith('https://')) {
         window.open(item.path, '_blank');
       } else {

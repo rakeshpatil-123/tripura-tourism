@@ -637,7 +637,8 @@ export class GenericService {
           icon: 'success',
         }).then(() => {
           this.removeSessionData();
-          this.router.navigate(['/']);
+          // this.router.navigate(['/']);
+          window.location.href = '/';
         });
       },
       error: (error) => {
@@ -664,7 +665,8 @@ export class GenericService {
           icon: 'warning',
         }).then(() => {
           this.removeSessionData();
-          this.router.navigate(['/']);
+          window.location.href = '/';
+          // this.router.navigate(['/']);
         });
       },
     });
@@ -695,7 +697,8 @@ export class GenericService {
         popup: 'animate__animated animate__fadeOutUp animate__faster',
       },
     }).then(() => {
-      this.router.navigate(['/page/login']);
+      // this.router.navigate(['/page/login']);
+      window.location.href = '/page/login';
     });
   }
 

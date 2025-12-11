@@ -21,10 +21,11 @@ interface PaymentRecord {
   email_id?: string | null;
   mobile_no?: string | null;
   amount: number;
-  expiry_date?: string | null;
+  payment_time?: string | null;
   status?: string | null;
   method?: string | null;
   comments?: string | null;
+  grn_number?: string | null;
   currency?: string;
   paidAt?: string | null;
 }
@@ -477,11 +478,11 @@ async exportToExcel(useFiltered = true) {
     const amt = Number(raw.amount ?? 0);
     const amount = Number.isFinite(amt) ? amt : 0;
 
-    const expiry_date = raw.expiry_date ?? null;
+    const payment_time = raw.payment_time ?? null;
     const status = raw.status ? String(raw.status).trim().toLowerCase().replace(/^\w/, c => c.toUpperCase()) : 'Pending';
     const method = raw.method ?? null;
     const comments = raw.comments ?? null;
-
+    const grn_number = raw.GRN_number ?? null;
     return {
       id,
       application_number,
@@ -489,10 +490,11 @@ async exportToExcel(useFiltered = true) {
       email_id,
       mobile_no,
       amount,
-      expiry_date,
+      payment_time,
       status,
       method,
       comments,
+      grn_number,
       currency: raw.currency ?? 'INR',
       paidAt: raw.paidAt ?? null
     };
@@ -537,11 +539,11 @@ async exportToExcel(useFiltered = true) {
       }
 
       if (from) {
-        const d = r.expiry_date ? new Date(r.expiry_date) : null;
+        const d = r.payment_time ? new Date(r.payment_time) : null;
         if (d) ok = ok && d >= from;
       }
       if (to) {
-        const d = r.expiry_date ? new Date(r.expiry_date) : null;
+        const d = r.payment_time ? new Date(r.payment_time) : null;
         if (d) ok = ok && d <= to;
       }
       if (amtMin !== null && !Number.isNaN(amtMin)) {

@@ -188,13 +188,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/my-departmental-applications',
       roles: ['department'],
     },
-    {
-      id: 'jsontoexcel',
-      title: 'Json to Excel',
-      icon: 'folders',
-      route: '/dashboard/json-to-excel',
-      roles: ['department', 'individual', 'admin'],
-    },
+    // {
+    //   id: 'jsontoexcel',
+    //   title: 'Json to Excel',
+    //   icon: 'folders',
+    //   route: '/dashboard/json-to-excel',
+    //   roles: ['department', 'individual', 'admin'],
+    // },
     {
       id: 'Upload Existing Licence',
       title: 'Upload Existing Licence',

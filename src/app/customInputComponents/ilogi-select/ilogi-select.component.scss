@@ -207,5 +207,108 @@ label{
 }
 .p-component{
   width: 100%;
+}:host ::ng-deep .p-multiselect,
+:host ::ng-deep .p-multiselect .p-multiselect-label,
+:host ::ng-deep .p-multiselect .p-multiselect-token,
+:host ::ng-deep .p-multiselect .p-multiselect-items-wrapper,
+:host ::ng-deep .p-multiselect .p-multiselect-option,
+:host ::ng-deep .p-checkbox-box {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #d7d7d7 !important;
 }
 
+:host ::ng-deep .p-multiselect-panel,
+.p-multiselect-panel,
+:host ::ng-deep .p-multiselect-overlay,
+.p-multiselect-overlay {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #d7d7d7 !important;
+  box-shadow: none !important;
+  min-width: 100% !important;
+}
+
+:host ::ng-deep .p-multiselect-option,
+.p-multiselect-panel .p-multiselect-option,
+.p-multiselect-overlay .p-multiselect-option {
+  background: #ffffff !important;
+  color: #000000 !important;
+  transition: none !important;
+}
+
+:host ::ng-deep .p-multiselect-option:hover,
+:host ::ng-deep .p-multiselect-option.p-focus,
+.p-multiselect-option:hover,
+.p-multiselect-option.p-focus {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .p-multiselect-option.p-multiselect-option-selected,
+.p-multiselect-option.p-multiselect-option-selected {
+  background-color: #003c5b !important;
+  color: #3b3b3b !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .p-checkbox-box,
+.p-checkbox-box {
+  background: #ffffff !important;
+  border: 1px solid #d7d7d7 !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .p-checkbox-box.p-highlight,
+.p-checkbox-box.p-highlight {
+  background: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:host ::ng-deep .p-checkbox-box .p-checkbox-icon,
+.p-checkbox-box .p-checkbox-icon {
+  color: #000000 !important;
+}
+
+:host ::ng-deep .p-multiselect-list,
+.p-multiselect-list,
+:host ::ng-deep .p-multiselect-items-wrapper,
+.p-multiselect-items-wrapper,
+:host ::ng-deep .p-multiselect .p-multiselect-token,
+.p-multiselect .p-multiselect-token {
+  background: #ffffff !important;
+  color: #3b3b3b !important;
+}
+
+:host ::ng-deep .p-multiselect-option[style*="color-mix"],
+.p-multiselect-option[style*="color-mix"] {
+  background-color: #ffffff !important;
+  color: #3b3b3b !important;
+}
+
+:host ::ng-deep .p-multiselect,
+:host ::ng-deep .p-multiselect-panel,
+:host ::ng-deep .p-multiselect-overlay,
+:host ::ng-deep .p-multiselect .p-multiselect-items-wrapper,
+:host ::ng-deep .p-multiselect .p-multiselect-option,
+:host ::ng-deep .p-multiselect .p-multiselect-token,
+:host ::ng-deep .p-multiselect .p-checkbox-box {
+  background-color: #ffffff !important;
+  color: #3b3b3b !important;
+}
+
+:host ::ng-deep .p-multiselect-list,
+:host ::ng-deep .p-multiselect-items-wrapper,
+:host ::ng-deep .p-multiselect-panel .p-multiselect-item,
+.p-multiselect-panel,
+.p-multiselect-overlay {
+  background-color: #ffffff !important;
+  color: #3b3b3b !important;
+}
+
+:host ::ng-deep .p-multiselect .p-multiselect-option,
+:host ::ng-deep .p-multiselect .p-multiselect-item {
+  background: transparent !important;
+  color: #3b3b3b !important;
+}

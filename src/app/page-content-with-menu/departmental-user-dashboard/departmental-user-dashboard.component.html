@@ -56,7 +56,7 @@
   </section>
   <section class="dashboard-section">
     <div class="dept-totals-wrapper"
-      *ngIf="(dashboardData?.total_pending_for_me > 0) || (dashboardData?.total_approved_by_me > 0)">
+      *ngIf="(dashboardData?.total_pending_for_me > 0) || (dashboardData?.total_approved_by_me >= 0)">
       <div class="dept-totals-card" role="region" aria-label="My application totals">
         <div class="dept-totals-grid">
           <div class="dept-card pending" *ngIf="dashboardData?.total_pending_for_me >= 0" role="group"
@@ -92,7 +92,7 @@
             </div>
           </div>
 
-          <div class="dept-card approved" *ngIf="dashboardData?.total_approved_by_me > 0" role="group"
+          <div class="dept-card approved" *ngIf="dashboardData?.total_approved_by_me >= 0" role="group"
             aria-live="polite" tabindex="0">
             <div class="card-icon" aria-hidden="true" title="Approved by you">
               <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img"

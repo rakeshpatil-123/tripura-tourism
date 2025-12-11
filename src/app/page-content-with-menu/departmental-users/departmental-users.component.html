@@ -19,7 +19,7 @@
     <button pButton type="button" icon="pi pi-file-excel" label="Download Excel" class="p-button-success fancy-btn"
       (click)="confirmExportExcel()">
     </button>
-    <button pButton type="button" icon="pi pi-plus" label="Add Departmental User" class="p-button-add fancy-btn"
+    <button *ngIf="userRole === 'admin'" pButton type="button" icon="pi pi-plus" label="Add Departmental User" class="p-button-add fancy-btn"
       (click)="openDialog()">
     </button>
   </div>
@@ -63,9 +63,9 @@
         <th>
           <div class="header-wrapper">ULB/Block</div>
         </th>
-        <th>
+        <!-- <th>
           <div class="header-wrapper">Ward</div>
-        </th>
+        </th> -->
         <th>
           <div class="header-wrapper">Department</div>
         </th>
@@ -85,9 +85,9 @@
           <div class="header-wrapper">Created By</div>
         </th>
         <th>
-          <div class="header-wrapper">Updated At</div>
+          <div class="header-wrapper">Updated By</div>
         </th>
-        <th>
+        <th *ngIf="userRole == 'admin'">
           <div class="header-wrapper">Action</div>
         </th>
       </tr>
@@ -97,8 +97,8 @@
         <td>{{ (pagination.current_page - 1) * pagination.row_count + rowIndex + 1 }}</td>
         <td>{{ user.id || '----' }}</td>
         <!-- <td pTooltip="{{ user.name_of_enterprise }}" tooltipPosition="right">
-          {{ user.name_of_enterprise || '----' }}
-        </td> -->
+                  {{ user.name_of_enterprise || '----' }}
+                </td> -->
         <td pTooltip="{{ user.authorized_person_name }}" tooltipPosition="right">
           {{ user.authorized_person_name || '----' }}
         </td>
@@ -114,18 +114,21 @@
         <td pTooltip="{{ user.hierarchy_level }}" tooltipPosition="right">
           {{ user.hierarchy_level ? (user.hierarchy_level | titlecase) : '----' }}
         </td>
-        <td pTooltip="{{ user.district_name }}" tooltipPosition="right">
-          {{ user.district_name || '----' }}
+        <td pTooltip="{{ user.district_name }}" tooltipPosition="right" class="large-data-cell col-district">
+          <div class="large-data-content" [innerHTML]="formatListHtml(user.district_name)"></div>
         </td>
-        <td pTooltip="{{ user.subdivision_name }}" tooltipPosition="right">
-          {{ user.subdivision_name || '----' }}
+        
+        <td pTooltip="{{ user.subdivision_name }}" tooltipPosition="right" class="large-data-cell col-subdivision">
+          <div class="large-data-content" [innerHTML]="formatListHtml(user.subdivision_name)"></div>
         </td>
-        <td pTooltip="{{ user.ulb_name }}" tooltipPosition="right">
-          {{ user.ulb_name || '----' }}
+        
+        <td pTooltip="{{ user.ulb_name }}" tooltipPosition="right" class="large-data-cell col-ulb">
+          <div class="large-data-content" [innerHTML]="formatListHtml(user.ulb_name)"></div>
         </td>
-        <td pTooltip="{{ user.ward_name }}" tooltipPosition="right">
-          {{ user.ward_name || '----' }}
-        </td>
+        
+        <!-- <td pTooltip="{{ user.ward_name }}" tooltipPosition="right">
+                  {{ user.ward_name || '----' }}
+                </td> -->
         <td pTooltip="{{ user.department_name }}" tooltipPosition="right">
           {{ user.department_name || '----' }}
         </td>
@@ -150,7 +153,7 @@
         <td pTooltip="{{ user.updated_by }}" tooltipPosition="right">
           {{ user.updated_by || '----' }}
         </td>
-        <td class="text-center">
+        <td *ngIf="userRole=='admin'" class="text-center">
           <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-sm edit-btn"
             pTooltip="Edit User" tooltipPosition="left" (click)="editUser(user)">
             <span class="ml-2 font-medium hidden sm:inline">Edit</span>

@@ -1,5 +1,6 @@
 <app-header-new></app-header-new>
-<app-new-nav *ngIf="!isLoggedIn"></app-new-nav>
+<app-new-nav [isLogged]="isLoggedIn"
+    *ngIf="(currentUrl === '/' || currentUrl == '/page/login' || currentUrl == '/page/registration' )"></app-new-nav>
 <div [style.padding-top]="isLoggedIn ? '10vh' : '16vh'">
     <router-outlet></router-outlet>
 </div>
