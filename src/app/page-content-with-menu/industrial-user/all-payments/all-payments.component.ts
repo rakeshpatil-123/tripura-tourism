@@ -35,12 +35,10 @@ export class AllPaymentsComponent implements OnInit {
   totalSelectedAmount = 0;
   pageSizes = [5, 10, 20, 50];
 
-  // UI state for returned payment HTML
   htmlToShow: SafeHtml | string | null = '';
   formSubmitted = false;
   loading = false;
 
-  // maximum number of selectable payments (your code used 5)
   readonly maxSelectable = 5;
 
   constructor(private apiService: GenericService, private sanitizer: DomSanitizer) {}
@@ -119,7 +117,6 @@ export class AllPaymentsComponent implements OnInit {
       });
   }
 
-  /* ---------- Pagination helpers (Pending) ---------- */
   get paginatedPendingPayments() {
     const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
     return this.pendingPayments.slice(start, start + this.itemsPerPagePending);
@@ -152,7 +149,6 @@ export class AllPaymentsComponent implements OnInit {
     this.currentPagePending = 1;
   }
 
-  /* ---------- Pagination helpers (Completed) ---------- */
   get paginatedCompletedPayments() {
     const start = (this.currentPageCompleted - 1) * this.itemsPerPageCompleted;
     return this.completedPayments.slice(
@@ -190,7 +186,6 @@ export class AllPaymentsComponent implements OnInit {
     this.currentPageCompleted = 1;
   }
 
-  /* ---------- Selection logic ---------- */
   toggleSelection(id: number): void {
     if (this.selectedPayments.has(id)) {
       this.selectedPayments.delete(id);
@@ -224,7 +219,6 @@ export class AllPaymentsComponent implements OnInit {
       this.selectedPayments.clear();
     } else {
       this.selectedPayments.clear();
-      // select up to maxSelectable from pendingPayments (you previously used slice(0,5))
       this.pendingPayments.slice(0, this.maxSelectable).forEach((p) =>
         this.selectedPayments.add(p.user_service_application_id)
       );
@@ -239,12 +233,10 @@ export class AllPaymentsComponent implements OnInit {
     );
   }
 
-  /* Getter used by templates that referenced maxSelectionReached */
   get maxSelectionReached(): boolean {
     return this.selectedPayments.size >= this.maxSelectable;
   }
 
-  /* ---------- Payment initiation ---------- */
   payNow(): void {
     if (this.selectedPayments.size === 0) {
       alert('Please select at least one payment to proceed.');
@@ -257,7 +249,6 @@ export class AllPaymentsComponent implements OnInit {
 
     this.loading = true;
 
-    // assume postAsText returns Observable<string> containing HTML form
     this.apiService.postAsText('api/user/update-payment', payload).subscribe({
       next: (htmlResponse: string) => {
         this.showPaymentForm(htmlResponse);
@@ -272,13 +263,39 @@ export class AllPaymentsComponent implements OnInit {
     });
   }
 
-  // Display the returned HTML safely in the template
-  private showPaymentForm(html: string): void {
-    this.htmlToShow = this.sanitizer.bypassSecurityTrustHtml(html);
-    this.formSubmitted = false;
+private showPaymentForm(html: string): void {
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  const form = doc.querySelector('form');
+  if (!form) {
+    console.error('No form found in payment response');
+    alert('Failed to initiate payment. Please try again.');
+    this.loading = false;
+    return;
   }
 
-  // call from template if payment iframe/form submits
+  const newForm = document.createElement('form');
+  newForm.method = form.getAttribute('method')?.toUpperCase() === 'POST' ? 'POST' : 'GET';
+  newForm.action = (form.getAttribute('action') || '').trim();
+
+  Array.from(form.querySelectorAll('input')).forEach(input => {
+    const newInput = document.createElement('input');
+    newInput.type = 'hidden';
+    newInput.name = input.name;
+    newInput.value = input.value;
+    newInput.required = false;
+    newForm.appendChild(newInput);
+  });
+
+  setTimeout(() => {
+    document.body.appendChild(newForm);
+    console.log('Submitting payment form to:', newForm.action);
+    newForm.submit();
+  }, 1000);
+}
+
   markFormSubmitted(): void {
     this.formSubmitted = true;
   }

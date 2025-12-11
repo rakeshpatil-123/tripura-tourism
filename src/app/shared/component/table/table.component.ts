@@ -54,7 +54,7 @@ export interface TableColumn {
   buttonColor?: string;
   buttonVisible?: (row: any) => boolean;
   actions?: Array<{
-    label: string;
+    label: string | ((row: any) => string); 
     action?: string;
     icon?: string;
     color?: 'primary' | 'warn' | 'accent' | 'success' | 'danger';
@@ -419,7 +419,7 @@ export class DynamicTableComponent implements OnChanges {
 
   private getStatusBadge(status: string): string {
     const s = (status || '').toLowerCase();
-    let label = 'Unknown';
+    let label = '___';
     let badgeClass = 'badge-muted';
 
     if (s.includes('approved') || s.includes('completed')) {
@@ -470,14 +470,17 @@ export class DynamicTableComponent implements OnChanges {
   onRowActionAndClose(
     actionItem: {
       action?: string;
-      label: string;
+      label: string | ((row: any) => string);
       handler?: (row: any) => void;
       onClick?: (row: any) => void;
       visible?: (row: any) => boolean;
     },
     row: any
   ): void {
-    const actionIdentifier = actionItem.action || actionItem.label;
+     const resolvedLabel = typeof actionItem.label === 'function'
+    ? actionItem.label(row)
+    : actionItem.label;
+    const actionIdentifier = actionItem.action || resolvedLabel;
 
     if (actionItem.onClick) {
       try {

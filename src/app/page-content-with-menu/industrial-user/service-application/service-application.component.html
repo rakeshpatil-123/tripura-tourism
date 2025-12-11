@@ -20,8 +20,8 @@
 
       <!-- Regular grouped questions -->
       <div *ngFor="let group of Object.keys(groupedQuestions)" class="p-4">
-        <h5 class="mrg2 info-head">{{ group }}</h5>
-        <hr class="mrg2">
+        <h5 class=" info-head">{{ group }}</h5>
+        <hr class="">
 
         <div class="row">
           <ng-container *ngFor="let q of groupedQuestions[group]">
@@ -29,7 +29,9 @@
               q.question_type !== 'date_mmdd' && 
               q.question_type !== 'date_yyyymmdd'">
               <!-- Text / Number / Email / Textarea -->
-              <app-ilogi-input *ngIf="
+               <div class="mrg4" >
+
+                 <app-ilogi-input *ngIf="
                 q.question_type === 'text' ||
                 q.question_type === 'number' ||
                 q.question_type === 'email' ||
@@ -38,6 +40,7 @@
                 [type]="q.question_type" [errorMessages]="{
                   pattern: q.validation_rule?.errorMessage || 'Invalid input.'
                 }"></app-ilogi-input>
+                </div>
 
               <!-- Date -->
               <app-ilogi-input-date *ngIf="q.question_type === 'date'" [formControlName]="q.id"
@@ -192,11 +195,15 @@
           </div>
         </div>
       </div>
-      <div class="m-4 btnss">
+      <div class="btnss  p-4">
+        @if(applicationStatus === 'draft' || applicationStatus === null) {
+        <button type="button" (click)="draft()" class="btn btn-info calculate-btn submit-btn"
+              >Save as Draft</button>
+        }
         @if(calculatedFee === null || formModifiedAfterFeeCalculation) {
         <div class="fee-actions">
           <button type="button" class="btn btn-success calculate-btn" (click)="calFee()" [disabled]="feeCalculating">
-            {{ feeCalculating ? 'Calculating...' : 'Calculate Fee' }}
+            {{ feeCalculating ? 'Calculating...' : 'Proceed and Calculate Fee' }}
           </button>
         </div>
         }
@@ -205,6 +212,7 @@
         <div class="fee-container">
           @if(visible && !formModifiedAfterFeeCalculation) {
           <div class="submit-wrap">
+            
             <button type="button" class="btn btn-success calculate-btn submit-btn"
               (click)="showSubmitConfirmation()">Submit</button>
           </div>
@@ -214,12 +222,12 @@
               <strong>Final Fee:</strong> ₹{{ calculatedFee }}
             </div>
 
-            @if(previousPaid !== 0 && previousPaid !== null) {
+            @if(previousPaid !== 0 && previousPaid !== 0) {
             <div class="fee-box fade-in">
               <strong>Previous Paid:</strong> ₹{{ previousPaid }}
             </div>
             }
-            @if(calculatedFee !== effectiveFee) {
+            @if(calculatedFee !== effectiveFee && effectiveFee !== 0 ) {
             <div class="fee-box fade-in">
               <strong>Effective Fee:</strong> ₹{{ effectiveFee }}
             </div>

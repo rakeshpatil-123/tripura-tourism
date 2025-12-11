@@ -266,9 +266,36 @@ export class UserDashboardComponent implements OnInit {
 
   htmlToShow: any = '';
   formSubmitted: boolean = false;
-  private showPaymentForm(html: string): void {
-    this.htmlToShow = this.sanitizer.bypassSecurityTrustHtml(html);
-    this.formSubmitted = false;
+ private showPaymentForm(html: string): void {
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  const form = doc.querySelector('form');
+  if (!form) {
+    console.error('No form found in payment response');
+    alert('Failed to initiate payment. Please try again.');
+    return;
   }
+
+  const newForm = document.createElement('form');
+  newForm.method = form.getAttribute('method')?.toUpperCase() === 'POST' ? 'POST' : 'GET';
+  newForm.action = (form.getAttribute('action') || '').trim();
+
+  Array.from(form.querySelectorAll('input')).forEach(input => {
+    const newInput = document.createElement('input');
+    newInput.type = 'hidden';
+    newInput.name = input.name;
+    newInput.value = input.value;
+    newInput.required = false;
+    newForm.appendChild(newInput);
+  });
+
+  setTimeout(() => {
+    document.body.appendChild(newForm);
+    console.log('Submitting payment form to:', newForm.action);
+    newForm.submit();
+  }, 1000);
+}
 
 }
