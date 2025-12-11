@@ -95,7 +95,7 @@
         </app-ilogi-select>
 
         <!-- Ward -->
-        <app-ilogi-select *ngIf="shouldShow('ward')" [multiple]="sourcePage === 'departmental-users'" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true"
+        <app-ilogi-select *ngIf="shouldShow('ward') && sourcePage !== 'departmental-users'" [multiple]="sourcePage === 'departmental-users'" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true"
           formControlName="ward_id" [selectOptions]="wards" placeholder="Select ward"
           [disabled]="!ulbs.length || loadingUlbs">
         </app-ilogi-select>
@@ -110,7 +110,11 @@
             formControlName="confirmPassword" type="password" placeholder="Re-enter password"
             errorMessage="Passwords do not match"></app-ilogi-input>
         </div>
-
+        <div *ngIf="editMode && sourcePage === 'departmental-users' && editData" class="password-hint mt-1" role="status"
+          aria-live="polite">
+          <small class="text-danger">
+            Enter a new password to change it. Leave both fields blank to keep your current password. </small>
+        </div>
         <!-- Submit Button -->
         <div class="form-actions">
           <button type="submit" class="btn-submit btn btn-primary" [disabled]="!registrationForm.valid">

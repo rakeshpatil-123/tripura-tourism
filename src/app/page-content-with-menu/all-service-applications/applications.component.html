@@ -1,44 +1,114 @@
 <div class="applications-container">
-  <h2 class="page-head">Applications</h2>
+  <ng-container *ngIf="currentServiceName; else defaultHead">
+    <header class="service-header-card interactive header-grid" role="banner" aria-live="polite">
+      <div class="avatar service-avatar" role="img" aria-label="Trusted service badge">
+        <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#0B61FF" />
+              <stop offset="60%" stop-color="#2B9BFF" />
+              <stop offset="100%" stop-color="#7AD0FF" />
+            </linearGradient>
+            <filter id="f-soft" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#0B61FF" flood-opacity="0.12" />
+            </filter>
+          </defs>
+          <path class="shield" d="M32 4 L48 12 V24 C48 36 40 48 32 52 C24 48 16 36 16 24 V12 L32 4 Z" fill="url(#g1)"
+            filter="url(#f-soft)" />
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center">
+          <circle cx="32" cy="28" r="18" class="inner" fill="rgba(255,255,255,0.06)" />
+
+          <path class="check" d="M22 32 L29.5 39 L42 26" fill="none" stroke="#fff" stroke-width="3.6"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="meta center-meta">
+        <h1 class="service-title">
+          {{ currentServiceName }}
+        </h1>
+      </div>
+      <div class="actions" role="region" aria-label="Service actions">
+        <button class="btn btn-primary" (click)="goToServices()" title="Browse services" aria-label="Browse services">
+          Browse services
+        </button>
+      </div>
+    </header>
+  </ng-container>
+  <ng-template #defaultHead>
+    <header class="service-header-card interactive empty" role="banner">
+      <div class="left">
+        <div class="avatar placeholder" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <div class="actions">
+      </div>
+    </header>
+    <h2 class="page-head">Applications</h2>
+  </ng-template>
+  <div *ngIf="isLoading" class="text-center loading-note" role="status" aria-live="polite">
     🔍 Loading applications...
   </div>
-
-  <!-- No Data -->
-  <div *ngIf="!isLoading && columns.length === 0 && applications.length === 0" class="text-center text-muted">
+  <div *ngIf="!isLoading && columns.length === 0 && applications.length === 0" class="text-center text-muted"
+    role="status">
     <p>No applications found for this service.</p>
   </div>
-  <form [formGroup]="remarkForm">
-    <div class="filters-row">
-      <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Search by Service, Applicant, Phone" formControlName="search"
-          class="search-input" />
-      </div>
-      <app-ilogi-select fieldId="district_id" fieldLabel="District" formControlName="district_id"
-        [selectOptions]="districts" placeholder="Select district" class="filter-select dropdown-fix"></app-ilogi-select>
-      <app-ilogi-select fieldId="subdivision_id" fieldLabel="Subdivision" formControlName="subdivision_id"
-        [selectOptions]="subdivisions" placeholder="Select subdivision" class="filter-select dropdown-fix"
-        [disabled]="!districts.length || loadingDistricts"></app-ilogi-select>
-  
-      <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" formControlName="hierarchy_level"
-        [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level"
-        class="filter-select dropdown-fix"></app-ilogi-select>
-  
-      <app-ilogi-select fieldId="current_status" fieldLabel="Current Status" formControlName="current_status"
-        [selectOptions]="statusOptions" placeholder="Select Current Status"
-        class="filter-select dropdown-fix"></app-ilogi-select>
-   <button type="button" class="btn btn-secondary" (click)="downloadExcel()">Download Excel</button>
+  <form [formGroup]="remarkForm" class="filters-form" (ngSubmit)="$event.preventDefault()" novalidate>
+    <div class="filters-row-wrapper">
+      <div class="filters-row centered" role="group" aria-label="Application filters">
+        <div class="search-wrapper">
+          <div class="search-icon" aria-hidden="true">🔎</div>
+          <input class="search-input" type="search" formControlName="search"
+            placeholder="Search applicant name or phone" aria-label="Search applications" />
+        </div>
+        <app-ilogi-input-date formControlName="startDate" class="filter-item" placeholder="Start date"
+          aria-label="Start date"></app-ilogi-input-date>
+        <app-ilogi-input-date formControlName="endDate" class="filter-item" placeholder="End date"
+          aria-label="End date"></app-ilogi-input-date>
 
+        <!-- <app-ilogi-select
+          class="filter-item dropdown-fix"
+          [options]="districts"
+          formControlName="district_id"
+          placeholder="District"
+          aria-label="Filter by district"
+        ></app-ilogi-select>
+        <app-ilogi-select
+          class="filter-item dropdown-fix"
+          [options]="subdivisions"
+          formControlName="subdivision_id"
+          placeholder="Subdivision"
+          aria-label="Filter by subdivision"
+        ></app-ilogi-select> -->
+
+        <app-ilogi-select class="filter-item dropdown-fix" [selectOptions]="hierarchyLevels"
+          formControlName="hierarchy_level" placeholder="Hierarchy" aria-label="Hierarchy level"></app-ilogi-select>
+
+        <app-ilogi-select class="filter-item dropdown-fix" [selectOptions]="statusOptions"
+          formControlName="current_status" placeholder="Status" aria-label="Filter by status"></app-ilogi-select>
+      </div>
+
+      <div class="filter-actions" aria-hidden="false">
+        <div class="filter-actions-inner">
+          <button type="button" class="btn btn-action" (click)="downloadExcel()" title="Download Excel"
+            aria-label="Download Excel">
+            Download Excel
+          </button>
+
+          <button type="button" class="btn btn-reset" (click)="resetFilters()" title="Reset filters"
+            aria-label="Reset filters">
+            Reset Filters
+          </button>
+        </div>
+      </div>
     </div>
   </form>
-  
-  <!-- Table -->
-  <div class="table-wrapper">
-  <app-dynamic-table *ngIf="!isLoading && columns.length > 0" [columns]="columns" [data]="filteredApplications"
-    [pageSize]="10" [showPagination]="true" [searchable]="false">
-  </app-dynamic-table>
-</div>
+  <div class="table-wrapper centered-table" role="region" aria-label="Applications table">
+    <app-dynamic-table *ngIf="!isLoading && columns.length > 0" [columns]="columns" [data]="filteredApplications"
+      [pageSize]="10" [showPagination]="true" [searchable]="false">
+    </app-dynamic-table>
+  </div>
 </div>

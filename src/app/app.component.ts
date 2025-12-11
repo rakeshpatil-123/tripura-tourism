@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { HeaderNewComponent } from './page-template/header-new/header-new.component';
 import { NewNavComponent } from './page-template/new-nav/new-nav.component';
 import { LoaderComponent } from './page-template/loader/loader.component';
@@ -59,8 +60,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.loaderSubscription = this.loaderService.getLoaderStatus().subscribe((status) => {
       this.showLoader = status;
       this.cdRef.detectChanges();
-      this.currentUrl = this.router.url;
     });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.currentUrl = event.url;
+        this.cdRef.detectChanges();
+      });
 
     this.genericService.getLoginStatus().subscribe((status) => {
       this.isLoggedIn = status;

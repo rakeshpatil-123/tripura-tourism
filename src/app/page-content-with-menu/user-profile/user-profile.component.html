@@ -29,7 +29,7 @@
               </app-ilogi-select>
 
               <app-ilogi-select *ngIf="profileForm.get('userType')?.value === 'department'" fieldId="hierarchy_level" fieldLabel="Hierarchy Level" formControlName="hierarchy_level"
-                [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
+                [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level" (change)="onHierarchyChange()">
               </app-ilogi-select>
 
               <app-ilogi-select *ngIf="shouldShow('district')" [multiple]="isDepartmentUser" fieldId="district_code" fieldLabel="District"
@@ -47,7 +47,7 @@
                 [disabled]="!subdivisions.length || loadingUlbs">
               </app-ilogi-select>
 
-              <app-ilogi-select *ngIf="shouldShow('ward')" fieldId="ward_code" fieldLabel="Ward"
+              <app-ilogi-select *ngIf="shouldShow('ward') && (profileForm.get('userType')?.value !== 'department')" fieldId="ward_code" fieldLabel="Ward"
                 formControlName="ward_code" [selectOptions]="wards" placeholder="Select Ward"
                 [disabled]="!ulbs.length || loadingWards">
               </app-ilogi-select>
