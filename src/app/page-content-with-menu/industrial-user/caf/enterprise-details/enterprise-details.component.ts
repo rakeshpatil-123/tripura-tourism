@@ -209,7 +209,6 @@ export class EnterpriseDetailsComponent implements OnInit {
     // }
   }
 
-  // Add this helper method
   // getErrorMessage(fieldName: string): string {
   //   const control = this.enterpriseForm.get(fieldName);
   //   if (control?.errors && (control.touched || this.submitted)) {

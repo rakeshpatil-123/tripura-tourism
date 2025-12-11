@@ -131,9 +131,11 @@ export class RepeatApplicationsComponent implements OnInit {
           },
         },
         {
-          label: 'Re-Submit',
+          label: (row : any) =>   {return row.status === 'draft'
+      ? 'Edit Draft'
+      : 'Re-Submit'},
           color: 'warn',
-          visible: (row: any) => row.status === 'send_back' || row.status === 'extra_payment',
+          visible: (row: any) => row.status === 'send_back' || row.status === 'extra_payment' || row.status === 'draft',
           onClick: (row: any) => {
             this.router.navigate(
               ['/dashboard/service-application', this.serviceId],

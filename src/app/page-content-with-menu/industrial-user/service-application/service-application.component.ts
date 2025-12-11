@@ -121,6 +121,7 @@ export class ServiceApplicationComponent implements OnInit {
   feeCalculating = false;
   applicationId: number | null = null;
   appId2: number | null = null;
+  applicationStatus: string | null = null;
   serviceForm!: FormGroup;
   questions: ServiceQuestion[] = [];
   groupedQuestions: { [group: string]: ServiceQuestion[] } = {};
@@ -163,7 +164,9 @@ export class ServiceApplicationComponent implements OnInit {
     this.serviceId = Number(this.route.snapshot.paramMap.get('id'));
     const queryParams = this.route.snapshot.queryParams;
     const appIdParam = queryParams['application_id'];
+    const appStatus = queryParams['application_status'];
     const appid2 = queryParams['appid2'];
+    this.applicationStatus = appStatus ? appStatus : null;
     this.applicationId = appIdParam ? Number(appIdParam) : null;
     this.appId2 = appid2 ? Number(appid2) : null;
 
@@ -172,7 +175,7 @@ export class ServiceApplicationComponent implements OnInit {
     } else {
       this.apiService.openSnackBar('Invalid service ID.', 'error');
       this.loading = false;
-    }
+    } 
   }
 
   loadServiceDetails(): void {
@@ -311,7 +314,7 @@ export class ServiceApplicationComponent implements OnInit {
                     type: this.getFileMimeType(fileName),
                   });
                   (fakeFile as any)._isFake = true;
-
+                          
                   control.setValue(fakeFile);
                   this.readonlyFields[question.id] = true;
                 } else {
@@ -727,11 +730,11 @@ export class ServiceApplicationComponent implements OnInit {
     const raw = this.serviceForm.getRawValue();
     const preparedRaw = this.prepareRawDataForSubmission(raw);
 
-    this.submitWithFiles(userId, preparedRaw);
+    this.submitWithFiles(userId, preparedRaw, false);
   }
 
   private getSubmissionEndpoint(): string {
-    return this.applicationId !== null
+    return this.applicationId !== null && this.applicationStatus !== 'draft'
       ? 'api/user/service-application-update'
       : 'api/user/service-application-store';
   }
@@ -775,11 +778,11 @@ export class ServiceApplicationComponent implements OnInit {
     return prepared;
   }
 
-  private submitWithFiles(userId: string, raw: any): void {
+  private submitWithFiles(userId: string, raw: any, saveAsDraft: boolean = false): void {
     const formData = new FormData();
     formData.append('user_id', userId);
     formData.append('service_id', this.serviceId.toString());
-
+    formData.append('save_data', saveAsDraft ? '1' : '0');
     const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
     if (actualAppId !== null) {
       formData.append('id', actualAppId.toString());
@@ -848,7 +851,7 @@ export class ServiceApplicationComponent implements OnInit {
             ) {
               formData.append(fieldName, value ?? '');
             }
-          }
+          } 
         });
       });
     });
@@ -879,6 +882,16 @@ export class ServiceApplicationComponent implements OnInit {
         },
       });
   }
+draft(): void {
+  const userId = this.apiService.getDecryptedUserId();
+  if (!userId) {
+    this.apiService.openSnackBar('User not authenticated.', 'error');
+    return;
+  }
+  const raw = this.serviceForm.getRawValue();
+  const preparedRaw = this.prepareRawDataForSubmission(raw);
+  this.submitWithFiles(userId, preparedRaw, true); 
+}
 
   downloadSample(sampleUrl: string): void {
     if (!sampleUrl || sampleUrl.trim() === '') {
@@ -1120,7 +1133,7 @@ export class ServiceApplicationComponent implements OnInit {
     formData.append('user_id', userId);
     formData.append('service_id', this.serviceId.toString());
     const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
-    
+
     if (actualAppId !== null) {
       formData.append('application_id', actualAppId.toString());
     }
@@ -1197,7 +1210,7 @@ export class ServiceApplicationComponent implements OnInit {
           if (res?.status === 1) {
             this.calculatedFee = Number(res.data.final_fee);
             this.effectiveFee = Number(res.data.effective_fee);
-            this.previousPaid = Number(res.data.previous_paid)
+            this.previousPaid = Number(res.data.previous_paid);
             this.visible = true;
             this.formModifiedAfterFeeCalculation = false;
             this.apiService.openSnackBar(

@@ -234,89 +234,16 @@ export class ServicesComponent {
       });
     });
 
-    // columns.push({
-    //   key: 'actions',
-    //   label: 'Actions',
-    //   type: 'action',
-    //   actions: [
-    //     {
-    //       label: 'View Applications',
-    //       color: 'primary',
-    //       visible: (row: any) =>
-    //         row.allow_repeat_application === 'yes' &&
-    //         row.application_id !== null,
-    //       onClick: (row: any) => {
-    //         this.router.navigate(['/dashboard/repeat-application', row.id]);
-    //       },
-    //     },
-    //     {
-    //       label: (row: any) => {
-    //         if (
-    //           row.application_status === 'send_back' &&
-    //           row.allow_repeat_application !== 'yes'
-    //         ) {
-    //           return 'Re-apply';
-    //         }
-    //         return 'Apply';
-    //       },
-    //       color: 'primary',
-    //       visible: (row: any) => {
-    //         return (
-    //           row.application_id === null ||
-    //           row.application_status === 'send_back' ||
-    //           row.allow_repeat_application === 'yes'
-    //         );
-    //       },
-    //       onClick: (row: any) => {
-    //         this.onApply(row);
-    //       },
-    //     },
-    //   ],
-    // });
-
-    // columns.push({
-    //   key: 'view',
-    //   label: 'View',
-    //   type: 'icon',
-    //   icon: 'visibility',
-    //   width: '60px',
-    //   onClick: (row: any) => {
-    //     this.router.navigate([
-    //       '/dashboard/user-app-view',
-    //       row.id,
-    //       row.application_id,
-    //     ]);
-    //   },
-    //   cellClass: (value: any, row: any) => {
-    //     const shouldShow =
-    //       row.application_status !== null &&
-    //       row.application_status !== 'send_back' &&
-    //       row.allow_repeat_application !== 'yes';
-    //     return shouldShow ? '' : 'd-none';
-    //   },
-    // });
-
-    // columns.push({
-    //   key: 'renew',
-    //     label: 'Feedback',
-    //     type: 'button',
-    //     width: '120px',
-    //     buttonText: 'Feedback',
-    //     buttonColor: 'btn-success',
-    //   onClick: (row: any) => {
-    //   this.router.navigate(
-    //             [`/dashboard/service-feedback`, row.id],
-
-    //           );
-
-    //   },
-
-    // });
+   
     columns.push({
       key: 'apply_icon',
       label: 'Apply',
       type: 'button',
-      buttonText: 'Apply',
+      buttonText:(row: any) =>{
+    return row.application_status === 'draft' && row.allow_repeat_application === 'no'
+      ? 'Edit Draft'
+      : 'Apply';
+  },
       width: '60px',
       onClick: (row: any) => {
         this.onApply(row);
@@ -329,7 +256,8 @@ export class ServicesComponent {
           row.application_id === null ||
           row.application_status === 'send_back' ||
           row.application_status === 'extra_payment' ||
-          row.allow_repeat_application === 'yes';
+          row.allow_repeat_application === 'yes' ||
+           (row.application_status === 'draft' && row.allow_repeat_application === 'no');
         return shouldShow ? '' : 'd-none';
       },
     });
@@ -419,9 +347,10 @@ export class ServicesComponent {
       return;
     }
 
-    const queryParams: any = {
-      application_status: row.application_status,
-    };
+    const queryParams: any = {};
+    if (row.allow_repeat_application === 'no') {
+      queryParams.application_status = row.application_status;
+    }
 
     if (row.application_id !== null && row.allow_repeat_application === 'no') {
       queryParams.appid2 = row.application_id;

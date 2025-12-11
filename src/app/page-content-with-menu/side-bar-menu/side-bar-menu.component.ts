@@ -339,7 +339,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       id: 'payments',
       title: 'All Payments (Unified)',
-      icon: 'person_pin',
+      icon: 'account_balance',
       route: '/dashboard/payments',
       roles: ['individual'],
     },

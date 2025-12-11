@@ -371,14 +371,18 @@ export class ApplicationSearchPageComponent implements OnInit {
             },
           },
           {
-            label: 'Re-submit',
+            label: (row : any) => {
+              return row.status === 'draft' ? 'Edit Draft' : 'Re-submit'
+            },
             action: 'view',
             color: 'warn',
-            visible: (row) => row.status === "extra_payment" || row.status === "send_back",
+            visible: (row) => row.status === "extra_payment" || row.status === "send_back" || row.status === 'draft',
             handler: (row: ApplicationDataItem) => {
-              const queryParams: any = {application_status : row.status, application_id : row.nocDetailsId};
+              const queryParams: any = {application_status : row.status};
               // console.log(row.nocDetailsId);
-              
+              if(row.status !== "draft"){
+                queryParams.application_id = row.nocDetailsId;
+              }
              
               this.router.navigate(
                 [`/dashboard/service-application`, row.service_id],

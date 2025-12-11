@@ -40,25 +40,25 @@ border-bottom: 3px solid #fda00f;
     margin-top: 8px;
 }
 
-.m-4.btnss {
+.btnss {
   width: 100%;
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   align-items: center;
   gap: 14px;
   box-sizing: border-box;
 }
 
 .m-4.btnss .fee-actions {
-  width: 100%;
+  // width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .m-4.btnss .submit-wrap {
-  width: 100%;
   display: flex;
+  gap: 12px;
   justify-content: center;
   align-items: center;
 }
@@ -69,7 +69,6 @@ border-bottom: 3px solid #fda00f;
   font-weight: 600;
   font-size: 16px;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.15s ease;
-  margin: 0 auto;
   display: inline-block;
   min-width: 160px;
 }
@@ -89,9 +88,9 @@ border-bottom: 3px solid #fda00f;
   cursor: not-allowed;
 }
 
-.submit-btn {
-  margin-bottom: 12px;
-}
+// .submit-btn {
+//   margin-bottom: 12px;
+// }
 
 .fee-container {
   text-align: center;
@@ -175,6 +174,9 @@ td {
 }
 .mrg3{
   margin-top:  -1.5vw;
+}
+.mrg4{
+  margin-top:  2vw;
 }
 
 

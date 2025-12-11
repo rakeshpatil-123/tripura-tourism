@@ -65,7 +65,7 @@ export class BarChartComponent implements OnInit {
         ],
         chart: {
           type: 'bar',
-          height: 500,
+          height: 400,
           toolbar: {
             show: true
           }
@@ -76,7 +76,7 @@ export class BarChartComponent implements OnInit {
             distributed: true,
             borderRadius: 2,
             horizontal: false,
-            columnWidth: '60%',
+            columnWidth: '50%',
           }
         },
         dataLabels: {
