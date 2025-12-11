@@ -73,7 +73,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       title: 'Departments',
       icon: 'apartment',
       route: '/dashboard/departments',
-      roles: ['admin', 'department'],
+      roles: ['admin'],
     },
     {
       id: 'Admin Services',
@@ -91,17 +91,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
     {
       id: 'Departmental User',
-      title: 'Departmental User',
+      title: 'My Departmental Users',
       icon: 'groups',
       route: '/dashboard/departmental-user',
       roles: ['admin', 'department'],
-    },
-    {
-      id: 'Incentive Applications',
-      title: 'Incentive Applications',
-      icon: 'military_tech',
-      route: '/dashboard/incentive-applications',
-      roles: ['department'],
     },
     {
       id: 'BusinessUser',
@@ -167,16 +160,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
         },
       ],
     },
-    {
-      id: 'Departmental services',
-      title: 'Departmental Services',
-      icon: 'important_devices',
-      route: '/dashboard/departmental-services',
-      roles: ['department'],
-    },
+    // {
+    //   id: 'Departmental services',
+    //   title: 'Departmental Services',
+    //   icon: 'important_devices',
+    //   route: '/dashboard/departmental-services',
+    //   roles: ['department'],
+    // },
     {
       id: 'all-departmental-applications',
-      title: 'Departmental All Applications',
+      title: 'My Departmental Applications',
       icon: 'assignment',
       route: '/dashboard/all-departmental-applications',
       roles: ['department'],
@@ -184,8 +177,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       id: 'my-departmental-applications',
       title: 'Pending Applications',
-      icon: 'folders',
+      icon: 'layers',
       route: '/dashboard/my-departmental-applications',
+      roles: ['department'],
+    },
+    {
+      id: 'Incentive Applications',
+      title: 'Incentive Applications',
+      icon: 'military_tech',
+      route: '/dashboard/incentive-applications',
       roles: ['department'],
     },
     // {
@@ -376,6 +376,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.currentUrl = this.router.url;
+    const deptItem = this.menuItems.find(item => item.id === 'Departmental User');
+    if (deptItem) {
+      deptItem.title = this.currentUserType === 'admin'
+        ? 'All Departmental Users'
+        : 'My Departmental Users';
+    }
     this.filterMenuItems();
     this.checkSidebarVisibility(this.currentUrl);
 

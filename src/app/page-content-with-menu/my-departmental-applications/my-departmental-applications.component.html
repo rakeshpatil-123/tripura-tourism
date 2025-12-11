@@ -4,7 +4,7 @@
         🔍 Loading applications...
     </div>
     <div *ngIf="!isLoading && columns.length === 0 && applications.length === 0" class="text-center text-muted">
-        <p>No applications found for this service.</p>
+        <p>No pending applications found.</p>
     </div>
     <form [formGroup]="remarkForm">
         <div class="filters-row">
@@ -13,12 +13,12 @@
                 <input type="text" placeholder="Search by Service, Applicant, Phone" formControlName="search"
                     class="search-input" />
             </div>
-            <app-ilogi-select fieldId="district_id" fieldLabel="District" formControlName="district_id"
+            <!-- <app-ilogi-select fieldId="district_id" fieldLabel="District" formControlName="district_id"
                 [selectOptions]="districts" placeholder="Select district"
                 class="filter-select dropdown-fix"></app-ilogi-select>
             <app-ilogi-select fieldId="subdivision_id" fieldLabel="Subdivision" formControlName="subdivision_id"
                 [selectOptions]="subdivisions" placeholder="Select subdivision" class="filter-select dropdown-fix"
-                [disabled]="!districts.length || loadingDistricts"></app-ilogi-select>
+                [disabled]="!districts.length || loadingDistricts"></app-ilogi-select> -->
 
             <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" formControlName="hierarchy_level"
                 [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level"
@@ -27,7 +27,7 @@
             <app-ilogi-select fieldId="current_status" fieldLabel="Current Status" formControlName="current_status"
                 [selectOptions]="statusOptions" placeholder="Select Current Status"
                 class="filter-select dropdown-fix"></app-ilogi-select>
-            <button type="button" class="btn btn-secondary" (click)="downloadExcel()">Download Excel</button>
+            <!-- <button type="button" class="btn btn-secondary" (click)="downloadExcel()">Download Excel</button> -->
         </div>
     </form>
     <div class="table-wrapper">

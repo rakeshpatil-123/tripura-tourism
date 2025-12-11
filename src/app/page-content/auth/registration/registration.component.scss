@@ -184,3 +184,8 @@ row-gap: 6px;
 app-ilogi-input + .otp-section {
   margin-top: 0.75rem;
 }
+.password-hint small {
+  color: #c53030;
+  font-size: 0.875rem;
+  line-height: 1.2;
+}

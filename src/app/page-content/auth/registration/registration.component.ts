@@ -169,6 +169,9 @@ export class RegistrationComponent implements OnInit, OnChanges {
       });
     }
     this.setupCascadingDropdowns();
+    this.registrationForm.get('hierarchy_level')?.valueChanges.subscribe(() => {
+      this.onHierarchyChange();
+    });
 
     this.registrationForm.get('mobile_no')?.valueChanges.subscribe(() => {
       this.otpSent = false;
@@ -178,23 +181,62 @@ export class RegistrationComponent implements OnInit, OnChanges {
   }
   ngOnChanges(changes: any): void {
     if (changes['editData'] && this.editData && this.editMode) {
-      if (this.sourcePage === 'departmental-users') {
-        if (!this.departments || this.departments.length === 0) {
-          this.getAllDepartmentList();
-          const interval = setInterval(() => {
-            if (this.departments.length > 0) {
-              clearInterval(interval);
-              this.prefillEditData();
-            }
-          }, 200);
+      // Ensure prefill runs after ngOnInit has created/adjusted form controls
+      setTimeout(() => {
+        if (this.sourcePage === 'departmental-users') {
+          if (!this.departments || this.departments.length === 0) {
+            this.getAllDepartmentList();
+            const interval = setInterval(() => {
+              if (this.departments.length > 0) {
+                clearInterval(interval);
+                this.prefillEditData();
+              }
+            }, 200);
+          } else {
+            this.prefillEditData();
+          }
         } else {
           this.prefillEditData();
         }
-      } else {
-        this.prefillEditData();
-      }
+      }, 0);
     }
   }
+    /**
+   * Called whenever hierarchy_level changes.
+   * Resets district_id, subdivision_id, ulb_id and ward_id controls in a way
+   * that plays well with both single-value selects and multi-select arrays
+   * (departmental-users uses arrays).
+   */
+  onHierarchyChange(): void {
+    // Reset only the 3 controls requested: district_id, subdivision_id, ulb_id
+    const keys = ['district_id', 'subdivision_id', 'ulb_id'];
+
+    keys.forEach(key => {
+      const ctrl = this.registrationForm.get(key);
+      if (!ctrl) return;
+
+      const current = ctrl.value;
+      // department mode uses arrays -> reset to empty array; otherwise reset to empty string
+      if (Array.isArray(current)) {
+        ctrl.setValue([], { emitEvent: true });
+      } else {
+        ctrl.setValue('', { emitEvent: true });
+      }
+      ctrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+
+    // Clear dependent option lists so UI updates correctly
+    this.subdivisions = [];
+    this.ulbs = [];
+    // clearing wards is safe (they exist) because ULB changed
+    this.wards = [];
+    
+    // do NOT reference undefined properties like multipleSubdivisions/multipleUlbs here
+    // selectedDistricts exists on the component; clearing it is safe but optional:
+    this.selectedDistricts = [];
+  }
+
+
 
   private normalizeToArray(v: any): string[] {
     if (v === null || v === undefined) return [];
@@ -212,6 +254,13 @@ export class RegistrationComponent implements OnInit, OnChanges {
   prefillEditData(): void {
     const data = this.editData;
     if (!data) return;
+    const ensureControl = (name: string, defaultValue: any = '') => {
+      if (!this.registrationForm.contains(name)) {
+        this.registrationForm.addControl(name, this.fb.control(defaultValue));
+      }
+    };
+    ['district_id', 'subdivision_id', 'ulb_id', 'ward_id', 'hierarchy_level', 'department_id', 'designation', 'inspector'].forEach(c => ensureControl(c));
+
     const prefill = {
       name_of_enterprise: data.name_of_enterprise || '',
       authorized_person_name: data.authorized_person_name || '',
@@ -230,81 +279,130 @@ export class RegistrationComponent implements OnInit, OnChanges {
       user_type: data.user_type || 'department',
       inspector: data.inspector === 'yes' ? '1' : '0',
     };
-    this.registrationForm.patchValue({
-      name_of_enterprise: prefill.name_of_enterprise,
-      authorized_person_name: prefill.authorized_person_name,
-      email_id: prefill.email_id,
-      mobile_no: prefill.mobile_no,
-      user_name: prefill.user_name,
-      registered_enterprise_address: prefill.registered_enterprise_address,
-      registered_enterprise_city: prefill.registered_enterprise_city,
-      hierarchy_level: prefill.hierarchy_level,
-      department_id: prefill.department_id,
-      designation: prefill.designation,
-      user_type: prefill.user_type,
-      inspector: prefill.inspector,
-    });
+    const { hierarchy_level, ...otherFields } = prefill;
+    this.registrationForm.patchValue(otherFields);
+    this.registrationForm.get('hierarchy_level')?.setValue(prefill.hierarchy_level, { emitEvent: false });
+
     const districtArrLegacy = this.normalizeToArray(prefill.district_id);
     const subdivisionArrLegacy = this.normalizeToArray(prefill.subdivision_id);
     const ulbArrLegacy = this.normalizeToArray(prefill.ulb_id);
     const wardArrLegacy = this.normalizeToArray(prefill.ward_id);
     const locations: any[] = Array.isArray(data.locations) ? data.locations : [];
 
+    const setArrayControlWhenReady = (
+      controlName: string,
+      ids: string[],
+      optionList: Array<{ id: string; name?: string }>,
+      triggerLoad?: (codes: string | string[]) => void,
+      maxAttempts = 25,
+      intervalMs = 200
+    ) => {
+      if (!ids || ids.length === 0) return;
+
+      ids = ids.map((id: any) => String(id));
+
+      const allPresent = () => ids.every(id => optionList.some(o => String(o.id) === String(id)));
+
+      if (allPresent()) {
+        this.registrationForm.get(controlName)?.setValue(ids);
+        this.registrationForm.get(controlName)?.updateValueAndValidity();
+        return;
+      }
+      if (typeof triggerLoad === 'function') {
+        try { triggerLoad(ids); } catch (_e) { }
+      }
+      const missing = ids.filter(id => !optionList.some(o => String(o.id) === id));
+      if (missing.length > 0) {
+        const placeholderPrefix = controlName.includes('district') ? 'District' :
+          controlName.includes('subdivision') ? 'Subdivision' :
+            controlName.includes('ulb') ? 'ULB' : 'Item';
+        missing.forEach(mid => {
+          if (!optionList.some(o => String(o.id) === mid)) {
+            optionList.push({ id: mid, name: `${placeholderPrefix} ${mid}` });
+          }
+        });
+        this.registrationForm.get(controlName)?.setValue(ids);
+        this.registrationForm.get(controlName)?.updateValueAndValidity();
+      }
+      let attempts = 0;
+      const iv = setInterval(() => {
+        attempts++;
+        if (allPresent()) {
+          clearInterval(iv);
+          this.registrationForm.get(controlName)?.setValue(ids);
+          this.registrationForm.get(controlName)?.updateValueAndValidity();
+          return;
+        }
+        if (attempts >= maxAttempts) {
+          clearInterval(iv);
+          const available = ids.filter(id => optionList.some(o => String(o.id) === String(id)));
+          if (available.length > 0) {
+            this.registrationForm.get(controlName)?.setValue(available);
+            this.registrationForm.get(controlName)?.updateValueAndValidity();
+          }
+        }
+      }, intervalMs);
+    };
+
     if (this.sourcePage === 'departmental-users' && locations.length > 0) {
       const districtSet = new Set<string>();
       const subdivisionSet = new Set<string>();
       const blockSet = new Set<string>();
-
-      const grouped: Record<string, {
-        id: string;
-        name?: string;
-        subdivisionsMap: Record<string, { name?: string; blocks: Map<string, { name?: string }> }>;
-      }> = {};
+      const grouped: Record<string, { id: string; name?: string; subdivisionsMap: Record<string, { name?: string; blocks: Map<string, { name?: string }> }> }> = {};
 
       locations.forEach((loc: any) => {
-        const dId = String(loc.district_id);
-        const sId = String(loc.subdivision_id);
-        const bId = String(loc.block_id);
+        const dId = loc.district_id !== undefined && loc.district_id !== null ? String(loc.district_id) : '';
+        const sId = loc.subdivision_id !== undefined && loc.subdivision_id !== null ? String(loc.subdivision_id) : '';
+        const bId = loc.block_id !== undefined && loc.block_id !== null ? String(loc.block_id) : '';
 
         const dName = loc.district_name ?? loc.district ?? undefined;
         const sName = loc.subdivision_name ?? loc.subdivision ?? loc.sub_division ?? undefined;
-        const bName = loc.block_name ?? loc.block ?? loc.block_name ?? loc.ulb_name ?? undefined;
+        const bName = loc.block_name ?? loc.block ?? loc.ulb_name ?? undefined;
 
-        districtSet.add(dId);
-        subdivisionSet.add(sId);
-        blockSet.add(bId);
+        if (dId) districtSet.add(dId);
+        if (sId) subdivisionSet.add(sId);
+        if (bId) blockSet.add(bId);
 
-        if (!grouped[dId]) {
-          grouped[dId] = { id: dId, name: dName, subdivisionsMap: {} };
-        } else if (!grouped[dId].name && dName) {
-          grouped[dId].name = dName;
+        if (dId) {
+          if (!grouped[dId]) {
+            grouped[dId] = { id: dId, name: dName, subdivisionsMap: {} };
+          } else if (!grouped[dId].name && dName) {
+            grouped[dId].name = dName;
+          }
         }
 
-        if (!grouped[dId].subdivisionsMap[sId]) {
-          grouped[dId].subdivisionsMap[sId] = { name: sName, blocks: new Map() };
-        } else if (!grouped[dId].subdivisionsMap[sId].name && sName) {
-          grouped[dId].subdivisionsMap[sId].name = sName;
-        }
+        if (dId && sId) {
+          if (!grouped[dId].subdivisionsMap[sId]) {
+            grouped[dId].subdivisionsMap[sId] = { name: sName, blocks: new Map() };
+          } else if (!grouped[dId].subdivisionsMap[sId].name && sName) {
+            grouped[dId].subdivisionsMap[sId].name = sName;
+          }
 
-        const blocksMap = grouped[dId].subdivisionsMap[sId].blocks;
-        if (!blocksMap.has(bId)) {
-          blocksMap.set(bId, { name: bName });
-        } else {
-          const existing = blocksMap.get(bId);
-          if (!existing?.name && bName) {
-            blocksMap.set(bId, { name: bName });
+          const blocksMap = grouped[dId].subdivisionsMap[sId].blocks;
+          if (bId) {
+            if (!blocksMap.has(bId)) {
+              blocksMap.set(bId, { name: bName });
+            } else {
+              const existing = blocksMap.get(bId);
+              if (!existing?.name && bName) {
+                blocksMap.set(bId, { name: bName });
+              }
+            }
           }
         }
       });
+
       const districtIds = Array.from(districtSet).map(String);
       const subdivisionIds = Array.from(subdivisionSet).map(String);
       const ulbIds = Array.from(blockSet).map(String);
+
       districtIds.forEach((dId) => {
         if (!this.districts.some((d) => String(d.id) === dId)) {
           const name = grouped[dId]?.name ?? `District ${dId}`;
           this.districts.push({ id: dId, name });
         }
       });
+
       subdivisionIds.forEach((sId) => {
         const sNameCandidate = (() => {
           for (const dKey of Object.keys(grouped)) {
@@ -317,6 +415,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
           this.subdivisions.push({ id: sId, name: sNameCandidate });
         }
       });
+
       ulbIds.forEach((uId) => {
         const uNameCandidate = (() => {
           for (const dKey of Object.keys(grouped)) {
@@ -331,9 +430,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
           this.ulbs.push({ id: uId, name: uNameCandidate });
         }
       });
-      this.registrationForm.get('district_id')?.setValue(districtIds);
-      this.registrationForm.get('subdivision_id')?.setValue(subdivisionIds);
-      this.registrationForm.get('ulb_id')?.setValue(ulbIds);
+
       this.selectedDistricts = Object.keys(grouped).map(dKey => {
         const subdivs = Object.keys(grouped[dKey].subdivisionsMap).map(sKey => {
           const blocks = Array.from(grouped[dKey].subdivisionsMap[sKey].blocks.keys());
@@ -343,6 +440,9 @@ export class RegistrationComponent implements OnInit, OnChanges {
       });
       if (districtIds.length) this.loadSubdivisions(districtIds);
       if (subdivisionIds.length) this.loadUlbs(subdivisionIds);
+      setArrayControlWhenReady('district_id', districtIds, this.districts, (ids) => this.loadSubdivisions(ids));
+      setArrayControlWhenReady('subdivision_id', subdivisionIds, this.subdivisions, (ids) => this.loadUlbs(ids));
+      setArrayControlWhenReady('ulb_id', ulbIds, this.ulbs);
       const wardIdsFromLocations: string[] = (locations.filter(l => l.ward_id).map(l => String(l.ward_id)));
       if (wardIdsFromLocations.length > 0) {
         const uniqueWardIds = Array.from(new Set(wardIdsFromLocations));
@@ -353,6 +453,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
           }
         });
         this.registrationForm.get('ward_id')?.setValue(uniqueWardIds);
+        this.registrationForm.get('ward_id')?.updateValueAndValidity();
       }
 
     } else {
@@ -364,8 +465,11 @@ export class RegistrationComponent implements OnInit, OnChanges {
           });
         }
       });
+
       if (this.sourcePage === 'departmental-users') {
         this.registrationForm.get('district_id')?.setValue(districtArrLegacy);
+        this.registrationForm.get('district_id')?.updateValueAndValidity();
+
         if (districtArrLegacy.length > 0) {
           this.loadSubdivisions(districtArrLegacy);
           const subInterval = setInterval(() => {
@@ -377,6 +481,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
                 }
               });
               this.registrationForm.get('subdivision_id')?.setValue(subdivisionArrLegacy);
+              this.registrationForm.get('subdivision_id')?.updateValueAndValidity();
 
               if (subdivisionArrLegacy.length > 0) {
                 this.loadUlbs(subdivisionArrLegacy);
@@ -389,6 +494,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
                       }
                     });
                     this.registrationForm.get('ulb_id')?.setValue(ulbArrLegacy);
+                    this.registrationForm.get('ulb_id')?.updateValueAndValidity();
 
                     wardArrLegacy.forEach((wCode) => {
                       if (!this.wards.some((w) => String(w.id) === String(wCode))) {
@@ -396,6 +502,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
                       }
                     });
                     this.registrationForm.get('ward_id')?.setValue(wardArrLegacy);
+                    this.registrationForm.get('ward_id')?.updateValueAndValidity();
                   }
                 }, 300);
               }
@@ -472,12 +579,12 @@ export class RegistrationComponent implements OnInit, OnChanges {
         user_name: prefill.user_name,
         registered_enterprise_address: prefill.registered_enterprise_address,
         registered_enterprise_city: prefill.registered_enterprise_city,
-        hierarchy_level: prefill.hierarchy_level,
         department_id: prefill.department_id,
         designation: prefill.designation,
         user_type: prefill.user_type,
         inspector: prefill.inspector,
       });
+      this.registrationForm.get('hierarchy_level')?.setValue(prefill.hierarchy_level, { emitEvent: false });
     }, 800);
   }
 
@@ -669,7 +776,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
     return password === confirmPassword ? null : { mismatch: true };
   }
 
-    onSubmit(): void {
+  onSubmit(): void {
     if (
       !this.editMode &&
       this.sourcePage !== 'departmental-users' &&
@@ -699,43 +806,80 @@ export class RegistrationComponent implements OnInit, OnChanges {
       }
 
       const cascadeFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
+      const hierarchy = this.registrationForm.get('hierarchy_level')?.value;
+      const isStateLevel = ['state1', 'state2', 'state3'].includes(hierarchy);
 
       if (this.sourcePage === 'departmental-users') {
-        let locations: any[] = [];
-        if (typeof (this as any).getLocationsPayload === 'function') {
-          locations = (this as any).getLocationsPayload();
-        }
-        if (!Array.isArray(locations) || locations.length === 0) {
-          const distArr = this.normalizeToArray(payload.district_id);
-          const subArr = this.normalizeToArray(payload.subdivision_id);
-          const blockArr = this.normalizeToArray(payload.ulb_id);
-          distArr.forEach((d) => {
-            subArr.forEach((s) => {
-              blockArr.forEach((b) => {
-                locations.push({
-                  district_id: Number(d),
-                  subdivision_id: Number(s),
-                  block_id: Number(b),
+        if (isStateLevel) {
+          if (payload.hasOwnProperty('locations')) delete payload.locations;
+          cascadeFields.forEach((f) => {
+            if (payload.hasOwnProperty(f)) delete payload[f];
+          });
+        } else {
+          let locations: any[] = [];
+          if (typeof (this as any).getLocationsPayload === 'function') {
+            locations = (this as any).getLocationsPayload();
+          }
+
+          if (!Array.isArray(locations) || locations.length === 0) {
+            const showDistrict = this.shouldShow('district');
+            const showSubdivision = this.shouldShow('subdivision');
+            const showBlock = this.shouldShow('block');
+            const distArr = showDistrict ? this.normalizeToArray(payload.district_id) : [null];
+            const subArr = showSubdivision ? this.normalizeToArray(payload.subdivision_id) : [null];
+            const blockArr = showBlock ? this.normalizeToArray(payload.ulb_id) : [null];
+            const built: any[] = [];
+            distArr.forEach((d) => {
+              subArr.forEach((s) => {
+                blockArr.forEach((b) => {
+                  built.push({
+                    district_id: d ? Number(d) : null,
+                    subdivision_id: s ? Number(s) : null,
+                    block_id: b ? Number(b) : null,
+                  });
                 });
               });
             });
+            const filtered = built.filter(
+              (loc) => loc.district_id !== null || loc.subdivision_id !== null || loc.block_id !== null
+            );
+            const uniq = new Map<string, any>();
+            filtered.forEach((loc) => {
+              const key = `${loc.district_id ?? ''}|${loc.subdivision_id ?? ''}|${loc.block_id ?? ''}`;
+              if (!uniq.has(key)) uniq.set(key, loc);
+            });
+            locations = Array.from(uniq.values());
+          }
+          if (Array.isArray(locations) && locations.length > 0) {
+            payload.locations = locations;
+          } else {
+            if (payload.hasOwnProperty('locations')) delete payload.locations;
+          }
+
+          cascadeFields.forEach((f) => {
+            if (payload.hasOwnProperty(f)) delete payload[f];
           });
         }
-
-        payload.locations = locations;
-        cascadeFields.forEach((f) => delete payload[f]);
       } else {
-        cascadeFields.forEach((field) => {
-          const v = payload[field];
-          if (Array.isArray(v)) {
-            payload[field] = v.length > 0 ? String(v[0]).trim() : '';
-          } else if (v === null || v === undefined) {
-            payload[field] = '';
-          } else {
-            payload[field] = String(v).trim();
-          }
-        });
+        if (isStateLevel) {
+          if (payload.hasOwnProperty('locations')) delete payload.locations;
+          cascadeFields.forEach((f) => {
+            if (payload.hasOwnProperty(f)) delete payload[f];
+          });
+        } else {
+          cascadeFields.forEach((field) => {
+            const v = payload[field];
+            if (Array.isArray(v)) {
+              payload[field] = v.length > 0 ? String(v[0]).trim() : '';
+            } else if (v === null || v === undefined) {
+              payload[field] = '';
+            } else {
+              payload[field] = String(v).trim();
+            }
+          });
+        }
       }
+
       if (payload.user_type === 'individual') {
         delete payload.department_id;
         delete payload.designation;
@@ -743,9 +887,15 @@ export class RegistrationComponent implements OnInit, OnChanges {
         delete payload.inspector;
       }
       const hierarchyFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
+      const fieldToCheck: Record<string, string> = {
+        district_id: 'district',
+        subdivision_id: 'subdivision',
+        ulb_id: 'block',
+        ward_id: 'ward',
+      };
       hierarchyFields.forEach((field) => {
-        const base = field.replace('_id', '');
-        if (!this.shouldShow(base) && payload.hasOwnProperty(field)) {
+        const check = fieldToCheck[field];
+        if (!this.shouldShow(check) && payload.hasOwnProperty(field)) {
           delete payload[field];
         }
       });
@@ -925,25 +1075,29 @@ export class RegistrationComponent implements OnInit, OnChanges {
         },
       });
   }
-  shouldShow(field: string): boolean {
-    const h = this.registrationForm.get('hierarchy_level')?.value;
-    const u = this.registrationForm.get('user_type')?.value;
-
-    if (u === 'individual') return true;
-    if (['state1', 'state2', 'state3'].includes(h)) {
-      return false;
-    }
-    if (h === 'district1' || h === 'district2' || h === 'district3') {
-      return field === 'district';
-    }
-    if (h === 'subdivision1' || h === 'subdivision2' || h === 'subdivision3') {
-      return ['district', 'subdivision'].includes(field);
-    }
-    if (h === 'block') {
-      return ['district', 'subdivision', 'block'].includes(field);
-    }
+shouldShow(field: string): boolean {
+  const h = this.registrationForm.get('hierarchy_level')?.value;
+  const u = this.registrationForm.get('user_type')?.value;
+  if (field === 'ulb') field = 'block';
+  if (u === 'individual') return true;
+  if (['state1', 'state2', 'state3'].includes(h)) {
     return false;
   }
+  if (h === 'district1' || h === 'district2' || h === 'district3') {
+    return field === 'district';
+  }
+
+  if (h === 'subdivision1' || h === 'subdivision2' || h === 'subdivision3') {
+    return ['district', 'subdivision'].includes(field);
+  }
+  if (h === 'block') {
+    if (field === 'ward') return true;
+    return ['district', 'subdivision', 'block'].includes(field);
+  }
+
+  return false;
+}
+
   getRadioOptions() {
     return [
       { label: 'Yes', value: 'yes' },
