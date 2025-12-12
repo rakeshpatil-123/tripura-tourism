@@ -38,6 +38,9 @@ interface ApplicationDataItem {
   _raw?: any;
   service_mode: string;
   application_id: number;
+  is_certificate: string | null;
+  already_rated: boolean;
+  rating: string;
 }
 
 @Component({
@@ -228,6 +231,9 @@ export class ApplicationSearchPageComponent implements OnInit {
                   '',
                 service_id: app.service_id || 0,
                 _raw: app,
+                is_certificate: app.is_certificate,
+                already_rated: app.already_rated,
+                rating: app.rating || '',
               } as ApplicationDataItem;
             });
 
@@ -326,14 +332,22 @@ export class ApplicationSearchPageComponent implements OnInit {
         label: 'Query & Feedback',
         type: 'button',
         width: '120px',
-        buttonText: 'Rating',
+        buttonText:(row : any) => {
+          return row.already_rated ? `${row.rating}⭐` : 'Rating';
+        } ,
         buttonColor: 'btn-success',
         buttonVisible: (row: any) => row.payment_status.toLowerCase() === 'paid',
         onClick: (row: any) => {
+          if(row.already_rated === false){
+
             this.router.navigate(
                 [`/dashboard/service-feedback`, row.id],
             
               );
+          }
+
+          console.log(row.rating);
+          
             
         },
       },
@@ -347,7 +361,7 @@ export class ApplicationSearchPageComponent implements OnInit {
             action: 'download',
             color: 'warn',
             visible: (row: ApplicationDataItem) =>
-              (row.status || '').toLowerCase() === 'approved',
+              (row.status || '').toLowerCase() === 'approved' && row.is_certificate !== null,
             handler: (row: ApplicationDataItem) => {
               this.downloadCertificate(row.id);
             },
