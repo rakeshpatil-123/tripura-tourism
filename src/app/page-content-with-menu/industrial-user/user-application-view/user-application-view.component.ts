@@ -80,22 +80,20 @@ export class UserApplicationViewComponent implements OnInit {
     '23': 'S-S Division',
   };
   defineHistoryColumns(): void {
-  this.historyColumns = [
-    { key: 'step_number', label: 'Step #', type: 'text' },
-    { key: 'step_type', label: 'Step Type', type: 'text' },
-    { key: 'status', label: 'Status', type: 'text' }, 
-    { key: 'remarks', label: 'Remarks', type: 'text' },
-    { key: 'action_taken_at', label: 'Action Taken At', type: 'text' },
+    this.historyColumns = [
+      { key: 'step_number', label: 'Step #', type: 'text' },
+      { key: 'step_type', label: 'Step Type', type: 'text' },
+      { key: 'status', label: 'Status', type: 'text' },
+      { key: 'remarks', label: 'Remarks', type: 'text' },
+      { key: 'action_taken_at', label: 'Action Taken At', type: 'text' },
       {
-      key: 'status_file',
-      label: 'Status File',
-      type: 'view-link',
-       viewLinkText: 'View Dept. Uploaded Doc',
-    },
-  ];
-}
-
-
+        key: 'status_file',
+        label: 'Status File',
+        type: 'view-link',
+        viewLinkText: 'View Dept. Uploaded Doc',
+      },
+    ];
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -106,7 +104,7 @@ export class UserApplicationViewComponent implements OnInit {
     this.loadRouteParams();
     this.checkThirdPartyService();
     this.defineColumns();
-     this.defineHistoryColumns();
+    this.defineHistoryColumns();
   }
 
   defineColumns(): void {
@@ -151,144 +149,146 @@ export class UserApplicationViewComponent implements OnInit {
       this.error = 'Invalid or missing route parameters.';
     }
   }
-//   fetchApplicationDetails(): void {
-//     this.isLoading = true;
-//     this.error = null;
+  //   fetchApplicationDetails(): void {
+  //     this.isLoading = true;
+  //     this.error = null;
 
-//     const payload = {
-//       service_id: this.serviceId,
-//       application_id: this.appId,
-//     };
+  //     const payload = {
+  //       service_id: this.serviceId,
+  //       application_id: this.appId,
+  //     };
 
-//     this.apiService
-//       .getByConditions(
-//         payload,
-//         'api/user/get-details-user-service-applications'
-//       )
-//       .subscribe({
-//         next: (res: any) => {
-//           this.isLoading = false;
-//           if (res?.status === 1 && res.data && typeof res.data === 'object') {
-//             this.transactionDetails = res.payment_details.map((item: any) => {
-//               return {
-//                 transaction_id: item.transaction_id,
-//                 GRN_number: item.GRN_number,
-//                 gateway: item.gateway,
-//                 payment_datetime: item.payment_datetime,
-//                 payment_amount: item.payment_amount,
-//                 payment_status: item.payment_status,
-//               };
-//             });
-//             this.serviceName = res?.service_name;
-//             const appData = res?.data;
+  //     this.apiService
+  //       .getByConditions(
+  //         payload,
+  //         'api/user/get-details-user-service-applications'
+  //       )
+  //       .subscribe({
+  //         next: (res: any) => {
+  //           this.isLoading = false;
+  //           if (res?.status === 1 && res.data && typeof res.data === 'object') {
+  //             this.transactionDetails = res.payment_details.map((item: any) => {
+  //               return {
+  //                 transaction_id: item.transaction_id,
+  //                 GRN_number: item.GRN_number,
+  //                 gateway: item.gateway,
+  //                 payment_datetime: item.payment_datetime,
+  //                 payment_amount: item.payment_amount,
+  //                 payment_status: item.payment_status,
+  //               };
+  //             });
+  //             this.serviceName = res?.service_name;
+  //             const appData = res?.data;
 
-//             this.application = {
-//               ...appData,
-//               application_data:
-//                 res.application_data || appData.application_data || {},
-//               application_data_structured: Array.isArray(res.application_data)
-//                 ? res.application_data.map((item: any) => ({
-//                     id: item.id,
-//                     question: item.question,
-//                     answer: item.answer || '—',
-//                   }))
-//                 : [],
-//               extra_payment: appData.extra_payment || '0',
-//               total_fee: appData.total_fee || '0',
-//               history_data: Array.isArray(res.history_data) ? res.history_data : [],
+  //             this.application = {
+  //               ...appData,
+  //               application_data:
+  //                 res.application_data || appData.application_data || {},
+  //               application_data_structured: Array.isArray(res.application_data)
+  //                 ? res.application_data.map((item: any) => ({
+  //                     id: item.id,
+  //                     question: item.question,
+  //                     answer: item.answer || '—',
+  //                   }))
+  //                 : [],
+  //               extra_payment: appData.extra_payment || '0',
+  //               total_fee: appData.total_fee || '0',
+  //               history_data: Array.isArray(res.history_data) ? res.history_data : [],
 
-// this.historyDetails = (res.history_data || []).map((h: any) => ({
-//   step_number: h.step_number,
-//   step_type: h.step_type || '—',
-//   status: h.status || '—',
-//   remarks: h.remarks || '—',
-//   action_taken_at: this.formatDate(h.action_taken_at),
-//   file_name: h.status_file ? this.getFileNameFromUrl(h.status_file) : '—',
-//   status_file_url: h.status_file, 
-// }))
-//             };
-//             this.checkDownloadUrlAvailability();
-//           } else {
-//             this.error = res?.message || 'No application details found.';
-//           }
-//         },
-//         error: (err) => {
-//           this.isLoading = false;
-//           this.error = 'Failed to load application. Please try again later.';
-//           console.error('API Error:', err);
-//         },
-//       });
-//   }
+  // this.historyDetails = (res.history_data || []).map((h: any) => ({
+  //   step_number: h.step_number,
+  //   step_type: h.step_type || '—',
+  //   status: h.status || '—',
+  //   remarks: h.remarks || '—',
+  //   action_taken_at: this.formatDate(h.action_taken_at),
+  //   file_name: h.status_file ? this.getFileNameFromUrl(h.status_file) : '—',
+  //   status_file_url: h.status_file,
+  // }))
+  //             };
+  //             this.checkDownloadUrlAvailability();
+  //           } else {
+  //             this.error = res?.message || 'No application details found.';
+  //           }
+  //         },
+  //         error: (err) => {
+  //           this.isLoading = false;
+  //           this.error = 'Failed to load application. Please try again later.';
+  //           console.error('API Error:', err);
+  //         },
+  //       });
+  //   }
 
-fetchApplicationDetails(): void {
-  this.isLoading = true;
-  this.error = null;
+  fetchApplicationDetails(): void {
+    this.isLoading = true;
+    this.error = null;
 
-  const payload = {
-    service_id: this.serviceId,
-    application_id: this.appId,
-  };
+    const payload = {
+      service_id: this.serviceId,
+      application_id: this.appId,
+    };
 
-  this.apiService
-    .getByConditions(
-      payload,
-      'api/user/get-details-user-service-applications'
-    )
-    .subscribe({
-      next: (res: any) => {
-        this.isLoading = false;
-        if (res?.status === 1 && res.data && typeof res.data === 'object') {
-          this.transactionDetails = res.payment_details.map((item: any) => {
-            return {
-              transaction_id: item.transaction_id,
-              GRN_number: item.GRN_number,
-              gateway: item.gateway,
-              payment_datetime: item.payment_datetime,
-              payment_amount: item.payment_amount,
-              payment_status: item.payment_status,
+    this.apiService
+      .getByConditions(
+        payload,
+        'api/user/get-details-user-service-applications'
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+          if (res?.status === 1 && res.data && typeof res.data === 'object') {
+            this.transactionDetails = res.payment_details.map((item: any) => {
+              return {
+                transaction_id: item.transaction_id,
+                GRN_number: item.GRN_number,
+                gateway: item.gateway,
+                payment_datetime: item.payment_datetime,
+                payment_amount: item.payment_amount,
+                payment_status: item.payment_status,
+              };
+            });
+
+            this.serviceName = res?.service_name;
+            const appData = res?.data;
+
+            this.application = {
+              ...appData,
+              application_data:
+                res.application_data || appData.application_data || {},
+              application_data_structured: this.normalizeApplicationData(
+                res.application_data
+              ).map((item) => ({
+                id: item.id,
+                question: item.question,
+                answer: item.answer ?? '—',
+              })),
+              extra_payment: appData.extra_payment || '0',
+              total_fee: appData.total_fee || '0',
+              history_data: Array.isArray(res.history_data)
+                ? res.history_data
+                : [],
             };
-          });
 
-          this.serviceName = res?.service_name;
-          const appData = res?.data;
+            this.historyDetails = (res.history_data || []).map((h: any) => ({
+              step_number: h.step_number,
+              step_type: h.step_type || '—',
+              status: h.status || '—',
+              remarks: h.remarks || '—',
+              action_taken_at: this.formatDate(h.action_taken_at),
+              status_file: h.status_file,
+            }));
 
-          this.application = {
-            ...appData,
-            application_data:
-              res.application_data || appData.application_data || {},
-            application_data_structured: Array.isArray(res.application_data)
-              ? res.application_data.map((item: any) => ({
-                  id: item.id,
-                  question: item.question,
-                  answer: item.answer || '—',
-                }))
-              : [],
-            extra_payment: appData.extra_payment || '0',
-            total_fee: appData.total_fee || '0',
-            history_data: Array.isArray(res.history_data) ? res.history_data : [], 
-          };
-
-          this.historyDetails = (res.history_data || []).map((h: any) => ({
-            step_number: h.step_number,
-            step_type: h.step_type || '—',
-            status: h.status || '—',
-            remarks: h.remarks || '—',
-            action_taken_at: this.formatDate(h.action_taken_at),
-            status_file: h.status_file,
-          }));
-
-          this.checkDownloadUrlAvailability();
-        } else {
-          this.error = res?.message || 'No application details found.';
-        }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.error = 'Failed to load application. Please try again later.';
-        console.error('API Error:', err);
-      },
-    });
-}
+            this.checkDownloadUrlAvailability();
+          } else {
+            this.error = res?.message || 'No application details found.';
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.error = 'Failed to load application. Please try again later.';
+          console.error('API Error:', err);
+        },
+      });
+  }
 
   getFileNameFromUrl(url: string | null | undefined): string {
     if (!url) return '';
@@ -396,5 +396,34 @@ fetchApplicationDetails(): void {
     }
 
     return String(answer);
+  }
+
+  private normalizeApplicationData(
+    data: any
+  ): { id: number; question: string; answer: any }[] {
+    const result: { id: number; question: string; answer: any }[] = [];
+
+    const traverse = (obj: any) => {
+      if (!obj || typeof obj !== 'object') return;
+
+      if (Array.isArray(obj)) {
+        obj.forEach((item) => traverse(item));
+        return;
+      }
+
+      if (obj.id !== undefined && obj.question !== undefined) {
+        result.push({
+          id: obj.id,
+          question: obj.question,
+          answer: obj.answer,
+        });
+        return;
+      }
+
+      Object.values(obj).forEach((value) => traverse(value));
+    };
+
+    traverse(data);
+    return result;
   }
 }

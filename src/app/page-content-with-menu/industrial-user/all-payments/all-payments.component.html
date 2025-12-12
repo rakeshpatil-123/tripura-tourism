@@ -2,16 +2,24 @@
 <div class="payments-container">
   <div class="section">
     <h2 class="section-title">Payments Pending (UNPAID)</h2>
+    <div class="filter ">
+
+      <app-ilogi-select fieldLabel="Service " fieldId="service" [(ngModel)]="service" name="applicationType"
+        [selectOptions]="serviceOptions" placeholder="Select Type" [mandatory]="false" [readonly]="false">
+      </app-ilogi-select>
+      <app-ilogi-select fieldLabel="Application Id" fieldId="applicationId" [(ngModel)]="applicationId"
+        name="applicationType" [selectOptions]="applicationIdOptions" placeholder="Select Type" [mandatory]="false"
+        [readonly]="false">
+      </app-ilogi-select>
+    </div>
 
     <div class="table-wrapper">
       <table class="payment-table">
         <thead>
           <tr>
             <th>
-              <!-- <input type="checkbox" [checked]="isAllSelected()"
-                [disabled]="pendingPayments.length > 5 && maxSelectionReached && !isAllSelected()"
-                (change)="toggleAllSelection()" /> -->
-                Select
+          
+              Select
             </th>
             <th>SL No</th>
             <th>Service Name</th>
@@ -23,7 +31,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let payment of paginatedPendingPayments">
+          <tr *ngFor="let payment of filteredPendingPayments">
+
             <td>
               <input type="checkbox" [checked]="isSelected(payment.user_service_application_id)"
                 [disabled]="!isSelected(payment.user_service_application_id) && maxSelectionReached"
@@ -37,7 +46,7 @@
             <td>{{ payment.status }}</td>
             <td>₹{{ payment.amount }}</td>
           </tr>
-          <tr *ngIf="paginatedPendingPayments.length === 0">
+          <tr *ngIf="filteredPendingPayments.length === 0">
             <td colspan="8" class="no-data">No pending payments found.</td>
           </tr>
         </tbody>
@@ -55,7 +64,7 @@
         </div>
       </div>
       <div class="pagination-info">
-        Page {{ currentPagePending }} of {{ totalPagesPending }}
+        Page {{ currentPagePending }} of {{ totalPagesPendingCalculated }}
       </div>
       <div class="pagination-controls">
         <button class="pagination-btn" [disabled]="currentPagePending === 1" (click)="prevPagePending()">
@@ -96,7 +105,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let payment of paginatedCompletedPayments">
+          <tr *ngFor="let payment of completedPayments">
             <td>{{ payment.slNo }}</td>
             <td>{{ payment.serviceName }}</td>
             <td>{{ payment.applicationId }}</td>
@@ -124,7 +133,7 @@
         </div>
       </div>
       <div class="pagination-info">
-        Page {{ currentPageCompleted }} of {{ totalPagesCompleted }}
+        Page {{ currentPageCompleted }} of {{ totalPagesCompletedCalculated }}
       </div>
       <div class="pagination-controls">
         <button class="pagination-btn" [disabled]="currentPageCompleted === 1" (click)="prevPageCompleted()">

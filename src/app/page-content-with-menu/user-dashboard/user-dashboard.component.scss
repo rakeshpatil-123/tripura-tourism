@@ -15,7 +15,7 @@
     color: #1e293b;
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: transparent; 
     background-clip: text;
   }
 
@@ -522,4 +522,12 @@ border-bottom: 3px solid #fda00f ;
   width: 100%;
   padding: 6px;
   box-sizing: border-box;
+}
+
+.filter{
+  width: 100%;
+    display: flex;
+    gap: 10px;
+    padding: 0 12px;
+    margin-bottom: 8px;
 }

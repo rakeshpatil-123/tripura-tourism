@@ -11,6 +11,8 @@ import { query } from '@angular/animations';
 import { GenericService } from '../../_service/generic/generic.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
+import { IlogiSelectComponent } from '../../customInputComponents/ilogi-select/ilogi-select.component';
+import { FormsModule } from '@angular/forms';
 
 interface Payment {
   slNo: number;
@@ -32,12 +34,22 @@ interface Payment {
     SummaryCardsComponent,
     LineChartComponent,
     DynamicTableComponent,
-    BarChartComponent
+    BarChartComponent,
+    IlogiSelectComponent,
+    FormsModule,
+    CommonModule
   ],
   templateUrl: './user-dashboard.component.html',
   styleUrls: ['./user-dashboard.component.scss'],
 })
 export class UserDashboardComponent implements OnInit {
+    service: string | null = null;
+  applicationId: string | null = null;
+
+  serviceOptions: { id: string; name: string }[] = [];
+  applicationIdOptions: { id: string; name: string }[] = [];
+   totalPagesPendingCalculated = 1;
+  totalPendingCount = 0;
   clarification_required: any[] = [];
   columns: any[] = [
     {
@@ -121,16 +133,26 @@ export class UserDashboardComponent implements OnInit {
         this.loaderService.hideLoader();
       },
     });
-    this.unpaidPayments();
+       this.unpaidPayments(this.currentPagePending, this.itemsPerPagePending);
+
 
   }
 
 
 
-  unpaidPayments(): void {
+  unpaidPayments(
+    page: number = 1,
+    perPage: number = this.itemsPerPagePending
+  ): void {
+    const payload = {
+      payment_status: 'pending',
+      current_page: page,
+      per_page: perPage,
+    };
+
     this.apiService
       .getByConditions(
-        { payment_status: 'pending' },
+        payload,
         'api/user/user-service-applications-by-payment-status'
       )
       .subscribe({
@@ -138,7 +160,7 @@ export class UserDashboardComponent implements OnInit {
           if (response?.status === 1 && Array.isArray(response.data)) {
             this.pendingPayments = response.data.map(
               (item: any, index: number) => ({
-                slNo: index + 1,
+                slNo: (page - 1) * perPage + index + 1,
                 serviceName: item.service_title_or_description || 'N/A',
                 applicationId: item.application_id || 'N/A',
                 applicationDate: item.application_date
@@ -150,47 +172,92 @@ export class UserDashboardComponent implements OnInit {
                 user_service_application_id: item.user_service_application_id,
               })
             );
+            this.buildFilterOptions();
+            this.currentPagePending = page;
+            this.itemsPerPagePending = perPage;
+            this.totalPagesPendingCalculated =
+              response.pagination?.last_page || 1;
+            this.totalPendingCount = response.pagination?.total || 0;
           } else {
             this.pendingPayments = [];
+            this.totalPagesPendingCalculated = 1;
+            this.totalPendingCount = 0;
           }
         },
         error: () => {
           this.pendingPayments = [];
+          this.totalPagesPendingCalculated = 1;
+          this.totalPendingCount = 0;
         },
       });
   }
 
+  private buildFilterOptions(): void {
+    const services = new Set<string>();
+    const appIds = new Set<string>();
 
- get paginatedPendingPayments() {
+    this.pendingPayments.forEach((payment) => {
+      if (payment.serviceName && payment.serviceName !== 'N/A') {
+        services.add(payment.serviceName);
+      }
+      if (payment.applicationId && payment.applicationId !== 'N/A') {
+        appIds.add(payment.applicationId);
+      }
+    });
+
+    this.serviceOptions = [{ id: '', name: 'All' }].concat(
+      Array.from(services).map((s) => ({ id: s, name: s }))
+    );
+
+    this.applicationIdOptions = [{ id: '', name: 'All' }].concat(
+      Array.from(appIds).map((id) => ({ id: id, name: id }))
+    );
+  }
+get filteredPendingPayments(): Payment[] {
+  return this.pendingPayments.filter(payment => {
+    const matchesService = !this.service || payment.serviceName === this.service;
+    const matchesAppId = !this.applicationId || payment.applicationId === this.applicationId;
+    return matchesService && matchesAppId;
+  });
+}
+
+  get paginatedPendingPayments() {
     const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
     return this.pendingPayments.slice(start, start + this.itemsPerPagePending);
   }
 
-    get totalPagesPending(): number {
+  get totalPagesPending(): number {
     return Math.ceil(this.pendingPayments.length / this.itemsPerPagePending);
   }
 
   goToPagePending(page: number): void {
-    if (page < 1 || page > this.totalPagesPending) return;
-    this.currentPagePending = page;
+    if (page < 1 || page > this.totalPagesPendingCalculated) return;
+    this.unpaidPayments(page, this.itemsPerPagePending);
   }
 
   nextPagePending(): void {
-    if (this.currentPagePending < this.totalPagesPending) {
-      this.currentPagePending++;
+    if (this.currentPagePending < this.totalPagesPendingCalculated) {
+      this.unpaidPayments(
+        this.currentPagePending + 1,
+        this.itemsPerPagePending
+      );
     }
   }
 
   prevPagePending(): void {
     if (this.currentPagePending > 1) {
-      this.currentPagePending--;
+      this.unpaidPayments(
+        this.currentPagePending - 1,
+        this.itemsPerPagePending
+      );
     }
   }
 
   onPageSizeChangePending(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    this.itemsPerPagePending = +target.value;
-    this.currentPagePending = 1;
+    const newSize = +target.value;
+    this.itemsPerPagePending = newSize;
+    this.unpaidPayments(1, newSize); // Reset to page 1
   }
 
   toggleSelection(id: number): void {
