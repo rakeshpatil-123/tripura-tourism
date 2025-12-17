@@ -21,7 +21,7 @@
       <h3 class=" page-head">Workflow Steps</h3>
       <div class="btn-group-right">
         <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
-        <button (click)="downloadCertificate()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate
+        <button (click)="editCertificateGeneration()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate
           <mat-icon>picture_as_pdf</mat-icon>
         </button>
         @if (sampleFilePreview) {
@@ -72,7 +72,7 @@
         </div>
         <div class="mb-3">
           <app-ilogi-input formControlName="remarks" label="Remarks" [mandatory]="true"
-            placeholder="Enter remarks for this action (min 5 characters)"></app-ilogi-input>
+            placeholder="Enter remarks for this action (min 2 characters)"></app-ilogi-input>
         </div>
         <div>
           <app-ilogi-file-upload formControlName="attachment"  [mandatory]="false"
@@ -81,7 +81,7 @@
 
         @if (remarkForm.get('remarks')?.invalid && remarkForm.get('remarks')?.touched) {
         <small class="text-danger">
-          Remarks are required and must be at least 5 characters.
+          Remarks are required and must be at least 2 characters.
         </small>
         }
         <div class="modal-actions">

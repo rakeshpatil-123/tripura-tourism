@@ -361,7 +361,7 @@ export class ApplicationSearchPageComponent implements OnInit {
             action: 'download',
             color: 'warn',
             visible: (row: ApplicationDataItem) =>
-              (row.status || '').toLowerCase() === 'approved' && row.is_certificate !== null,
+             true,
             handler: (row: ApplicationDataItem) => {
               this.downloadCertificate(row.id);
             },
@@ -531,8 +531,8 @@ export class ApplicationSearchPageComponent implements OnInit {
           this.error =
             res?.message || 'PDF file not found for this application.';
           Swal.fire({
-            icon: 'error',
-            title: 'Error',
+            icon: 'warning',
+            title: 'Warning',
             text: this.error || 'PDF file not found for this application.',
             confirmButtonText: 'OK',
           });

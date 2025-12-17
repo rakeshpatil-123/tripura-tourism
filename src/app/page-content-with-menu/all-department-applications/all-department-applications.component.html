@@ -8,7 +8,12 @@
     <div class="search-box" role="search" aria-label="Search services">
       <input pInputText type="text" placeholder="Search by service name, applications count..." [(ngModel)]="searchText"
         (keydown.enter)="applyClientSearch(dt)" class="server-search-input" aria-label="Search services" />
-
+        <form class="mb-20" [formGroup]="departmentApplicationForm">
+          <app-ilogi-select fieldId="department_id" fieldLabel="Department" [selectOptions]="departments"
+            placeholder="Select department" appendTo="body" formControlName="department_id"
+            (ngModelChange)="applyClientSearch($event)">
+          </app-ilogi-select>
+        </form>
       <button pButton type="button" class="btn btn-search" (click)="applyClientSearch(dt)" aria-label="Search">
         <i class="pi pi-search"></i>
         <span class="btn-text">Search</span>

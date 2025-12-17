@@ -168,7 +168,7 @@
           <div class="no-data-wrapper">
             <i class="pi pi-inbox no-data-icon"></i>
             <h3>No Departmental Users Found</h3>
-            <p>Please add a new user by clicking <b>"Add Departmental User"</b> button above.</p>
+            <p *ngIf="userRole==='admin'">Please add a new user by clicking <b>"Add Departmental User"</b> button above.</p>
           </div>
         </td>
       </tr>

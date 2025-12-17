@@ -64,35 +64,38 @@
           <input class="search-input" type="search" formControlName="search"
             placeholder="Search applicant name or phone" aria-label="Search applications" />
         </div>
-        <app-ilogi-input-date formControlName="startDate" class="filter-item" placeholder="Start date"
-          aria-label="Start date"></app-ilogi-input-date>
-        <app-ilogi-input-date formControlName="endDate" class="filter-item" placeholder="End date"
-          aria-label="End date"></app-ilogi-input-date>
 
-        <!-- <app-ilogi-select
+
+        <app-ilogi-select
           class="filter-item dropdown-fix"
-          [options]="districts"
+          [selectOptions]="districts"
           formControlName="district_id"
+          [fieldLabel]="'District'"
           placeholder="District"
           aria-label="Filter by district"
         ></app-ilogi-select>
         <app-ilogi-select
           class="filter-item dropdown-fix"
-          [options]="subdivisions"
+          [selectOptions]="subdivisions"
+          [fieldLabel]="'Subdivision'"
           formControlName="subdivision_id"
           placeholder="Subdivision"
           aria-label="Filter by subdivision"
-        ></app-ilogi-select> -->
+        ></app-ilogi-select>
 
-        <app-ilogi-select class="filter-item dropdown-fix" [selectOptions]="hierarchyLevels"
+        <app-ilogi-select class="filter-item dropdown-fix" [fieldLabel]="'Hierarchy level'" [selectOptions]="hierarchyLevels"
           formControlName="hierarchy_level" placeholder="Hierarchy" aria-label="Hierarchy level"></app-ilogi-select>
 
-        <app-ilogi-select class="filter-item dropdown-fix" [selectOptions]="statusOptions"
+        <app-ilogi-select class="filter-item dropdown-fix" [fieldLabel]="'Status'" [selectOptions]="statusOptions"
           formControlName="current_status" placeholder="Status" aria-label="Filter by status"></app-ilogi-select>
       </div>
 
       <div class="filter-actions" aria-hidden="false">
         <div class="filter-actions-inner">
+                  <app-ilogi-input-date formControlName="startDate" [fieldLabel]="'Start date'" class="filter-item mb-17" placeholder="Start date"
+          aria-label="Start date"></app-ilogi-input-date>
+        <app-ilogi-input-date formControlName="endDate" [fieldLabel]="'End date'" class="filter-item mb-17" placeholder="End date"
+          aria-label="End date"></app-ilogi-input-date>
           <button type="button" class="btn btn-action" (click)="downloadExcel()" title="Download Excel"
             aria-label="Download Excel">
             Download Excel

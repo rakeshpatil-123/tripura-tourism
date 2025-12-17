@@ -93,7 +93,7 @@ export class AddServiceDialogComponent implements OnInit {
 
       generate_id: [true],
       generate_pdf: [true],
-      generated_id_format: [''],
+      generated_id_format: ['', Validators.required],
       show_letter_date: [true],
 
 

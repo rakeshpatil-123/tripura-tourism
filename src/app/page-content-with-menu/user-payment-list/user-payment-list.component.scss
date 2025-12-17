@@ -570,6 +570,7 @@ $focus-glow: rgba(10, 163, 163, 0.12);
 .btn.export {
   background: linear-gradient(180deg, $accent, darken($accent, 6%));
   color: #fff;
+  padding: 20px 12px;
   border-color: rgba(10, 163, 163, 0.06);
   box-shadow: 0 8px 22px rgba(10, 163, 163, 0.10);
 }
@@ -957,10 +958,15 @@ $shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.08);
 
 .btn.mark {
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 9px;
   font-weight: 800;
   cursor: pointer;
   transition: transform .12s ease, box-shadow .15s ease, opacity .12s ease;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 70px;
+  max-width: 100%;
 }
 
 .btn-mark {
@@ -997,6 +1003,13 @@ td.status {
   border-radius: 6px;
   cursor: pointer;
   border: none;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-mark {

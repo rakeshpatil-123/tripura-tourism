@@ -44,11 +44,11 @@
                 <div *ngSwitchCase="'password'">
                   <input [formControlName]="v.key" type="password" class="input-field" (input)="updateLivePreview()" />
                 </div>
-                <div *ngSwitchCase="'image'" class="image-field">
+                <!-- <div *ngSwitchCase="'image'" class="image-field">
                   <input type="file" accept="image/*" (change)="onImageSelected($event, v.key)" />
                   <img *ngIf="form.get(v.key)?.value" [src]="form.get(v.key)?.value" alt="{{ v.key }}"
                     class="preview-image" />
-                </div>
+                </div> -->
 
                 <input *ngSwitchDefault [formControlName]="v.key" type="text" class="input-field"
                   (input)="updateLivePreview()" />

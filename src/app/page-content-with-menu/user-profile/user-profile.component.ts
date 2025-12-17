@@ -98,9 +98,12 @@ export class UserProfileComponent implements OnInit {
   loadingUlbs = false;
   loadingWards = false;
 
-  constructor(private genericService: GenericService, private fb: FormBuilder, private loaderService: LoaderService) { }
+  constructor(private genericService: GenericService, private fb: FormBuilder, private loaderService: LoaderService) {
+    this.isDepartmentUser = String(localStorage.getItem('userRole')) === 'department';
+   }
 
   ngOnInit(): void {
+    this.isDepartmentUser = String(localStorage.getItem('userRole')) === 'department';
     this.initForms();
     this.getAllDepartmentList();
     this.loadDistricts();
@@ -258,8 +261,8 @@ export class UserProfileComponent implements OnInit {
   updateProfile(): void {
     this.loaderService.showLoader();
     const userId = Number(localStorage.getItem('userId'));
+    const isDeptRole = String(localStorage.getItem('userRole')) === 'department';
     const val = this.profileForm.getRawValue();
-
     let payload: BackendProfile | any = {
       id: userId,
       name_of_enterprise: val.enterpriseName,
@@ -272,6 +275,7 @@ export class UserProfileComponent implements OnInit {
       hierarchy_level: val.hierarchy_level,
       department_id: val.department_id
     };
+    
     if (val.userType === 'individual') {
       delete payload.hierarchy_level;
       delete payload.department_id;
@@ -287,8 +291,23 @@ export class UserProfileComponent implements OnInit {
       if (val.ward_code) {
         payload.ward_id = val.ward_code;
       }
-    } else {
-      const isDeptRole = String(localStorage.getItem('userRole')) === 'department';
+       this.genericService.updateProfile(payload).pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
+        next: (res: any) => {
+          if (res?.status === 1) {
+            this.genericService.openSnackBar(res?.message || 'Profile updated successfully!', 'Success');
+            this.profileForm.markAsPristine();
+          } else {
+            this.genericService.openSnackBar(res?.message || 'Update failed', 'Error');
+          }
+        },
+        error: (err: any) => {
+          console.error('Profile update failed:', err);
+          this.genericService.openSnackBar('Something went wrong while updating profile', 'Error');
+        }
+      });
+    }
+     else if (val.userType === 'department') {
+
       if (isDeptRole) {
         const hierarchy = String(val.hierarchy_level || '').trim();
 
@@ -414,8 +433,8 @@ export class UserProfileComponent implements OnInit {
         delete payload.ulb_id;
         delete payload.ward_id;
       } else {
-      }
 
+      }
       this.genericService.updateProfile(payload).pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
         next: (res: any) => {
           if (res?.status === 1) {
@@ -430,7 +449,23 @@ export class UserProfileComponent implements OnInit {
           this.genericService.openSnackBar('Something went wrong while updating profile', 'Error');
         }
       });
+    } else if (val.userType === 'admin') {
+       this.genericService.updateProfile(payload).pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
+        next: (res: any) => {
+          if (res?.status === 1) {
+            this.genericService.openSnackBar(res?.message || 'Profile updated successfully!', 'Success');
+            this.profileForm.markAsPristine();
+          } else {
+            this.genericService.openSnackBar(res?.message || 'Update failed', 'Error');
+          }
+        },
+        error: (err: any) => {
+          console.error('Profile update failed:', err);
+          this.genericService.openSnackBar('Something went wrong while updating profile', 'Error');
+        }
+      });
     }
+
   }
   getLocationsPayload(): any[] {
     const locations: Array<{ district_id: number | null; subdivision_id: number | null; block_id: number | null }> = [];

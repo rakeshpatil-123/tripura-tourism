@@ -179,7 +179,7 @@ export class BarGraphDeptUserComponent implements OnChanges, AfterViewInit, OnDe
   }
 
   formatDays(v: number) {
-    if (v <= 0.01) return '0d';
+    if (v <= 0.01) return '1d';
     if (v < 1) return `${v.toFixed(2)}d`;
     if (Math.abs(v - Math.round(v)) < 0.01) return `${Math.round(v)}d`;
     return `${v.toFixed(1)}d`;

@@ -1579,7 +1579,7 @@ getAdminDepartmentalUserProfile(params?: any): Observable<any> {
 getBusinessUsersDetails(page: number = 1, rowCount: number = 10, search?: string) {
   const body: any = {
     page,
-    row_count: rowCount
+    per_page: rowCount
   };
 
   if (search && search.toString().trim()) {

@@ -399,7 +399,7 @@ export class DepartmentalUsersComponent implements OnInit {
       payload.department_id = selectedDep;
     }
     payload.page = this.pagination.current_page ?? 1;
-    payload.per_page = this.pagination.row_count ?? 5;
+    payload.row_count  = this.pagination.row_count ?? 5;
     payload.export = 'excel';
 
     const currentUserType = localStorage.getItem('userRole');

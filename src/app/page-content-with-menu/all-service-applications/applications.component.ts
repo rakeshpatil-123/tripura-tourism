@@ -72,6 +72,7 @@ export class ApplicationsComponent implements OnInit {
 
   statusOptions = [
     { id: '', name: 'None' },
+    {id: 'noc_issued', name: 'NOC Issued'},
     { id: 'saved', name: 'Saved' },
     { id: 'submitted', name: 'Submitted' },
     { id: 'under_review', name: 'Under Review' },
@@ -189,6 +190,8 @@ export class ApplicationsComponent implements OnInit {
         ) {
           this.applications = res.data.map((app: any) => ({
             ...app,
+            hierarchy: this.capitalizeFirstLetter(app.hierarchy_level),
+            payment_status: this.capitalizeFirstLetter(app.payment_status),
             submission_date: this.formatDateTime(app.submission_date),
             max_processing_date: this.formatDateTime(app.max_processing_date),
           }));
@@ -221,7 +224,7 @@ export class ApplicationsComponent implements OnInit {
     const firstItem = data[0];
     const columns: TableColumn[] = [];
 
-    const skipKeys = ['final_fee', 'extra_payment', 'total_fee', 'current_step_number', 'ulb_code', 'ulb_name', 'ward_code', 'ward_name', 'district_code', 'subdivision_code'];
+    const skipKeys = ['application_id', 'service_name', 'final_fee', 'extra_payment', 'total_fee', 'current_step_number', 'ulb_code', 'ulb_name', 'ward_code', 'ward_name', 'district_code', 'subdivision_code'];
 
     const columnConfig: Record<
       string,
@@ -232,14 +235,14 @@ export class ApplicationsComponent implements OnInit {
         linkHref?: (row: any) => string;
       }
     > = {
-      application_id: {
-        label: 'Application ID',
-        width: '120px',
-        type: 'link',
-        linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
-      },
-      application_number: { type: 'text', label: 'Application Number', width: '190px' },
-      service_name: { label: 'Service', width: '180px' },
+      // application_id: {
+      //   label: 'Application ID',
+      //   width: '120px',
+      //   type: 'link',
+      //   linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
+      // },
+      application_number: { label: 'Application Number', width: '190px', type: 'link', linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`},
+      // service_name: { label: 'Service', width: '180px' },
       applicant_name: { label: 'Applicant Name', width: '180px' },
       applicant_email: { label: 'Email', width: '200px' },
       applicant_mobile: { label: 'Mobile', width: '140px' },
@@ -302,6 +305,11 @@ export class ApplicationsComponent implements OnInit {
     const seconds = String(date.getSeconds()).padStart(2, '0');
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  private capitalizeFirstLetter(str: string): string {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
 
   openStatusModal(
@@ -478,15 +486,21 @@ export class ApplicationsComponent implements OnInit {
     const status = this.remarkForm.get('current_status')?.value;
     if (status) payload.status = status;
 
+    const districtId = this.remarkForm.get('district_id')?.value;
+    if (districtId) payload.district_id = districtId;
+
+    const subdivisionId = this.remarkForm.get('subdivision_id')?.value;
+    if (subdivisionId) payload.subdivision_id = subdivisionId;
+
     const rawSearch = (this.remarkForm.get('search')?.value || '').toString().trim();
     if (rawSearch) {
       const numericOnly = rawSearch.replace(/\D/g, '');
       const looksLikePhone = numericOnly.length >= 3 && /^[\d+\-\s()]+$/.test(rawSearch);
 
       if (looksLikePhone) {
-        payload.applicant_phone = numericOnly;
+        payload.search = numericOnly;
       } else {
-        payload.applicant_name = rawSearch;
+        payload.search = rawSearch;
       }
     }
     const startRaw = this.remarkForm.get('startDate')?.value ?? this.remarkForm.get('searchDate')?.value;
@@ -519,6 +533,8 @@ export class ApplicationsComponent implements OnInit {
           if (res?.status === 1 && Array.isArray(res.data)) {
             this.applications = res.data.map((app: any) => ({
               ...app,
+              status: this.capitalizeFirstLetter(app.status),
+              payment_status: this.capitalizeFirstLetter(app.payment_status),
               submission_date: this.formatDateTime(app.submission_date),
               max_processing_date: this.formatDateTime(app.max_processing_date),
             }));

@@ -79,11 +79,17 @@
         </mat-form-field>
         </div>
     <div *ngIf="serviceForm.get('service_mode')?.value !== 'third_party'" class="form-row">
+      <div>
+        
+        <mat-error style="font-size: 10px" *ngIf="serviceForm.get('generated_id_format')?.hasError('required')">
+          Generated License ID is required
+        </mat-error>
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Generated License ID</mat-label>
-        <input matInput formControlName="generated_id_format" placeholder="e.g. CL/WR/SWS/{{ '{YEAR}' }}/{{ '{SEQ}' }}">
-        <mat-hint>Use {{ '{YEAR}' }} for current year & {{ '{SEQ}' }} for sequence</mat-hint>
-      </mat-form-field>
+          <mat-label>Generated License ID</mat-label>
+          <input matInput formControlName="generated_id_format" placeholder="e.g. CL/WR/SWS/{{ '{YEAR}' }}/{{ '{SEQ}' }}">
+          <mat-hint>Use {{ '{YEAR}' }} for current year & {{ '{SEQ}' }} for sequence</mat-hint>
+        </mat-form-field>
+      </div>
       <mat-form-field appearance="outline" class="form-field full-width">
         <mat-label>Depend on Service</mat-label>
         <mat-select formControlName="depends_on_services" placeholder="Select dependent service" multiple>

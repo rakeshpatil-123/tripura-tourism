@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GenericService } from '../../_service/generic/generic.service';
 import { TooltipModule } from 'primeng/tooltip';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import Swal from 'sweetalert2';
@@ -13,9 +13,11 @@ import { LoaderService } from '../../_service/loader/loader.service';
 import { finalize } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
+import { IlogiSelectComponent, SelectOption } from '../../customInputComponents/ilogi-select/ilogi-select.component';
 
 @Component({
   selector: 'app-departmental-services',
+  standalone: true,
   templateUrl: './all-department-applications.component.html',
   styleUrls: ['./all-department-applications.component.scss'],
   imports: [
@@ -26,43 +28,66 @@ import { HttpResponse } from '@angular/common/http';
     TooltipModule,
     FormsModule,
     InputTextModule,
-    ButtonModule
+    ButtonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    IlogiSelectComponent
   ],
 })
 export class AllDepartmentApplicationsComponent implements OnInit {
   services: any[] = [];
   serviceColumns: any[] = [];
   displayedColumns: { field: string; header: string }[] = [];
-
+  departments: SelectOption[] = [{id: 'rakesh', name: 'rakesh'}];
   isLoading: boolean = false;
   totalRecords: number = 0;
   rows: number = 10;
   currentPage: number = 1;
-
+  departmentApplicationForm!: FormGroup;
   searchText: string = '';
   globalFilterFields: string[] = [];
 
   constructor(
     private apiService: GenericService,
     private router: Router,
-    private loaderService: LoaderService
-  ) { }
+    private loaderService: LoaderService,
+    private fb : FormBuilder
+  ) {
+    this.departmentApplicationForm = this.fb.group({
+      department_id: [''],
+    })
+   }
 
   ngOnInit(): void {
     const deptId = localStorage.getItem('deptId');
     if (!deptId) {
       this.apiService.openSnackBar('Department ID not found.', 'Close');
     }
+    this.getAllDepartmentNames();
     this.fetchServices(1, this.rows);
+    this.departmentApplicationForm.get('department_id')?.valueChanges.subscribe((value)=> {
+      this.fetchServices(1, this.rows);
+    })
+  }
+  getAllDepartmentNames(): void {
+    this.apiService.getAllDepartmentNames().subscribe((res: any) => {
+      this.departments = res.data.map((dept: any) => {
+        return {
+          id: dept.id,
+          name: dept.name,
+        }
+      })
+    })
   }
 
   fetchServices(page: number = 1, rowCount: number = this.rows) {
     this.isLoading = true;
     this.loaderService.showLoader();
 
-    const departmentId = localStorage.getItem('deptId') || '';
+    const departmentIdCurrent = localStorage.getItem('deptId') || '';
+    const departmentId = this.departmentApplicationForm.get('department_id')?.value;
     const payload: any = {
-      department_id: departmentId,
+      department_id: departmentId || departmentIdCurrent,
       page: page,
       row_count: rowCount
     };
@@ -128,7 +153,6 @@ export class AllDepartmentApplicationsComponent implements OnInit {
     if (!dt) {
       return;
     }
-
     if (!q) {
       try { dt.reset(); } catch { }
       return;

@@ -70,7 +70,7 @@ export class ServiceViewComponent implements OnInit {
   ) {
     this.remarkForm = this.fb.group({
       extraAmount: [null],
-      remarks: ['', [Validators.required, Validators.minLength(5)]],
+      remarks: ['', [Validators.required, Validators.minLength(2)]],
       attachment: [null],
     });
   }
@@ -438,29 +438,192 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
     });
   }
   previewCertificate(): void {
-    this.apiService.getByConditions({}, `api/department/preview-certificate/${this.applicationId}`).subscribe({
-      next: (res: any) => {
-        if (res?.pdf_url) {
-          window.open(res.pdf_url, '_blank');
+    const payload = {
+      is_preview: "yes",
+      application_id: this.applicationId
+    };
+    this.loaderService.showLoader();
+    this.apiService.previewCertificate(payload).pipe(finalize(()=> this.loaderService.hideLoader())).subscribe({
+      next: async (res: any) => {
+        let blob: Blob | null = null;
+        try {
+          if (res instanceof Blob) {
+            blob = res;
+          } else if (res?.body instanceof Blob) {
+            blob = res.body;
+          } else if (res?.data instanceof Blob) {
+            blob = res.data;
+          } else if (res instanceof ArrayBuffer) {
+            blob = new Blob([res], { type: 'application/pdf' });
+          } else if (res?.body instanceof ArrayBuffer) {
+            blob = new Blob([res.body], { type: 'application/pdf' });
+          } else if (res?.blob && typeof res.blob === 'function') {
+            const maybe = await res.blob();
+            if (maybe instanceof Blob) blob = maybe;
+          } else if (typeof res === 'object' && res !== null && (res.data || res.body)) {
+            const candidate = res.data ?? res.body;
+            if (typeof candidate === 'string') {
+              const dataUriMatch = candidate.match(/^data:(.+);base64,(.*)$/);
+              if (dataUriMatch) {
+                const mime = dataUriMatch[1];
+                const b64 = dataUriMatch[2];
+                blob = this.base64ToBlob(b64, mime);
+              } else {
+                const possibleB64 = candidate.replace(/\s/g, '');
+                if (/^[A-Za-z0-9+/=]+$/.test(possibleB64) && possibleB64.length % 4 === 0) {
+                  blob = this.base64ToBlob(possibleB64, 'application/pdf');
+                }
+              }
+            }
+          } else if (typeof res === 'string') {
+            const dataUriMatch = res.match(/^data:(.+);base64,(.*)$/);
+            if (dataUriMatch) {
+              const mime = dataUriMatch[1];
+              const b64 = dataUriMatch[2];
+              blob = this.base64ToBlob(b64, mime);
+            } else {
+            }
+          } else if (typeof res === 'object' && res !== null) {
+            try {
+              blob = new Blob([JSON.stringify(res)], { type: 'application/pdf' });
+            } catch (e) {
+              blob = null;
+            }
+          }
+        } catch (ex) {
+          console.warn('Error while trying to normalize response to Blob', ex);
+          blob = null;
+        }
+        if (blob && blob.size > 0) {
+          const isPdf = blob.type?.includes('pdf') || blob.size > 200;
+          if (!isPdf) {
+            try {
+              const text = await blob.text();
+              try {
+                const parsed = JSON.parse(text);
+                const message = parsed?.message || parsed?.error || text;
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: typeof message === 'string' ? message : 'Failed to retrieve certificate. Please try again.',
+                  confirmButtonText: 'OK'
+                });
+                return;
+              } catch {
+                const lower = text.slice(0, 300).toLowerCase();
+                if (lower.includes('error') || lower.includes('exception') || lower.includes('not found')) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: text.slice(0, 300),
+                    confirmButtonText: 'OK'
+                  });
+                  return;
+                }
+              }
+            } catch (readErr) {
+              console.warn('Could not read blob text', readErr);
+            }
+          }
+        }
+        if (!blob || blob.size === 0) {
+          const errMsg =
+            (res && typeof res === 'object' && (res.message || res.error)) ? (res.message || res.error) :
+              'Failed to retrieve certificate. Please try again.';
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errMsg,
+            confirmButtonText: 'OK'
+          });
+          return;
+          }
+          const blobUrl = URL.createObjectURL(blob);
+          const htmlContent = `
+    <p style="margin-bottom: 16px; font-size: 14px;">
+      Your certificate preview is ready. Click the button below to open it in a new tab.
+    </p>
+    <button id="preview-cert-link" 
+      style="padding: 10px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+      📄 View Certificate
+    </button>
+  `;
+          Swal.fire({
+          title: 'Certificate Preview',
+          html: htmlContent,
+          icon: 'success',
+          confirmButtonText: 'Close',
+          didOpen: () => {
+            const link = document.getElementById('preview-cert-link');
+            if (link) {
+              link.addEventListener('click', () => {
+                this.openBlobInNewTab(blob!, blobUrl);
+              });
+            }
+          },
+          willClose: () => {
+            try { URL.revokeObjectURL(blobUrl); } catch (e) { /* ignore */ }
+          }
+        });
+      },
+      error: (err: any) => {
+        if (err?.error instanceof Blob) {
+          err.error.text().then((text: string) => {
+            let message = text;
+            try {
+              const parsed = JSON.parse(text);
+              message = parsed?.message || parsed?.error || text;
+            } catch { }
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: message || 'Something went wrong while fetching the certificate. Please try again.',
+              confirmButtonText: 'OK'
+            });
+          }).catch(() => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Something went wrong while fetching the certificate. Please try again.',
+              confirmButtonText: 'OK'
+            });
+          });
         } else {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'PDF URL not found. Please try again.',
+            text: (err?.message) ? err.message : 'Something went wrong while fetching the certificate. Please try again.',
             confirmButtonText: 'OK'
           });
         }
-      },
-      error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Download Failed',
-          text: 'Something went wrong while fetching the certificate.',
-          confirmButtonText: 'Retry'
-        });
       }
     });
   }
+  private openBlobInNewTab(blob: Blob, suggestedFilename?: string): boolean {
+    try {
+      const url = URL.createObjectURL(blob);
+      const newTab = window.open(url, '_blank');
+      if (!newTab) {
+        URL.revokeObjectURL(url);
+        return false;
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      return true;
+    } catch (e) {
+      console.error('openBlobInNewTab error', e);
+      return false;
+    }
+  }
+  private base64ToBlob(base64: string, contentType = 'application/pdf'): Blob {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: contentType });
+  }
+
   editCertificateGeneration(): void {
     const dialogRef = this.dialog.open(EditableCertificateGenerationComponent, {
       width: '80vw',
