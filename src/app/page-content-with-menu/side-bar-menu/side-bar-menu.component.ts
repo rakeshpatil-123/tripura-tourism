@@ -69,6 +69,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       ],
     },
     {
+      id: 'my-departmental-applications',
+      title: 'Pending Applications',
+      icon: 'layers',
+      route: '/dashboard/my-departmental-applications',
+      roles: ['department'],
+    },
+    {
       id: 'Departments',
       title: 'Departments',
       icon: 'apartment',
@@ -88,13 +95,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       icon: 'military_tech',
       route: '/dashboard/admin-incentive',
       roles: ['admin'],
-    },
-    {
-      id: 'Departmental User',
-      title: 'My Departmental Users',
-      icon: 'groups',
-      route: '/dashboard/departmental-user',
-      roles: ['admin', 'department'],
     },
     {
       id: 'BusinessUser',
@@ -175,18 +175,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
       roles: ['department'],
     },
     {
-      id: 'my-departmental-applications',
-      title: 'Pending Applications',
-      icon: 'layers',
-      route: '/dashboard/my-departmental-applications',
-      roles: ['department'],
-    },
-    {
       id: 'Incentive Applications',
       title: 'Incentive Applications',
       icon: 'military_tech',
       route: '/dashboard/incentive-applications',
       roles: ['department'],
+    },
+       {
+      id: 'Departmental User',
+      title: 'My Departmental Users',
+      icon: 'groups',
+      route: '/dashboard/departmental-user',
+      roles: ['admin', 'department'],
     },
     // {
     //   id: 'jsontoexcel',

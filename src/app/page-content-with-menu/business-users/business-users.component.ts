@@ -181,7 +181,7 @@ export class BusinessUsersComponent implements OnInit {
   performExport() {
     const payload: any = {
       page: this.currentPage ?? 1,
-      row_count: this.rows ?? 10,
+      per_page: this.rows ?? 10,
       export: 'excel'
     };
 

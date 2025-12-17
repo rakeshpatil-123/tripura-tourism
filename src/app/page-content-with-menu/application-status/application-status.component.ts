@@ -43,6 +43,7 @@ export class ApplicationStatusComponent implements OnInit, OnDestroy {
   statuses: SelectOption[] = [
     { id: '', name: 'All status' },
     { id: 'submitted', name: 'Submitted' },
+    {id: 'noc_issued', name: 'NOC Issued'},
     { id: 'approved', name: 'Approved' },
     { id: 'rejected', name: 'Rejected' },
     { id: 'send_back', name: 'Send Back' },

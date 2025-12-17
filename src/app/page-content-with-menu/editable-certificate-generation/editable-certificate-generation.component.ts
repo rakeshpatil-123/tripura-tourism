@@ -253,19 +253,19 @@ export class EditableCertificateGenerationComponent implements OnInit {
     basePayload.is_preview = 'yes';
     const payloadToSend = this.prepareBackendPayload(basePayload);
 
-    const svc: any = this.genericService as any;
-    let obs: any;
-    if (typeof svc.previewCertificate === 'function') {
-      obs = svc.previewCertificate(payloadToSend);
-    } else if (typeof svc.generateCertificateAsBlob === 'function') {
-      obs = svc.generateCertificateAsBlob(payloadToSend);
-    } else {
-      this.generating = false;
-      Swal.fire('Error', 'No blob-returning service method available (previewCertificate / generateCertificateAsBlob).', 'error');
-      return;
-    }
+    // const svc: any = this.genericService as any;
+    // let obs: any;
+    // if (typeof svc.previewCertificate === 'function') {
+    //   obs = svc.previewCertificate(payloadToSend);
+    // } else if (typeof svc.generateCertificateAsBlob === 'function') {
+    //   obs = svc.generateCertificateAsBlob(payloadToSend);
+    // } else {
+    //   this.generating = false;
+    //   Swal.fire('Error', 'No blob-returning service method available (previewCertificate / generateCertificateAsBlob).', 'error');
+    //   return;
+    // }
 
-    obs.subscribe({
+    this.genericService.previewCertificate(payloadToSend).subscribe({
       next: (resp: any) => {
         this.generating = false;
         try { this.dialogRef?.close?.('generated'); } catch (e) { }

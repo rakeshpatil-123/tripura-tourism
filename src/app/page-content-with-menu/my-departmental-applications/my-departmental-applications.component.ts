@@ -16,6 +16,9 @@ import {
 } from '@angular/forms';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
 import { SelectOption, IlogiSelectComponent } from '../../customInputComponents/ilogi-select/ilogi-select.component';
+import { LoaderService } from '../../_service/loader/loader.service';
+import { debounceTime, finalize } from 'rxjs';
+import { IlogiInputDateComponent } from '../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 
 interface StatusActionModal {
   visible: boolean;
@@ -41,6 +44,7 @@ interface District {
     IlogiInputComponent,
     ReactiveFormsModule,
     IlogiSelectComponent,
+    IlogiInputDateComponent
   ],
   templateUrl: './my-departmental-applications.component.html',
   styleUrls: ['./my-departmental-applications.component.scss'],
@@ -49,7 +53,8 @@ interface District {
 export class MyDepartmentalApplicationsComponent implements OnInit {
   departmentId: number | null = null;
   serviceId: number | null = null;
-
+  services: SelectOption[] = [];
+  departments: SelectOption[] = [];
   hierarchyLevels = [
     { id: '', name: 'None' },
     { id: 'block', name: 'Block' },
@@ -66,6 +71,7 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
 
   statusOptions = [
     { id: '', name: 'None' },
+    {id: 'noc_issued', name: 'NOC Issued'},
     { id: 'saved', name: 'Saved' },
     { id: 'submitted', name: 'Submitted' },
     { id: 'under_review', name: 'Under Review' },
@@ -97,11 +103,18 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
     private router: Router,
     private apiService: GenericService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService
   ) {
+    const today = new Date();
+    const past12Months = new Date();
+    past12Months.setFullYear(today.getFullYear() - 1);
     this.remarkForm = this.fb.group({
       remarks: ['', [Validators.required, Validators.minLength(5)]],
       district_id: [''],
+      start_date: [past12Months],
+      end_date: [today],
+      service_id: [''],
       subdivision_id: [''],
       hierarchy_level: [''],
       current_status: [''],
@@ -112,22 +125,50 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
   ngOnInit(): void {
     this.loadParamsAndData();
     this.loadDistricts();
-
+    this.getAllServiceNames();
     this.remarkForm.get('district_id')?.valueChanges.subscribe((district) => {
       this.loadSubdivisions(district);
-      this.applyFilters();
-    });
+      this.loadApplications();
+    });   
+    this.remarkForm.get('start_date')?.valueChanges.subscribe(()=> this.loadApplications());
+    this.remarkForm.get('end_date')?.valueChanges.subscribe(()=> this.loadApplications());
+    this.remarkForm.get('subdivision_id')?.valueChanges.subscribe(() => this.loadApplications());
+    this.remarkForm.get('hierarchy_level')?.valueChanges.subscribe(() => this.loadApplications());
+    this.remarkForm.get('current_status')?.valueChanges.subscribe(() => this.loadApplications());
+    this.remarkForm.get('service_id')?.valueChanges.subscribe(()=> this.loadApplications())
+    this.remarkForm.get('search')?.valueChanges.pipe(debounceTime(500)).subscribe(() => this.loadApplications());
+    this.remarkForm.get('start_date')?.valueChanges.subscribe(() => this.loadApplications());
+    this.remarkForm.get('end_date')?.valueChanges.subscribe(() => this.loadApplications());
+  }
+  getAllServiceNames(): void {
+    this.loaderService.showLoader();
+    this.apiService.getAdminServices().pipe(finalize(() => this.loaderService.hideLoader())).subscribe((res: any) => {
+      this.services = res.data.map((singleService: any) => {
+        return { id: singleService.id, name: singleService.service_title_or_description };
+      })
+      this.services.unshift({id: '', name: 'None'});
+    })
+  }
 
-    this.remarkForm
-      .get('subdivision_id')
-      ?.valueChanges.subscribe(() => this.applyFilters());
-    this.remarkForm
-      .get('hierarchy_level')
-      ?.valueChanges.subscribe(() => this.applyFilters());
-    this.remarkForm
-      .get('current_status')
-      ?.valueChanges.subscribe(() => this.applyFilters());
-    this.remarkForm.get('search')?.valueChanges.subscribe(() => this.applyFilters());
+  makeFirstLetterUpperCase(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  private formatDateToDDMMYYYY(date: any): string | null {
+    if (!date) return null;
+    let d: Date;
+    if (date instanceof Date) {
+      d = date;
+    } else if (typeof date === 'string') {
+      d = new Date(date);
+    } else {
+      return null;
+    }
+    if (isNaN(d.getTime())) return null;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
   }
   loadParamsAndData(): void {
     this.isLoading = true;
@@ -141,26 +182,51 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
     });
   }
   loadApplications(): void {
-    const deptId =
-      this.departmentId ?? (localStorage.getItem('deptId') ? Number(localStorage.getItem('deptId')) : null);
+    const deptId = this.departmentId ?? (localStorage.getItem('deptId') ? Number(localStorage.getItem('deptId')) : null);
+    const serviceId = this.remarkForm.get('service_id')?.value || null;
+    const hierarchyLevel = this.remarkForm.get('hierarchy_level')?.value || null;
+    const status = this.remarkForm.get('current_status')?.value || null;
+    const searchInput = this.remarkForm.get('search')?.value || null;
+    const startDate = this.remarkForm.get('start_date')?.value || null;
+    const endDate = this.remarkForm.get('end_date')?.value || null;
 
     const payload: any = {};
-    if (deptId !== null) payload.department_id = deptId;
+    if (!!serviceId) {
+      payload.service_id = serviceId
+    }
+    if (!!hierarchyLevel) {
+      payload.hierarchy_level = hierarchyLevel;
+    }
+    if (!!status) {
+      payload.status = status;
+    }
+    if (!!searchInput) {
+      payload.search = searchInput;
+    } 
+    if (startDate) {
+      payload.date_from = this.formatDateToDDMMYYYY(startDate);
+    }
+    if (endDate) {
+      payload.date_to = this.formatDateToDDMMYYYY(endDate);
+    }
+    // if (deptId !== null) payload.department_id = deptId;
     if (this.serviceId !== null) payload.service_id = this.serviceId;
     const uid = this.apiService.getDecryptedUserId();
     const api = `api/department/user/${uid}/assigned-applications`;
     this.isLoading = true;
-
-    this.apiService.getByConditions({}, api).subscribe({
+    
+    this.apiService.getByConditions(payload, api).subscribe({
       next: (res: any) => {
         this.isLoading = false;
 
         if (res?.success === true || (res?.status === 1 && Array.isArray(res.data))) {
           this.applications = res.data.map((app: any) => ({
             ...app,
-            submission_date: this.formatDateTime(app.submission_date),
+            status: this.removeUnderscoreFromText(app.status),
+            // submission_date: this.formatDateTime(app.submission_date),
+            current_step_type: this.removeUnderscoreFromText(app.current_type),
             max_processing_date: this.formatDateTime(app.max_processing_date),
-            hierarchy_level: app.hierarchy_level ?? app.hierarchy ?? '',
+            hierarchy_level: this.makeFirstLetterUpperCase(app.hierarchy_level) ?? this.makeFirstLetterUpperCase(app.hierarchy) ?? '',
           }));
           this.filteredApplications = [...this.applications];
           this.columns = this.generateColumns(this.applications);
@@ -179,6 +245,14 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
     });
   }
 
+  removeUnderscoreFromText(status: string): string {
+    if (!status) return 'Pending';
+    if (status.toLowerCase() === 'noc_issued') return 'NOC Issued';
+    return status.replace(/_/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
   generateColumns(data: any[]): TableColumn[] {
     if (!Array.isArray(data) || data.length === 0) return [];
     const firstItem = data[0];
@@ -195,6 +269,7 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
       'ward_name',
       'district_code',
       'subdivision_code',
+      'application_id'
     ];
 
     const columnConfig: Record<
@@ -206,13 +281,13 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
         linkHref?: (row: any) => string;
       }
     > = {
-      application_id: {
-        label: 'Application ID',
-        width: '120px',
-        type: 'link',
-        linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
-      },
-      application_number: { type: 'text', label: 'Application Number', width: '190px' },
+      // application_id: {
+      //   label: 'Application ID',
+      //   width: '120px',
+      //   type: 'link',
+      //   linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
+      // },
+      application_number: { type: 'link', label: 'Application Number', width: '190px', linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`},
       service_name: { label: 'Service', width: '180px' },
       applicant_name: { label: 'Applicant Name', width: '180px' },
       applicant_email: { label: 'Email', width: '200px' },
@@ -221,10 +296,11 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
       status: { type: 'status', label: 'Status', width: '140px' },
       district: { label: 'District', width: '160px' },
       sub_division: { label: 'Subdivision', width: '160px' },
+      current_step_type: {label: 'Current Step', width: '140px'},
       hierarchy: { label: 'Hierarchy', width: '140px' },
       payment_status: { type: 'status', label: 'Payment Status', width: '140px' },
-      submission_date: { type: 'text', label: 'Submission Date', width: '180px' },
-      max_processing_date: { type: 'text', label: 'Max Processing Date', width: '180px' },
+      // submission_date: { type: 'text', label: 'Submission Date', width: '180px' },
+      max_processing_date: { type: 'date', label: 'Max Processing Date', width: '180px' },
     };
 
     for (const key in firstItem) {
@@ -404,17 +480,23 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
     const hierarchyLevel = this.remarkForm.get('hierarchy_level')?.value;
     const currentStatus = this.remarkForm.get('current_status')?.value;
     const searchText = (this.remarkForm.get('search')?.value || '').toLowerCase();
+    const serviceId = this.remarkForm.get('service_id')?.value || '';
+    
+
+
 
     this.filteredApplications = this.applications.filter((app) => {
       const appDistrictCode = app.district_code ?? app.district ?? '';
       const appSubdivisionCode = app.subdivision_code ?? app.sub_division ?? '';
       const appHierarchy = app.hierarchy_level ?? app.hierarchy ?? '';
       const appPhone = app.applicant_phone ?? app.applicant_mobile ?? '';
+      const appServiceId = app.service_name ?? app.service_id ?? '';
 
       const matchDistrict = !districtId || appDistrictCode === districtId;
       const matchSubdivision = !subdivisionId || appSubdivisionCode === subdivisionId;
       const matchHierarchy = !hierarchyLevel || appHierarchy === hierarchyLevel;
       const matchStatus = !currentStatus || app.status === currentStatus;
+      
 
       const matchSearch =
         !searchText ||
