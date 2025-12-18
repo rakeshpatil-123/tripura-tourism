@@ -23,18 +23,41 @@
     <app-line-chart></app-line-chart>
   </section>
   <section class="dashboard-section charts-section">
-<app-bar-chart></app-bar-chart>
+    <app-bar-chart></app-bar-chart>
 
-</section>
+  </section>
   <section class="dashboard-section charts-section">
     <div class="table-h">
       <p class=""> Clarification Raised </p>
-      <app-dynamic-table [data]="clarification_required" [columns]="columns" [searchable]="false"
+     <div class="filter">
+  <app-ilogi-select
+    fieldLabel="Service"
+    fieldId="clarificationService"
+    [(ngModel)]="clarificationService"
+    name="clarificationService"
+    [selectOptions]="clarificationServiceOptions"
+    placeholder="Select Service"
+    [mandatory]="false"
+    [readonly]="false">
+  </app-ilogi-select>
+
+  <app-ilogi-select
+    fieldLabel="Application Number"
+    fieldId="clarificationAppNumber"
+    [(ngModel)]="clarificationAppNumber"
+    name="clarificationAppNumber"
+    [selectOptions]="clarificationAppNumberOptions"
+    placeholder="Select Application"
+    [mandatory]="false"
+    [readonly]="false">
+  </app-ilogi-select>
+</div>
+      <app-dynamic-table [data]="filteredClarificationRequired" [columns]="columns" [searchable]="false"
         [showPagination]="true" [pageSize]="5"></app-dynamic-table>
     </div>
   </section>
   <section class="dashboard-section charts-section">
-     <div class="filter ">
+    <div class="filter ">
 
       <app-ilogi-select fieldLabel="Service " fieldId="service" [(ngModel)]="service" name="applicationType"
         [selectOptions]="serviceOptions" placeholder="Select Type" [mandatory]="false" [readonly]="false">
@@ -60,7 +83,7 @@
                 </th>
                 <th>SL No</th>
                 <th>Service Name</th>
-                <th>Application ID</th>
+                <th>Application Number</th>
                 <th>Application Date</th>
                 <th>Payment Type<br>(Application Fee Payment/Extra Payment Raised)</th>
                 <th>Status</th>
@@ -68,7 +91,7 @@
               </tr>
             </thead>
             <tbody>
-                       <tr *ngFor="let payment of filteredPendingPayments">
+              <tr *ngFor="let payment of filteredPendingPayments">
 
                 <td>
                   <input type="checkbox" [checked]="isSelected(payment.user_service_application_id)"
@@ -83,9 +106,9 @@
                 <td>{{ payment.status }}</td>
                 <td>₹{{ payment.amount }}</td>
               </tr>
-              <tr *ngIf="paginatedPendingPayments.length === 0">
+              <!-- <tr *ngIf="paginatedPendingPayments.length === 0">
                 <td colspan="8" class="no-data">No pending payments found.</td>
-              </tr>
+              </tr> -->
             </tbody>
           </table>
         </div>
@@ -101,13 +124,13 @@
             </div>
           </div>
           <div class="pagination-info">
-            Page {{ currentPagePending }} of {{ totalPagesPending }}
+            Page {{ currentPagePending }} of {{ totalPagesPendingCalculated }}
           </div>
           <div class="pagination-controls">
             <button class="pagination-btn" [disabled]="currentPagePending === 1" (click)="prevPagePending()">
               &laquo; Previous
             </button>
-            <button class="pagination-btn" [disabled]="currentPagePending === totalPagesPending"
+            <button class="pagination-btn" [disabled]="currentPagePending === totalPagesPendingCalculated"
               (click)="nextPagePending()">
               Next &raquo;
             </button>
@@ -129,5 +152,5 @@
     </div>
   </section>
 
- 
+
 </div>

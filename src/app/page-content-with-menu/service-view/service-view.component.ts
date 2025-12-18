@@ -105,7 +105,7 @@ export class ServiceViewComponent implements OnInit {
 
           if (res?.status === 1 && res.data) {
             this.applicationData = res.data;
-            this.isCertificatePreview = res.data.just_before_final_step;
+            this.isCertificatePreview = true;
             if (res?.data?.history_data?.status_file) {
               this.sampleFilePreview = res?.data?.history_data?.status_file || null;
             }
@@ -342,11 +342,11 @@ if (Array.isArray(data.application_data) && data.application_data.length > 0) {
     this.cdr.detectChanges();
   }
 
-closeModal(): void {
-  this.statusModal.visible = false;
-  this.remarkForm.reset();
-  this.remarkForm.get('attachment')?.setValue(null);
-}
+    closeModal(): void {
+      this.statusModal.visible = false;
+      this.remarkForm.reset();
+      this.remarkForm.get('attachment')?.setValue(null);
+    }
 
 
 onSubmitStatus(): void {

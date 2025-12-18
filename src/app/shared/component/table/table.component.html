@@ -17,8 +17,7 @@
 
   <div class="mt-2 d-flex justify-content-end align-items-center mb-2" *ngIf="showPagination">
     <label class="me-2 text-nowrap">Rows per page:</label>
-    <select [(ngModel)]="pageSize" (ngModelChange)="applyPagination()" class="form-control page-size-select"
-      style="width: auto; padding: 0.375rem 0.75rem; font-size: 0.9rem;">
+    <select [ngModel]="pageSize" (ngModelChange)="pageSize = +$event">
       <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
     </select>
   </div>
@@ -86,15 +85,15 @@
               [innerHTML]="formatValue(row[col.key], col, row)"
               [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"></div> -->
             <!-- Regular Cells -->
-            <div *ngIf="!isCustomComponentColumn(col) && col.type !== 'action' && col.type !== 'icon' && col.type !== 'button'"
+            <div
+              *ngIf="!isCustomComponentColumn(col) && col.type !== 'action' && col.type !== 'icon' && col.type !== 'button'"
               [innerHTML]="formatValue(row[col.key], col, row)"
               [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''"></div>
 
             <div *ngIf="col.type === 'button'" class="button-cell text-center"
               [class]="col.cellClass ? col.cellClass(row[col.key], row) : ''">
               <button *ngIf="!col.buttonVisible || col.buttonVisible(row)"
-                (click)="col.onClick ? col.onClick(row) : null"
-                class="btn btn-success" type="button">
+                (click)="col.onClick ? col.onClick(row) : null" class="btn btn-success" type="button">
                 {{
                 (typeof col.buttonText === 'function')
                 ? col.buttonText(row)
@@ -182,11 +181,17 @@
 
   <div class="pagination-container" *ngIf="showPagination && totalPages > 0">
     <div class="pagination-info">
-      Showing <strong>{{ (currentPage - 1) * pageSize + 1 }}</strong> to
-      <strong>{{
-        minValue(currentPage * pageSize, filteredData.length)
-        }}</strong>
-      of <strong>{{ filteredData.length }}</strong> entries
+      <ng-container *ngIf="!serverMode; else serverInfo">
+        Showing <strong>{{ (currentPage - 1) * pageSize + 1 }}</strong> to
+        <strong>{{ minValue(currentPage * pageSize, filteredData.length) }}</strong>
+        of <strong>{{ filteredData.length }}</strong> entries
+      </ng-container>
+
+      <ng-template #serverInfo>
+        Showing <strong>{{ (currentPage - 1) * pageSize + 1 }}</strong> to
+        <strong>{{ minValue(currentPage * pageSize, totalItems) }}</strong>
+        of <strong>{{ totalItems }}</strong> entries
+      </ng-template>
     </div>
 
     <div class="pagination-controls">

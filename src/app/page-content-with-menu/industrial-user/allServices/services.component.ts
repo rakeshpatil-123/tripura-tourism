@@ -36,50 +36,7 @@ export class ServicesComponent {
     this.allServices();
   }
 
-  // allServices(): void {
-  //   this.isLoading = true;
-  //   this.apiService.getByConditions({}, 'api/fetch-all-services').subscribe({
-  //     next: (response: any) => {
-  //       if (response?.status === 1 && Array.isArray(response.data)) {
-  //         this.isLoading = false;
-  //         this.ApplicationData = response.data.map(
-  //           (item: any, index: number) => ({
-  //             ...item,
-  //             sl_no: index + 1,
-  //             allow_repeat_application_display:
-  //               item.allow_repeat_application === 'yes' ? 'Yes' : 'No',
-  //           })
-  //         );
-  //          const departments = [
-  //           ...new Set(response.data.map((item: any) => item.department_name)),
-  //         ] as string[];
-  //         this.departmentOptions = departments.map(name => ({
-  //           id: name,
-  //           name: name,
-  //         }));
-  //         this.departmentOptions.unshift({ id: null, name: 'All Departments' });
-
-  //        const nocTypes = [
-  //           ...new Set(response.data.map((item: any) => item.noc_type)),
-  //         ] as string[];
-  //         this.nocTypeOptions = nocTypes.map(type => ({
-  //           id: type,
-  //           name: type,
-  //         }));
-  //         this.nocTypeOptions.unshift({ id: null, name: 'All NOC Types' });
-
-  //         this.applyFilters();
-
-  //         this.createColumns(this.ApplicationData);
-  //       }
-  //     },
-
-  //     error: (error) => {
-  //       console.error('Error fetching services:', error);
-  //       this.isLoading = false;
-  //     },
-  //   });
-  // }
+  
 
   allServices(): void {
     this.isLoading = true;
@@ -364,4 +321,8 @@ export class ServicesComponent {
   handleRowAction(event: any): void {
     console.log('Row action emitted:', event);
   }
+
+  // close(){
+  //   window.close();
+  // }
 }

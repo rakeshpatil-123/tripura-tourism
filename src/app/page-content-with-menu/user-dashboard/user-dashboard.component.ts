@@ -37,20 +37,29 @@ interface Payment {
     BarChartComponent,
     IlogiSelectComponent,
     FormsModule,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './user-dashboard.component.html',
   styleUrls: ['./user-dashboard.component.scss'],
 })
 export class UserDashboardComponent implements OnInit {
-    service: string | null = null;
+  service: string | null = null;
   applicationId: string | null = null;
-
+  appNumber: string | null = null;
   serviceOptions: { id: string; name: string }[] = [];
+  applicationNoOptions: { id: string; name: string }[] = [];
   applicationIdOptions: { id: string; name: string }[] = [];
-   totalPagesPendingCalculated = 1;
+  totalPagesPendingCalculated = 1;
   totalPendingCount = 0;
   clarification_required: any[] = [];
+
+// Clarification filters
+clarificationAppNumber: string | null = null;
+clarificationService: string | null = null;
+
+// Options for clarification filters
+clarificationServiceOptions: { id: string; name: string }[] = [];
+clarificationAppNumberOptions: { id: string; name: string }[] = [];
   columns: any[] = [
     {
       key: 'applicationId',
@@ -95,7 +104,7 @@ export class UserDashboardComponent implements OnInit {
       key: 'status_file',
       label: 'Status File',
       type: 'view-link',
-       viewLinkText: 'View Dept. Uploaded Doc',
+      viewLinkText: 'View Dept. Uploaded Doc',
     },
   ];
   pendingPayments: Payment[] = [];
@@ -111,7 +120,6 @@ export class UserDashboardComponent implements OnInit {
     private loaderService: LoaderService,
     private apiService: GenericService,
     private sanitizer: DomSanitizer
-
   ) {}
 
   ngOnInit(): void {
@@ -121,8 +129,9 @@ export class UserDashboardComponent implements OnInit {
         if (data) {
           this.clarification_required = data.clarification_required || [];
           this.noc_issued_per_service = data.noc_issued_per_service || [];
+           this.buildClarificationFilterOptions();
           this.loaderService.hideLoader();
-        }else{
+        } else {
           this.loaderService.hideLoader();
           // this.clarification_required = [];
         }
@@ -133,12 +142,66 @@ export class UserDashboardComponent implements OnInit {
         this.loaderService.hideLoader();
       },
     });
-       this.unpaidPayments(this.currentPagePending, this.itemsPerPagePending);
-
-
+    this.unpaidPayments(this.currentPagePending, this.itemsPerPagePending);
   }
 
+  formatApplicationDate(isoString: string): string {
+    if (!isoString) return 'N/A';
 
+    const date = new Date(isoString);
+
+    if (isNaN(date.getTime())) return 'Invalid Date';
+
+    const day = date.getUTCDate();
+    const getOrdinal = (n: number): string => {
+      if (n > 3 && n < 21) return 'th';
+      switch (n % 10) {
+        case 1:
+          return 'st';
+        case 2:
+          return 'nd';
+        case 3:
+          return 'rd';
+        default:
+          return 'th';
+      }
+    };
+    const dayWithOrdinal = `${day}${getOrdinal(day)}`;
+
+    const month = date.toLocaleString('en-US', {
+      month: 'short',
+      timeZone: 'UTC',
+    });
+
+    const year = date.getUTCFullYear();
+
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+    return `${dayWithOrdinal} ${month} ${year} - ${hours} : ${minutes}`;
+  }
+
+private buildClarificationFilterOptions(): void {
+  const appNumbers = new Set<string>();
+  const services = new Set<string>();
+
+  this.clarification_required.forEach((item) => {
+    if (item.applicationId && item.applicationId !== 'N/A') {
+      appNumbers.add(item.applicationId);
+    }
+    if (item.service_name && item.service_name !== 'N/A') {
+      services.add(item.service_name);
+    }
+  });
+
+  this.clarificationAppNumberOptions = [{ id: '', name: 'All' }].concat(
+    Array.from(appNumbers).map((id) => ({ id, name: id }))
+  );
+
+  this.clarificationServiceOptions = [{ id: '', name: 'All' }].concat(
+    Array.from(services).map((name) => ({ id: name, name }))
+  );
+}
 
   unpaidPayments(
     page: number = 1,
@@ -164,7 +227,7 @@ export class UserDashboardComponent implements OnInit {
                 serviceName: item.service_title_or_description || 'N/A',
                 applicationId: item.application_id || 'N/A',
                 applicationDate: item.application_date
-                  ? item.application_date.split(' ')[0]
+                  ? this.formatApplicationDate(item.application_date)
                   : 'N/A',
                 paymentType: item.payment_type || 'Application Fee Payment',
                 status: 'Pending',
@@ -213,22 +276,33 @@ export class UserDashboardComponent implements OnInit {
       Array.from(appIds).map((id) => ({ id: id, name: id }))
     );
   }
-get filteredPendingPayments(): Payment[] {
-  return this.pendingPayments.filter(payment => {
-    const matchesService = !this.service || payment.serviceName === this.service;
-    const matchesAppId = !this.applicationId || payment.applicationId === this.applicationId;
-    return matchesService && matchesAppId;
+
+get filteredClarificationRequired(): any[] {
+  return this.clarification_required.filter(item => {
+    const matchesApp = !this.clarificationAppNumber || item.applicationId === this.clarificationAppNumber;
+    const matchesService = !this.clarificationService || item.service_name === this.clarificationService;
+    return matchesApp && matchesService;
   });
 }
 
-  get paginatedPendingPayments() {
-    const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
-    return this.pendingPayments.slice(start, start + this.itemsPerPagePending);
+  get filteredPendingPayments(): Payment[] {
+    return this.pendingPayments.filter((payment) => {
+      const matchesService =
+        !this.service || payment.serviceName === this.service;
+      const matchesAppId =
+        !this.applicationId || payment.applicationId === this.applicationId;
+      return matchesService && matchesAppId;
+    });
   }
 
-  get totalPagesPending(): number {
-    return Math.ceil(this.pendingPayments.length / this.itemsPerPagePending);
-  }
+  // get paginatedPendingPayments() {
+  //   const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
+  //   return this.pendingPayments.slice(start, start + this.itemsPerPagePending);
+  // }
+
+  // get totalPagesPending(): number {
+  //   return Math.ceil(this.pendingPayments.length / this.itemsPerPagePending);
+  // }
 
   goToPagePending(page: number): void {
     if (page < 1 || page > this.totalPagesPendingCalculated) return;
@@ -288,7 +362,7 @@ get filteredPendingPayments(): Payment[] {
       .reduce((sum, amt) => sum + amt, 0);
   }
 
-   toggleAllSelection(): void {
+  toggleAllSelection(): void {
     if (this.isAllSelected()) {
       this.selectedPayments.clear();
     } else {
@@ -333,36 +407,35 @@ get filteredPendingPayments(): Payment[] {
 
   htmlToShow: any = '';
   formSubmitted: boolean = false;
- private showPaymentForm(html: string): void {
+  private showPaymentForm(html: string): void {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
+    const form = doc.querySelector('form');
+    if (!form) {
+      console.error('No form found in payment response');
+      alert('Failed to initiate payment. Please try again.');
+      return;
+    }
 
-  const form = doc.querySelector('form');
-  if (!form) {
-    console.error('No form found in payment response');
-    alert('Failed to initiate payment. Please try again.');
-    return;
+    const newForm = document.createElement('form');
+    newForm.method =
+      form.getAttribute('method')?.toUpperCase() === 'POST' ? 'POST' : 'GET';
+    newForm.action = (form.getAttribute('action') || '').trim();
+
+    Array.from(form.querySelectorAll('input')).forEach((input) => {
+      const newInput = document.createElement('input');
+      newInput.type = 'hidden';
+      newInput.name = input.name;
+      newInput.value = input.value;
+      newInput.required = false;
+      newForm.appendChild(newInput);
+    });
+
+    setTimeout(() => {
+      document.body.appendChild(newForm);
+      console.log('Submitting payment form to:', newForm.action);
+      newForm.submit();
+    }, 1000);
   }
-
-  const newForm = document.createElement('form');
-  newForm.method = form.getAttribute('method')?.toUpperCase() === 'POST' ? 'POST' : 'GET';
-  newForm.action = (form.getAttribute('action') || '').trim();
-
-  Array.from(form.querySelectorAll('input')).forEach(input => {
-    const newInput = document.createElement('input');
-    newInput.type = 'hidden';
-    newInput.name = input.name;
-    newInput.value = input.value;
-    newInput.required = false;
-    newForm.appendChild(newInput);
-  });
-
-  setTimeout(() => {
-    document.body.appendChild(newForm);
-    console.log('Submitting payment form to:', newForm.action);
-    newForm.submit();
-  }, 1000);
-}
-
 }

@@ -10,10 +10,8 @@ import {
 import { IlogiSelectComponent } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { IlogiInputDateComponent } from '../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { ButtonComponent } from '../../../shared/component/button-component/button.component';
-
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-
 import { GenericService } from '../../../_service/generic/generic.service';
 import { TransactionHistoryDialogComponent } from './transaction-history';
 import Swal from 'sweetalert2';
@@ -60,14 +58,17 @@ interface ApplicationDataItem {
 })
 export class ApplicationSearchPageComponent implements OnInit {
   serviceFilterOptions: Array<{ id: string | null; name: string }> = [];
-  selectedServiceName: string | null = null;
-  ApplicationData: ApplicationDataItem[] = [];
+  selectedServiceId: string | null = null;
   filteredData: ApplicationDataItem[] = [];
   ApplicationColumns: TableColumn[] = [];
   error: string = '';
+currentPageSize = 5;
+  // Filter properties
   fromDate: string = '';
+  toDate: string = ''; // Added for future use
   department: string = '';
   applicationType: string = '';
+
   departmentOptions: Array<{ id: string; name: string }> = [
     { id: '', name: 'All Departments' },
   ];
@@ -79,6 +80,8 @@ export class ApplicationSearchPageComponent implements OnInit {
     { id: 'OTHER', name: 'Other' },
     { id: 'SPECIAL', name: 'Special' },
   ];
+  private skipNextPageSizeUpdate = false;
+
   private serviceMap: Record<
     number,
     { name: string; dept: string; type: string; code: string }
@@ -105,8 +108,14 @@ export class ApplicationSearchPageComponent implements OnInit {
 
   loading: boolean = false;
   loadingDepartments = false;
-  appId: number | null = null;
   noDataMessage = 'No applications found';
+
+  // Server pagination state
+  serverPagination = {
+    currentPage: 1,
+    pageSize: 10,
+    totalItems: 0,
+  };
 
   constructor(
     private apiService: GenericService,
@@ -117,9 +126,12 @@ export class ApplicationSearchPageComponent implements OnInit {
   ngOnInit(): void {
     this.defineColumns();
     this.getAllDepartmentList();
+    this.fetchAllServices();
+    // this.getServiceFilterOptions(); // Fetch service options separately
     this.getApplications();
   }
 
+  // Fetch departments
   getAllDepartmentList(): void {
     this.loadingDepartments = true;
     this.apiService.getAllDepartmentNames().subscribe({
@@ -130,76 +142,134 @@ export class ApplicationSearchPageComponent implements OnInit {
             ? res.data
             : res?.data?.departments || [];
         if (Array.isArray(list) && list.length) {
-          const opts = list.map((d: any) => {
-            return {
-              id: d.id ? String(d.id) : d.department_code || d.name || '',
-              name:
-                d.name ||
-                d.department_name ||
-                d.department ||
-                d.name_of_enterprise ||
-                '',
-            };
-          });
+          const opts = list.map((d: any) => ({
+            id: d.id ? String(d.id) : d.department_code || d.name || '',
+            name:
+              d.name ||
+              d.department_name ||
+              d.department ||
+              d.name_of_enterprise ||
+              '',
+          }));
           this.departmentOptions = [
             { id: '', name: 'All Departments' },
             ...opts,
           ];
-        } else {
-          this.departmentOptions = [{ id: '', name: 'All Departments' }];
         }
       },
-
       error: (err) => {
         this.loadingDepartments = false;
         console.error('Error loading departments', err);
-        this.departmentOptions = [{ id: '', name: 'All Departments' }];
       },
     });
   }
 
-  getApplications(): void {
-    this.loading = true;
+  private fetchAllServices(): void {
     const user_id = localStorage.getItem('userId') || '';
 
+    // Fetch ALL applications just to extract unique services
     this.apiService
       .getByConditions(
-        { user_id },
+        { user_id, per_page: 1000 }, // get all in one go
         'api/user/get-all-user-service-applications'
       )
       .subscribe({
         next: (res: any) => {
-          this.loading = false;
-          if (res?.status === 1 && res?.data) {
-            const rawData = Array.isArray(res.data.application)
-              ? res.data.application
-              : Array.isArray(res.data)
-              ? res.data
-              : res?.data?.application || [];
-            if (!rawData || rawData.length === 0) {
-              this.ApplicationData = [];
-              this.filteredData = [];
-              return;
-            }
+          if (res?.status === 1 && Array.isArray(res.data)) {
+            const serviceMap = new Map<string, { id: string; name: string }>();
 
-            this.ApplicationData = rawData.map((app: any) => {
+            res.data.forEach((app: any) => {
+              if (
+                app?.service_id != null &&
+                app?.service_title_or_description
+              ) {
+                const idStr = String(app.service_id);
+                if (!serviceMap.has(idStr)) {
+                  serviceMap.set(idStr, {
+                    id: idStr,
+                    name: app.service_title_or_description,
+                  });
+                }
+              }
+            });
+
+            this.serviceFilterOptions = [
+              { id: null, name: 'All Services' },
+              ...Array.from(serviceMap.values()),
+            ];
+          }
+        },
+        error: (err) => {
+          console.error('Failed to fetch service options', err);
+          this.serviceFilterOptions = [{ id: null, name: 'All Services' }];
+        },
+      });
+  }
+
+  // // Fetch service filter options separately
+  // getServiceFilterOptions(): void {
+  //   this.apiService
+  //     .getByConditions({}, 'api/user/get-service-filter-options')
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         if (res?.status === 1 && Array.isArray(res.data)) {
+  //           this.serviceFilterOptions = [
+  //             { id: null, name: 'All Services' },
+  //             ...res.data.map((s: any) => ({
+  //               id: s.service_id?.toString() || s.name,
+  //               name: s.name || s.service_title_or_description,
+  //             })),
+  //           ];
+  //         }
+  //       },
+  //       error: (err) => console.error('Error fetching service options', err),
+  //     });
+  // }
+
+  getApplications(page: number = 1, perPage: number = 5): void {
+    this.loading = true;
+    const user_id = localStorage.getItem('userId') || '';
+
+    const payload: any = {
+      user_id,
+      current_page: page,
+      per_page: perPage,
+    };
+
+    if (this.fromDate) {
+      payload.date_from = this.formatDateForBackend(this.fromDate);
+    }
+    if (this.toDate) {
+      payload.date_to = this.formatDateForBackend(this.toDate);
+    }
+
+    if (this.department) payload.department_id = this.department;
+    if (this.applicationType) payload.application_type = this.applicationType;
+    if (this.selectedServiceId) {
+      payload.service_id = Number(this.selectedServiceId);
+    }
+
+    this.apiService
+      .getByConditions(payload, 'api/user/get-all-user-service-applications')
+      .subscribe({
+        next: (res: any) => {
+          this.loading = false;
+          if (res?.status === 1 && Array.isArray(res.data)) {
+            this.filteredData = res.data.map((app: any) => {
               const rawDateStr =
                 app.application_date || app.applicationDate || '';
               const rawDateObj: Date | null = rawDateStr
                 ? new Date(rawDateStr)
                 : null;
-
               const serviceName =
                 app.service_title_or_description ||
                 this.serviceMap[app.service_id]?.name ||
                 `Service ${app.service_id}`;
-
               const deptName =
                 app.department_name ||
                 this.serviceMap[app.service_id]?.dept ||
                 app.department ||
                 'Unknown Department';
-
               const appTypeRaw = (
                 app.application_type ||
                 this.serviceMap[app.service_id]?.type ||
@@ -231,35 +301,51 @@ export class ApplicationSearchPageComponent implements OnInit {
                   '',
                 service_id: app.service_id || 0,
                 _raw: app,
+                service_mode: app.service_mode || 'native',
                 is_certificate: app.is_certificate,
                 already_rated: app.already_rated,
                 rating: app.rating || '',
               } as ApplicationDataItem;
             });
 
-            const uniqueServices = [
-              ...new Set(
-                this.ApplicationData.map((item) => item.applicationFor)
-              ),
-            ];
-            this.serviceFilterOptions = [
-              { id: null, name: 'All Services' },
-              ...uniqueServices.map((name) => ({ id: name, name })),
-            ];
-            this.selectedServiceName = null;
+            const serviceMap = new Map<string, { id: string; name: string }>();
 
-            this.filteredData = [...this.ApplicationData];
-          } else {
-            this.ApplicationData = [];
-            this.filteredData = [];
-          }
-        },
-        error: (err) => {
-          this.loading = false;
-          this.ApplicationData = [];
-          this.filteredData = [];
-        },
+            this.filteredData.forEach((item) => {
+              const raw = item._raw;
+              if (raw?.service_id && raw?.service_title_or_description) {
+                const key = String(raw.service_id);
+                if (!serviceMap.has(key)) {
+                  serviceMap.set(key, {
+                    id: key,
+                    name: raw.service_title_or_description,
+                  });
+                }
+              }
+            });
+
+           const meta = res.pagination || {};
+        this.skipNextPageSizeUpdate = true;
+      this.serverPagination = {
+        currentPage: page,
+        pageSize: perPage, 
+        totalItems: meta.total || 0,
+      };
+      } else {
+        this.filteredData = [];
+        this.serverPagination.totalItems = 0;
+      }
+    },
+    error: (err) => {
+      this.loading = false;
+      this.filteredData = [];
+    },
       });
+  }
+
+  // Format date to YYYY-MM-DD for backend
+  private formatDateForBackend(input: string): string {
+    const parsed = this.parseInputDate(input);
+    return parsed ? parsed.toISOString().split('T')[0] : '';
   }
 
   defineColumns(): void {
@@ -328,27 +414,22 @@ export class ApplicationSearchPageComponent implements OnInit {
         cellClass: () => 'input-large-custom wid-cus',
       },
       {
-         key: 'renew',
+        key: 'renew',
         label: 'Query & Feedback',
         type: 'button',
         width: '120px',
-        buttonText:(row : any) => {
+        buttonText: (row: any) => {
           return row.already_rated ? `${row.rating}⭐` : 'Rating';
-        } ,
+        },
         buttonColor: 'btn-success',
-        buttonVisible: (row: any) => row.payment_status.toLowerCase() === 'paid',
+        buttonVisible: (row: any) =>
+          row.payment_status.toLowerCase() === 'paid',
         onClick: (row: any) => {
-          if(row.already_rated === false){
-
-            this.router.navigate(
-                [`/dashboard/service-feedback`, row.id],
-            
-              );
+          if (row.already_rated === false) {
+            this.router.navigate([`/dashboard/service-feedback`, row.id]);
           }
 
           console.log(row.rating);
-          
-            
         },
       },
       {
@@ -360,8 +441,7 @@ export class ApplicationSearchPageComponent implements OnInit {
             label: 'Download Certificate',
             action: 'download',
             color: 'warn',
-            visible: (row: ApplicationDataItem) =>
-             true,
+            visible: (row: ApplicationDataItem) => true,
             handler: (row: ApplicationDataItem) => {
               this.downloadCertificate(row.id);
             },
@@ -385,19 +465,22 @@ export class ApplicationSearchPageComponent implements OnInit {
             },
           },
           {
-            label: (row : any) => {
-              return row.status === 'draft' ? 'Edit Draft' : 'Re-submit'
+            label: (row: any) => {
+              return row.status === 'draft' ? 'Edit Draft' : 'Re-submit';
             },
             action: 'view',
             color: 'warn',
-            visible: (row) => row.status === "extra_payment" || row.status === "send_back" || row.status === 'draft',
+            visible: (row) =>
+              row.status === 'extra_payment' ||
+              row.status === 'send_back' ||
+              row.status === 'draft',
             handler: (row: ApplicationDataItem) => {
-              const queryParams: any = {application_status : row.status};
+              const queryParams: any = { application_status: row.status };
               // console.log(row.nocDetailsId);
-              if(row.status !== "draft"){
+              if (row.status !== 'draft') {
                 queryParams.application_id = row.nocDetailsId;
               }
-             
+
               this.router.navigate(
                 [`/dashboard/service-application`, row.service_id],
                 {
@@ -406,13 +489,75 @@ export class ApplicationSearchPageComponent implements OnInit {
               );
             },
           },
-        
         ],
         class: 'text-center',
       },
-
-    
     ];
+  }
+
+  onPageChange(newPage: number): void {
+    this.getApplications(newPage, this.serverPagination.pageSize);
+  }
+
+  onSearch(): void {
+    this.serverPagination.currentPage = 1; // Reset to first page on new filters
+    this.getApplications(1, this.serverPagination.pageSize);
+  }
+
+  onReset(): void {
+    this.fromDate = '';
+    this.toDate = '';
+    this.department = '';
+    this.applicationType = '';
+    this.selectedServiceId = null;
+    this.onSearch();
+  }
+
+  // Helper method for date parsing
+  private parseInputDate(input: string | Date): Date | null {
+    if (!input) return null;
+    if (input instanceof Date && !isNaN(input.getTime())) return input;
+    if (typeof input === 'string') {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
+        const [y, m, d] = input.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+      if (/^\d{2}[/-]\d{2}[/-]\d{4}$/.test(input)) {
+        const [d, m, y] = input.split(/[-/]/).map(Number);
+        return new Date(y, m - 1, d);
+      }
+    }
+    return null;
+  }
+
+  downloadCertificate(appId: number): void {
+    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+    this.apiService.downloadUserServiceCertificate(appId).subscribe({
+      next: (res: any) => {
+        if (res.status === 1 && res?.download_url) {
+          const openPdf = baseUrl + res.download_url;
+          window.open(openPdf, '_blank');
+        } else {
+          this.error =
+            res?.message || 'PDF file not found for this application.';
+          Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: this.error || 'PDF file not found for this application.',
+            confirmButtonText: 'OK',
+          });
+        }
+      },
+      error: (err: any) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Download Failed',
+          text:
+            err?.error?.message || 'PDF file not found for this application.',
+          confirmButtonText: 'Retry',
+        });
+      },
+    });
   }
 
   formatDate(date: string | Date): string {
@@ -463,90 +608,12 @@ export class ApplicationSearchPageComponent implements OnInit {
     }
   }
 
-  onSearch(): void {
-    let result = [...this.ApplicationData];
-
-    if (this.fromDate) {
-      const parsedFrom = this.parseInputDate(this.fromDate);
-      if (parsedFrom) {
-        result = result.filter(
-          (row) =>
-            row.applicationDateRaw && row.applicationDateRaw >= parsedFrom
-        );
-      }
-    }
-    if (this.department) {
-      result = result.filter((row) => row.departmentId === this.department);
-    }
-    if (this.applicationType) {
-      result = result.filter(
-        (row) =>
-          row.applicationType?.toLowerCase() ===
-          this.applicationType.toLowerCase()
-      );
-    }
-
-    if (this.selectedServiceName) {
-      result = result.filter(
-        (row) => row.applicationFor === this.selectedServiceName
-      );
-    }
-
-    this.filteredData = result;
+onPageSizeChange(newSize: number): void {
+  if (this.skipNextPageSizeUpdate) {
+    this.skipNextPageSizeUpdate = false;
+    return;
   }
-
-  onReset(): void {
-    this.fromDate = '';
-    this.department = '';
-    this.applicationType = '';
-    this.filteredData = [...this.ApplicationData];
-  }
-  private parseInputDate(input: string | Date): Date | null {
-    if (!input) return null;
-    if (input instanceof Date && !isNaN(input.getTime())) {
-      return input;
-    }
-    if (typeof input === 'string') {
-      if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
-        const [y, m, d] = input.split('-').map(Number);
-        return new Date(y, m - 1, d);
-      }
-
-      if (/^\d{2}[/-]\d{2}[/-]\d{4}$/.test(input)) {
-        const [d, m, y] = input.split(/[-/]/).map(Number);
-        return new Date(y, m - 1, d);
-      }
-    }
-    return null;
-  }
-
-  downloadCertificate(appId: number): void {
-    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
-    this.apiService.downloadUserServiceCertificate(appId).subscribe({
-      next: (res: any) => {
-        if (res.status === 1 && res?.download_url) {
-          const openPdf = baseUrl + res.download_url;
-          window.open(openPdf, '_blank');
-        } else {
-          this.error =
-            res?.message || 'PDF file not found for this application.';
-          Swal.fire({
-            icon: 'warning',
-            title: 'Warning',
-            text: this.error || 'PDF file not found for this application.',
-            confirmButtonText: 'OK',
-          });
-        }
-      },
-      error: (err: any) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Download Failed',
-          text:
-            err?.error?.message || 'PDF file not found for this application.',
-          confirmButtonText: 'Retry',
-        });
-      },
-    });
-  }
+  this.serverPagination.pageSize = newSize;
+  this.getApplications(1, newSize);
+}
 }

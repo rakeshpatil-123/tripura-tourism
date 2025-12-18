@@ -372,7 +372,7 @@
           </mat-card-content>
         </mat-card>
       </mat-card>
-       <ng-template #noManagementData>
+      <ng-template #noManagementData>
         <mat-card>
           <mat-card-content class="text-center py-4">
             <p class="text-muted">No management details available.</p>
@@ -394,7 +394,8 @@
       </mat-card>
 
       <!-- Raw Materials -->
-      <mat-card *ngIf="lineOfActivityDetails.raw_material_to_be_used?.length; else nolineOfActivityDetails" class="mt-4">
+      <mat-card *ngIf="lineOfActivityDetails.raw_material_to_be_used?.length; else nolineOfActivityDetails"
+        class="mt-4">
         <mat-card-header>
           <mat-card-title>Raw Materials</mat-card-title>
         </mat-card-header>
@@ -445,7 +446,7 @@
         </mat-card-content>
       </mat-card>
 
-        <ng-template #nolineOfActivityDetails>
+      <ng-template #nolineOfActivityDetails>
         <mat-card>
           <mat-card-content class="text-center py-4">
             <p class="text-muted">No line of activity details available.</p>
@@ -591,7 +592,7 @@
       </mat-card>
 
 
-       <ng-template #noActivityDetails>
+      <ng-template #noActivityDetails>
         <mat-card>
           <mat-card-content class="text-center py-4">
             <p class="text-muted">No Activity details available.</p>
@@ -600,4 +601,11 @@
       </ng-template>
     </mat-tab>
   </mat-tab-group>
+
+
+  <div *ngIf="error" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">No data found</span>
+    </div>
+  </div>
 </div>

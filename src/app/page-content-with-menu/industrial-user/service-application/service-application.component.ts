@@ -79,6 +79,11 @@ interface SectionGroup {
   formArray: FormArray;
 }
 
+interface succesRes{
+  message :string;
+  data: any;
+}
+
 @Component({
   selector: 'app-service-application',
   imports: [
@@ -132,6 +137,8 @@ export class ServiceApplicationComponent implements OnInit {
   readonlyFields: { [key: number]: boolean } = {};
   extraPayment: string | number | null = null;
   serviceName: string | null = null;
+  successFullySubmitted: boolean = false;
+  succesResponse!: succesRes;
   private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
@@ -175,7 +182,7 @@ export class ServiceApplicationComponent implements OnInit {
     } else {
       this.apiService.openSnackBar('Invalid service ID.', 'error');
       this.loading = false;
-    } 
+    }
   }
 
   loadServiceDetails(): void {
@@ -314,7 +321,7 @@ export class ServiceApplicationComponent implements OnInit {
                     type: this.getFileMimeType(fileName),
                   });
                   (fakeFile as any)._isFake = true;
-                          
+
                   control.setValue(fakeFile);
                   this.readonlyFields[question.id] = true;
                 } else {
@@ -778,7 +785,11 @@ export class ServiceApplicationComponent implements OnInit {
     return prepared;
   }
 
-  private submitWithFiles(userId: string, raw: any, saveAsDraft: boolean = false): void {
+  private submitWithFiles(
+    userId: string,
+    raw: any,
+    saveAsDraft: boolean = false
+  ): void {
     const formData = new FormData();
     formData.append('user_id', userId);
     formData.append('service_id', this.serviceId.toString());
@@ -851,7 +862,7 @@ export class ServiceApplicationComponent implements OnInit {
             ) {
               formData.append(fieldName, value ?? '');
             }
-          } 
+          }
         });
       });
     });
@@ -865,7 +876,9 @@ export class ServiceApplicationComponent implements OnInit {
               'Application saved successfully!',
               'success'
             );
-            this.router.navigate(['/dashboard/services']);
+            // this.router.navigate(['/dashboard/services']);
+            this.successFullySubmitted = true;
+            this.succesResponse = res ;
           } else {
             this.apiService.openSnackBar(
               res?.message || 'Submission failed.',
@@ -882,16 +895,22 @@ export class ServiceApplicationComponent implements OnInit {
         },
       });
   }
-draft(): void {
-  const userId = this.apiService.getDecryptedUserId();
-  if (!userId) {
-    this.apiService.openSnackBar('User not authenticated.', 'error');
-    return;
+
+  goTo() {
+    this.router.navigate(['/dashboard/services']);
+    this.successFullySubmitted = false;
   }
-  const raw = this.serviceForm.getRawValue();
-  const preparedRaw = this.prepareRawDataForSubmission(raw);
-  this.submitWithFiles(userId, preparedRaw, true); 
-}
+
+  draft(): void {
+    const userId = this.apiService.getDecryptedUserId();
+    if (!userId) {
+      this.apiService.openSnackBar('User not authenticated.', 'error');
+      return;
+    }
+    const raw = this.serviceForm.getRawValue();
+    const preparedRaw = this.prepareRawDataForSubmission(raw);
+    this.submitWithFiles(userId, preparedRaw, true);
+  }
 
   downloadSample(sampleUrl: string): void {
     if (!sampleUrl || sampleUrl.trim() === '') {

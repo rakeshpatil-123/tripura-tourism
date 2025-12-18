@@ -23,7 +23,7 @@
             </th>
             <th>SL No</th>
             <th>Service Name</th>
-            <th>Application ID</th>
+            <th>Application Number</th>
             <th>Application Date</th>
             <th>Payment Type<br>(Application Fee Payment/Extra Payment Raised)</th>
             <th>Status</th>
@@ -70,7 +70,7 @@
         <button class="pagination-btn" [disabled]="currentPagePending === 1" (click)="prevPagePending()">
           &laquo; Previous
         </button>
-        <button class="pagination-btn" [disabled]="currentPagePending === totalPagesPending"
+        <button class="pagination-btn" [disabled]="currentPagePending === totalPagesPendingCalculated"
           (click)="nextPagePending()">
           Next &raquo;
         </button>
@@ -96,7 +96,7 @@
           <tr>
             <th>SL No</th>
             <th>Service Name</th>
-            <th>Application ID</th>
+            <th>Application Number</th>
             <th>Payment Date</th>
             <th>Status</th>
             <th>Payment Type<br>(Application Fee Payment/Extra Payment Raised)</th>
@@ -115,9 +115,9 @@
             <td>{{ payment.grnNumber }}</td>
             <td>₹{{ payment.amount }}</td>
           </tr>
-          <tr *ngIf="paginatedCompletedPayments.length === 0">
+          <!-- <tr *ngIf="paginatedCompletedPayments.length === 0">
             <td colspan="8" class="no-data">No completed payments found.</td>
-          </tr>
+          </tr> -->
         </tbody>
       </table>
     </div>
@@ -139,7 +139,7 @@
         <button class="pagination-btn" [disabled]="currentPageCompleted === 1" (click)="prevPageCompleted()">
           &laquo; Previous
         </button>
-        <button class="pagination-btn" [disabled]="currentPageCompleted === totalPagesCompleted"
+        <button class="pagination-btn" [disabled]="currentPageCompleted === totalPagesCompletedCalculated"
           (click)="nextPageCompleted()">
           Next &raquo;
         </button>

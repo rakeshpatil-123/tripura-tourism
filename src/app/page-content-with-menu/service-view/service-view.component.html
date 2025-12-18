@@ -19,7 +19,17 @@
     @if (workflowData.length > 0) {
     <div class="btn-right">
       <h3 class=" page-head">Workflow Steps</h3>
+
       <div class="btn-group-right">
+        <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'"
+          mat-raised-button class="generate-btn" (click)="editCertificateGeneration()">
+          <mat-icon style="color: white;" class="mr-2">workspace_premium</mat-icon>
+          <span style="color: white;">Generate Certificate</span>
+        </button>
+         <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'"
+            mat-raised-button color="primary" (click)="previewCertificate()">
+            <span style="color: white;">Preview Certificate</span>
+          </button>
         <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
         <button (click)="editCertificateGeneration()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate
           <mat-icon>picture_as_pdf</mat-icon>
@@ -75,7 +85,7 @@
             placeholder="Enter remarks for this action (min 2 characters)"></app-ilogi-input>
         </div>
         <div>
-          <app-ilogi-file-upload formControlName="attachment"  [mandatory]="false"
+          <app-ilogi-file-upload formControlName="attachment" [mandatory]="false"
             placeholder="Upload supporting document" accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
         </div>
 
@@ -85,20 +95,18 @@
         </small>
         }
         <div class="modal-actions">
-          <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'" mat-raised-button color="primary" (click)="previewCertificate()">
-           <span style="color: white;">Preview Certificate</span>
-            </button>
-          
-            <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'" mat-raised-button class="generate-btn"
-              (click)="editCertificateGeneration()">
-              <mat-icon style="color: white;" class="mr-2">workspace_premium</mat-icon>
-              <span style="color: white;">Generate Certificate</span>
-            </button>
-          
-          
-            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+         
+<!-- 
+          <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'"
+            mat-raised-button class="generate-btn" (click)="editCertificateGeneration()">
+            <mat-icon style="color: white;" class="mr-2">workspace_premium</mat-icon>
+            <span style="color: white;">Generate Certificate</span>
+          </button> -->
 
-        <button type="submit" class="btn btn-primary" [disabled]="remarkForm.invalid">
+
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+
+          <button type="submit" class="btn btn-primary" [disabled]="remarkForm.invalid">
             Confirm
           </button>
         </div>

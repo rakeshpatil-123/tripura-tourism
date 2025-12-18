@@ -54,7 +54,10 @@ export class RepeatApplicationsComponent implements OnInit {
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data)) {
 
-            this.applications = res.data;
+             this.applications = res.data.map((app : any) => ({
+          ...app,
+          formatted_latest_workflow_status: this.formatStatus(app.latest_workflow_status),
+        }));
             this.buildColumns();
           } else {
             this.applications = [];
@@ -70,6 +73,21 @@ export class RepeatApplicationsComponent implements OnInit {
       });
   }
 
+  formatStatus(status: string): string {
+  const map: { [key: string]: string } = {
+    send_back: 'Send Back',
+    extra_payment: 'Extra Payment',
+    re_submitted: 'Re-Submitted',
+    submitted: 'Submitted',
+    approved: 'Approved',
+    draft: 'Draft',
+    saved: 'Saved',
+    pending: 'Pending',
+    rejected: 'Rejected',
+  };
+ return map[status] || (status ? status.replace(/_/g, ' ') : '—');
+}
+
   buildColumns(): void {
     if (this.applications.length === 0) return;
 
@@ -81,16 +99,17 @@ export class RepeatApplicationsComponent implements OnInit {
       'application_number',
       'application_date',
       'payment_status',
-      'status',
-      'latest_workflow_status',
+         
+  'formatted_latest_workflow_status',
     ];
 
     const columns: any[] = [];
 
     allowedKeys.forEach((key) => {
       let label = key
-        .replace(/_([a-z])/g, (match, letter) => ` ${letter.toUpperCase()}`)
-        .replace(/^./, (str) => str.toUpperCase());
+  .replace(/^formatted_/, '') 
+  .replace(/_([a-z])/g, (match, letter) => ` ${letter.toUpperCase()}`)
+  .replace(/^./, (str) => str.toUpperCase());
 
       let type = 'text';
       if (key.includes('status')) {
