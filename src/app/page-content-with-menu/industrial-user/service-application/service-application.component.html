@@ -47,7 +47,7 @@
                 [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
                 [submitted]="serviceForm.touched"></app-ilogi-input-date>
 
-           
+
               <!-- File Upload -->
               <ng-container *ngIf="q.question_type === 'file'">
                 <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
@@ -129,7 +129,7 @@
                             [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
                             [submitted]="serviceForm.touched"></app-ilogi-input-date>
 
-                      
+
                           <ng-container *ngIf="q.question_type === 'file'">
                             <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
                               [fileUrl]="getDefaultFileUrl(q.id)" [accept]="q.validation_rule?.pattern || '*'"
@@ -226,3 +226,26 @@
   </ng-template>
   }
 </div>
+
+@if(successFullySubmitted === true){
+<div class="popup-overlay">
+  <div class="popup-content">
+    <div class="success-icon">✓</div>
+
+    <h4 class="popup-title">{{ succesResponse.message }}</h4>
+
+    <div class="popup-details">
+      <h5>Service: <span>{{ serviceName }}</span></h5>
+      <h5 *ngIf="succesResponse.data.applicationId">
+        Application No: <span>{{ succesResponse.data.applicationId }}</span>
+      </h5>
+    </div>
+
+    <button class="btn btn-success popup-btn" (click)="goTo()">
+      Go to Services
+    </button>
+  </div>
+</div>
+
+
+}

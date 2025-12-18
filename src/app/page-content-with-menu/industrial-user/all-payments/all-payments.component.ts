@@ -61,6 +61,42 @@ export class AllPaymentsComponent implements OnInit {
     this.unpaidPayments(this.currentPagePending, this.itemsPerPagePending);
   }
 
+  formatApplicationDate(isoString: string): string {
+    if (!isoString) return 'N/A';
+
+    const date = new Date(isoString);
+
+    if (isNaN(date.getTime())) return 'Invalid Date';
+
+    const day = date.getUTCDate();
+    const getOrdinal = (n: number): string => {
+      if (n > 3 && n < 21) return 'th';
+      switch (n % 10) {
+        case 1:
+          return 'st';
+        case 2:
+          return 'nd';
+        case 3:
+          return 'rd';
+        default:
+          return 'th';
+      }
+    };
+    const dayWithOrdinal = `${day}${getOrdinal(day)}`;
+
+    const month = date.toLocaleString('en-US', {
+      month: 'short',
+      timeZone: 'UTC',
+    });
+
+    const year = date.getUTCFullYear();
+
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+    return `${dayWithOrdinal} ${month} ${year} - ${hours} : ${minutes}`;
+  }
+
   unpaidPayments(
     page: number = 1,
     perPage: number = this.itemsPerPagePending
@@ -85,7 +121,7 @@ export class AllPaymentsComponent implements OnInit {
                 serviceName: item.service_title_or_description || 'N/A',
                 applicationId: item.application_id || 'N/A',
                 applicationDate: item.application_date
-                  ? item.application_date.split(' ')[0]
+                  ? this.formatApplicationDate(item.application_date)
                   : 'N/A',
                 paymentType: item.payment_type || 'Application Fee Payment',
                 status: 'Pending',
@@ -134,13 +170,15 @@ export class AllPaymentsComponent implements OnInit {
       Array.from(appIds).map((id) => ({ id: id, name: id }))
     );
   }
-get filteredPendingPayments(): Payment[] {
-  return this.pendingPayments.filter(payment => {
-    const matchesService = !this.service || payment.serviceName === this.service;
-    const matchesAppId = !this.applicationId || payment.applicationId === this.applicationId;
-    return matchesService && matchesAppId;
-  });
-}
+  get filteredPendingPayments(): Payment[] {
+    return this.pendingPayments.filter((payment) => {
+      const matchesService =
+        !this.service || payment.serviceName === this.service;
+      const matchesAppId =
+        !this.applicationId || payment.applicationId === this.applicationId;
+      return matchesService && matchesAppId;
+    });
+  }
 
   paidPayments(
     page: number = 1,
@@ -166,7 +204,7 @@ get filteredPendingPayments(): Payment[] {
                 serviceName: item.service_title_or_description || 'N/A',
                 applicationId: item.application_id || 'N/A',
                 applicationDate: item.application_date
-                  ? item.application_date.split(' ')[0]
+                  ? this.formatApplicationDate(item.application_date)
                   : 'N/A',
                 paymentType: item.payment_type || 'N/A',
                 status: 'Paid',
@@ -197,15 +235,6 @@ get filteredPendingPayments(): Payment[] {
       });
   }
 
-  get paginatedPendingPayments() {
-    const start = (this.currentPagePending - 1) * this.itemsPerPagePending;
-    return this.pendingPayments.slice(start, start + this.itemsPerPagePending);
-  }
-
-  get totalPagesPending(): number {
-    return Math.ceil(this.pendingPayments.length / this.itemsPerPagePending);
-  }
-
   goToPagePending(page: number): void {
     if (page < 1 || page > this.totalPagesPendingCalculated) return;
     this.unpaidPayments(page, this.itemsPerPagePending);
@@ -234,20 +263,6 @@ get filteredPendingPayments(): Payment[] {
     const newSize = +target.value;
     this.itemsPerPagePending = newSize;
     this.unpaidPayments(1, newSize); // Reset to page 1
-  }
-
-  get paginatedCompletedPayments() {
-    const start = (this.currentPageCompleted - 1) * this.itemsPerPageCompleted;
-    return this.completedPayments.slice(
-      start,
-      start + this.itemsPerPageCompleted
-    );
-  }
-
-  get totalPagesCompleted(): number {
-    return Math.ceil(
-      this.completedPayments.length / this.itemsPerPageCompleted
-    );
   }
 
   goToPageCompleted(page: number): void {

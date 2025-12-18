@@ -47,14 +47,14 @@ export interface TableColumn {
   linkHref?: (row: any) => string;
   linkText?: (row: any) => string;
   linkQueryParams?: (row: any) => { [key: string]: any };
-   viewLinkText?: string | ((row: any) => string);
+  viewLinkText?: string | ((row: any) => string);
   icon?: string;
   onClick?: (row: any) => void;
   buttonText?: string | ((row: any) => string);
   buttonColor?: string;
   buttonVisible?: (row: any) => boolean;
   actions?: Array<{
-    label: string | ((row: any) => string); 
+    label: string | ((row: any) => string);
     action?: string;
     icon?: string;
     color?: 'primary' | 'warn' | 'accent' | 'success' | 'danger';
@@ -92,17 +92,33 @@ export interface TableRowAction {
   ],
 })
 export class DynamicTableComponent implements OnChanges {
+  protected readonly Math = Math;
   @Input() data: any[] = [];
   @Input() columns: TableColumn[] = [];
-  private _pageSize = 10;
-  @Input()
-  set pageSize(value: number) {
-    this._pageSize = value;
-    this.applyPagination();
+private _pageSize = 10;
+@Input()
+set pageSize(value: number) {
+  // 👇 Convert to number if string
+  const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+  if (isNaN(numValue) || numValue <= 0) return;
+  
+  if (numValue === this._pageSize) return;
+  this._pageSize = numValue;
+  
+  if (this.serverMode) {
+    this.pageSizeChange.emit(numValue);
+  } else {
+    this.currentPage = 1;
+    this.applyFilters();
   }
-  get pageSize(): number {
-    return this._pageSize;
-  }
+}
+get pageSize(): number {
+  return this._pageSize;
+}
+  paginatedData: any[] = [];
+  filteredData: any[] = [];
+
+  originalData: any[] = [];
   @Input() showPagination: boolean = true;
   @Input() searchable: boolean = true;
   @Input() filterColumnKey?: string; // e.g., 'status'
@@ -115,13 +131,17 @@ export class DynamicTableComponent implements OnChanges {
   //   return this._selectedFilterValue;
   // }
   @Output() rowAction = new EventEmitter<TableRowAction>();
+  @Output() pageSizeChange = new EventEmitter<number>();
   pageSizes = [5, 10, 20, 30, 40, 50];
-  filteredData: any[] = [];
-  paginatedData: any[] = [];
-  currentPage: number = 1;
+  // currentPage: number = 1;
   searchTerm: string = '';
   sortColumn: string | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
+  @Input() totalItems: number = 0;
+  @Input() currentPage: number = 1;
+  @Input() serverMode: boolean = false;
+
+  @Output() pageChange = new EventEmitter<number>();
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -129,11 +149,22 @@ export class DynamicTableComponent implements OnChanges {
     public injector: Injector
   ) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['columns']) {
+ngOnChanges(changes: SimpleChanges): void {
+  if (changes['data'] || changes['columns'] || changes['serverMode']) {
+    if (this.serverMode) {
+      this.paginatedData = [...this.data];
+      this.originalData = [...this.data]; 
+      this.filteredData = [...this.data]; 
+    } else {
+      this.originalData = [...this.data];
       this.applyFilters();
     }
   }
+
+   if (changes['data'] && !this.serverMode) {
+    this.applyFilters();
+  }
+}
 
   trackByRowIndex(index: number, item: any): any {
     return index;
@@ -173,47 +204,58 @@ export class DynamicTableComponent implements OnChanges {
   //   this.applyPagination();
   // }
 
-  applyFilters(): void {
-    let result = [...this.data];
+applyFilters(): void {
+  if (this.serverMode) return; 
 
-    // 🔹 1. Apply select filter (if active)
-    if (this.filterColumnKey && this.selectedFilterValue !== null) {
-      result = result.filter((row) => {
-        const cellValue = row[this.filterColumnKey!];
-        return cellValue == this.selectedFilterValue; // '==' to match string/number
-      });
-    }
+  let result = [...this.originalData];
 
-    // 🔹 2. Apply search term (existing)
-    if (this.searchable && this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      result = result.filter((row) =>
-        Object.values(row).some((val) =>
-          String(val).toLowerCase().includes(term)
-        )
-      );
-    }
-
-    // 🔹 3. Apply sorting (existing)
-    if (this.sortColumn) {
-      const col = this.columns.find((c) => c.key === this.sortColumn);
-      result.sort((a, b) => this.sortData(a, b, this.sortColumn!, col?.type));
-    }
-
-    this.filteredData = result;
-    this.currentPage = 1;
-    this.applyPagination();
+  if (this.filterColumnKey && this.selectedFilterValue !== null) {
+    result = result.filter((row) => {
+      const cellValue = row[this.filterColumnKey!];
+      return cellValue == this.selectedFilterValue; 
+    });
   }
 
-  applyPagination(): void {
-    if (!this.showPagination) {
-      this.paginatedData = [...this.filteredData];
-      return;
-    }
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.paginatedData = this.filteredData.slice(start, end);
+  if (this.searchable && this.searchTerm) {
+    const term = this.searchTerm.toLowerCase();
+    result = result.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(term)
+      )
+    );
   }
+
+  // 🔹 3. Apply sorting (existing)
+  if (this.sortColumn) {
+    const col = this.columns.find((c) => c.key === this.sortColumn);
+    result.sort((a, b) => this.sortData(a, b, this.sortColumn!, col?.type));
+  }
+
+  this.filteredData = result;
+  this.currentPage = 1;
+  this.applyPagination();
+}
+
+applyPagination(): void {
+  console.log('applyPagination called');
+  console.log('showPagination:', this.showPagination);
+  console.log('currentPage:', this.currentPage);
+  console.log('pageSize:', this.pageSize);
+  console.log('filteredData length:', this.filteredData.length);
+
+  if (!this.showPagination) {
+    console.log('>>> NOT paginating - showing all data');
+    this.paginatedData = [...this.filteredData];
+    return;
+  }
+  
+  const start = (this.currentPage - 1) * this.pageSize;
+  const end = start + this.pageSize;
+  this.paginatedData = this.filteredData.slice(start, end);
+  
+  console.log('paginatedData length:', this.paginatedData.length);
+  console.log('start-end:', start, end);
+}
 
   onSearch(): void {
     this.applyFilters();
@@ -233,13 +275,41 @@ export class DynamicTableComponent implements OnChanges {
     this.applyFilters();
   }
 
-  onPageChange(page: number): void {
-    if (page < 1 || page > this.totalPages) return;
+ onPageChange(page: number): void {
+  if (page < 1 || page > this.totalPages) return;
+
+  if (this.serverMode) {
+    this.pageChange.emit(page); 
+  } else {
     this.currentPage = page;
     this.applyPagination();
   }
+}
+
+getPageNumbers(): number[] {
+  const pages = [];
+  const maxVisible = 5;
+  const half = Math.floor(maxVisible / 2);
+
+  const totalPages = this.totalPages;
+  let start = Math.max(this.currentPage - half, 1);
+  let end = start + maxVisible - 1;
+
+  if (end > totalPages) {
+    end = totalPages;
+    start = Math.max(end - maxVisible + 1, 1);
+  }
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+}
 
   get totalPages(): number {
+    if (this.serverMode) {
+      return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+    }
     return Math.max(1, Math.ceil(this.filteredData.length / this.pageSize));
   }
 
@@ -375,23 +445,25 @@ export class DynamicTableComponent implements OnChanges {
         );
 
       case 'view-link':
-  if (value) {
-    let buttonText: string;
-    if (typeof column.viewLinkText === 'function') {
-      buttonText = column.viewLinkText(row);
-    } else if (typeof column.viewLinkText === 'string') {
-      buttonText = column.viewLinkText;
-    } else {
-      buttonText = 'View'; 
-    }
+        if (value) {
+          let buttonText: string;
+          if (typeof column.viewLinkText === 'function') {
+            buttonText = column.viewLinkText(row);
+          } else if (typeof column.viewLinkText === 'string') {
+            buttonText = column.viewLinkText;
+          } else {
+            buttonText = 'View';
+          }
 
-    return this.sanitizer.bypassSecurityTrustHtml(
-      `<button class="btn btn-success" onclick="window.open('${this.sanitizeUrl(value)}', '_blank')" type="button">${buttonText}</button>`
-    );
-  }
-  return this.sanitizer.bypassSecurityTrustHtml(
-    '<span class="text-muted">—</span>'
-  );
+          return this.sanitizer.bypassSecurityTrustHtml(
+            `<button class="btn btn-success" onclick="window.open('${this.sanitizeUrl(
+              value
+            )}', '_blank')" type="button">${buttonText}</button>`
+          );
+        }
+        return this.sanitizer.bypassSecurityTrustHtml(
+          '<span class="text-muted">—</span>'
+        );
       case 'button': {
         const isVisible = column.buttonVisible
           ? column.buttonVisible(row)
@@ -477,9 +549,10 @@ export class DynamicTableComponent implements OnChanges {
     },
     row: any
   ): void {
-     const resolvedLabel = typeof actionItem.label === 'function'
-    ? actionItem.label(row)
-    : actionItem.label;
+    const resolvedLabel =
+      typeof actionItem.label === 'function'
+        ? actionItem.label(row)
+        : actionItem.label;
     const actionIdentifier = actionItem.action || resolvedLabel;
 
     if (actionItem.onClick) {

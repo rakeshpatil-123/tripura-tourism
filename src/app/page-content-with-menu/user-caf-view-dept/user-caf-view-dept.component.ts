@@ -36,7 +36,6 @@ export class UserCafViewDeptComponent implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
-  // ✅ Tab labels
   tabs = [
     { label: 'Unit Details', key: 'unitDetails' },
     { label: 'Enterprise Details', key: 'enterpriseDetails' },
