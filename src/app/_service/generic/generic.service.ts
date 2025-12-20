@@ -19,11 +19,11 @@ import Swal from 'sweetalert2';
 })
 export class GenericService {
   // API URLs (same as provided)
-  static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static DEV_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
+  static QA_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
+  static UAT_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
+  static CERTIN_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
+  static PRODUCTION_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
 
   public static BACKEND_URL(): string {
     console.log(window.location.origin);
