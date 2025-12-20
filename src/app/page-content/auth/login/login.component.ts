@@ -17,10 +17,13 @@ import { finalize } from 'rxjs';
 })
 export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   loginForm: FormGroup;
+  // images: string[] = [
+  //   // '../../../../assets/images/First_Department-list.png',
+  //   // '../../../../assets/images/Second_Department-list.png',
+  //   '../../../../assets/images/Login_ Page_ Banner.png'
+  // ];
   images: string[] = [
-    // '../../../../assets/images/First_Department-list.png',
-    // '../../../../assets/images/Second_Department-list.png',
-    '../../../../assets/images/Login_ Page_ Banner.png'
+    'assets/images/Login_ Page_ Banner.png'
   ];
   currentImageIndex = 0;
   previousImageIndex = 0;
@@ -46,6 +49,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.images = this.images.map(src => encodeURI(src));
     this.images.forEach(src => {
       const img = new Image();
       img.src = src;
