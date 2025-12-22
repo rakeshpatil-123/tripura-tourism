@@ -291,26 +291,76 @@ export class ApplicationsComponent implements OnInit {
     return columns;
   }
 
-  formatDateTime(dateTimeString: string): string {
-    if (!dateTimeString) return '-';
+formatDateTime(dateTimeString: string): string {
+  if (!dateTimeString) return '-';
 
-    const date = new Date(dateTimeString);
-    if (isNaN(date.getTime())) return dateTimeString;
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  // Support numeric timestamps (seconds or milliseconds)
+  let date: Date;
+  if (/^\d+$/.test(dateTimeString.trim())) {
+    const ts = Number(dateTimeString.trim());
+    date = new Date(dateTimeString.trim().length === 10 ? ts * 1000 : ts);
+  } else {
+    date = new Date(dateTimeString);
   }
 
-  private capitalizeFirstLetter(str: string): string {
-    if (!str) return str;
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  if (isNaN(date.getTime())) return dateTimeString;
+
+  // Format in a consistent timezone (Asia/Kolkata) and produce "YYYY-MM-DD HH:mm:ss"
+  const dtf = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
+  const parts = dtf.formatToParts(date).reduce<Record<string,string>>((acc, part) => {
+    if (part.type !== 'literal') acc[part.type] = part.value;
+    return acc;
+  }, {});
+
+  // Ensure we have all parts; otherwise fall back to original formatting
+  const { year, month, day, hour, minute, second } = parts;
+  if (!(year && month && day && hour && minute && second)) {
+    // Fallback to original local formatting (previous behaviour)
+    const y = date.getFullYear();
+    const mo = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const h = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    const s = String(date.getSeconds()).padStart(2, '0');
+    return `${y}-${mo}-${d} ${h}:${min}:${s}`;
   }
+
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+
+
+private capitalizeFirstLetter(str: string): string {
+  if (!str) return str;
+
+  // Normalize separators to spaces (underscores, hyphens, multiple separators)
+  let s = str.replace(/[_-]+/g, ' ');
+
+  // Split camelCase / PascalCase boundaries (e.g. "underReview" -> "under Review")
+  s = s.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+
+  // Separate letters from trailing digits (e.g. "subdivision1" -> "subdivision 1")
+  s = s.replace(/([A-Za-z])([0-9])/g, '$1 $2').replace(/([0-9])([A-Za-z])/g, '$1 $2');
+
+  // Collapse multiple spaces and trim
+  s = s.replace(/\s+/g, ' ').trim();
+
+  // Title-case each word to make it more meaningful ("under review" -> "Under Review")
+  return s
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 
   openStatusModal(
     applicationId: number,

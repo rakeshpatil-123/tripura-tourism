@@ -331,3 +331,80 @@ button[color='accent'] {
 ::ng-deep .mat-mdc-raised-button:not(:disabled) span:hover {
   background-color: transparent !important;
 }
+
+// Q&A Section Styling
+.qa-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.qa-section-header {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  margin-top: 16px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+}
+
+.qa-item {
+  display: grid;
+  grid-template-columns: 40% 1fr;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qa-question {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.qa-answer {
+  color: #6b7280;
+  font-size: 14px;
+  word-break: break-word;
+  padding: 4px 8px;
+  background: white;
+  border-left: 3px solid #2563eb;
+  border-radius: 2px;
+}
+
+.view-file-btn {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.view-file-btn:hover {
+  background: #1e40af;
+}

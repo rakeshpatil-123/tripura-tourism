@@ -39,7 +39,7 @@ export class ServiceViewComponent implements OnInit {
   isCertificatePreview: any = null;
   sampleFilePreview : any = null;
   isLoading: boolean = false;
-  isFinalApproval: string = '';
+  isFinalApproval: boolean = false;
 
   infoData: any[] = [];
   infoColumns: TableColumn[] = [];
@@ -49,7 +49,7 @@ export class ServiceViewComponent implements OnInit {
 
   applicationQATableData: any[] = [];
   applicationQAColumns: TableColumn[] = [];
-
+  isFinallyApproved: boolean = false;
   statusModal: StatusActionModal = {
     visible: false,
     applicationId: 0,
@@ -73,6 +73,16 @@ export class ServiceViewComponent implements OnInit {
       remarks: ['', [Validators.required, Validators.minLength(2)]],
       attachment: [null],
     });
+  }
+
+  // Opens a file URL in a new tab (used by QA view button)
+  openFile(url?: string): void {
+    if (!url) return;
+    try {
+      window.open(url, '_blank');
+    } catch (e) {
+      console.error('Failed to open file URL', e);
+    }
   }
 
   ngOnInit(): void {
@@ -111,7 +121,6 @@ export class ServiceViewComponent implements OnInit {
             }
             this.isFinalApproval = res.data.status;
             console.log('Application Data:', this.applicationData.application_data);
-
             this.processDataForDisplay();
           } else {
             this.apiService.openSnackBar(
@@ -132,10 +141,11 @@ export class ServiceViewComponent implements OnInit {
 
   processDataForDisplay(): void {
     const data = this.applicationData;
-
+    this.isFinalApproval = data.is_finally_approved;
     // Define field mapping for readable labels
     const fieldMap: Record<string, string> = {
       'application_id': 'Application ID',
+      'application_number': 'Application Number',
       'service_name': 'Service Name',
       'status': 'Status',
       'application_fee': 'Application Fee',
@@ -160,7 +170,7 @@ export class ServiceViewComponent implements OnInit {
     if (!obj.hasOwnProperty(key)) continue;
 
     // Skip workflow, application_data, applied_fee, approved_fee
-    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id', 'just_before_final_step', 'history_data'].includes(key)) {
+    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id', 'just_before_final_step', 'history_data', 'is_finally_approved', 'application_id'].includes(key)) {
       continue;
     }
 
@@ -196,60 +206,192 @@ export class ServiceViewComponent implements OnInit {
     ];
 
 // ➤ Process Application Q&A
-if (Array.isArray(data.application_data) && data.application_data.length > 0) {
-  this.applicationQATableData = data.application_data.map((item: any) => {
-    let formattedAnswer = '—';
+if (data.application_data && typeof data.application_data === 'object') {
+  const qaData: any[] = [];
 
-    if (Array.isArray(item.answer)) {
-      if (item.answer.length === 0) {
-        formattedAnswer = '—';
-      } else {
-        const allValues: string[] = [];
+  // Iterate through all keys in application_data
+  for (const key in data.application_data) {
+    if (!data.application_data.hasOwnProperty(key)) continue;
 
-        for (const ans of item.answer) {
-          if (ans === null || ans === undefined) continue;
+    const value = data.application_data[key];
 
-          if (typeof ans === 'string') {
-            // Plain string answer
-            if (ans.trim()) allValues.push(ans);
-          } else if (typeof ans === 'object') {
-            for (const key in ans) {
-              if (ans.hasOwnProperty(key)) {
-                const value = ans[key];
-                if (value !== null && value !== undefined && value !== '') {
-                  allValues.push(String(value));
+    // Case 1: Simple question object (numeric keys like "0", "1")
+    if (typeof value === 'object' && !Array.isArray(value) && value.question && value.answer !== undefined) {
+      let formattedAnswer = '—';
+      let isFile = false;
+      let fileUrl: string | undefined;
+      let fileName: string | undefined;
+
+      const detectFileFromString = (ansStr: string) => {
+        const urlRegex = /^https?:\/\//i;
+        const fileExtRegex = /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i;
+        if (urlRegex.test(ansStr) && fileExtRegex.test(ansStr)) {
+          return ansStr;
+        }
+        return null;
+      };
+
+      if (Array.isArray(value.answer)) {
+        if (value.answer.length === 0) {
+          formattedAnswer = '—';
+        } else {
+          const allValues: string[] = [];
+          for (const ans of value.answer) {
+            if (ans === null || ans === undefined) continue;
+            if (typeof ans === 'string') {
+              if (ans.trim()) allValues.push(ans);
+            } else if (typeof ans === 'object') {
+              for (const k in ans) {
+                if (ans.hasOwnProperty(k)) {
+                  const v = ans[k];
+                  if (v !== null && v !== undefined && v !== '') {
+                    allValues.push(String(v));
+                  }
                 }
               }
             }
           }
+          if (allValues.length > 0) {
+            // If single value and it is a file URL, mark as file
+            if (allValues.length === 1) {
+              const maybe = detectFileFromString(allValues[0]);
+              if (maybe) {
+                isFile = true;
+                fileUrl = maybe;
+                fileName = maybe.split('/').pop() || maybe;
+                formattedAnswer = '';
+              } else {
+                formattedAnswer = allValues.join(', ');
+              }
+            } else {
+              formattedAnswer = allValues.join(', ');
+            }
+          } else {
+            formattedAnswer = '—';
+          }
         }
-
-        if (allValues.length > 0) {
-          formattedAnswer = allValues.join(', ');
+      } else if (typeof value.answer === 'string' && value.answer.trim()) {
+        // detect file url
+        const maybeFile = (value.answer && typeof value.answer === 'string') ? detectFileFromString(value.answer) : null;
+        if (maybeFile) {
+          isFile = true;
+          fileUrl = maybeFile;
+          fileName = maybeFile.split('/').pop() || maybeFile;
+          formattedAnswer = '';
         } else {
-          formattedAnswer = '—';
+          formattedAnswer = value.answer;
         }
       }
-    } else if (typeof item.answer === 'string' && item.answer.trim()) {
-      formattedAnswer = item.answer;
-    } else {
-      formattedAnswer = '—';
+
+      qaData.push({
+        question: value.question || '—',
+        answer: formattedAnswer,
+        isFile,
+        fileUrl,
+        fileName,
+      });
     }
+    // Case 2: Grouped questions (string keys like "10th Class", "12th Class")
+    else if (Array.isArray(value)) {
+      // Add section header
+      qaData.push({
+        question: key,
+        answer: '',
+        isSection: true,
+      });
 
-    return {
-      question: item.question || '—',
-      answer: formattedAnswer,
-    };
-  });
+      // Process nested items in the array
+      for (const itemGroup of value) {
+        if (Array.isArray(itemGroup)) {
+          for (const item of itemGroup) {
+            if (typeof item === 'object' && item.question && item.answer !== undefined) {
+              let formattedAnswer = '—';
+              let isFile = false;
+              let fileUrl: string | undefined;
+              let fileName: string | undefined;
 
+              const detectFileFromString = (ansStr: string) => {
+                const urlRegex = /^https?:\/\//i;
+                const fileExtRegex = /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i;
+                if (urlRegex.test(ansStr) && fileExtRegex.test(ansStr)) {
+                  return ansStr;
+                }
+                return null;
+              };
+
+              if (Array.isArray(item.answer)) {
+                if (item.answer.length === 0) {
+                  formattedAnswer = '—';
+                } else {
+                  const allValues: string[] = [];
+                  for (const ans of item.answer) {
+                    if (ans === null || ans === undefined) continue;
+                    if (typeof ans === 'string') {
+                      if (ans.trim()) allValues.push(ans);
+                    } else if (typeof ans === 'object') {
+                      for (const k in ans) {
+                        if (ans.hasOwnProperty(k)) {
+                          const v = ans[k];
+                          if (v !== null && v !== undefined && v !== '') {
+                            allValues.push(String(v));
+                          }
+                        }
+                      }
+                    }
+                  }
+                  if (allValues.length > 0) {
+                    if (allValues.length === 1) {
+                      const maybe = detectFileFromString(allValues[0]);
+                      if (maybe) {
+                        isFile = true;
+                        fileUrl = maybe;
+                        fileName = maybe.split('/').pop() || maybe;
+                        formattedAnswer = '';
+                      } else {
+                        formattedAnswer = allValues.join(', ');
+                      }
+                    } else {
+                      formattedAnswer = allValues.join(', ');
+                    }
+                  } else {
+                    formattedAnswer = '—';
+                  }
+                }
+              } else if (typeof item.answer === 'string' && item.answer.trim()) {
+                const maybeFile = (item.answer && typeof item.answer === 'string') ? detectFileFromString(item.answer) : null;
+                if (maybeFile) {
+                  isFile = true;
+                  fileUrl = maybeFile;
+                  fileName = maybeFile.split('/').pop() || maybeFile;
+                  formattedAnswer = '';
+                } else {
+                  formattedAnswer = item.answer;
+                }
+              }
+
+              qaData.push({
+                question: item.question || '—',
+                answer: formattedAnswer,
+                isFile,
+                fileUrl,
+                fileName,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  this.applicationQATableData = qaData;
   this.applicationQAColumns = [
     { key: 'question', label: 'Question', type: 'text' },
-    { key: 'answer', label: 'Answer', type: 'text' }, // no HTML needed now
+    { key: 'answer', label: 'Answer', type: 'text' },
   ];
 } else {
-      this.applicationQATableData = [];
-      this.applicationQAColumns = [];
-    }
+  this.applicationQATableData = [];
+  this.applicationQAColumns = [];
+}
 
     // ➤ Process Workflow
     if (Array.isArray(data.workflow)) {
@@ -284,7 +426,7 @@ if (Array.isArray(data.application_data) && data.application_data.length > 0) {
           width: '200px',
           actions: [
             {
-              label: 'Approve',
+              label: (this.isFinalApproval === true) ? 'Final Approve' : 'Approve/Forward',
               color: 'success',
               visible: (row: any) => row.status === 'pending',
               onClick: (row: any) => {

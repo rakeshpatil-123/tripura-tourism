@@ -198,6 +198,10 @@ export class NewFocusSectorComponent implements OnInit {
     console.log(`Selected sector: ${sector.title}`);
   }
 
+  redirectToLogin():void {
+    window.location.href = 'page/login';
+  }
+
   applyForInvestment(): void {
     console.log('Applying for investment');
     // Add navigation or form logic

@@ -110,7 +110,7 @@ export class AllDepartmentApplicationsComponent implements OnInit {
             this.serviceColumns = this.generateColumns(res.data);
             const preferredOrder = [
               'service_name',
-              'total_applications',
+              'department_name',
               'pending_applications',
               'target_days',
               'actions'
@@ -187,8 +187,8 @@ export class AllDepartmentApplicationsComponent implements OnInit {
       return id ? `${name}\n${id}` : name;
     }
 
-    if (field === 'total_applications') {
-      const val = row.total_applications ?? 0;
+    if (field === 'department_name') {
+      const val = row.department_name ?? 0;
       return `Total: ${val}`;
     }
 

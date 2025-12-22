@@ -153,6 +153,7 @@ export class ServicesComponent {
       'noc_payment_type',
       'id',
       'sl_no',
+      'is_caf_filled'
     ]);
 
     columns.push({

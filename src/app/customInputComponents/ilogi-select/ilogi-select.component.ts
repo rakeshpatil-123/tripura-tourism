@@ -60,9 +60,11 @@ export class IlogiSelectComponent
   @Input() placeholder = '';
   @Input() mandatory = false;
   @Input() readonly = false;
+  @Input() isReadOnly = false;
   @Input() selectOptions: SelectOption[] = [{ id: '', name: 'Select' }];
   filteredOptions: SelectOption[] = [];
   @Input() enableSearch: boolean = false;
+  @Input() disabled: boolean = false;
   searchTerm: string = '';
   @Input() errors: { [key: string]: any } | null = null;
   @Input() multiple: boolean = false;

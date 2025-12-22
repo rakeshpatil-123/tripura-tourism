@@ -11,23 +11,45 @@
           <ng-container *ngIf="sourcePage !== 'departmental-users'">
           <app-ilogi-input fieldId="name_of_enterprise" fieldLabel="Name of Enterprise" [mandatory]="true"
             formControlName="name_of_enterprise" placeholder="Enter enterprise name"></app-ilogi-input>
+          <small class="error-text" *ngIf="registrationForm.get('name_of_enterprise')?.touched && registrationForm.get('name_of_enterprise')?.invalid">
+            Please enter a valid enterprise name.
+          </small>
           </ng-container>
+                 <!-- PAN Number -->
+                      <ng-container *ngIf="sourcePage !== 'departmental-users'">
+                        <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
+                          placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
+                         <small class="error-text" *ngIf="registrationForm.get('pan')?.touched && registrationForm.get('pan')?.invalid">
+                          Please enter a valid PAN number.
+                        </small></app-ilogi-input>
+                       
+                      </ng-container>
           <!-- Authorized Person -->
           <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
             formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
+          <small class="error-text" *ngIf="registrationForm.get('authorized_person_name')?.touched && registrationForm.get('authorized_person_name')?.invalid">
+            Please enter a valid name.
+          </small>
 
           <!-- Email -->
           <app-ilogi-input fieldId="email_id" fieldLabel="Email ID" [mandatory]="true" formControlName="email_id"
             placeholder="Enter email" type="email"></app-ilogi-input>
+          <small class="error-text" *ngIf="registrationForm.get('email_id')?.touched && registrationForm.get('email_id')?.invalid">
+            Please enter a valid email address.
+          </small>
           <div>
             <!-- Mobile -->
             <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true"
               formControlName="mobile_no" placeholder="Enter mobile number" type="text"></app-ilogi-input>
+            <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched && registrationForm.get('mobile_no')?.invalid">
+              Please enter a valid 10-digit mobile number.
+            </small>
+
 
             <!-- OTP  -->
             <div
               *ngIf="!editMode && sourcePage !== 'departmental-users' && registrationForm.get('mobile_no')?.value?.toString().trim().length >= 10"
-              class="otp-section mb-2">
+              class="otp-section mb-2">           
               <button type="button" class="btn-otp" (click)="sendOtp()"
                 [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid">
                 {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
@@ -51,11 +73,18 @@
           <!-- Username -->
           <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
             placeholder="Choose a username"></app-ilogi-input>
+          <small class="error-text" *ngIf="registrationForm.get('user_name')?.touched && registrationForm.get('user_name')?.invalid">
+            Please enter a valid username.
+          </small>
+               
 
           <!-- City -->
           <app-ilogi-input *ngIf="!(sourcePage === 'departmental-users')" fieldId="registered_enterprise_city"
             fieldLabel="City" [mandatory]="true" formControlName="registered_enterprise_city"
             placeholder="Enter city"></app-ilogi-input>
+          <small class="error-text" *ngIf="registrationForm.get('registered_enterprise_city')?.touched && registrationForm.get('registered_enterprise_city')?.invalid">
+            Please enter a valid city.
+          </small>
         </div>
 
         <div *ngIf="!(sourcePage === 'departmental-users')" class="single-field">
@@ -63,6 +92,9 @@
           <app-ilogi-input class="height-20" fieldId="registered_enterprise_address"
             fieldLabel="Registered Enterprise Address" [mandatory]="true"
             formControlName="registered_enterprise_address" placeholder="Enter full address"></app-ilogi-input>
+          <small class="error-text" *ngIf="registrationForm.get('registered_enterprise_address')?.touched && registrationForm.get('registered_enterprise_address')?.invalid">
+            Please enter a valid address.
+          </small>
         </div>
         <div *ngIf="(sourcePage === 'departmental-users')">
           <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" [mandatory]="true"
