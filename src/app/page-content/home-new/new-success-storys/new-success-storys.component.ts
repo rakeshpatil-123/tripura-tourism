@@ -41,30 +41,30 @@ interface Metric {
 export class NewSuccessStorysComponent implements AfterViewInit {
   @ViewChildren('metricCard') metricCards!: QueryList<ElementRef>;
   metrics: Metric[] = [
-    {
-      icon: 'trending-up',
-      value: '+300%',
-      title: 'Investment Growth',
-      subtitle: 'YoY',
-      gradientFrom: 'from-green-500',
-      gradientTo: 'to-emerald-500'
-    },
-    {
-      icon: 'users',
-      value: '2,500+',
-      title: 'Active Investors',
-      subtitle: 'Companies',
-      gradientFrom: 'from-blue-500',
-      gradientTo: 'to-cyan-500'
-    },
-    {
-      icon: 'building',
-      value: '15+',
-      title: 'Industrial Parks',
-      subtitle: 'Locations',
-      gradientFrom: 'from-purple-500',
-      gradientTo: 'to-indigo-500'
-    }
+    // {
+    //   icon: 'trending-up',
+    //   value: '+300%',
+    //   title: 'Investment Growth',
+    //   subtitle: 'YoY',
+    //   gradientFrom: 'from-green-500',
+    //   gradientTo: 'to-emerald-500'
+    // },
+    // {
+    //   icon: 'users',
+    //   value: '2,500+',
+    //   title: 'Active Investors',
+    //   subtitle: 'Companies',
+    //   gradientFrom: 'from-blue-500',
+    //   gradientTo: 'to-cyan-500'
+    // },
+    // {
+    //   icon: 'building',
+    //   value: '15+',
+    //   title: 'Industrial Parks',
+    //   subtitle: 'Locations',
+    //   gradientFrom: 'from-purple-500',
+    //   gradientTo: 'to-indigo-500'
+    // }
   ];
 
   cardState: string = 'hidden';
@@ -93,6 +93,10 @@ export class NewSuccessStorysComponent implements AfterViewInit {
       { threshold: 0.4 }
     );
     observer.observe(this.el.nativeElement);
+  }
+
+  redirectToLogin(): void {
+    window.location.href = 'page/login';
   }
 
   animateNumbers() {

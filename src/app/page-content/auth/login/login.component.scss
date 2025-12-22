@@ -317,3 +317,84 @@
   margin-bottom: 8px;
   display: block;
 }
+/* === REPLACE your existing .form-footer + related responsive rules WITH THIS BLOCK === */
+
+/* Footer row: force single-row layout, prevent wrapping */
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+
+  /* Prevent children from wrapping and allow the left text to shrink if needed */
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* left text container; allow it to truncate if space is tight */
+.form-footer .text-left {
+  color: #333;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* register link: keep appearance and prevent wrapping */
+.form-footer .register-link {
+  background: transparent;
+  color: #003c5b;
+  font-weight: 700;
+  text-decoration: underline;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 160ms ease, transform 120ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto; /* avoid shrinking too much */
+  margin-left: 6px;
+}
+
+/* prominent forgot-password link (right side) */
+.forgot-link {
+  background: transparent;
+  color: #003c5b;
+  font-weight: 700;
+  text-decoration: underline;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 160ms ease, transform 120ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto; /* avoid shrinking */
+}
+
+/* Hover interactions retained */
+.form-footer .register-link:hover,
+.forgot-link:hover {
+  background: rgba(0, 60, 91, 0.06);
+  transform: translateY(-1px);
+}
+
+/* Small screens: keep them on one line but slightly reduce font/padding to avoid overflow */
+@media (max-width: 576px) {
+  .form-footer {
+    flex-wrap: nowrap; /* force single row */
+    gap: 8px;
+    justify-content: space-between;
+  }
+  .form-footer .text-left { font-size: 0.82rem; }
+  .form-footer .register-link,
+  .forgot-link {
+    font-size: 0.82rem;
+    padding: 6px 8px;
+  }
+}
+
+/* Extra-small screens: allow slight truncation of left text but still single row */
+@media (max-width: 420px) {
+  .form-footer .text-left { font-size: 0.78rem; max-width: 58%; }
+  .form-footer .register-link,
+  .forgot-link { font-size: 0.78rem; padding: 6px 8px; }
+}

@@ -38,7 +38,7 @@
             </ng-template>
           </p-select> -->
   <!-- single-select when multiple is false -->
-  <p-select *ngIf="!multiple" appendTo="body" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name"
+  <p-select *ngIf="!multiple" appendTo="body" [readonly]="isReadOnly" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name"
     [(ngModel)]="value" optionValue="id" [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false"
     (onShow)="onDropdownShow()" (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()"
     (onBlur)="onBlur()" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
@@ -59,8 +59,8 @@
   </p-select>
   
   <!-- multi-select when multiple is true -->
-  <p-multiSelect *ngIf="multiple" appendTo="body" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name"
-    [(ngModel)]="value" optionValue="id" [placeholder]="placeholder" [disabled]="isDisabled" [filter]="false"
+  <p-multiSelect *ngIf="multiple" appendTo="body" [readonly]="isReadOnly" [inputId]="fieldId" [options]="filteredOptions" optionLabel="name"
+    [(ngModel)]="value" optionValue="id" [placeholder]="placeholder" [disabled]="disabled" [filter]="false"
     (onShow)="onDropdownShow()" (onChange)="onChangeControl($event.value)" (onFocus)="showErrorOnFieldHover()"
     (onBlur)="onBlur()" [attr.aria-invalid]="submitted && errors ? 'true' : 'false'"
     [attr.aria-describedby]="errorFieldId" styleClass="w-full">

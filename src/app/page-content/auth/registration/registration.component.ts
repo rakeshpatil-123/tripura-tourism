@@ -13,6 +13,9 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { of } from 'rxjs';
+import { debounceTime, map, distinctUntilChanged, filter, switchMap, finalize, catchError, tap } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
 import {
@@ -22,6 +25,7 @@ import {
 import { Router } from '@angular/router';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { IlogiRadioComponent } from '../../../customInputComponents/ilogi-radio/ilogi-radio.component';
+import { LoaderService } from '../../../_service/loader/loader.service';
 
 interface District {
   district_code: string;
@@ -68,6 +72,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
   districts: SelectOption[] = [];
   subdivisions: SelectOption[] = [];
   ulbs: SelectOption[] = [];
+  private PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
   wards: SelectOption[] = [];
   departments: SelectOption[] = [];
   otpControl!: FormControl;
@@ -77,6 +82,12 @@ export class RegistrationComponent implements OnInit, OnChanges {
   loadingSubdivisions = false;
   loadingUlbs = false;
   loadingWards = false;
+  private suppressCascading = false;
+  private lastSubdivisionsKey = '';
+  private lastUlbsKey = '';
+  private departmentsLoaded = false;
+  private loadingDepartments = false;
+
   hierarchyLevels = [
     { id: 'block', name: 'Block' },
     { id: 'subdivision1', name: 'Subdivision 1' },
@@ -96,14 +107,16 @@ export class RegistrationComponent implements OnInit, OnChanges {
   constructor(
     private fb: FormBuilder,
     private genericService: GenericService,
-    private router: Router
+    private router: Router,
+    private loaderService: LoaderService
   ) {
     this.registrationForm = this.fb.group(
       {
         name_of_enterprise: ['', []],
         authorized_person_name: ['', []],
         email_id: ['', []],
-        mobile_no: ['', []],
+        pan: ['', [ Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]],
+        mobile_no: [''],
         user_name: ['', []],
         registered_enterprise_address: ['', []],
         registered_enterprise_city: ['', []],
@@ -131,7 +144,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadDistricts();
-    this.getAllDepartmentList();
+      this.getAllDepartmentList();
     if (this.sourcePage === 'departmental-users') {
       this.registrationForm.patchValue({ user_type: 'department' });
       ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'].forEach((ctrl) => {
@@ -173,6 +186,43 @@ export class RegistrationComponent implements OnInit, OnChanges {
       this.onHierarchyChange();
     });
 
+    this.registrationForm.get('pan')?.valueChanges.pipe(
+      map((v: string) => (v || '').toString().toUpperCase()),
+      distinctUntilChanged(),
+      tap((upper) => {
+        const ctrl = this.registrationForm.get('pan');
+        if (ctrl && ctrl.value !== upper) {
+          ctrl.setValue(upper, { emitEvent: false });
+        }
+      }),
+      debounceTime(500),
+      filter((value: string) => this.PAN_REGEX.test(value)),
+      switchMap((value: string) => {
+        // this.loaderService.showLoader();
+        return this.genericService.getByConditions({ pan_no: value }, 'api/user/check-pan-resgistered').pipe(
+          finalize(() => this.loaderService.hideLoader()),
+          catchError((err) => {
+            console.error('PAN check failed', err);
+            return of(null);
+          })
+        );
+      })
+    ).subscribe((res: any) => {
+      if (!res) return;
+      if (res.is_registered) {
+        const message = res.message || 'Your account already exists. Please login.';
+        Swal.fire({
+          title: 'Account already exists',
+          text: message,
+          icon: 'info',
+          confirmButtonText: 'OK'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // this.router.navigate(['page/login'], { queryParams: { message } });
+          }
+        });
+      }
+    });
     this.registrationForm.get('mobile_no')?.valueChanges.subscribe(() => {
       this.otpSent = false;
       this.otpVerified = false;
@@ -181,7 +231,6 @@ export class RegistrationComponent implements OnInit, OnChanges {
   }
   ngOnChanges(changes: any): void {
     if (changes['editData'] && this.editData && this.editMode) {
-      // Ensure prefill runs after ngOnInit has created/adjusted form controls
       setTimeout(() => {
         if (this.sourcePage === 'departmental-users') {
           if (!this.departments || this.departments.length === 0) {
@@ -195,6 +244,9 @@ export class RegistrationComponent implements OnInit, OnChanges {
           } else {
             this.prefillEditData();
           }
+          setTimeout(() => {
+            this.prefillEditData();
+          }, 200);
         } else {
           this.prefillEditData();
         }
@@ -207,34 +259,30 @@ export class RegistrationComponent implements OnInit, OnChanges {
    * that plays well with both single-value selects and multi-select arrays
    * (departmental-users uses arrays).
    */
-  onHierarchyChange(): void {
-    // Reset only the 3 controls requested: district_id, subdivision_id, ulb_id
-    const keys = ['district_id', 'subdivision_id', 'ulb_id'];
+onHierarchyChange(): void {
+  const keys = ['district_id', 'subdivision_id', 'ulb_id'];
 
-    keys.forEach(key => {
-      const ctrl = this.registrationForm.get(key);
-      if (!ctrl) return;
+  keys.forEach(key => {
+    const ctrl = this.registrationForm.get(key);
+    if (!ctrl) return;
 
-      const current = ctrl.value;
-      // department mode uses arrays -> reset to empty array; otherwise reset to empty string
-      if (Array.isArray(current)) {
-        ctrl.setValue([], { emitEvent: true });
-      } else {
-        ctrl.setValue('', { emitEvent: true });
-      }
-      ctrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-    });
+    const current = ctrl.value;
+    // perform silent reset — don't emit valueChanges while programmatic
+    if (Array.isArray(current)) {
+      ctrl.setValue([], { emitEvent: false });
+    } else {
+      ctrl.setValue('', { emitEvent: false });
+    }
+    ctrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+  });
 
-    // Clear dependent option lists so UI updates correctly
-    this.subdivisions = [];
-    this.ulbs = [];
-    // clearing wards is safe (they exist) because ULB changed
-    this.wards = [];
-    
-    // do NOT reference undefined properties like multipleSubdivisions/multipleUlbs here
-    // selectedDistricts exists on the component; clearing it is safe but optional:
-    this.selectedDistricts = [];
-  }
+  this.subdivisions = [];
+  this.ulbs = [];
+  this.wards = [];
+
+  // Clear selected districts grouping safely
+  this.selectedDistricts = [];
+}
 
 
 
@@ -254,6 +302,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
   prefillEditData(): void {
     const data = this.editData;
     if (!data) return;
+    this.suppressCascading = true;
     const ensureControl = (name: string, defaultValue: any = '') => {
       if (!this.registrationForm.contains(name)) {
         this.registrationForm.addControl(name, this.fb.control(defaultValue));
@@ -265,6 +314,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
       name_of_enterprise: data.name_of_enterprise || '',
       authorized_person_name: data.authorized_person_name || '',
       email_id: data.email_id || '',
+      pan: data.pan || '',
       mobile_no: data.mobile_no || '',
       user_name: data.user_name || '',
       registered_enterprise_address: data.registered_enterprise_address || '',
@@ -294,8 +344,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
       ids: string[],
       optionList: Array<{ id: string; name?: string }>,
       triggerLoad?: (codes: string | string[]) => void,
-      maxAttempts = 25,
-      intervalMs = 200
+      maxAttempts = 0,
+      intervalMs = 0
     ) => {
       if (!ids || ids.length === 0) return;
 
@@ -438,10 +488,10 @@ export class RegistrationComponent implements OnInit, OnChanges {
         });
         return { id: dKey, subdivisions: subdivs };
       });
-      if (districtIds.length) this.loadSubdivisions(districtIds);
-      if (subdivisionIds.length) this.loadUlbs(subdivisionIds);
+      // if (districtIds.length) this.loadSubdivisions(districtIds);
+      // if (subdivisionIds.length) this.loadUlbs(subdivisionIds);
       setArrayControlWhenReady('district_id', districtIds, this.districts, (ids) => this.loadSubdivisions(ids));
-      setArrayControlWhenReady('subdivision_id', subdivisionIds, this.subdivisions, (ids) => this.loadUlbs(ids));
+      setArrayControlWhenReady('subdivision_id', subdivisionIds, this.subdivisions, (ids) =>{this.loadUlbs(ids) } );
       setArrayControlWhenReady('ulb_id', ulbIds, this.ulbs);
       const wardIdsFromLocations: string[] = (locations.filter(l => l.ward_id).map(l => String(l.ward_id)));
       if (wardIdsFromLocations.length > 0) {
@@ -483,31 +533,31 @@ export class RegistrationComponent implements OnInit, OnChanges {
               this.registrationForm.get('subdivision_id')?.setValue(subdivisionArrLegacy);
               this.registrationForm.get('subdivision_id')?.updateValueAndValidity();
 
-              if (subdivisionArrLegacy.length > 0) {
-                this.loadUlbs(subdivisionArrLegacy);
-                const ulbInterval = setInterval(() => {
-                  if (this.ulbs.length > 0) {
-                    clearInterval(ulbInterval);
-                    ulbArrLegacy.forEach((uCode) => {
-                      if (!this.ulbs.some((u) => String(u.id) === String(uCode))) {
-                        this.ulbs.push({ id: uCode, name: data.ulb || `ULB ${uCode}` });
-                      }
-                    });
-                    this.registrationForm.get('ulb_id')?.setValue(ulbArrLegacy);
-                    this.registrationForm.get('ulb_id')?.updateValueAndValidity();
+              // if (subdivisionArrLegacy.length > 0) {
+              //   this.loadUlbs(subdivisionArrLegacy);
+              //   const ulbInterval = setInterval(() => {
+              //     if (this.ulbs.length > 0) {
+              //       clearInterval(ulbInterval);
+              //       ulbArrLegacy.forEach((uCode) => {
+              //         if (!this.ulbs.some((u) => String(u.id) === String(uCode))) {
+              //           this.ulbs.push({ id: uCode, name: data.ulb || `ULB ${uCode}` });
+              //         }
+              //       });
+              //       this.registrationForm.get('ulb_id')?.setValue(ulbArrLegacy);
+              //       this.registrationForm.get('ulb_id')?.updateValueAndValidity();
 
-                    wardArrLegacy.forEach((wCode) => {
-                      if (!this.wards.some((w) => String(w.id) === String(wCode))) {
-                        this.wards.push({ id: wCode, name: data.ward || `Ward ${wCode}` });
-                      }
-                    });
-                    this.registrationForm.get('ward_id')?.setValue(wardArrLegacy);
-                    this.registrationForm.get('ward_id')?.updateValueAndValidity();
-                  }
-                }, 300);
-              }
+              //       wardArrLegacy.forEach((wCode) => {
+              //         if (!this.wards.some((w) => String(w.id) === String(wCode))) {
+              //           this.wards.push({ id: wCode, name: data.ward || `Ward ${wCode}` });
+              //         }
+              //       });
+              //       this.registrationForm.get('ward_id')?.setValue(wardArrLegacy);
+              //       this.registrationForm.get('ward_id')?.updateValueAndValidity();
+              //     }
+              //   }, 200);
+              // }
             }
-          }, 300);
+          }, 200);
         }
       } else {
         this.registrationForm.patchValue({
@@ -526,36 +576,36 @@ export class RegistrationComponent implements OnInit, OnChanges {
                 });
               }
               this.registrationForm.patchValue({ subdivision_id: subdivisionArrLegacy[0] ?? '' });
-              if (subdivisionArrLegacy[0]) {
-                this.loadUlbs(subdivisionArrLegacy[0]);
-                const ulbInterval = setInterval(() => {
-                  if (this.ulbs.length > 0) {
-                    clearInterval(ulbInterval);
-                    if (ulbArrLegacy[0] && !this.ulbs.some((u) => u.id === ulbArrLegacy[0])) {
-                      this.ulbs.push({
-                        id: ulbArrLegacy[0],
-                        name: data.ulb || `ULB ${ulbArrLegacy[0]}`,
-                      });
-                    }
-                    this.registrationForm.patchValue({ ulb_id: ulbArrLegacy[0] ?? '' });
-                    if (ulbArrLegacy[0]) {
-                      this.loadWards(ulbArrLegacy[0]);
-                      const wardInterval = setInterval(() => {
-                        if (this.wards.length > 0) {
-                          clearInterval(wardInterval);
-                          if (wardArrLegacy[0] && !this.wards.some((w) => w.id === wardArrLegacy[0])) {
-                            this.wards.push({
-                              id: wardArrLegacy[0],
-                              name: data.ward || `Ward ${wardArrLegacy[0]}`,
-                            });
-                          }
-                          this.registrationForm.patchValue({ ward_id: wardArrLegacy[0] ?? '' });
-                        }
-                      }, 300);
-                    }
-                  }
-                }, 300);
-              }
+              // if (subdivisionArrLegacy[0]) {
+              //   this.loadUlbs(subdivisionArrLegacy[0]);
+              //   const ulbInterval = setInterval(() => {
+              //     if (this.ulbs.length > 0) {
+              //       clearInterval(ulbInterval);
+              //       if (ulbArrLegacy[0] && !this.ulbs.some((u) => u.id === ulbArrLegacy[0])) {
+              //         this.ulbs.push({
+              //           id: ulbArrLegacy[0],
+              //           name: data.ulb || `ULB ${ulbArrLegacy[0]}`,
+              //         });
+              //       }
+              //       this.registrationForm.patchValue({ ulb_id: ulbArrLegacy[0] ?? '' });
+              //       if (ulbArrLegacy[0]) {
+              //         this.loadWards(ulbArrLegacy[0]);
+              //         const wardInterval = setInterval(() => {
+              //           if (this.wards.length > 0) {
+              //             clearInterval(wardInterval);
+              //             if (wardArrLegacy[0] && !this.wards.some((w) => w.id === wardArrLegacy[0])) {
+              //               this.wards.push({
+              //                 id: wardArrLegacy[0],
+              //                 name: data.ward || `Ward ${wardArrLegacy[0]}`,
+              //               });
+              //             }
+              //             this.registrationForm.patchValue({ ward_id: wardArrLegacy[0] ?? '' });
+              //           }
+              //         }, 300);
+              //       }
+              //     }
+              //   }, 300);
+              // }
             }
           }, 300);
         }
@@ -575,6 +625,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         name_of_enterprise: prefill.name_of_enterprise,
         authorized_person_name: prefill.authorized_person_name,
         email_id: prefill.email_id,
+        pan: prefill.pan,
         mobile_no: prefill.mobile_no,
         user_name: prefill.user_name,
         registered_enterprise_address: prefill.registered_enterprise_address,
@@ -585,59 +636,144 @@ export class RegistrationComponent implements OnInit, OnChanges {
         inspector: prefill.inspector,
       });
       this.registrationForm.get('hierarchy_level')?.setValue(prefill.hierarchy_level, { emitEvent: false });
-    }, 800);
+      this.suppressCascading = false;
+    }, 500);
   }
 
+  private areSameValues(a: any, b: any): boolean {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    const A = [...a].map(String).sort();
+    const B = [...b].map(String).sort();
+    return A.every((v, i) => v === B[i]);
+  }
+  return String(a) === String(b);
+}
+
+
   setupCascadingDropdowns(): void {
-    this.registrationForm.get('district_id')?.valueChanges.subscribe((district) => {
-      if (Array.isArray(district)) {
-        this.registrationForm.get('subdivision_id')?.setValue([]);
-        this.registrationForm.get('ulb_id')?.setValue([]);
-        this.registrationForm.get('ward_id')?.setValue([]);
+    // this.registrationForm.get('district_id')?.valueChanges.subscribe((district) => {
+    //   if (Array.isArray(district)) {
+    //     this.registrationForm.get('subdivision_id')?.setValue([]);
+    //     this.registrationForm.get('ulb_id')?.setValue([]);
+    //     this.registrationForm.get('ward_id')?.setValue([]);
+    //   } else {
+    //     this.registrationForm.get('subdivision_id')?.reset();
+    //     this.registrationForm.get('ulb_id')?.reset();
+    //     this.registrationForm.get('ward_id')?.reset();
+    //   }
+    //   this.subdivisions = [];
+    //   this.ulbs = [];
+    //   this.wards = [];
+
+    //   if (district && (Array.isArray(district) ? district.length > 0 : true)) {
+    //     this.loadSubdivisions(district);
+    //   }
+    // });
+    // this.registrationForm.get('subdivision_id')?.valueChanges.subscribe((subdivision) => {
+    //   if (Array.isArray(subdivision)) {
+    //     this.registrationForm.get('ulb_id')?.setValue([]);
+    //     this.registrationForm.get('ward_id')?.setValue([]);
+    //   } else {
+    //     this.registrationForm.get('ulb_id')?.reset();
+    //     this.registrationForm.get('ward_id')?.reset();
+    //   }
+
+    //   this.ulbs = [];
+    //   this.wards = [];
+
+    //   if (subdivision && (Array.isArray(subdivision) ? subdivision.length > 0 : true)) {
+    //     this.loadUlbs(subdivision);
+    //   }
+    // });
+    // this.registrationForm.get('ulb_id')?.valueChanges.subscribe((ulb) => {
+    //   if (Array.isArray(ulb)) {
+    //     this.registrationForm.get('ward_id')?.setValue([]);
+    //   } else {
+    //     this.registrationForm.get('ward_id')?.reset();
+    //   }
+    //   this.wards = [];
+
+    //   if (ulb && (Array.isArray(ulb) ? ulb.length > 0 : true)) {
+    //     if (this.sourcePage === 'departmental-users') {
+    //     } else {
+    //       this.loadWards(ulb);
+    //     }
+    //   }
+    // });
+    this.registrationForm.get('district_id')?.valueChanges
+  .pipe(distinctUntilChanged((a, b) => this.areSameValues(a, b)))
+  .subscribe((district) => {
+    if (this.suppressCascading) return;
+
+    // reset request caches when parent changes
+    this.lastSubdivisionsKey = '';
+    this.lastUlbsKey = '';
+
+    if (Array.isArray(district)) {
+      this.registrationForm.get('subdivision_id')?.setValue([], { emitEvent: false });
+      this.registrationForm.get('ulb_id')?.setValue([], { emitEvent: false });
+      this.registrationForm.get('ward_id')?.setValue([], { emitEvent: false });
+    } else {
+      this.registrationForm.get('subdivision_id')?.reset({ emitEvent: false });
+      this.registrationForm.get('ulb_id')?.reset({ emitEvent: false });
+      this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
+    }
+
+    this.subdivisions = [];
+    this.ulbs = [];
+    this.wards = [];
+
+    if (district && (Array.isArray(district) ? district.length > 0 : true)) {
+      this.loadSubdivisions(district);
+    }
+  });
+
+this.registrationForm.get('subdivision_id')?.valueChanges
+  .pipe(distinctUntilChanged((a, b) => this.areSameValues(a, b)))
+  .subscribe((subdivision) => {
+    if (this.suppressCascading) return;
+
+    // reset ulb cache when subdivision changes
+    this.lastUlbsKey = '';
+
+    if (Array.isArray(subdivision)) {
+      this.registrationForm.get('ulb_id')?.setValue([], { emitEvent: false });
+      this.registrationForm.get('ward_id')?.setValue([], { emitEvent: false });
+    } else {
+      this.registrationForm.get('ulb_id')?.reset({ emitEvent: false });
+      this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
+    }
+
+    this.ulbs = [];
+    this.wards = [];
+
+    if (subdivision && (Array.isArray(subdivision) ? subdivision.length > 0 : true)) {
+      this.loadUlbs(subdivision);
+    }
+  });
+
+this.registrationForm.get('ulb_id')?.valueChanges
+  .pipe(distinctUntilChanged((a, b) => this.areSameValues(a, b)))
+  .subscribe((ulb) => {
+    if (this.suppressCascading) return;
+
+    if (Array.isArray(ulb)) {
+      this.registrationForm.get('ward_id')?.setValue([], { emitEvent: false });
+    } else {
+      this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
+    }
+    this.wards = [];
+
+    if (ulb && (Array.isArray(ulb) ? ulb.length > 0 : true)) {
+      if (this.sourcePage === 'departmental-users') {
+        // departmental-users handles wards differently — keep same logic
       } else {
-        this.registrationForm.get('subdivision_id')?.reset();
-        this.registrationForm.get('ulb_id')?.reset();
-        this.registrationForm.get('ward_id')?.reset();
+        this.loadWards(ulb);
       }
-      this.subdivisions = [];
-      this.ulbs = [];
-      this.wards = [];
+    }
+  });
 
-      if (district && (Array.isArray(district) ? district.length > 0 : true)) {
-        this.loadSubdivisions(district);
-      }
-    });
-    this.registrationForm.get('subdivision_id')?.valueChanges.subscribe((subdivision) => {
-      if (Array.isArray(subdivision)) {
-        this.registrationForm.get('ulb_id')?.setValue([]);
-        this.registrationForm.get('ward_id')?.setValue([]);
-      } else {
-        this.registrationForm.get('ulb_id')?.reset();
-        this.registrationForm.get('ward_id')?.reset();
-      }
-
-      this.ulbs = [];
-      this.wards = [];
-
-      if (subdivision && (Array.isArray(subdivision) ? subdivision.length > 0 : true)) {
-        this.loadUlbs(subdivision);
-      }
-    });
-    this.registrationForm.get('ulb_id')?.valueChanges.subscribe((ulb) => {
-      if (Array.isArray(ulb)) {
-        this.registrationForm.get('ward_id')?.setValue([]);
-      } else {
-        this.registrationForm.get('ward_id')?.reset();
-      }
-      this.wards = [];
-
-      if (ulb && (Array.isArray(ulb) ? ulb.length > 0 : true)) {
-        if (this.sourcePage === 'departmental-users') {
-        } else {
-          this.loadWards(ulb);
-        }
-      }
-    });
   }
 
   loadDistricts(): void {
@@ -663,80 +799,124 @@ export class RegistrationComponent implements OnInit, OnChanges {
   }
 
   loadSubdivisions(districtCodes: string | string[]): void {
-    this.loadingSubdivisions = true;
-    const codes = Array.isArray(districtCodes) ? districtCodes : [districtCodes];
+  this.loadingSubdivisions = true;
+  const codesRaw = Array.isArray(districtCodes) ? districtCodes : [districtCodes];
 
-    let payload: any;
-    let endpoint = 'api/tripura/get-sub-subdivisions';
+  // normalize & remove falsy values
+  const codes = codesRaw.map((c: any) => String(c).trim()).filter((c: string) => c !== '' && c !== 'null' && c !== 'undefined');
 
-    if (this.sourcePage === 'departmental-users' && codes.length > 1) {
-      payload = { districts: codes.map((c) => Number(c)) };
-      endpoint = 'api/tripura/get-multiple-subdivisions';
-    } else {
-      payload = { district: codes[0] };
-      endpoint = 'api/tripura/get-sub-subdivisions';
-    }
-
-    this.genericService.getByConditions(payload, endpoint).subscribe({
-      next: (res: any) => {
-        const list = res?.subdivision ?? res?.subdivisions ?? [];
-        if (res?.status === 1 && Array.isArray(list)) {
-          this.subdivisions = list.map((s: any) => ({
-            id:
-              String(s.sub_lgd_code ?? s.sub_division_code ?? s.subdivision_code ?? s.id ?? ''),
-            name:
-              String(s.sub_division ?? s.sub_division_name ?? s.subdivision_name ?? s.name ?? ''),
-          }));
-        } else {
-          this.subdivisions = [];
-        }
-        this.loadingSubdivisions = false;
-      },
-      error: (err: any) => {
-        console.error('Failed to load subdivisions:', err);
-        this.genericService.openSnackBar('Failed to load subdivisions', 'Error');
-        this.loadingSubdivisions = false;
-      },
-    });
+  // nothing valid to query
+  if (codes.length === 0) {
+    this.loadingSubdivisions = false;
+    return;
   }
 
-
-
-  loadUlbs(subdivisionCodes: string | string[]): void {
-    this.loadingUlbs = true;
-    const codes = Array.isArray(subdivisionCodes) ? subdivisionCodes : [subdivisionCodes];
-
-    let payload: any;
-    let endpoint = 'api/tripura/get-block-names';
-
-    if (this.sourcePage === 'departmental-users' && codes.length > 1) {
-      payload = { subdivisions: codes.map((c) => Number(c)) };
-      endpoint = 'api/tripura/get-multiple-block';
-    } else {
-      payload = { subdivision: codes[0] };
-      endpoint = 'api/tripura/get-block-names';
-    }
-
-    this.genericService.getByConditions(payload, endpoint).subscribe({
-      next: (res: any) => {
-        const list = res?.ulbs ?? res?.blocks ?? res?.data ?? [];
-        if (res?.status === 1 && Array.isArray(list)) {
-          this.ulbs = list.map((u: any) => ({
-            id: String(u.ulb_lgd_code ?? u.block_code ?? u.block_lgd_code ?? u.id ?? ''),
-            name: String(u.ulb_name ?? u.block_name ?? u.block_name ?? u.name ?? ''),
-          }));
-        } else {
-          this.ulbs = [];
-        }
-        this.loadingUlbs = false;
-      },
-      error: (err: any) => {
-        console.error('Failed to load ULBs:', err);
-        this.genericService.openSnackBar('Failed to load ULBs', 'Error');
-        this.loadingUlbs = false;
-      },
-    });
+  // prevent duplicate identical requests (use normalized codes)
+  const key = codes.map(String).sort().join(',');
+  if (key === this.lastSubdivisionsKey) {
+    this.loadingSubdivisions = false;
+    return;
   }
+  this.lastSubdivisionsKey = key;
+
+  let payload: any;
+  let endpoint = 'api/tripura/get-sub-subdivisions';
+
+  if (this.sourcePage === 'departmental-users' && codes.length >= 1) {
+    const numeric = codes.map((c) => Number(c)).filter(n => !isNaN(n));
+    if (numeric.length === 0) {
+      this.loadingSubdivisions = false;
+      return;
+    }
+    payload = { districts: numeric };
+    endpoint = 'api/tripura/get-multiple-subdivisions';
+  } else {
+    payload = { district: codes[0] };
+    endpoint = 'api/tripura/get-sub-subdivisions';
+  }
+
+  this.genericService.getByConditions(payload, endpoint).subscribe({
+    next: (res: any) => {
+      const list = res?.subdivision ?? res?.subdivisions ?? [];
+      if (res?.status === 1 && Array.isArray(list)) {
+        this.subdivisions = list.map((s: any) => ({
+          id: String(s.sub_lgd_code ?? s.sub_division_code ?? s.subdivision_code ?? s.id ?? ''),
+          name: String(s.sub_division ?? s.sub_division_name ?? s.subdivision_name ?? s.name ?? ''),
+        }));
+      } else {
+        this.subdivisions = [];
+      }
+      this.loadingSubdivisions = false;
+    },
+    error: (err: any) => {
+      console.error('Failed to load subdivisions:', err);
+      this.genericService.openSnackBar('Failed to load subdivisions', 'Error');
+      this.loadingSubdivisions = false;
+    },
+  });
+}
+
+
+
+
+loadUlbs(subdivisionCodes: string | string[]): void {
+  this.loadingUlbs = true;
+  const codesRaw = Array.isArray(subdivisionCodes) ? subdivisionCodes : [subdivisionCodes];
+
+  // normalize & remove falsy values
+  const codes = codesRaw.map((c: any) => String(c).trim()).filter((c: string) => c !== '' && c !== 'null' && c !== 'undefined');
+
+  // nothing valid to query
+  if (codes.length === 0) {
+    this.loadingUlbs = false;
+    return;
+  }
+
+  // prevent duplicate identical requests (use normalized codes)
+  const key = codes.map(String).sort().join(',');
+  if (key === this.lastUlbsKey) {
+    this.loadingUlbs = false;
+    return;
+  }
+  this.lastUlbsKey = key;
+
+  let payload: any;
+  let endpoint = 'api/tripura/get-block-names';
+
+  if (this.sourcePage === 'departmental-users' && codes.length >= 1) {
+    const numeric = codes.map((c) => Number(c)).filter(n => !isNaN(n));
+    if (numeric.length === 0) {
+      this.loadingUlbs = false;
+      return;
+    }
+    payload = { subdivisions: numeric };
+    endpoint = 'api/tripura/get-multiple-block';
+  } else {
+    payload = { subdivision: codes[0] };
+    endpoint = 'api/tripura/get-block-names';
+  }
+
+  this.genericService.getByConditions(payload, endpoint).subscribe({
+    next: (res: any) => {
+      const list = res?.ulbs ?? res?.blocks ?? res?.data ?? [];
+      if (res?.status === 1 && Array.isArray(list)) {
+        this.ulbs = list.map((u: any) => ({
+          id: String(u.ulb_lgd_code ?? u.block_code ?? u.block_lgd_code ?? u.id ?? ''),
+          name: String(u.ulb_name ?? u.block_name ?? u.block_name ?? u.name ?? ''),
+        }));
+      } else {
+        this.ulbs = [];
+      }
+      this.loadingUlbs = false;
+    },
+    error: (err: any) => {
+      console.error('Failed to load ULBs:', err);
+      this.genericService.openSnackBar('Failed to load ULBs', 'Error');
+      this.loadingUlbs = false;
+    },
+  });
+}
+
 
 
 
@@ -1055,26 +1235,33 @@ export class RegistrationComponent implements OnInit, OnChanges {
     }
     return err?.error?.message || 'Something went wrong. Please try again.';
   }
-  getAllDepartmentList(): void {
-    this.genericService
-      .getByConditions({}, 'api/department-get-all-departments')
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status === 1 && Array.isArray(res.data)) {
-            this.departments = res.data.map((d: any) => ({
-              id: String(d.id ?? d.department_id),
-              name: d.name ?? d.department_name ?? 'Unnamed Department',
-            }));
-          } else {
-            this.departments = [];
-          }
-        },
-        error: (err) => {
-          console.error('Error fetching departments:', err);
+getAllDepartmentList(): void {
+  if (this.departmentsLoaded || this.loadingDepartments) return;
+  this.loadingDepartments = true;
+
+  this.genericService
+    .getByConditions({}, 'api/department-get-all-departments')
+    .subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && Array.isArray(res.data)) {
+          this.departments = res.data.map((d: any) => ({
+            id: String(d.id ?? d.department_id),
+            name: d.name ?? d.department_name ?? 'Unnamed Department',
+          }));
+          this.departmentsLoaded = true;
+        } else {
           this.departments = [];
-        },
-      });
-  }
+        }
+        this.loadingDepartments = false;
+      },
+      error: (err) => {
+        console.error('Error fetching departments:', err);
+        this.departments = [];
+        this.loadingDepartments = false;
+      },
+    });
+}
+
 shouldShow(field: string): boolean {
   const h = this.registrationForm.get('hierarchy_level')?.value;
   const u = this.registrationForm.get('user_type')?.value;

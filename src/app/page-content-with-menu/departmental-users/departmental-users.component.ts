@@ -44,6 +44,7 @@ export class DepartmentalUsersComponent implements OnInit {
   users: any[] = [];
   userRole: any;
   loading: boolean = false;
+  isStateLevelUser: boolean = false;
   displayDialog: boolean = false;
   private readonly STORAGE_KEY = 'selectedDepartment';
   usersBackup: any[] = [];
@@ -80,6 +81,9 @@ export class DepartmentalUsersComponent implements OnInit {
   ngOnInit(): void {
     const saved = localStorage.getItem(this.STORAGE_KEY);
     this.userRole = localStorage.getItem('userRole');
+    const hierarchyLevel = localStorage.getItem('hierarchy');
+    const isStateOfficer = hierarchyLevel?.startsWith('state');
+    this.isStateLevelUser = isStateOfficer || false;
     if (saved !== null && saved !== '') {
       this.selectedDepartment = +saved;
     } else {

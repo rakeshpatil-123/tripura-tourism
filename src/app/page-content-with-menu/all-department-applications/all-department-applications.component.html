@@ -9,10 +9,10 @@
       <input pInputText type="text" placeholder="Search by service name, applications count..." [(ngModel)]="searchText"
         (keydown.enter)="applyClientSearch(dt)" class="server-search-input" aria-label="Search services" />
         <form class="mb-20" [formGroup]="departmentApplicationForm">
-          <app-ilogi-select fieldId="department_id" fieldLabel="Department" [selectOptions]="departments"
+          <!-- <app-ilogi-select fieldId="department_id" fieldLabel="Department" [selectOptions]="departments"
             placeholder="Select department" appendTo="body" formControlName="department_id"
             (ngModelChange)="applyClientSearch($event)">
-          </app-ilogi-select>
+          </app-ilogi-select> -->
         </form>
       <button pButton type="button" class="btn btn-search" (click)="applyClientSearch(dt)" aria-label="Search">
         <i class="pi pi-search"></i>
@@ -50,7 +50,7 @@
               'col-address': col.field === 'registered_enterprise_address',
               'col-normal': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address',
               'col-service': col.field === 'service_name',
-              'col-numeric': col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days',
+              'col-numeric': col.field === 'department_name' || col.field === 'pending_applications' || col.field === 'target_days',
               'col-action': col.field === 'actions'
             }" [pSortableColumn]="col.field !== 'actions' ? col.field : undefined" style="vertical-align:middle">
             <div class="header-wrapper" [style.justifyContent]="col.field === 'service_name' ? 'flex-start' : 'center'">
@@ -72,7 +72,7 @@
               'col-address wrap': col.field === 'registered_enterprise_address',
               'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address',
               'col-service': col.field === 'service_name',
-              'col-numeric': col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days',
+              'col-numeric': col.field === 'department_name' || col.field === 'pending_applications' || col.field === 'target_days',
               'col-action': col.field === 'actions'
             }" [pTooltip]="getTooltip(row, col.field)" tooltipPosition="top" style="vertical-align:middle">
             <ng-container *ngIf="col.field === 'service_name'">
@@ -88,7 +88,7 @@
               </a>
             </ng-container>
             <ng-container
-              *ngIf="col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days'">
+              *ngIf="col.field === 'department_name' || col.field === 'pending_applications' || col.field === 'target_days'">
               <div class="numeric-cell" [ngClass]="
                   col.field === 'pending_applications'
                     ? ( (+(row.pending_applications ?? 0) === 0) ? 'pending-zero' : 'pending-nonzero' )
@@ -108,7 +108,7 @@
             </ng-container>
 
             <ng-container
-              *ngIf="col.field !== 'service_name' && col.field !== 'actions' && col.field !== 'total_applications' && col.field !== 'pending_applications' && col.field !== 'target_days'">
+              *ngIf="col.field !== 'service_name' && col.field !== 'actions' && col.field !== 'department_name' && col.field !== 'pending_applications' && col.field !== 'target_days'">
               {{ row[col.field] || '----' }}
             </ng-container>
           </td>
@@ -126,8 +126,8 @@
               'col-address wrap': col.field === 'registered_enterprise_address',
               'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'registered_enterprise_address'
             }" [pTooltip]="getTooltip(row, col.field)" tooltipPosition="top"
-            [style.width.px]="col.field === 'service_name' ? 420 : (col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days' ? 80 : null)"
-            [style.text-align]="(col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days') ? 'center' : 'left'"
+            [style.width.px]="col.field === 'service_name' ? 420 : (col.field === 'department_name' || col.field === 'pending_applications' || col.field === 'target_days' ? 80 : null)"
+            [style.text-align]="(col.field === 'department_name' || col.field === 'pending_applications' || col.field === 'target_days') ? 'center' : 'left'"
             style="vertical-align:middle">
             <ng-container *ngIf="col.field === 'service_name'">
               <a class="service-link" (click)="onServiceNameClick(row)" href="javascript:void(0)"
@@ -141,7 +141,7 @@
               </a>
             </ng-container>
             <ng-container
-              *ngIf="col.field === 'total_applications' || col.field === 'pending_applications' || col.field === 'target_days'">
+              *ngIf="col.field === 'department_name' || col.field === 'pending_applications' || col.field === 'target_days'">
               <div style="width:100%; display:flex; justify-content:center; align-items:center; font-weight:600;">
                 {{ row[col.field] ?? '0' }}
               </div>
@@ -157,7 +157,7 @@
               </div>
             </ng-container>
             <ng-container
-              *ngIf="col.field !== 'service_name' && col.field !== 'actions' && col.field !== 'total_applications' && col.field !== 'pending_applications' && col.field !== 'target_days'">
+              *ngIf="col.field !== 'service_name' && col.field !== 'actions' && col.field !== 'department_name' && col.field !== 'pending_applications' && col.field !== 'target_days'">
               {{ row[col.field] || '----' }}
             </ng-container>
           </td>

@@ -44,6 +44,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   userName: string = 'User';
   deptName: string = '';
+  currentUserEnterpriseName: string = '';
   emailId: string = '';
   hierarchyLevel: string = '';
   designation: string = '';
@@ -362,6 +363,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.genericService.decryptLocalStorageItem('user_name') || 'User';
     this.deptName = localStorage.getItem('deptName') || '';
     this.emailId = localStorage.getItem('email_id') || '';
+    this.currentUserEnterpriseName = this.genericService.decryptLocalStorageItem('name_of_enterprise') || '';
     this.hierarchyLevel = localStorage.getItem('hierarchy') || 'India';
     this.designation = localStorage.getItem('designation') || '';
     this.bin = this.genericService.decryptLocalStorageItem('bin') || '';

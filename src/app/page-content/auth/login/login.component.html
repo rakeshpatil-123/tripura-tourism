@@ -22,8 +22,8 @@
       <p class="subtitle">To access your dashboard and apply for approvals.</p>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
-        <app-ilogi-input fieldId="user_name" fieldLabel="User Name" [mandatory]="true" formControlName="user_name"
-          type="text" placeholder="Enter your user name">
+        <app-ilogi-input fieldId="user_name" fieldLabel="User ID (Username / PAN / BIN)" [mandatory]="true" formControlName="user_name"
+          type="text" placeholder="Enter username, PAN, or BIN">
         </app-ilogi-input>
         <small class="error-text" *ngIf="loginForm.get('user_name')?.hasError('invalid')">
           Invalid username.
@@ -54,9 +54,14 @@
 
         <button type="submit" class="btn-submit" [disabled]="!loginForm.valid || !captchaValid">Login</button>
         
-        <span class="text-center small">
-          New User? <a href="/page/registration">Register here</a>
+      <div class="form-footer">
+        <span class="text-left small">
+          New? <a href="/page/registration" class="register-link">Register here</a>
         </span>
+      
+        <!-- Beautiful, prominent forgot password link -->
+        <a class="forgot-link" href="/page/forgot-password" aria-label="Forgot password">Forgot Password?</a>
+      </div>
       </form>
     </div>
     <div class="side-image">

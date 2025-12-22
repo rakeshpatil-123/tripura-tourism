@@ -105,7 +105,8 @@ export class EnterpriseDetailsComponent implements OnInit {
           }
         },
         error: (err: any) => {
-          console.error('Failed to load enterprise details:', err);
+          // console.error('Failed to load enterprise details:', err);
+          this.apiService.openSnackBar(err.error.message || 'Error loading data', 'error');
           this.isLoading = false;
         },
       });
@@ -179,7 +180,7 @@ export class EnterpriseDetailsComponent implements OnInit {
         },
         error: (err: any) => {
           console.error('API Error:', err);
-
+          console.log('dslkdjf');
           const errorResponse = err?.error;
           if (errorResponse?.errors) {
             const allErrors: string[] = [];

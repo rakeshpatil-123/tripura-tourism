@@ -142,9 +142,10 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
   }
   getAllServiceNames(): void {
     this.loaderService.showLoader();
-    this.apiService.getAdminServices().pipe(finalize(() => this.loaderService.hideLoader())).subscribe((res: any) => {
+    const deptId = localStorage.getItem('deptId')
+    this.apiService.getByConditions({department_id : deptId}, 'api/department/services').pipe(finalize(() => this.loaderService.hideLoader())).subscribe((res: any) => {
       this.services = res.data.map((singleService: any) => {
-        return { id: singleService.id, name: singleService.service_title_or_description };
+        return { id: singleService.service_id, name: singleService.service_name };
       })
       this.services.unshift({id: '', name: 'None'});
     })
