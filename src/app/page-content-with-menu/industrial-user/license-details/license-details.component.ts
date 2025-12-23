@@ -18,6 +18,8 @@ export class LicenseDetailsComponent {
     { key: 'licensee_name', label: 'Licensee Name', type: 'text' },
     { key: 'application_no', label: 'Application No', type: 'text' },
     { key: 'license_no', label: 'License No', type: 'text' },
+    { key: 'license_file', label: 'Uploaded File',  type: 'view-link',
+      viewLinkText: 'View File',},
     { key: 'valid_from_display', label: 'Valid From', type: 'text' },
     { key: 'expiry_date_display', label: 'Expiry Date', type: 'text' },
     { key: 'created_at_display', label: 'Created At', type: 'text' },
