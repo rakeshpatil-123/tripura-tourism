@@ -268,7 +268,7 @@ export class EditableCertificateGenerationComponent implements OnInit {
     this.genericService.previewCertificate(payloadToSend).subscribe({
       next: (resp: any) => {
         this.generating = false;
-        try { this.dialogRef?.close?.('generated'); } catch (e) { }
+        // try { this.dialogRef?.close?.('generated'); } catch (e) { }
         let blob: Blob | null = null;
         if (resp instanceof Blob) {
           blob = resp;
@@ -416,7 +416,7 @@ export class EditableCertificateGenerationComponent implements OnInit {
     }
     if (!key) return 'text';
     const k = key.toLowerCase();
-    const idAsTextExceptions = ['license_id', 'licence_id', 'license no', 'licence no'];
+    const idAsTextExceptions = ['license_id', 'licence_id', 'license no', 'licence no', 'business_pan_no'];
     if (k.endsWith('_id') && !idAsTextExceptions.includes(k)) {
       return 'number';
     }

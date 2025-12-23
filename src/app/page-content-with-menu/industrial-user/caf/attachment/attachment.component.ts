@@ -217,7 +217,9 @@ export class AttachmentComponent implements OnInit {
 }
           }
         },
-        error: () => {},
+        error: (err) => {
+          this.apiService.openSnackBar(`${err.error.message}`, 'error');
+        },
       });
   }
 
@@ -392,6 +394,7 @@ export class AttachmentComponent implements OnInit {
               'error'
             );
           }
+          this.apiService.openSnackBar(err.error.message || 'Error occurred', 'error');
         },
       });
   }

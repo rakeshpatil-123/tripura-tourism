@@ -72,7 +72,7 @@
         <th>
           <div class="header-wrapper">Is Inspector</div>
         </th>
-        <th>
+        <th *ngIf="userRole === 'admin'">
           <div class="header-wrapper">Status</div>
         </th>
         <th>
@@ -87,7 +87,7 @@
         <th>
           <div class="header-wrapper">Updated By</div>
         </th>
-        <th *ngIf="userRole == 'admin'">
+        <th *ngIf="userRole == 'admin' || isStateLevelUser">
           <div class="header-wrapper">Action</div>
         </th>
       </tr>
@@ -135,9 +135,9 @@
         <td pTooltip="{{ user.inspector }}" tooltipPosition="right">
           {{ user.inspector || '----' }}
         </td>
-        <td>
+        <td *ngIf="userRole === 'admin'">
           <form [formGroup]="userForms[user.id]">
-            <p-toggleswitch formControlName="status" (onChange)="confirmStatusChange($event, user)">
+            <p-toggleswitch [readonly]="userRole === 'admin' ? true : false" [disabled]="userRole === 'admin' ? true : false" formControlName="status" (onChange)="confirmStatusChange($event, user)">
             </p-toggleswitch>
           </form>
         </td>
@@ -153,7 +153,7 @@
         <td pTooltip="{{ user.updated_by }}" tooltipPosition="right">
           {{ user.updated_by || '----' }}
         </td>
-        <td *ngIf="userRole=='admin'" class="text-center">
+        <td *ngIf="userRole=='admin' || isStateLevelUser" class="text-center">
           <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-sm edit-btn"
             pTooltip="Edit User" tooltipPosition="left" (click)="editUser(user)">
             <span class="ml-2 font-medium hidden sm:inline">Edit</span>

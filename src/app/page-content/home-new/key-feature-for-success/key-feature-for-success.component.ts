@@ -71,20 +71,20 @@ export class KeyFeatureForSuccessComponent implements AfterViewInit {
       statValue: '24/7',
       statLabel: 'Real-time Updates'
     },
-    {
-      gradientFrom: 'blue-500',
-      gradientTo: 'cyan-500',
-      icon: 'map-pin',
-      iconSvg: `<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle>`,
-      title: 'Land Bank Portal',
-      description: 'Access comprehensive GIS-enabled land information, availability, virtual tours, and instant booking system.',
-      checks: ['GIS Mapping', 'Virtual Tours', 'Instant Booking', 'Price Calculator'],
-      statBg: 'blue-50',
-      statGradientFrom: 'blue-500',
-      statGradientTo: 'cyan-500',
-      statValue: '500+',
-      statLabel: 'Available Plots'
-    }
+    // {
+    //   gradientFrom: 'blue-500',
+    //   gradientTo: 'cyan-500',
+    //   icon: 'map-pin',
+    //   iconSvg: `<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle>`,
+    //   title: 'Land Bank Portal',
+    //   description: 'Access comprehensive GIS-enabled land information, availability, virtual tours, and instant booking system.',
+    //   checks: ['GIS Mapping', 'Virtual Tours', 'Instant Booking', 'Price Calculator'],
+    //   statBg: 'blue-50',
+    //   statGradientFrom: 'blue-500',
+    //   statGradientTo: 'cyan-500',
+    //   statValue: '500+',
+    //   statLabel: 'Available Plots'
+    // }
   ];
 
   // smallFeatures: SmallFeature[] = [
@@ -121,6 +121,10 @@ export class KeyFeatureForSuccessComponent implements AfterViewInit {
 
     this.setupIntersectionObserver();
     this.setupHoverAnimations();
+  }
+
+  redirectToDashboard():void {
+    window.location.href = 'page/login';
   }
 
   setupIntersectionObserver() {

@@ -125,7 +125,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         pattern: [''],
         errorMessage: [''],
         mimes: [['jpg', 'jpeg', 'png', 'pdf', 'docx', 'xls', 'xlsx', 'csv', 'txt',]],
-        max_size_mb: [3],
+        max_size_mb: [],
       })
     });
   }
@@ -177,7 +177,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
         }
         this.validationRule.patchValue({
           mimes: mimesArray,
-          max_size_mb: rule.max_size_mb || 3,
+          max_size_mb: rule.max_size_mb,
         });
       }
 
@@ -299,7 +299,7 @@ export class AddQuestionnaireDialogComponent implements OnInit {
     mimesArray.forEach((mime: string, index: number) => {
       formData.append(`questionnaires[0][validation_rule][mimes][${index}]`, mime);
     });
-      formData.append('questionnaires[0][validation_rule][max_size_mb]', rule.max_size_mb || '3');
+      formData.append('questionnaires[0][validation_rule][max_size_mb]', rule.max_size_mb);
     }
 
       const request$ = this.data.mode === 'add'

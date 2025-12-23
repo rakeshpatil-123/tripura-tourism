@@ -1,11 +1,9 @@
-<div class="success-stories-container">
-  <!-- Header Section -->
+<!-- <div class="success-stories-container">
   <div class="header-section">
     <h1 class="main-title">User Experience & Success Stories</h1>
     <p class="subtitle">Discover how SWAAGAT 2.0 has revolutionized investment experiences across Tripura with seamless processes and impactful results.</p>
   </div>
 
-  <!-- Statistics Cards -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-number">96%</div>
@@ -28,8 +26,6 @@
       <div class="stat-description">Faster than national average</div>
     </div>
   </div>
-
-  <!-- Testimonials Slider -->
   <div class="testimonials-section">
     <h2 class="section-title">Investor Testimonials</h2>
     <div class="testimonials-slider">
@@ -68,17 +64,13 @@
           </div>
         </div>
       </div>
-      <!-- Navigation Buttons -->
       <button class="nav-btn prev-btn" (click)="previousSlide()" [disabled]="currentSlide === 0">‹</button>
       <button class="nav-btn next-btn" (click)="nextSlide()" [disabled]="currentSlide === testimonials.length - 1">›</button>
-      <!-- Dots Indicator -->
       <div class="dots-container">
         <span *ngFor="let dot of testimonials; let i = index" class="dot" [class.active]="i === currentSlide" (click)="goToSlide(i)"></span>
       </div>
     </div>
   </div>
-
-  <!-- Feedback Section -->
   <div class="feedback-section">
     <div class="feedback-container">
       <div class="feedback-form-card">
@@ -130,4 +122,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

@@ -202,6 +202,41 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
       const errorMessage =
         err?.error?.message ||
         err?.message || 'Something went wrong while fetching the inspection list.';
+      
+      this.loading = false;
+      this.loaderService.hideLoader();
+      
+      // Check if it's an access denied error with status 0
+      if (err?.error?.status === 0 && errorMessage.toLowerCase().includes('access denied')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Access Denied',
+          text: errorMessage,
+          background: '#ffffff',
+          color: '#333',
+          iconColor: '#e53935',
+          showConfirmButton: true,
+          confirmButtonColor: '#e53935',
+          confirmButtonText: 'Okay',
+          backdrop: `
+        rgba(0,0,0,0.4)
+        left top
+        no-repeat
+      `,
+          showClass: {
+            popup: 'animate__animated animate__shakeX animate__faster'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__fadeOut animate__faster'
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.router.navigate(['/dashboard/home']);
+          }
+        });
+        return;
+      }
+      
       this.genericService.openSnackBar?.(errorMessage, 'error');
       Swal.fire({
         icon: 'error',
@@ -225,9 +260,6 @@ export class DepartmentalInspectionListComponent implements OnInit, OnChanges {
           popup: 'animate__animated animate__fadeOut animate__faster'
         }
       });
-
-      this.loading = false;
-      this.loaderService.hideLoader();
     },
 
     complete: () => {

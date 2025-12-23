@@ -53,62 +53,62 @@ export class NewNavComponent implements OnDestroy, OnInit {
           dropdownOpen: false,
           children: []
         },
-        {
-          label: 'Incentive',
-          path: '/page/incentive',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
-        {
-          label: 'Investor Facilitation Cell',
-          path: '/page/investor-facilitation-cell',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
-        {
-          label: 'Central Inspection System',
-          path: '/page/central-inspection-system',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
-        {
-          label: 'MIS Reports',
-          path: '/page/mis-reports',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
-        {
-          label: 'Land Availability',
-          path: '/page/land-availability',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
-        {
-          label: 'Land Availability - GIS',
-          path: '/page/land-availability-gis',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
-        {
-          label: 'List of Services',
-          path: '/page/list-of-services',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
+        // {
+        //   label: 'Incentive',
+        //   path: '/page/incentive',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
+        // {
+        //   label: 'Investor Facilitation Cell',
+        //   path: '/page/investor-facilitation-cell',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
+        // {
+        //   label: 'Central Inspection System',
+        //   path: '/page/central-inspection-system',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
+        // {
+        //   label: 'MIS Reports',
+        //   path: '/page/mis-reports',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
+        // {
+        //   label: 'Land Availability',
+        //   path: '/page/land-availability',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
+        // {
+        //   label: 'Land Availability - GIS',
+        //   path: '/page/land-availability-gis',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
+        // {
+        //   label: 'List of Services',
+        //   path: '/page/list-of-services',
+        //   hasDropdown: false,
+        //   isActive: false,
+        //   dropdownOpen: false,
+        //   children: []
+        // },
         // {
         //   label: 'Query/Feedback',
         //   path: '/page/query-feedback',
