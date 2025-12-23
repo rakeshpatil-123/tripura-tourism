@@ -57,7 +57,7 @@
               'col-address wrap': col.field === 'address',
               'col-normal nowrap': col.field !== 'ward' && col.field !== 'ulb' && col.field !== 'address'
             }" pTooltip="{{ user[col.field] }}" tooltipPosition="top">
-            <span *ngIf="col.field !== 'status'">
+            <span *ngIf="col.field !== 'status' && col.field !== 'login'">
               {{ user[col.field] || '----' }}
             </span>
             <span *ngIf="col.field === 'status'">
@@ -65,6 +65,11 @@
                 <p-toggleswitch formControlName="status" (onChange)="confirmStatusChange(user)">
                 </p-toggleswitch>
               </form>
+            </span>
+            <span *ngIf="col.field === 'login'">
+                <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-sm edit-btn"
+            pTooltip="Login as User" tooltipPosition="left" (click)="getUserLogin(user)">Login as User
+                </button>
             </span>
           </td>
         </tr>

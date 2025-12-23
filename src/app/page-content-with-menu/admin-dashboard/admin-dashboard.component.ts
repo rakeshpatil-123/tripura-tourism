@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { LoaderService } from '../../_service/loader/loader.service';
 import { GenericService } from '../../_service/generic/generic.service';
 import { Subscription, of } from 'rxjs';
@@ -8,7 +8,9 @@ import { BarChartComponent } from '../charts/bar-chart/bar-chart';
 import { PieChartsComponent } from '../dashboard-components/pie-charts/pie-charts.component';
 import { ClarificationTableComponent } from '../tables/clarification-table/clarification-table';
 import { HorizontalBarChartComponent } from '../charts/horizontal-bar-chart/horizontal-bar-chart';
-
+import { HelpService } from '../../_service/help/help.service';
+import { HelpSidebarComponent } from '../../page-template/help-sidebar/help-sidebar.component';
+import { Router, RouterOutlet, RouterModule } from '@angular/router';
 const DUMMY_DATA = {};
 
 @Component({
@@ -20,18 +22,23 @@ const DUMMY_DATA = {};
     BarChartComponent,
     PieChartsComponent,
     ClarificationTableComponent,
-    HorizontalBarChartComponent
-  ]
+    HorizontalBarChartComponent,
+    HelpSidebarComponent, RouterModule, RouterOutlet]
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   subs: Subscription;
   dashboardData: any = null;
   sidebarCollapsed = false;
   isLoading = false;
+  private helpSidebarSubscription!: Subscription;
+  helpSidebarOpen = false;
 
   constructor(
     private loaderService: LoaderService,
-    private genericService: GenericService
+    private genericService: GenericService,
+    private helpService: HelpService,
+    private cdRef: ChangeDetectorRef,
+    private router : Router
   ) {
     this.subs = new Subscription();
   }
@@ -39,6 +46,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const adminDashboardDataSubs = this.getAdminDashboardData();
     this.subs.add(adminDashboardDataSubs);
+     this.helpSidebarSubscription = this.helpService.helpSidebar$.subscribe((isOpen) => {
+      this.helpSidebarOpen = isOpen;
+      this.cdRef.detectChanges();
+    });
   }
 
   getAdminDashboardData(): Subscription {
@@ -82,12 +93,21 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       console.error('Error fetching admin dashboard data (dummy flow):', err);
     });
   }
+  
 
   toggleSidebar() {
     this.sidebarCollapsed = !this.sidebarCollapsed;
   }
+  openHelpSidebar() {
+    this.helpService.openHelpSidebar();
+  }
+
+  closeHelpSidebar() {
+    this.helpService.closeHelpSidebar();
+  }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+    this.helpSidebarSubscription.unsubscribe();
   }
 }

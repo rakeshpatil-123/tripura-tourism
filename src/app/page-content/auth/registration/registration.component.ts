@@ -72,6 +72,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
   districts: SelectOption[] = [];
   subdivisions: SelectOption[] = [];
   ulbs: SelectOption[] = [];
+  subdivisionsRaw: any[] = [];
+  ulbsRaw: any[] = [];
   private PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
   wards: SelectOption[] = [];
   departments: SelectOption[] = [];
@@ -798,7 +800,7 @@ this.registrationForm.get('ulb_id')?.valueChanges
       });
   }
 
-  loadSubdivisions(districtCodes: string | string[]): void {
+loadSubdivisions(districtCodes: string | string[]): void {
   this.loadingSubdivisions = true;
   const codesRaw = Array.isArray(districtCodes) ? districtCodes : [districtCodes];
 
@@ -838,14 +840,56 @@ this.registrationForm.get('ulb_id')?.valueChanges
   this.genericService.getByConditions(payload, endpoint).subscribe({
     next: (res: any) => {
       const list = res?.subdivision ?? res?.subdivisions ?? [];
-      if (res?.status === 1 && Array.isArray(list)) {
-        this.subdivisions = list.map((s: any) => ({
-          id: String(s.sub_lgd_code ?? s.sub_division_code ?? s.subdivision_code ?? s.id ?? ''),
-          name: String(s.sub_division ?? s.sub_division_name ?? s.subdivision_name ?? s.name ?? ''),
-        }));
-      } else {
+      const incoming = Array.isArray(list) ? list : [];
+
+      // helper to compute canonical id for a subdivision
+      const subKey = (s: any) => String(s?.sub_lgd_code ?? s?.sub_division_code ?? s?.subdivision_code ?? s?.id ?? '').trim();
+
+      // Merge raw subdivisions into this.subdivisionsRaw (avoid overwriting previous batches)
+      const mergedSubMap = new Map<string, any>();
+      // start with existing raw items
+      (this.subdivisionsRaw || []).forEach((s: any) => {
+        const k = subKey(s);
+        if (k) mergedSubMap.set(k, s);
+      });
+      // merge incoming, prefer incoming non-empty names to fill gaps
+      incoming.forEach((s: any) => {
+        const k = subKey(s);
+        if (!k) return;
+        const existing = mergedSubMap.get(k);
+        if (!existing) {
+          mergedSubMap.set(k, s);
+        } else {
+          // if existing has no sensible name but incoming has, replace
+          const existingName = String(existing?.sub_division_name ?? existing?.subdivision_name ?? existing?.sub_division ?? '').trim();
+          const incomingName = String(s?.sub_division ?? s?.sub_division_name ?? s?.subdivision_name ?? s?.name ?? '').trim();
+          if ((!existingName || existingName === '') && incomingName) {
+            mergedSubMap.set(k, s);
+          }
+        }
+      });
+      this.subdivisionsRaw = Array.from(mergedSubMap.values());
+
+      // Build UI-friendly subdivisions array and merge (avoid duplicates)
+      const incomingOptions = incoming.map((s: any) => ({
+        id: subKey(s),
+        name: String(s.sub_division ?? s.sub_division_name ?? s.subdivision_name ?? s.name ?? ''),
+      })).filter(o => o.id);
+
+      const uiMap = new Map<string, SelectOption>();
+      (this.subdivisions || []).forEach((o: any) => {
+        if (o && o.id) uiMap.set(String(o.id), o);
+      });
+      incomingOptions.forEach((o) => {
+        if (!uiMap.has(o.id)) uiMap.set(o.id, o);
+      });
+      this.subdivisions = Array.from(uiMap.values());
+
+      // if API returned empty but we have existing UI options, keep them (don't clear)
+      if (!(res?.status === 1 && Array.isArray(list)) && (!this.subdivisions || this.subdivisions.length === 0)) {
         this.subdivisions = [];
       }
+
       this.loadingSubdivisions = false;
     },
     error: (err: any) => {
@@ -855,6 +899,7 @@ this.registrationForm.get('ulb_id')?.valueChanges
     },
   });
 }
+
 
 
 
@@ -899,14 +944,54 @@ loadUlbs(subdivisionCodes: string | string[]): void {
   this.genericService.getByConditions(payload, endpoint).subscribe({
     next: (res: any) => {
       const list = res?.ulbs ?? res?.blocks ?? res?.data ?? [];
-      if (res?.status === 1 && Array.isArray(list)) {
-        this.ulbs = list.map((u: any) => ({
-          id: String(u.ulb_lgd_code ?? u.block_code ?? u.block_lgd_code ?? u.id ?? ''),
-          name: String(u.ulb_name ?? u.block_name ?? u.block_name ?? u.name ?? ''),
-        }));
-      } else {
+      const incoming = Array.isArray(list) ? list : [];
+
+      // helper to compute canonical id for a ULB
+      const ulKey = (u: any) => String(u?.ulb_lgd_code ?? u?.block_code ?? u?.block_lgd_code ?? u?.id ?? '').trim();
+
+      // Merge raw ulbs into this.ulbsRaw (preserve previously loaded ULBs)
+      const mergedUlMap = new Map<string, any>();
+      (this.ulbsRaw || []).forEach((u: any) => {
+        const k = ulKey(u);
+        if (k) mergedUlMap.set(k, u);
+      });
+      incoming.forEach((u: any) => {
+        const k = ulKey(u);
+        if (!k) return;
+        const existing = mergedUlMap.get(k);
+        if (!existing) {
+          mergedUlMap.set(k, u);
+        } else {
+          // prefer incoming to fill missing name or parent info
+          const existingName = String(existing?.ulb_name ?? existing?.block_name ?? existing?.name ?? '').trim();
+          const incomingName = String(u?.ulb_name ?? u?.block_name ?? u?.name ?? '').trim();
+          if ((!existingName || existingName === '') && incomingName) {
+            mergedUlMap.set(k, u);
+          }
+        }
+      });
+      this.ulbsRaw = Array.from(mergedUlMap.values());
+
+      // Build UI-friendly ULBs array and merge (avoid duplicates)
+      const incomingOptions = incoming.map((u: any) => ({
+        id: ulKey(u),
+        name: String(u.ulb_name ?? u.block_name ?? u.name ?? ''),
+      })).filter(o => o.id);
+
+      const uiMap = new Map<string, SelectOption>();
+      (this.ulbs || []).forEach((o: any) => {
+        if (o && o.id) uiMap.set(String(o.id), o);
+      });
+      incomingOptions.forEach((o) => {
+        if (!uiMap.has(o.id)) uiMap.set(o.id, o);
+      });
+      this.ulbs = Array.from(uiMap.values());
+
+      // if API returned empty but we have existing UI options, keep them (don't clear)
+      if (!(res?.status === 1 && Array.isArray(list)) && (!this.ulbs || this.ulbs.length === 0)) {
         this.ulbs = [];
       }
+
       this.loadingUlbs = false;
     },
     error: (err: any) => {
@@ -1132,94 +1217,166 @@ loadUlbs(subdivisionCodes: string | string[]): void {
       },
     });
   }
-  getLocationsPayload(): any[] {
-    const locations: Array<{ district_id: number | null; subdivision_id: number | null; block_id: number | null }> = [];
-    const rawDistrict = this.registrationForm.get('district_id')?.value;
-    const rawSubdivision = this.registrationForm.get('subdivision_id')?.value;
-    const rawUlb = this.registrationForm.get('ulb_id')?.value;
-    const toArr = (v: any): string[] => {
-      if (v === null || v === undefined) return [];
-      if (Array.isArray(v)) return v.map(x => String(x)).filter(Boolean);
-      const s = String(v).trim();
-      if (!s) return [];
-      return s.includes(',') ? s.split(',').map(x => x.trim()).filter(Boolean) : [s];
-    };
+getLocationsPayload(): any[] {
+  const locations: Array<{ district_id: number | null; subdivision_id: number | null; block_id: number | null }> = [];
+  const rawDistrict = this.registrationForm.get('district_id')?.value;
+  const rawSubdivision = this.registrationForm.get('subdivision_id')?.value;
+  const rawUlb = this.registrationForm.get('ulb_id')?.value;
 
-    const distArr = toArr(rawDistrict);
-    const subArr = toArr(rawSubdivision);
-    const blockArr = toArr(rawUlb);
-    const subdivToDistrict = new Map<string, string>();
-    (this.subdivisions || []).forEach((s: any) => {
-      if (s && s.id) subdivToDistrict.set(String(s.id), String((s as any).district_code ?? ''));
-    });
+  const toArr = (v: any): string[] => {
+    if (v === null || v === undefined) return [];
+    if (Array.isArray(v)) return v.map(x => String(x)).filter(Boolean);
+    const s = String(v).trim();
+    if (!s) return [];
+    return s.includes(',') ? s.split(',').map(x => x.trim()).filter(Boolean) : [s];
+  };
 
-    const ulbToSubdivision = new Map<string, string>();
-    (this.ulbs || []).forEach((u: any) => {
-      if (u && u.id) ulbToSubdivision.set(String(u.id), String((u as any).subdivision_code ?? ''));
-    });
-    if (distArr.length > 0 && subArr.length > 0 && blockArr.length > 0) {
-      distArr.forEach(d => {
-        subArr.forEach(s => {
-          blockArr.forEach(b => {
-            locations.push({ district_id: Number(d), subdivision_id: Number(s), block_id: Number(b) });
-          });
-        });
-      });
-    }
-    else if (distArr.length > 0 && subArr.length > 0) {
-      distArr.forEach(d => {
-        subArr.forEach(s => locations.push({ district_id: Number(d), subdivision_id: Number(s), block_id: null }));
-      });
-    }
-    else if (subArr.length > 0 && blockArr.length > 0) {
-      subArr.forEach(s => {
-        const resolvedDistrict = subdivToDistrict.get(String(s)) ?? null;
-        blockArr.forEach(b => {
-          const blockParentSub = ulbToSubdivision.get(String(b));
-          const finalSub = blockParentSub ?? s;
-          const finalDistrict = subdivToDistrict.get(String(finalSub)) ?? resolvedDistrict ?? null;
-          locations.push({
-            district_id: finalDistrict ? Number(finalDistrict) : null,
-            subdivision_id: finalSub ? Number(finalSub) : Number(s),
-            block_id: Number(b)
-          });
-        });
-      });
-    }
-    else if (blockArr.length > 0) {
-      blockArr.forEach(b => {
-        const resolvedSub = ulbToSubdivision.get(String(b)) ?? null;
-        const resolvedDistrict = resolvedSub ? (subdivToDistrict.get(String(resolvedSub)) ?? null) : null;
-        locations.push({
-          district_id: resolvedDistrict ? Number(resolvedDistrict) : null,
-          subdivision_id: resolvedSub ? Number(resolvedSub) : null,
-          block_id: Number(b)
-        });
-      });
-    }
-    else if (subArr.length > 0) {
-      subArr.forEach(s => {
-        const resolvedDistrict = subdivToDistrict.get(String(s)) ?? null;
-        locations.push({ district_id: resolvedDistrict ? Number(resolvedDistrict) : null, subdivision_id: Number(s), block_id: null });
-      });
-    }
-    else if (distArr.length > 0) {
-      distArr.forEach(d => locations.push({ district_id: Number(d), subdivision_id: null, block_id: null }));
-    }
-    const uniq = new Map<string, { district_id: number | null; subdivision_id: number | null; block_id: number | null }>();
-    locations.forEach(loc => {
-      const key = `${loc.district_id ?? ''}|${loc.subdivision_id ?? ''}|${loc.block_id ?? ''}`;
-      if (!uniq.has(key)) {
-        uniq.set(key, {
-          district_id: loc.district_id === null ? null : Number(loc.district_id),
-          subdivision_id: loc.subdivision_id === null ? null : Number(loc.subdivision_id),
-          block_id: loc.block_id === null ? null : Number(loc.block_id)
-        });
+  const distArr = toArr(rawDistrict);     // selected district codes (strings)
+  const subArr = toArr(rawSubdivision);   // selected subdivision ids (strings)
+  const blockArr = toArr(rawUlb);        // selected block/ulb ids (strings)
+
+  // helper: canonicalize possible id fields from API raw objects
+  const getSubId = (s: any) => String(s?.sub_lgd_code ?? s?.sub_lgd ?? s?.sub_division_code ?? s?.subdivision_code ?? s?.sub_division ?? s?.id ?? '').trim();
+  const getSubDistrict = (s: any) => String(s?.district_code ?? s?.district_id ?? s?.district_code ?? '').trim();
+  const getUlId = (u: any) => String(u?.ulb_lgd_code ?? u?.block_code ?? u?.block_lgd_code ?? u?.id ?? '').trim();
+  const getUlSub = (u: any) => String(u?.subdivision_code ?? u?.sub_division_code ?? u?.subdivision_id ?? u?.sub_division ?? '').trim();
+  const getUlDistrict = (u: any) => String(u?.district_code ?? u?.district_id ?? u?.district_code ?? '').trim();
+
+  // Build maps from raw API responses (these raw arrays come from loadSubdivisions/loadUlbs)
+  const subdivToDistrict = new Map<string, string>();
+  (this.subdivisionsRaw || []).forEach((s: any) => {
+    const sid = getSubId(s);
+    const did = getSubDistrict(s);
+    if (sid) subdivToDistrict.set(sid, did || '');
+  });
+
+  const ulbMap = new Map<string, any>(); // ulbId -> raw ulb object
+  (this.ulbsRaw || []).forEach((u: any) => {
+    const uid = getUlId(u);
+    if (uid) ulbMap.set(uid, u);
+  });
+
+  // also create subdivision -> list of ulb ids (from ulbsRaw) for fast lookup
+  const subdivToUlbs = new Map<string, string[]>();
+  (this.ulbsRaw || []).forEach((u: any) => {
+    const uid = getUlId(u);
+    const sid = getUlSub(u);
+    if (!uid || !sid) return;
+    const arr = subdivToUlbs.get(sid) ?? [];
+    if (!arr.includes(uid)) arr.push(uid);
+    subdivToUlbs.set(sid, arr);
+  });
+
+  const selectedDistSet = new Set(distArr.map(String));
+  const selectedSubSet = new Set(subArr.map(String));
+  const selectedBlockSet = new Set(blockArr.map(String));
+
+  // 1) If blocks are selected -> produce one location per selected block, resolved to its real parent subdivision & district
+  if (blockArr.length > 0) {
+    blockArr.forEach(bRaw => {
+      const b = String(bRaw);
+      // find ulb raw entry
+      const ulbRaw = ulbMap.get(b) ?? (this.ulbsRaw || []).find((u: any) => getUlId(u) === b) ?? null;
+
+      // if found, get parent subdivision and district directly from it
+      let parentSub = ulbRaw ? getUlSub(ulbRaw) || null : null;
+      let parentDist = ulbRaw ? getUlDistrict(ulbRaw) || null : null;
+
+      // if not found in ulbsRaw, attempt fallback via selectedDistricts grouping (prefill)
+      if (!parentSub && this.selectedDistricts && this.selectedDistricts.length) {
+        for (const d of this.selectedDistricts) {
+          for (const s of d.subdivisions || []) {
+            const blocks = (s.blocks || []).map((x: any) => String(x));
+            if (blocks.includes(b)) {
+              parentSub = String(s.id);
+              parentDist = String(d.id);
+              break;
+            }
+          }
+          if (parentSub) break;
+        }
       }
-    });
 
-    return Array.from(uniq.values());
+      // if user explicitly selected subdivisions, ensure the block belongs to one of them
+      if (selectedSubSet.size > 0) {
+        if (!parentSub) return; // cannot confirm parent -> skip block
+        if (!selectedSubSet.has(parentSub)) return; // block's sub not selected -> skip
+      }
+
+      // if parentSub still not found -> skip (safe, prevents cross-mapping)
+      if (!parentSub) return;
+
+      // if parentDist not present from ulbRaw, try subdivisionsRaw map
+      if ((!parentDist || parentDist === '') && parentSub) {
+        parentDist = subdivToDistrict.get(parentSub) ?? parentDist ?? null;
+        if ((!parentDist || parentDist === '') && this.subdivisionsRaw && this.subdivisionsRaw.length) {
+          const found = this.subdivisionsRaw.find((ss: any) => getSubId(ss) === parentSub);
+          if (found) parentDist = getSubDistrict(found) || null;
+        }
+      }
+
+      // if user explicitly selected districts, ensure this block belongs to one of them
+      if (selectedDistSet.size > 0) {
+        if (!parentDist) return; // cannot resolve district -> skip
+        if (!selectedDistSet.has(parentDist)) return; // belongs to unselected district -> skip
+      }
+
+      locations.push({
+        district_id: parentDist ? Number(parentDist) : null,
+        subdivision_id: parentSub ? Number(parentSub) : null,
+        block_id: Number(b)
+      });
+    });
   }
+  // 2) No blocks selected but subdivisions selected -> output each selected subdivision paired with its actual district
+  else if (subArr.length > 0) {
+    subArr.forEach(sRaw => {
+      const s = String(sRaw);
+      // resolve district from subdivisionsRaw map
+      let parentDist = subdivToDistrict.get(s) ?? null;
+
+      if ((!parentDist || parentDist === '') && this.subdivisionsRaw && this.subdivisionsRaw.length) {
+        const found = this.subdivisionsRaw.find((ss: any) => getSubId(ss) === s);
+        if (found) parentDist = getSubDistrict(found) || null;
+      }
+
+      // if the user explicitly selected districts, ensure this subdivision belongs to one of them
+      if (selectedDistSet.size > 0) {
+        if (!parentDist) return; // can't resolve district -> skip
+        if (!selectedDistSet.has(parentDist)) return; // subdivision belongs to unselected district -> skip
+      }
+
+      locations.push({
+        district_id: parentDist ? Number(parentDist) : null,
+        subdivision_id: Number(s),
+        block_id: null
+      });
+    });
+  }
+  // 3) Only districts selected -> output district-only entries
+  else if (distArr.length > 0) {
+    distArr.forEach(d => {
+      locations.push({ district_id: Number(d), subdivision_id: null, block_id: null });
+    });
+  }
+
+  // dedupe (same as before)
+  const uniq = new Map<string, { district_id: number | null; subdivision_id: number | null; block_id: number | null }>();
+  locations.forEach(loc => {
+    const key = `${loc.district_id ?? ''}|${loc.subdivision_id ?? ''}|${loc.block_id ?? ''}`;
+    if (!uniq.has(key)) {
+      uniq.set(key, {
+        district_id: loc.district_id === null ? null : Number(loc.district_id),
+        subdivision_id: loc.subdivision_id === null ? null : Number(loc.subdivision_id),
+        block_id: loc.block_id === null ? null : Number(loc.block_id)
+      });
+    }
+  });
+
+  return Array.from(uniq.values());
+}
+
+
   private extractErrorMessage(err: any): string {
     if (err?.error?.errors) {
       const messages: string[] = [];

@@ -34,4 +34,6 @@
       </div>
     </div>
   </section>
+  <app-help-sidebar [isOpen]="helpSidebarOpen" (closeSidebarEvent)="closeHelpSidebar()"></app-help-sidebar>
+  <router-outlet></router-outlet>
 </div>

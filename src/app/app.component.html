@@ -8,7 +8,7 @@
 <!-- Hide floating button when logged in -->
 <app-help-floating-button 
     (toggleSidebarEvent)="openHelpSidebar()" 
-    *ngIf="!helpSidebarOpen && !isLoggedIn">
+    *ngIf="!helpSidebarOpen">
 </app-help-floating-button>
 <app-help-sidebar [isOpen]="helpSidebarOpen" (closeSidebarEvent)="closeHelpSidebar()"></app-help-sidebar>
 <app-logo-footer *ngIf="!isLoggedIn"/>

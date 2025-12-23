@@ -10,10 +10,23 @@
     {{ error }}
   </div>
 
-  <mat-tab-group *ngIf="!isLoading && !error" mat-stretch-tabs="false" dynamicHeight="true">
+  <mat-tab-group
+    *ngIf="!isLoading"
+    (selectedIndexChange)="onTabChange($event)"
+    [selectedIndex]="selectedIndex"
+    mat-stretch-tabs="false"
+    dynamicHeight="true">
     <!-- Unit Details -->
     <mat-tab label="Unit Details">
-      <mat-card *ngIf="unitDetails; else noUnitData">
+       <ng-container *ngIf="selectedIndex === 0 && !fetchedTabs.unitDetails">
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 mb-0">Loading unit details...</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+      <mat-card *ngIf="fetchedTabs.unitDetails && unitDetails; else unitNoData">
         <mat-card-header>
           <mat-card-title>Unit Information</mat-card-title>
         </mat-card-header>
@@ -112,10 +125,10 @@
           <p><strong>Manufacturing Process:</strong> {{ safeDisplay(unitDetails.product_manufacturing_process) }}</p>
         </mat-card-content>
       </mat-card>
-      <ng-template #noUnitData>
+      <ng-template #unitNoData>
         <mat-card>
           <mat-card-content class="text-center py-4">
-            <p class="text-muted">No unit details available.</p>
+            <p class="text-muted">No unit details found.</p>
           </mat-card-content>
         </mat-card>
       </ng-template>
@@ -123,7 +136,16 @@
 
     <!-- Enterprise Details -->
     <mat-tab label="Enterprise Details">
-      <mat-card *ngIf="enterpriseDetails; else noEnterpriseData">
+      <ng-container *ngIf="selectedIndex === 1 && !fetchedTabs.enterpriseDetails">
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 mb-0">Loading enterprise details...</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+
+      <mat-card *ngIf="fetchedTabs.enterpriseDetails && enterpriseDetails; else enterpriseNoData">
         <mat-card-header>
           <mat-card-title>Enterprise Information</mat-card-title>
         </mat-card-header>
@@ -160,10 +182,10 @@
           </div>
         </mat-card-content>
       </mat-card>
-      <ng-template #noEnterpriseData>
+      <ng-template #enterpriseNoData>
         <mat-card>
           <mat-card-content class="text-center py-4">
-            <p class="text-muted">No enterprise details available.</p>
+            <p class="text-muted">No enterprise details found.</p>
           </mat-card-content>
         </mat-card>
       </ng-template>
@@ -171,7 +193,15 @@
 
     <!-- Management Details -->
     <mat-tab label="Management Details">
-      <mat-card *ngIf="managementDetails ; else noManagementData">
+       <ng-container *ngIf="selectedIndex === 2 && !fetchedTabs.managementDetails">
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 mb-0">Loading management details...</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+      <mat-card *ngIf="fetchedTabs.managementDetails && managementDetails ; else managementNoData">
         <!-- Owner Details -->
         <mat-card class="mb-4">
           <mat-card-header>
@@ -372,10 +402,10 @@
           </mat-card-content>
         </mat-card>
       </mat-card>
-      <ng-template #noManagementData>
+      <ng-template #managementNoData>
         <mat-card>
           <mat-card-content class="text-center py-4">
-            <p class="text-muted">No management details available.</p>
+            <p class="text-muted">No management details found.</p>
           </mat-card-content>
         </mat-card>
       </ng-template>
@@ -383,7 +413,15 @@
 
     <!-- Line of Activity -->
     <mat-tab label="Line of Activity">
-      <mat-card *ngIf="lineOfActivityDetails; else nolineOfActivityDetails">
+       <ng-container *ngIf="selectedIndex === 3 && !fetchedTabs.lineOfActivityDetails">
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 mb-0">Loading line of activity...</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+      <mat-card *ngIf="fetchedTabs.lineOfActivityDetails && lineOfActivityDetails; else lineOfActivityNoData">
         <mat-card-header>
           <mat-card-title>Thrust Sector</mat-card-title>
         </mat-card-header>
@@ -394,7 +432,7 @@
       </mat-card>
 
       <!-- Raw Materials -->
-      <mat-card *ngIf="lineOfActivityDetails.raw_material_to_be_used?.length; else nolineOfActivityDetails"
+      <mat-card *ngIf="fetchedTabs.lineOfActivityDetails && lineOfActivityDetails?.raw_material_to_be_used?.length"
         class="mt-4">
         <mat-card-header>
           <mat-card-title>Raw Materials</mat-card-title>
@@ -420,7 +458,8 @@
       </mat-card>
 
       <!-- Products -->
-      <mat-card *ngIf="lineOfActivityDetails.list_of_products?.length; else nolineOfActivityDetails" class="mt-4">
+      <mat-card *ngIf="fetchedTabs.lineOfActivityDetails && lineOfActivityDetails?.list_of_products?.length"
+        class="mt-4">
         <mat-card-header>
           <mat-card-title>Products</mat-card-title>
         </mat-card-header>
@@ -445,11 +484,10 @@
           </table>
         </mat-card-content>
       </mat-card>
-
-      <ng-template #nolineOfActivityDetails>
+    <ng-template #lineOfActivityNoData>
         <mat-card>
           <mat-card-content class="text-center py-4">
-            <p class="text-muted">No line of activity details available.</p>
+            <p class="text-muted">No line of activity details found.</p>
           </mat-card-content>
         </mat-card>
       </ng-template>
@@ -457,7 +495,16 @@
 
     <!-- General Attachments -->
     <mat-tab label="General Attachments">
-      <mat-card *ngIf="generalAttachmentDetails; else noGeneralAttachmentDetails">
+      <ng-container *ngIf="selectedIndex === 4 && !fetchedTabs.generalAttachmentDetails">
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 mb-0">Loading attachments...</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+
+      <mat-card *ngIf="fetchedTabs.generalAttachmentDetails && generalAttachmentDetails; else generalAttachmentNoData">
         <mat-card-content>
           <table class="table table-bordered">
             <thead>
@@ -521,18 +568,27 @@
           </table>
         </mat-card-content>
       </mat-card>
-      <ng-template #noGeneralAttachmentDetails>
-        <mat-card>
-          <mat-card-content class="text-center py-4">
-            <p class="text-muted">No general attachments details available.</p>
-          </mat-card-content>
-        </mat-card>
-      </ng-template>
+    <ng-template #generalAttachmentNoData>
+      <mat-card>
+        <mat-card-content class="text-center py-4">
+          <p class="text-muted">No attachments found.</p>
+        </mat-card-content>
+      </mat-card>
+    </ng-template>
     </mat-tab>
 
     <!-- Bank Details -->
     <mat-tab label="Bank Details">
-      <mat-card *ngIf="bankDetails; else noBankDetails">
+      <ng-container *ngIf="selectedIndex === 5 && !fetchedTabs.bankDetails">
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 mb-0">Loading bank details...</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+
+      <mat-card *ngIf="fetchedTabs.bankDetails && bankDetails; else bankNoData">
         <mat-card-content>
           <div class="row">
             <div class="col-md-6">
@@ -547,10 +603,10 @@
         </mat-card-content>
       </mat-card>
 
-      <ng-template #noBankDetails>
+      <ng-template #bankNoData>
         <mat-card>
           <mat-card-content class="text-center py-4">
-            <p class="text-muted">No bank details available.</p>
+            <p class="text-muted">No bank details found.</p>
           </mat-card-content>
         </mat-card>
       </ng-template>
@@ -559,7 +615,16 @@
     <!-- Activity Details (Placeholder) -->
     <!-- Activity Details -->
     <mat-tab label="Activity Details">
-      <mat-card *ngIf="activityDetails && activityDetails.length > 0; else noActivityDetails" class="mb-4">
+       <ng-container *ngIf="selectedIndex === 6 && !fetchedTabs.activityDetails">
+        <mat-card>
+          <mat-card-content class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 mb-0">Loading activity details...</p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+      <mat-card *ngIf="fetchedTabs.activityDetails && activityDetails && activityDetails.length > 0; else activityNoData"
+        class="mb-4">
         <mat-card-header>
           <mat-card-title>Enterprise Activities (NIC Codes)</mat-card-title>
         </mat-card-header>
@@ -585,23 +650,31 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card *ngIf="activityDetails && activityDetails.length === 0; else noActivityDetails">
+      <mat-card *ngIf="activityDetails && activityDetails.length === 0; else activityNoData">
         <mat-card-content class="text-center py-4">
           <p class="text-muted">No activity details available.</p>
         </mat-card-content>
       </mat-card>
 
 
-      <ng-template #noActivityDetails>
+      <ng-template #activityNoData>
         <mat-card>
           <mat-card-content class="text-center py-4">
-            <p class="text-muted">No Activity details available.</p>
+            <p class="text-muted">No activity details found.</p>
           </mat-card-content>
         </mat-card>
       </ng-template>
     </mat-tab>
   </mat-tab-group>
 
+  <div *ngIf="!isLoading && noDataForUser" class="mb-4">
+    <mat-card>
+      <mat-card-content class="text-center py-4">
+        <h5 class="mb-2">No data available for this user.</h5>
+        <p class="text-muted">All sections returned empty or no information is available for the selected user.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
 
   <div *ngIf="error" class="text-center py-4">
     <div class="spinner-border text-primary" role="status">

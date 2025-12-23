@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { RegistrationComponent } from '../../page-content/auth/registration/registration.component';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -13,7 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitchModule } from "primeng/toggleswitch";
 import Swal from 'sweetalert2';
 import { LoaderService } from '../../_service/loader/loader.service';
-import { debounceTime, finalize } from 'rxjs';
+import { debounceTime, finalize } from 'rxjs/operators';
 import { IlogiInputComponent } from '../../customInputComponents/ilogi-input/ilogi-input.component';
 import { HttpResponse } from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -22,7 +22,7 @@ import { Subject } from 'rxjs';
   selector: 'app-departmental-users',
   standalone: true,
   imports: [
-    RouterOutlet,
+    RouterModule,
     RegistrationComponent,
     CommonModule,
     TableModule,
@@ -34,7 +34,6 @@ import { Subject } from 'rxjs';
     TooltipModule,
     ToggleSwitchModule,
     ReactiveFormsModule,
-    CommonModule,
     IlogiInputComponent
   ],
   templateUrl: './departmental-users.component.html',
@@ -45,6 +44,7 @@ export class DepartmentalUsersComponent implements OnInit {
   userRole: any;
   loading: boolean = false;
   isStateLevelUser: boolean = false;
+  rowsPerPageOptions: number[] = [5, 10, 20];
   displayDialog: boolean = false;
   private readonly STORAGE_KEY = 'selectedDepartment';
   usersBackup: any[] = [];
@@ -76,7 +76,7 @@ export class DepartmentalUsersComponent implements OnInit {
       last_page: 1
     };
 
-  constructor(private genericService: GenericService, private loaderService: LoaderService) { }
+  constructor(private genericService: GenericService, private loaderService: LoaderService, private router: Router) { }
 
   ngOnInit(): void {
     const saved = localStorage.getItem(this.STORAGE_KEY);
@@ -106,11 +106,12 @@ export class DepartmentalUsersComponent implements OnInit {
 
     this.fetchProfile(1, this.pagination.row_count);
   }
-  fetchProfile(page: number = 1, per_page: number = this.pagination.row_count) {
+  fetchProfile(page: number = 1, per_page?: number) {
     this.loaderService.showLoader();
     this.loading = true;
     const currentUserType = localStorage.getItem('userRole');
-    const params: any = { page, per_page };
+    const requestedPerPage = (typeof per_page === 'number' && per_page > 0) ? per_page : this.pagination.row_count;
+    const params: any = { page, per_page: requestedPerPage };
 
     const searchValue = (this.filters.search || '').toString().trim();
     if (searchValue) {
@@ -134,8 +135,12 @@ export class DepartmentalUsersComponent implements OnInit {
         if (res && res.pagination) {
           const dataArray = res.data || [];
           this.mapUsersAndForms(dataArray);
+          const serverRowCount = res.pagination.row_count;
+          if (typeof serverRowCount === 'number' && serverRowCount > 0 && serverRowCount !== requestedPerPage) {
+            console.warn(`Server returned row_count=${serverRowCount} but client requested per_page=${requestedPerPage}. Preserving client selection.`);
+          }
           this.pagination.current_page = res.pagination.current_page ?? page;
-          this.pagination.row_count = res.pagination.row_count ?? per_page;
+          this.pagination.row_count = requestedPerPage;
           this.pagination.total = res.pagination.total ?? dataArray.length;
           this.pagination.start_row = res.pagination.start_row ?? ((this.pagination.current_page - 1) * this.pagination.row_count) + 1;
           this.pagination.end_row = res.pagination.end_row ?? (this.pagination.start_row + dataArray.length - 1);
@@ -145,7 +150,7 @@ export class DepartmentalUsersComponent implements OnInit {
         else if (res && (res.status === 1 || res.success) && res.data) {
           this.mapUsersAndForms(res.data);
           this.pagination.current_page = 1;
-          this.pagination.row_count = this.pagination.row_count ?? per_page;
+          this.pagination.row_count = requestedPerPage;
           this.pagination.total = this.users.length;
           this.pagination.start_row = 1;
           this.pagination.end_row = this.users.length;
@@ -173,7 +178,70 @@ export class DepartmentalUsersComponent implements OnInit {
       }
     });
   }
+LoginAsDeptUser(user: any): void {
+  this.loaderService.showLoader();
+  const payload = { user_id: user.id };
 
+  this.genericService.getByConditions(payload, 'api/admin/login-by-admin')
+    .pipe(finalize(() => this.loaderService.hideLoader()))
+    .subscribe({
+      next: (res: any) => {
+        if (res?.status === 1 && res?.token) {
+          // keep admin's localStorage session as-is (do NOT overwrite)
+          // store admin's session locally if you still want to (optional)
+          // localStorage.setItem('admin_token', localStorage.getItem('token') ?? '');
+
+          // open a new tab to a "switch-user" route that will receive the session
+          const newWin = window.open('/switch-user', '_blank');
+
+          // Wait for the new tab to signal readiness, then send the payload
+          const onMessage = (ev: MessageEvent) => {
+            if (ev.origin !== window.location.origin) return; // security
+            if (ev.data === 'SWITCH_USER_READY') {
+              const payloadToSend = {
+                token: res.token,
+                token_type: res.token_type || 'bearer',
+                expires_in: res.expires_in || '',
+                data: res.data
+              };
+              newWin?.postMessage({ action: 'SET_SESSION', payload: payloadToSend }, window.location.origin);
+              window.removeEventListener('message', onMessage);
+            }
+          };
+          window.addEventListener('message', onMessage);
+
+          // Now set admin UI/session in this (admin) tab as you already do:
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('token_type', res.token_type || 'bearer');
+          // ... other localStorage admin values as you already had
+          this.genericService.storeSessionData(res, false);
+          this.genericService.setLoginStatus(true);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: `Switched to ${res.data?.name_of_enterprise || res.data?.authorized_person_name || res.data?.email_id}`,
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            // do not navigate away so admin remains logged in KEEP IT LOGGGED IN ONLY AND 
+          });
+        } else {
+          Swal.fire('Login Failed', res?.message || 'Unable to login this user.', 'error');
+        }
+      },
+      error: (err: any) => {
+        console.error('Login error:', err);
+        Swal.fire('Error', 'Failed to login user. Please try again.', 'error');
+      }
+    });
+}
+
+     logout(): void {
+      this.genericService.logoutUser();
+    }
+
+   
   private mapUsersAndForms(rawArray: any[]) {
     this.users = rawArray.map((user: any) => ({
       id: user.id,
@@ -303,20 +371,38 @@ export class DepartmentalUsersComponent implements OnInit {
     this.displayDialog = false;
     this.fetchProfile(this.pagination.current_page, this.pagination.row_count);
   }
-  onPageChange(event: any) {
-    const table = document.querySelector('.p-datatable-tbody');
-    if (table) {
-      table.classList.add('table-fade-out');
-      setTimeout(() => {
-        table.classList.remove('table-fade-out');
-      }, 250);
-    }
-    const requestedPage = (typeof event.page === 'number') ? (event.page + 1) : Math.floor(event.first / event.rows) + 1;
-    const rows = event.rows || this.pagination.row_count;
-    this.pagination.current_page = requestedPage;
-    this.pagination.row_count = rows;
-    this.fetchProfile(requestedPage, rows);
+onPageChange(event: any) {
+  // fade animation: try to target table wrapper first, fallback to tbody
+  const table = document.querySelector('.p-datatable') || document.querySelector('.p-datatable-tbody');
+  if (table) {
+    table.classList.add('table-fade-out');
+    setTimeout(() => {
+      table.classList.remove('table-fade-out');
+    }, 250);
   }
+
+  // compute requested page safely (PrimeNG page is zero-based when present)
+  const requestedPage = (typeof event.page === 'number')
+    ? (event.page + 1)
+    : (typeof event.first === 'number' && typeof event.rows === 'number')
+      ? (Math.floor(event.first / event.rows) + 1)
+      : this.pagination.current_page;
+
+  // determine rows per page robustly
+  const rows = (typeof event.rows === 'number' && event.rows > 0)
+    ? event.rows
+    : (this.pagination.row_count || this.rowsPerPageOptions[0]);
+
+  // ensure the current rows value appears in the rowsPerPageOptions so the dropdown always shows the selected value
+  if (!this.rowsPerPageOptions.includes(rows)) {
+    this.rowsPerPageOptions = [...this.rowsPerPageOptions, rows].sort((a, b) => a - b);
+  }
+
+  this.pagination.current_page = requestedPage;
+  this.pagination.row_count = rows;
+
+  this.fetchProfile(requestedPage, rows);
+}
   confirmStatusChange(event: any, user: any) {
     const isCurrentlyActive = user.status === 'active';
     const newStatus = isCurrentlyActive ? 'inactive' : 'active';
