@@ -457,11 +457,8 @@ private formatDateForBackend(input: string): string {
               row.status === 'send_back' ||
               row.status === 'draft',
             handler: (row: ApplicationDataItem) => {
-              const queryParams: any = { application_status: row.status };
-              // console.log(row.nocDetailsId);
-              if (row.status == 'draft') {
-                queryParams.application_id = row.nocDetailsId;
-              }
+              const queryParams: any = { application_status: row.status, application_id: row.nocDetailsId };
+             
 
               this.router.navigate(
                 [`/dashboard/service-application`, row.service_id],
