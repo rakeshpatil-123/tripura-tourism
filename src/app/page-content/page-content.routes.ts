@@ -18,6 +18,11 @@ export const PAGE_CONTENT_ROUTES: Routes = [
                     import('./auth/registration/registration.component').then(m => m.RegistrationComponent)
             },
             {
+                path: 'forgot-password',
+                loadComponent: () =>
+                    import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+            },
+            {
                 path: 'admin',
                 loadComponent: () => import('./auth/admin-login/admin-login.component').then(m => m.AdminLoginComponent)
             },

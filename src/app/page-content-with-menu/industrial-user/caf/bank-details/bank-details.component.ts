@@ -62,8 +62,7 @@ loadExistingData(): void {
       }
     },
     error: (err) => {
-      console.error('API Error:', err);
-      this.apiService.openSnackBar('Failed to load bank details.', 'error');
+      this.apiService.openSnackBar(`${err.error.message}`, 'error');
     }
   });
 }

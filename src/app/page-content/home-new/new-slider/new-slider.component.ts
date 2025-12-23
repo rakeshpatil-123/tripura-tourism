@@ -30,9 +30,9 @@ export class NewSliderComponent implements OnInit, OnDestroy, AfterViewInit {
   ];
 
   stats: Stat[] = [
-    { value: '19', label: 'Tribal Communities' },
-    { value: '₹500 Cr', label: 'Tourism Potential' },
-    { value: '15,000+', label: 'Artisans' }
+    // { value: '19', label: 'Tribal Communities' },
+    // { value: '₹500 Cr', label: 'Tourism Potential' },
+    // { value: '15,000+', label: 'Artisans' }
   ];
 
   currentSlide = 0;
@@ -87,6 +87,9 @@ export class NewSliderComponent implements OnInit, OnDestroy, AfterViewInit {
       dot.style.animationDuration = `${3 + Math.random() * 3}s`;
       container.appendChild(dot);
     }
+  }
+  redirectToLogin():void {
+    window.location.href = 'page/login';
   }
 
   onInvestClick(): void {

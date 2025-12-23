@@ -111,6 +111,7 @@ export class LineOfActivityComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error fetching line of activity:', err);
+          this.apiService.openSnackBar(err.error.message || 'Error loading data', 'error');
           this.addRawMaterial();
           this.addProduct();
         },

@@ -158,7 +158,8 @@ export class ManagementComponent implements OnInit, OnDestroy {
           }
         },
         error: (err) => {
-          console.error('Error fetching management details:', err);
+          console.error(`${err.error.message}`, err);
+          this.apiService.openSnackBar(`${err.error.message}`, 'error');
         },
       });
   }

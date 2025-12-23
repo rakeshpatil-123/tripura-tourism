@@ -14,6 +14,7 @@ export interface BackendProfile {
   name_of_enterprise: string;
   authorized_person_name: string;
   email_id: string;
+  pan: string,
   mobile_no: string;
   registered_enterprise_address: string;
   registered_enterprise_city: string;
@@ -136,10 +137,11 @@ export class UserProfileComponent implements OnInit {
 
       const profile = this.backendProfile;
       const [first, ...last] = (profile.authorized_person_name || '').split(' ');
-      this.profileForm.patchValue({
+    this.profileForm.patchValue({
         enterpriseName: profile.name_of_enterprise,
         authorized_person_name: profile.authorized_person_name || '',
         email: profile.email_id,
+        pan: profile.pan,
         phone: profile.mobile_no,
         address: profile.registered_enterprise_address,
         city: profile.registered_enterprise_city,
@@ -230,6 +232,7 @@ export class UserProfileComponent implements OnInit {
       authorized_person_name: ['', Validators.required],
       // lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      pan: [{ value: '', disabled: true }],
       phone: ['', Validators.required],
       address: ['', Validators.required],
       city: ['', Validators.required],
@@ -268,6 +271,7 @@ export class UserProfileComponent implements OnInit {
       name_of_enterprise: val.enterpriseName,
       authorized_person_name: `${val.authorized_person_name}`.trim(),
       email_id: val.email,
+      pan: val.pan,
       mobile_no: val.phone.toString(),
       registered_enterprise_address: val.address,
       registered_enterprise_city: val.city,

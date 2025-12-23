@@ -33,7 +33,7 @@
       <ng-container *ngIf="currentUserType === 'individual'">
         <div class="user-name">
           <span class="name">{{ auth_person | titlecase }}</span>
-          <span class="username">({{ userName }})</span>
+          <span class="username">({{ currentUserEnterpriseName }})</span>
         </div>
         <div class="user-detail">
           <span class="label">BIN :  </span>
@@ -54,12 +54,12 @@
       <!-- Department User -->
       <ng-container *ngIf="currentUserType === 'department'">
         <div class="user-name">
-          <span class="name">{{ userName }}</span>
-          <span class="email">({{ emailId }})</span>
+          <span class="name">{{ userName }}</span>&nbsp;&nbsp;
+          <span class="email">({{ auth_person }})</span>
         </div>
         <div class="user-detail">
           <span class="label">{{ designation | titlecase }}</span>
-          <span class="separator">•</span>
+          <span class="separator">&nbsp;&nbsp;•&nbsp;&nbsp;</span>
           <span class="value">{{ deptName }}</span>
         </div>
         <div class="user-detail">

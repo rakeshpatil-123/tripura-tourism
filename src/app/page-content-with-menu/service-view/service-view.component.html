@@ -16,52 +16,60 @@
   <div *ngIf="!isLoading && applicationData">
 
     <!-- Workflow History -->
-    @if (workflowData.length > 0) {
-    <div class="btn-right">
+    <div *ngIf="workflowData.length > 0" class="btn-right">
       <h3 class=" page-head">Workflow Steps</h3>
 
       <div class="btn-group-right">
-        <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'"
+        <button class="btn btn-primary" *ngIf="isFinalApproval"
           mat-raised-button class="generate-btn" (click)="editCertificateGeneration()">
           <mat-icon style="color: white;" class="mr-2">workspace_premium</mat-icon>
           <span style="color: white;">Generate Certificate</span>
         </button>
-         <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'"
+         <button class="btn btn-primary" *ngIf="isFinalApproval"
             mat-raised-button color="primary" (click)="previewCertificate()">
             <span style="color: white;">Preview Certificate</span>
           </button>
         <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
-        <button (click)="editCertificateGeneration()" *ngIf="isFinalApproval === 'approved'" class="submit-btn">Certificate
+        <button (click)="editCertificateGeneration()" *ngIf="isFinalApproval" class="submit-btn">Certificate
           <mat-icon>picture_as_pdf</mat-icon>
         </button>
-        @if (sampleFilePreview) {
-        <button mat-raised-button color="primary" class="submit-btn" (click)="previewSampleFile()">
+        <button mat-raised-button color="primary" class="submit-btn" *ngIf="sampleFilePreview" (click)="previewSampleFile()">
           Preview Sample File
         </button>
-        }
       </div>
     </div>
     <app-dynamic-table [data]="workflowData" [columns]="workflowColumns" [showPagination]="true" [pageSize]="5"
       [searchable]="true"></app-dynamic-table>
-    }
 
-    @if (applicationQAColumns.length > 0) {
-    <h3 class="mt-4 page-head">Application Questions & Answers</h3>
-    <app-dynamic-table [data]="applicationQATableData" [columns]="applicationQAColumns" [showPagination]="false"
-      [searchable]="false"></app-dynamic-table>
-    }
-    @else {
-    <div class="alert alert-info mt-4">
-      No application questions provided.
-    </div>
-    }
+    <ng-container *ngIf="applicationQAColumns.length > 0; else noQa">
+      <h3 class="mt-4 page-head">Application Questions & Answers</h3>
+      <div class="qa-section">
+        <ng-container *ngFor="let item of applicationQATableData; let i = index">
+          <div *ngIf="item.isSection" class="qa-section-header">
+            <h5 class="section-title">{{ item.question }}</h5>
+          </div>
+          <div *ngIf="!item.isSection" class="qa-item">
+            <div class="qa-question">{{ item.question }}</div>
+            <div class="qa-answer" *ngIf="item.isFile">
+              <button type="button" class="view-file-btn" (click)="openFile(item.fileUrl)">{{ item.fileName }}</button>
+            </div>
+            <div class="qa-answer" *ngIf="!item.isFile">{{ item.answer }}</div>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+    <ng-template #noQa>
+      <div class="alert alert-info mt-4">
+        No application questions provided.
+      </div>
+    </ng-template>
 
     <!-- Main Application Summary -->
-    @if (infoData.length > 0) {
-    <h3 class="mt-4 page-head">Application Summary</h3>
-    <app-dynamic-table [data]="infoData" [columns]="infoColumns" [showPagination]="false"
-      [searchable]="false"></app-dynamic-table>
-    }
+    <div *ngIf="infoData.length > 0">
+      <h3 class="mt-4 page-head">Application Summary</h3>
+      <app-dynamic-table [data]="infoData" [columns]="infoColumns" [showPagination]="false"
+        [searchable]="false"></app-dynamic-table>
+    </div>
 
 
   </div>
@@ -76,9 +84,7 @@
           <app-ilogi-input formControlName="extraAmount" fieldLabel="Extra Payment Amount" [mandatory]="true"
             placeholder="Enter extra payment amount" [type]="'number'" inputType="number"></app-ilogi-input>
 
-          @if (remarkForm.get('extraAmount')?.invalid && remarkForm.get('extraAmount')?.touched) {
-          <small class="text-danger">Extra Payment Amount is required.</small>
-          }
+          <small *ngIf="remarkForm.get('extraAmount')?.invalid && remarkForm.get('extraAmount')?.touched" class="text-danger">Extra Payment Amount is required.</small>
         </div>
         <div class="mb-3">
           <app-ilogi-input formControlName="remarks" label="Remarks" [mandatory]="true"
@@ -89,11 +95,9 @@
             placeholder="Upload supporting document" accept=".png,.jpg,.jpeg,.pdf"></app-ilogi-file-upload>
         </div>
 
-        @if (remarkForm.get('remarks')?.invalid && remarkForm.get('remarks')?.touched) {
-        <small class="text-danger">
+        <small *ngIf="remarkForm.get('remarks')?.invalid && remarkForm.get('remarks')?.touched" class="text-danger">
           Remarks are required and must be at least 2 characters.
         </small>
-        }
         <div class="modal-actions">
          
 <!-- 
@@ -106,11 +110,11 @@
 
           <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
 
-          <button type="submit" class="btn btn-primary" [disabled]="remarkForm.invalid">
-            Confirm
+        <button type="submit" class="btn btn-primary" [disabled]="remarkForm.invalid">
+           {{ statusModal.action === 'approved' ? (isFinalApproval ?  'Final Approve' : 'Approve/Forward') : statusModal.action === 'raise_extra_payment' ? 'Raise Extra Payment' : statusModal.action === 'send_back' ? 'Send Back' : 'Reject'}}
           </button>
         </div>
       </form>
-    </div>
+    <!-- </div> -->
   </div>
 </div>

@@ -89,6 +89,7 @@ export class AddServiceDialogComponent implements OnInit {
       target_days: [15, Validators.required],
       fixed_expiry_date: [null],
       has_input_form: [true],
+      caf_depends: [false],
       depends_on_services: [''],
 
       generate_id: [true],
@@ -140,6 +141,7 @@ export class AddServiceDialogComponent implements OnInit {
               target_days: s.target_days,
               fixed_expiry_date: s.fixed_expiry_date ? moment(s.fixed_expiry_date, 'YYYY-MM-DD').toDate() : null,
               has_input_form: s.has_input_form === 'yes',
+              caf_depends: s.caf_depends === 'yes',
               depends_on_services: (() => { const deps = s.depends_on_services; if (!deps) return []; if (Array.isArray(deps)) return deps; try { const parsed = JSON.parse(deps); if (Array.isArray(parsed)) return parsed; } catch (e) { return deps.replace(/[\[\]"']/g, '').split(',').map((x: string) => x.trim()).filter((x: any) => x); } return [];})(),
               generate_id: s.generate_id === 'yes',
               generate_pdf: s.generate_pdf === 'yes',
@@ -230,6 +232,7 @@ export class AddServiceDialogComponent implements OnInit {
         target_days: formValue.target_days,
         fixed_expiry_date: formValue.fixed_expiry_date ? moment(formValue.fixed_expiry_date).format('YYYY-MM-DD') : null,
         has_input_form: formValue.has_input_form ? 'yes' : 'no',
+        caf_depends: formValue.caf_depends ? 'yes' : 'no',
         depends_on_services: Array.isArray(formValue.depends_on_services) ? formValue.depends_on_services.filter((s: any) => s !== '').map((s: any) => `${s}`) : formValue.depends_on_services,
         generate_id: formValue.generate_id ? 'yes' : 'no',
         generated_id_format: formValue.generated_id_format,

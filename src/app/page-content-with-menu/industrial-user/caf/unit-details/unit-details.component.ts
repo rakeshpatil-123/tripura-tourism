@@ -465,7 +465,8 @@ onDistrictChange(district: string): void {
         }
       },
       error: (err) => {
-        console.error('Error fetching unit details:', err);
+        // console.error(`${err.error.message}`, err);
+        this.apiService.openSnackBar(`${err.error.message}`, 'error');
       },
     });
   }
