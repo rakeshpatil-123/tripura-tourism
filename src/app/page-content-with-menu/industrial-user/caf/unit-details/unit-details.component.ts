@@ -283,7 +283,7 @@ loadingSubdivisions = false;
           id: d.district_code,
           name: d.district_name
         }));
-        console.log('Loaded districts:', this.districtOptions);
+        // console.log('Loaded districts:', this.districtOptions);
       } else {
         this.apiService.openSnackBar('Failed to load districts.', 'error');
       }
@@ -297,7 +297,7 @@ loadingSubdivisions = false;
 }
 
 onDistrictChange(district: string): void {
-  console.log(district, 'batao');
+  // console.log(district, 'batao');
   
   this.form.get('subDivision')?.reset();
   this.subDivisionOptions = [];
@@ -315,7 +315,7 @@ onDistrictChange(district: string): void {
           id: s.sub_lgd_code,
           name: s.sub_division
         }));
-        console.log('Loaded subdivisions:', this.subDivisionOptions);
+        // console.log('Loaded subdivisions:', this.subDivisionOptions);
       } else {
         this.apiService.openSnackBar('No subdivisions found for this district.', 'info');
       }
@@ -567,13 +567,13 @@ onDistrictChange(district: string): void {
       (payload as any).save_data = 1;
     }
 
-    console.log('Final Payload:', payload);
+    // console.log('Final Payload:', payload);
 
     this.apiService
       .getByConditions(payload, 'api/caf/unit-details-store')
       .subscribe({
         next: (res) => {
-          console.log('API Success:', res);
+          // console.log('API Success:', res);
           const message = isDraft
             ? 'Draft saved successfully!'
             : 'Unit details submitted successfully!';

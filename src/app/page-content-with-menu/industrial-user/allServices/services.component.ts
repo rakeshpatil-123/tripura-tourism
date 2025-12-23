@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoaderComponent } from '../../../page-template/loader/loader.component';
 import { IlogiSelectComponent } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-services',
@@ -13,6 +14,7 @@ import { FormsModule } from '@angular/forms';
     LoaderComponent,
     IlogiSelectComponent,
     FormsModule,
+    CommonModule
   ],
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.scss'],
@@ -26,7 +28,7 @@ export class ServicesComponent {
   filterPlaceholder = 'Select NOC Type';
   departmentOptions: Array<{ id: any; name: string }> = [];
   nocTypeOptions: Array<{ id: any; name: string }> = [];
-
+  showPopup: boolean = false;
   selectedNocType: string | null = null;
   selectedDepartment: string | null = null;
   isLoading: boolean = false;
@@ -35,8 +37,6 @@ export class ServicesComponent {
   ngOnInit(): void {
     this.allServices();
   }
-
-  
 
   allServices(): void {
     this.isLoading = true;
@@ -153,7 +153,7 @@ export class ServicesComponent {
       'noc_payment_type',
       'id',
       'sl_no',
-      'is_caf_filled'
+      'is_caf_filled',
     ]);
 
     columns.push({
@@ -192,22 +192,24 @@ export class ServicesComponent {
       });
     });
 
-   
     columns.push({
       key: 'apply_icon',
       label: 'Apply',
       type: 'button',
-      buttonText:(row: any) =>{
-    return row.application_status === 'draft' && row.allow_repeat_application === 'no'
-      ? 'Edit Draft'
-      : 'Apply';
-  },
+      buttonText: (row: any) => {
+        return row.application_status === 'draft' &&
+          row.allow_repeat_application === 'no'
+          ? 'Edit Draft'
+          : 'Apply';
+      },
       width: '60px',
       onClick: (row: any) => {
-        this.onApply(row);
-        console.log(row.application_status);
-        console.log(row.allow_repeat_application);
         
+        if (row.is_caf_filled === true) {
+          this.onApply(row);
+        } else  {
+          this.showPopup = true;
+        }
       },
       cellClass: (value: any, row: any) => {
         const shouldShow =
@@ -215,7 +217,8 @@ export class ServicesComponent {
           row.application_status === 'send_back' ||
           row.application_status === 'extra_payment' ||
           row.allow_repeat_application === 'yes' ||
-           (row.application_status === 'draft' && row.allow_repeat_application === 'no');
+          (row.application_status === 'draft' &&
+            row.allow_repeat_application === 'no');
         return shouldShow ? '' : 'd-none';
       },
     });
@@ -227,8 +230,8 @@ export class ServicesComponent {
       icon: 'visibility',
       width: '60px',
       onClick: (row: any) => {
-        console.log(row.service_mode);
-        
+        // console.log(row.service_mode);
+
         const queryParams: any = {};
         if (row.service_mode === 'Third Party') {
           queryParams.service = 'third_party';
@@ -323,7 +326,9 @@ export class ServicesComponent {
     console.log('Row action emitted:', event);
   }
 
-  // close(){
-  //   window.close();
-  // }
+  close(){
+    this.showPopup = false;
+   this.router.navigate(['/dashboard/caf'])
+    
+  }
 }

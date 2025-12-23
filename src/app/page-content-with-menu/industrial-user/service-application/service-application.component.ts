@@ -133,6 +133,7 @@ export class ServiceApplicationComponent implements OnInit {
   sectionGroups: SectionGroup[] = [];
   serviceId!: number;
   loading: boolean = false;
+  apiCalling: boolean = false;
   visible = false;
   readonlyFields: { [key: number]: boolean } = {};
   extraPayment: string | number | null = null;
@@ -867,6 +868,8 @@ export class ServiceApplicationComponent implements OnInit {
       });
     });
 
+    this.apiCalling = true;
+
     this.apiService
       .getByConditions(formData, this.getSubmissionEndpoint())
       .subscribe({
@@ -879,11 +882,14 @@ export class ServiceApplicationComponent implements OnInit {
             // this.router.navigate(['/dashboard/services']);
             this.successFullySubmitted = true;
             this.succesResponse = res ;
+            this.apiCalling = false;
           } else {
             this.apiService.openSnackBar(
               res?.message || 'Submission failed.',
               'error'
             );
+            this.apiCalling = false;
+
           }
         },
         error: (err) => {

@@ -63,9 +63,8 @@ export class ApplicationSearchPageComponent implements OnInit {
   ApplicationColumns: TableColumn[] = [];
   error: string = '';
 currentPageSize = 5;
-  // Filter properties
   fromDate: string = '';
-  toDate: string = ''; // Added for future use
+  toDate: string = ''; 
   department: string = '';
   applicationType: string = '';
 
@@ -110,7 +109,6 @@ currentPageSize = 5;
   loadingDepartments = false;
   noDataMessage = 'No applications found';
 
-  // Server pagination state
   serverPagination = {
     currentPage: 1,
     pageSize: 10,
@@ -127,11 +125,9 @@ currentPageSize = 5;
     this.defineColumns();
     this.getAllDepartmentList();
     this.fetchAllServices();
-    // this.getServiceFilterOptions(); // Fetch service options separately
     this.getApplications();
   }
 
-  // Fetch departments
   getAllDepartmentList(): void {
     this.loadingDepartments = true;
     this.apiService.getAllDepartmentNames().subscribe({
@@ -167,7 +163,6 @@ currentPageSize = 5;
   private fetchAllServices(): void {
     const user_id = localStorage.getItem('userId') || '';
 
-    // Fetch ALL applications just to extract unique services
     this.apiService
       .getByConditions(
         { user_id, per_page: 1000 }, // get all in one go
@@ -206,25 +201,7 @@ currentPageSize = 5;
       });
   }
 
-  // // Fetch service filter options separately
-  // getServiceFilterOptions(): void {
-  //   this.apiService
-  //     .getByConditions({}, 'api/user/get-service-filter-options')
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         if (res?.status === 1 && Array.isArray(res.data)) {
-  //           this.serviceFilterOptions = [
-  //             { id: null, name: 'All Services' },
-  //             ...res.data.map((s: any) => ({
-  //               id: s.service_id?.toString() || s.name,
-  //               name: s.name || s.service_title_or_description,
-  //             })),
-  //           ];
-  //         }
-  //       },
-  //       error: (err) => console.error('Error fetching service options', err),
-  //     });
-  // }
+ 
 
   getApplications(page: number = 1, perPage: number = 5): void {
     this.loading = true;
@@ -232,7 +209,7 @@ currentPageSize = 5;
 
     const payload: any = {
       user_id,
-      current_page: page,
+      page: page,
       per_page: perPage,
     };
 
@@ -342,11 +319,16 @@ currentPageSize = 5;
       });
   }
 
-  // Format date to YYYY-MM-DD for backend
-  private formatDateForBackend(input: string): string {
-    const parsed = this.parseInputDate(input);
-    return parsed ? parsed.toISOString().split('T')[0] : '';
-  }
+private formatDateForBackend(input: string): string {
+  const parsed = this.parseInputDate(input);
+  if (!parsed) return '';
+  const utcDate = new Date(Date.UTC(
+    parsed.getFullYear(),
+    parsed.getMonth(),
+    parsed.getDate()
+  ));
+  return utcDate.toISOString().split('T')[0];
+}
 
   defineColumns(): void {
     this.ApplicationColumns = [
@@ -441,7 +423,7 @@ currentPageSize = 5;
             label: 'Download Certificate',
             action: 'download',
             color: 'warn',
-            visible: (row: ApplicationDataItem) => true,
+            visible: (row: ApplicationDataItem) => row.is_certificate !== null ,
             handler: (row: ApplicationDataItem) => {
               this.downloadCertificate(row.id);
             },
@@ -477,7 +459,7 @@ currentPageSize = 5;
             handler: (row: ApplicationDataItem) => {
               const queryParams: any = { application_status: row.status };
               // console.log(row.nocDetailsId);
-              if (row.status !== 'draft') {
+              if (row.status == 'draft') {
                 queryParams.application_id = row.nocDetailsId;
               }
 
