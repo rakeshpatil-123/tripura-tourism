@@ -151,7 +151,6 @@ export class UserApplicationViewComponent implements OnInit {
     }
   }
 
-
   fetchApplicationDetails(): void {
     this.isLoading = true;
     this.error = null;
@@ -184,19 +183,21 @@ export class UserApplicationViewComponent implements OnInit {
             this.serviceName = res?.service_name;
             const appData = res?.data;
 
-            const structuredData = Array.isArray(res.application_data)
-  ? res.application_data
-  : [];
+            const structuredData = this.normalizeApplicationData(
+              res.application_data
+            );
+            const filteredData = structuredData.filter((qa) => {
+              if (qa.answer == null) return false;
+              if (qa.answer === '') return false;
+              if (Array.isArray(qa.answer) && qa.answer.length === 0)
+                return false;
+              return true;
+            });
 
-this.application = {
-  ...appData,
-  application_data: appData.application_data || {},
-  application_data_structured: structuredData.map((item : any) => ({
-    id: item.id,
-    question: item.question,
-    answer: item.answer ?? '—',
-    type: item.type || 'text',
-  })),
+            this.application = {
+              ...appData,
+              application_data: appData.application_data || {},
+              application_data_structured: filteredData,
               extra_payment: appData.extra_payment || '0',
               total_fee: appData.total_fee || '0',
               history_data: Array.isArray(res.history_data)
@@ -337,7 +338,12 @@ this.application = {
   private normalizeApplicationData(
     data: any
   ): { id: number; question: string; answer: any; type?: string }[] {
-    const result: { id: number; question: string; answer: any; type?: string }[] = [];
+    const result: {
+      id: number;
+      question: string;
+      answer: any;
+      type?: string;
+    }[] = [];
 
     const traverse = (obj: any) => {
       if (!obj || typeof obj !== 'object') return;

@@ -1,7 +1,7 @@
 <!-- user-application-view.component.html -->
 <div class="application-view-container">
   <div class="loading" *ngIf="isLoading">
-   <app-loader></app-loader>>
+    <app-loader></app-loader>>
   </div>
 
   <div class="error-card" *ngIf="error && !isLoading">
@@ -15,9 +15,7 @@
       <div class="app-header">
         <h2 class="app-title">Application Information</h2>
         <!-- Show Download Certificate button only if not third-party AND has download URL -->
-        <button class="btn-download" 
-                *ngIf=" hasDownloadUrl" 
-                (click)="downloadCertificate()">
+        <button class="btn-download" *ngIf=" hasDownloadUrl" (click)="downloadCertificate()">
           Download Certificate
         </button>
       </div>
@@ -34,17 +32,17 @@
           <label>Due Date</label>
           <span>{{ formatDate(application?.max_processing_date) || '—' }}</span>
         </div>
-        <div class="field" *ngIf="application?.approved_fee !== null || 0">
+        <!-- <div class="field" *ngIf="application?.approved_fee !== null || 0">
           <label>Approved Fee</label>
           <span>{{ application?.approved_fee || '₹0' }}</span>
-        </div>
+        </div> -->
         <div class="field" *ngIf="!isThirdParty">
           <label>Current Step</label>
           <span> {{ historyDetails[0]?.step_number || '—' }}</span>
         </div>
         <div class="field" *ngIf="!isThirdParty">
           <label>Current Step Name</label>
-          <span class="capitalize" > {{ historyDetails[0]?.step_type || '—' }}</span>
+          <span class="capitalize"> {{ historyDetails[0]?.step_type || '—' }}</span>
         </div>
         <div class="field" *ngIf="!isThirdParty">
           <label>Base Fee</label>
@@ -74,30 +72,29 @@
       </div>
     </section>
 
-    <section class="section" 
-             *ngIf="!isThirdParty && application?.application_data_structured?.length">
+    <section class="section" *ngIf="!isThirdParty && application?.application_data_structured?.length">
       <h2>Applicant Information</h2>
       <div class="grid">
-      <div class="field" *ngFor="let qa of application.application_data_structured">
-  @if(qa.type === 'file') {
-    <div class="file-display">
-      <label>{{ qa.question }}</label>
-      <span>{{ getFileNameFromUrl(qa.answer) }}</span>
-      <button type="button" class="btn-view btn-success btn-sm" (click)="previewFile(qa.answer)">
-        View
-      </button>
-    </div>
-  } @else {
-    <label>{{ qa.question }}</label>
-    <span>{{ formatAnswerForDisplay(qa.answer) }}</span>
-  }
-</div>
+        <div class="field" *ngFor="let qa of application.application_data_structured">
+          @if(qa.type === 'file') {
+          <div class="file-display">
+            <label [innerHTML]="qa.question"></label>
+            <span>{{ getFileNameFromUrl(qa.answer) }}</span>
+            <button type="button" class="btn-view btn-success btn-sm" (click)="previewFile(qa.answer)">
+              View
+            </button>
+          </div>
+          } @else {
+          <label [innerHTML]="qa.question"></label>
+          <span>{{ formatAnswerForDisplay(qa.answer) }}</span>
+          }
+        </div>
       </div>
     </section>
 
     <!-- Hide Applicant Information section for third-party -->
-    <section class="section" 
-             *ngIf="!isThirdParty && !application?.application_data_structured?.length && application?.application_data">
+    <section class="section"
+      *ngIf="!isThirdParty && !application?.application_data_structured?.length && application?.application_data">
       <h2>Applicant Information</h2>
       <div class="grid">
         <div class="field" *ngFor="let entry of application.application_data | keyvalue">
@@ -162,20 +159,18 @@
       </div>
     </section>
 
-    
-<section class="section" >
-  <h2>Application History</h2>
-  <app-dynamic-table
-    [searchable]="false"
-    [columns]="historyColumns"
-    [data]="historyDetails">
-  </app-dynamic-table>
-</section>
+
+    <section class="section">
+      <h2>Application History</h2>
+      <app-dynamic-table [searchable]="false" [columns]="historyColumns" [data]="historyDetails">
+      </app-dynamic-table>
+    </section>
 
     <section class="section">
       <h2>Payment Details</h2>
 
-      <app-dynamic-table [searchable]="false" [columns]="transactionColumns" [data]="transactionDetails"  ></app-dynamic-table>
+      <app-dynamic-table [searchable]="false" [columns]="transactionColumns"
+        [data]="transactionDetails"></app-dynamic-table>
     </section>
   </div>
 </div>

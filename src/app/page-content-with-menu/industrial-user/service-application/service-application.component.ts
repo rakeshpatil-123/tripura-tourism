@@ -197,7 +197,7 @@ export class ServiceApplicationComponent implements OnInit {
           if (res?.status === 1 && Array.isArray(res.data)) {
             this.serviceName = res.service_name || null;
             this.questions = res.data
-              .filter((q: ServiceQuestion) => q.status === 1)
+              .filter((q: ServiceQuestion) => q.status === 1 || q.status === 0)
               .map((q: any) => ({
                 ...q,
                 parsedOptions: this.parseOptions(q.options),

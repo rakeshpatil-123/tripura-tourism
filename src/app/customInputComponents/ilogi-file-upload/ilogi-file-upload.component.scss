@@ -106,6 +106,17 @@
   margin-left: 4px;
   font-weight: bold;
 }
+.file-display {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* or use margin */
+  flex-wrap: wrap;
+}
+
+.filename-wrapper {
+  display: flex;
+  align-items: center;
+}
 
 .label-wrapper {
   display: flex;
