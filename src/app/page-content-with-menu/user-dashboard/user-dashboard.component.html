@@ -1,4 +1,8 @@
-<div class="dashboard-page">
+
+
+@if(isLoading){
+  <app-loader></app-loader>
+}@else{<div class="dashboard-page">
   <div class="dashboard-header">
     <p class="subtitle">Welcome to the</p>
     <h1>Dashboard</h1>
@@ -154,3 +158,4 @@
 
 
 </div>
+}

@@ -91,13 +91,12 @@ export class ActivitiesComponent implements OnInit {
     this.loadExistingData();
   }
 
-  // --- Load NIC 2-digit codes ---
   loadNic2DigitCodes(): void {
     this.apiService.getByConditions({}, 'api/fetch-all-nic-2-digit-codes-with-description').subscribe({
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.nic2DigitOptions = res.data;
-          console.log(' Loaded NIC 2-digit codes:', this.nic2DigitOptions);
+          // console.log(' Loaded NIC 2-digit codes:', this.nic2DigitOptions);
         } else {
           this.apiService.openSnackBar('Failed to load NIC 2-digit codes.', 'error');
         }
@@ -109,7 +108,6 @@ export class ActivitiesComponent implements OnInit {
     });
   }
 
-  // --- On NIC 2-digit change → load 4-digit codes ---
   onNic2Change(value: string): void {
     this.resetAfter2Digit();
     if (!value) return;
@@ -119,7 +117,7 @@ export class ActivitiesComponent implements OnInit {
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.nic4DigitOptions = res.data;
-          console.log(' Loaded NIC 4-digit codes:', this.nic4DigitOptions);
+          // console.log(' Loaded NIC 4-digit codes:', this.nic4DigitOptions);
         } else {
           this.apiService.openSnackBar('No 4-digit codes found.', 'info');
         }
@@ -131,7 +129,6 @@ export class ActivitiesComponent implements OnInit {
     });
   }
 
-  // --- On NIC 4-digit change → load 5-digit codes ---
   onNic4Change(value: string): void {
     this.resetAfter4Digit();
     if (!value) return;
@@ -141,7 +138,7 @@ export class ActivitiesComponent implements OnInit {
       next: (res: any) => {
         if (res?.status === 1 && Array.isArray(res.data)) {
           this.nic5DigitOptions = res.data;
-          console.log(' Loaded NIC 5-digit codes:', this.nic5DigitOptions);
+          // console.log(' Loaded NIC 5-digit codes:', this.nic5DigitOptions);
         } else {
           this.apiService.openSnackBar('No 5-digit codes found.', 'info');
         }
@@ -268,7 +265,7 @@ export class ActivitiesComponent implements OnInit {
             };
           });
 
-        console.log('Loaded and parsed existing NIC data:', this.activities);
+        // console.log('Loaded and parsed existing NIC data:', this.activities);
 
         if (this.activities.length > 0) {
           const last = this.activities[this.activities.length - 1];

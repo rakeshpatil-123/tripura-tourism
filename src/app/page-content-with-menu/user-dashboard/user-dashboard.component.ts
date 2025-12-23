@@ -13,6 +13,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import { IlogiSelectComponent } from '../../customInputComponents/ilogi-select/ilogi-select.component';
 import { FormsModule } from '@angular/forms';
+import { LoaderComponent } from "../../page-template/loader/loader.component";
 
 interface Payment {
   slNo: number;
@@ -38,7 +39,8 @@ interface Payment {
     IlogiSelectComponent,
     FormsModule,
     CommonModule,
-  ],
+    LoaderComponent
+],
   templateUrl: './user-dashboard.component.html',
   styleUrls: ['./user-dashboard.component.scss'],
 })
@@ -53,13 +55,13 @@ export class UserDashboardComponent implements OnInit {
   totalPendingCount = 0;
   clarification_required: any[] = [];
 
-// Clarification filters
-clarificationAppNumber: string | null = null;
-clarificationService: string | null = null;
+  // Clarification filters
+  clarificationAppNumber: string | null = null;
+  clarificationService: string | null = null;
 
-// Options for clarification filters
-clarificationServiceOptions: { id: string; name: string }[] = [];
-clarificationAppNumberOptions: { id: string; name: string }[] = [];
+  // Options for clarification filters
+  clarificationServiceOptions: { id: string; name: string }[] = [];
+  clarificationAppNumberOptions: { id: string; name: string }[] = [];
   columns: any[] = [
     {
       key: 'applicationId',
@@ -114,6 +116,8 @@ clarificationAppNumberOptions: { id: string; name: string }[] = [];
   currentPagePending = 1;
   itemsPerPagePending = 5;
   noc_issued_per_service: any[] = [];
+  isLoading: boolean = false;
+
   constructor(
     private dashboardService: DashboardService,
     private router: Router,
@@ -123,14 +127,16 @@ clarificationAppNumberOptions: { id: string; name: string }[] = [];
   ) {}
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.loaderService.showLoader();
     this.dashboardService.dashboardData$.subscribe({
       next: (data: any) => {
         if (data) {
           this.clarification_required = data.clarification_required || [];
           this.noc_issued_per_service = data.noc_issued_per_service || [];
-           this.buildClarificationFilterOptions();
+          this.buildClarificationFilterOptions();
           this.loaderService.hideLoader();
+          this.isLoading = false;
         } else {
           this.loaderService.hideLoader();
           // this.clarification_required = [];
@@ -181,27 +187,27 @@ clarificationAppNumberOptions: { id: string; name: string }[] = [];
     return `${dayWithOrdinal} ${month} ${year} - ${hours} : ${minutes}`;
   }
 
-private buildClarificationFilterOptions(): void {
-  const appNumbers = new Set<string>();
-  const services = new Set<string>();
+  private buildClarificationFilterOptions(): void {
+    const appNumbers = new Set<string>();
+    const services = new Set<string>();
 
-  this.clarification_required.forEach((item) => {
-    if (item.applicationId && item.applicationId !== 'N/A') {
-      appNumbers.add(item.applicationId);
-    }
-    if (item.service_name && item.service_name !== 'N/A') {
-      services.add(item.service_name);
-    }
-  });
+    this.clarification_required.forEach((item) => {
+      if (item.applicationId && item.applicationId !== 'N/A') {
+        appNumbers.add(item.applicationId);
+      }
+      if (item.service_name && item.service_name !== 'N/A') {
+        services.add(item.service_name);
+      }
+    });
 
-  this.clarificationAppNumberOptions = [{ id: '', name: 'All' }].concat(
-    Array.from(appNumbers).map((id) => ({ id, name: id }))
-  );
+    this.clarificationAppNumberOptions = [{ id: '', name: 'All' }].concat(
+      Array.from(appNumbers).map((id) => ({ id, name: id }))
+    );
 
-  this.clarificationServiceOptions = [{ id: '', name: 'All' }].concat(
-    Array.from(services).map((name) => ({ id: name, name }))
-  );
-}
+    this.clarificationServiceOptions = [{ id: '', name: 'All' }].concat(
+      Array.from(services).map((name) => ({ id: name, name }))
+    );
+  }
 
   unpaidPayments(
     page: number = 1,
@@ -209,7 +215,7 @@ private buildClarificationFilterOptions(): void {
   ): void {
     const payload = {
       payment_status: 'pending',
-      current_page: page,
+      page: page,
       per_page: perPage,
     };
 
@@ -277,13 +283,17 @@ private buildClarificationFilterOptions(): void {
     );
   }
 
-get filteredClarificationRequired(): any[] {
-  return this.clarification_required.filter(item => {
-    const matchesApp = !this.clarificationAppNumber || item.applicationId === this.clarificationAppNumber;
-    const matchesService = !this.clarificationService || item.service_name === this.clarificationService;
-    return matchesApp && matchesService;
-  });
-}
+  get filteredClarificationRequired(): any[] {
+    return this.clarification_required.filter((item) => {
+      const matchesApp =
+        !this.clarificationAppNumber ||
+        item.applicationId === this.clarificationAppNumber;
+      const matchesService =
+        !this.clarificationService ||
+        item.service_name === this.clarificationService;
+      return matchesApp && matchesService;
+    });
+  }
 
   get filteredPendingPayments(): Payment[] {
     return this.pendingPayments.filter((payment) => {

@@ -181,7 +181,8 @@
       </div>
       <div class="btnss  p-4">
         @if(applicationStatus === 'draft' || applicationStatus === null) {
-        <button type="button" (click)="draft()" class="btn btn-info calculate-btn submit-btn">Save as Draft</button>
+        <button type="button" (click)="draft()" class="btn draft calculate-btn submit-btn" [disabled]="apiCalling">Save
+          as Draft</button>
         }
         @if(calculatedFee === null || formModifiedAfterFeeCalculation) {
         <div class="fee-actions">
@@ -196,7 +197,7 @@
           @if(visible && !formModifiedAfterFeeCalculation) {
           <div class="submit-wrap">
 
-            <button type="button" class="btn btn-success calculate-btn submit-btn"
+            <button type="button" class="btn btn-success calculate-btn submit-btn" [disabled]="apiCalling"
               (click)="showSubmitConfirmation()">Submit</button>
           </div>
           }

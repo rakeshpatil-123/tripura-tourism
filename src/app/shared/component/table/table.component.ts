@@ -237,14 +237,9 @@ applyFilters(): void {
 }
 
 applyPagination(): void {
-  console.log('applyPagination called');
-  console.log('showPagination:', this.showPagination);
-  console.log('currentPage:', this.currentPage);
-  console.log('pageSize:', this.pageSize);
-  console.log('filteredData length:', this.filteredData.length);
+
 
   if (!this.showPagination) {
-    console.log('>>> NOT paginating - showing all data');
     this.paginatedData = [...this.filteredData];
     return;
   }
@@ -253,8 +248,7 @@ applyPagination(): void {
   const end = start + this.pageSize;
   this.paginatedData = this.filteredData.slice(start, end);
   
-  console.log('paginatedData length:', this.paginatedData.length);
-  console.log('start-end:', start, end);
+  
 }
 
   onSearch(): void {

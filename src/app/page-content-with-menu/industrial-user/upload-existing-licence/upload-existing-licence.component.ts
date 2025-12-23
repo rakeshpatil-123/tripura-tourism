@@ -7,7 +7,7 @@ import {
   SelectOption,
 } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { IlogiInputDateComponent } from '../../../customInputComponents/ilogi-input-date/ilogi-input-date.component';
 import { IlogiFileUploadComponent } from '../../../customInputComponents/ilogi-file-upload/ilogi-file-upload.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -38,7 +38,7 @@ interface Service {
     IlogiInputDateComponent,
     IlogiFileUploadComponent,
     ConfirmationModalComponent,
-    LoaderComponent
+    LoaderComponent,
   ],
   templateUrl: './upload-existing-licence.component.html',
   styleUrl: './upload-existing-licence.component.scss',
@@ -60,11 +60,11 @@ export class UploadExistingLicenceComponent implements OnInit {
     { key: 'licensee_name', label: 'Licensee Name', type: 'text' },
     { key: 'license_no', label: 'Licence No.', type: 'text' },
     { key: 'application_no', label: 'Application No', type: 'text' },
-    { key: 'valid_from', label: 'Valid From', type: 'text' },
-    { key: 'expiry_date', label: 'Expiry Date', type: 'text' },
+    { key: 'valid_from_display', label: 'Valid From', type: 'text' },
+    { key: 'expiry_date_display', label: 'Expiry Date', type: 'text' },
     { key: 'status', label: 'Status', type: 'text' },
-    { key: 'created_at', label: 'Created At', type: 'text' },
-    { key: 'updated_at', label: 'Updated At', type: 'text' },
+    { key: 'created_at_display', label: 'Created At', type: 'text' },
+    { key: 'updated_at_display', label: 'Updated At', type: 'text' },
     {
       key: 'actions',
       label: 'Action',
@@ -75,8 +75,7 @@ export class UploadExistingLicenceComponent implements OnInit {
           label: 'View',
           color: 'primary',
           onClick: (row: any) => {
-           this.router.navigate([`dashboard/licence-details/${row.id}`])
-           
+            this.router.navigate([`dashboard/licence-details/${row.id}`]);
           },
         },
         {
@@ -121,7 +120,7 @@ export class UploadExistingLicenceComponent implements OnInit {
   }
 
   loadDepartments(): void {
-    this.isLoading = true
+    this.isLoading = true;
     this.apiService
       .getByConditions({}, 'api/department-get-all-departments')
       .subscribe({
@@ -133,15 +132,13 @@ export class UploadExistingLicenceComponent implements OnInit {
               name: dept.name,
             }));
           }
-          this.isLoading = false
-
+          this.isLoading = false;
         },
         error: (err) => {
           console.error('Failed to load departments:', err);
           this.apiService.openSnackBar('Failed to load departments', 'error');
-          this.isLoading = false
+          this.isLoading = false;
         },
-
       });
   }
 
@@ -177,7 +174,17 @@ export class UploadExistingLicenceComponent implements OnInit {
       .getByConditions({}, 'api/user/existing-license-view')
       .subscribe({
         next: (res: any) => {
-          this.licDatas = res?.status === 1 && Array.isArray(res.data) ? res.data : [];
+          this.isLoading = false;
+          const rawData =
+            res?.status === 1 && Array.isArray(res.data) ? res.data : [];
+
+          this.licDatas = rawData.map((item: any) => ({
+            ...item,
+            valid_from_display: this.formatDateForDisplay(item.valid_from),
+            expiry_date_display: this.formatDateForDisplay(item.expiry_date),
+            created_at_display: this.formatDateForDisplay(item.created_at),
+            updated_at_display: this.formatDateForDisplay(item.updated_at),
+          }));
         },
         error: (err) => {
           console.error('Failed to load licenses:', err);
@@ -187,7 +194,7 @@ export class UploadExistingLicenceComponent implements OnInit {
       });
   }
 
- openDialog(): void {
+  openDialog(): void {
     this.isEditing = false;
     this.editingLicenseId = null;
     this.licForm.reset();
@@ -237,13 +244,15 @@ export class UploadExistingLicenceComponent implements OnInit {
 
     const raw = this.licForm.value;
 
-    const validFrom = raw.valid_from_date instanceof Date 
-      ? raw.valid_from_date.toISOString().split('T')[0] 
-      : raw.valid_from_date;
-    
-    const expiryDate = raw.expiry_date instanceof Date 
-      ? raw.expiry_date.toISOString().split('T')[0] 
-      : raw.expiry_date;
+    const validFrom =
+      raw.valid_from_date instanceof Date
+        ? raw.valid_from_date.toISOString().split('T')[0]
+        : raw.valid_from_date;
+
+    const expiryDate =
+      raw.expiry_date instanceof Date
+        ? raw.expiry_date.toISOString().split('T')[0]
+        : raw.expiry_date;
 
     if (this.isEditing && this.editingLicenseId) {
       const payload = {
@@ -255,7 +264,7 @@ export class UploadExistingLicenceComponent implements OnInit {
         license_no: raw.license_no,
         valid_from: validFrom,
         expiry_date: expiryDate,
-        status: 'pending'
+        status: 'pending',
       };
 
       this.apiService
@@ -264,11 +273,17 @@ export class UploadExistingLicenceComponent implements OnInit {
           next: (res: any) => {
             this.isSubmitting = false;
             if (res?.status === 1) {
-              this.apiService.openSnackBar('License updated successfully!', 'success');
+              this.apiService.openSnackBar(
+                'License updated successfully!',
+                'success'
+              );
               this.closeDialog();
               this.loadLicenses();
             } else {
-              this.apiService.openSnackBar(res?.message || 'Failed to update license', 'error');
+              this.apiService.openSnackBar(
+                res?.message || 'Failed to update license',
+                'error'
+              );
             }
           },
           error: (err) => {
@@ -306,11 +321,17 @@ export class UploadExistingLicenceComponent implements OnInit {
           next: (res: any) => {
             this.isSubmitting = false;
             if (res?.status === 1) {
-              this.apiService.openSnackBar('License uploaded successfully!', 'success');
+              this.apiService.openSnackBar(
+                'License uploaded successfully!',
+                'success'
+              );
               this.closeDialog();
               this.loadLicenses();
             } else {
-              this.apiService.openSnackBar(res?.message || 'Failed to upload license', 'error');
+              this.apiService.openSnackBar(
+                res?.message || 'Failed to upload license',
+                'error'
+              );
             }
           },
           error: (err) => {
@@ -333,10 +354,16 @@ export class UploadExistingLicenceComponent implements OnInit {
           this.showDeleteModal = false;
           this.licenseToDelete = null;
           if (res?.status === 1) {
-            this.apiService.openSnackBar('License deleted successfully!', 'success');
+            this.apiService.openSnackBar(
+              'License deleted successfully!',
+              'success'
+            );
             this.loadLicenses();
           } else {
-            this.apiService.openSnackBar(res?.message || 'Failed to delete license', 'error');
+            this.apiService.openSnackBar(
+              res?.message || 'Failed to delete license',
+              'error'
+            );
           }
         },
         error: (err) => {
@@ -351,5 +378,39 @@ export class UploadExistingLicenceComponent implements OnInit {
   cancelDelete(): void {
     this.showDeleteModal = false;
     this.licenseToDelete = null;
+  }
+
+  private formatDateForDisplay(dateString: string): string {
+    if (!dateString) return '—';
+
+    let date: Date;
+    if (dateString.includes('T')) {
+      date = new Date(dateString);
+    } else {
+      date = new Date(dateString.replace(' ', 'T') + 'Z');
+    }
+
+    const datePipe = new DatePipe('en-US');
+
+    const day = date.getDate();
+    const ordinal = this.getOrdinal(day);
+    let formatted = datePipe.transform(date, `d'th' MMM yyyy – hh:mm a`);
+
+    if (!formatted) return dateString;
+    return formatted.replace('th', ordinal);
+  }
+
+  private getOrdinal(n: number): string {
+    if (n > 3 && n < 21) return 'th';
+    switch (n % 10) {
+      case 1:
+        return 'st';
+      case 2:
+        return 'nd';
+      case 3:
+        return 'rd';
+      default:
+        return 'th';
+    }
   }
 }

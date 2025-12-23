@@ -22,15 +22,14 @@ export class LogoFooterComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    console.log('LogoFooterComponent logos:', this.logos); // Debug log
-    this.cdr.detectChanges(); // Force change detection
+    this.cdr.detectChanges(); 
   }
 
   trackByFn(index: number, logo: any): string {
-    return logo.src; // Unique identifier for *ngFor
+    return logo.src; 
   }
 
   onImageError(event: Event, src: string) {
-    console.error(`Failed to load image: ${src}`); // Log image loading errors
+    console.error(`Failed to load image: ${src}`); 
   }
 }

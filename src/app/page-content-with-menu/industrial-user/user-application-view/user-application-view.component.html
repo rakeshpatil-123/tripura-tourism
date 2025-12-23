@@ -34,7 +34,7 @@
           <label>Due Date</label>
           <span>{{ formatDate(application?.max_processing_date) || '—' }}</span>
         </div>
-        <div class="field">
+        <div class="field" *ngIf="application?.approved_fee !== null || 0">
           <label>Approved Fee</label>
           <span>{{ application?.approved_fee || '₹0' }}</span>
         </div>
@@ -78,21 +78,20 @@
              *ngIf="!isThirdParty && application?.application_data_structured?.length">
       <h2>Applicant Information</h2>
       <div class="grid">
-        <div class="field" *ngFor="let qa of application.application_data_structured">
-          @if(!qa.answer.includes('http')) {
-          <label>{{ qa.question }}</label>
-          <span>{{ formatAnswerForDisplay(qa.answer) }}</span>
-          }
-          @if(qa.answer.includes('http')) {
-          <div class="file-display">
-          <label>{{ qa.question }}</label>
-            <span>{{ getFileNameFromUrl(qa.answer) }}</span>
-            <button type="button" class="btn-view btn-success btn-sm" (click)="previewFile(qa.answer)">
-              View
-            </button>
-          </div>
-          }
-        </div>
+      <div class="field" *ngFor="let qa of application.application_data_structured">
+  @if(qa.type === 'file') {
+    <div class="file-display">
+      <label>{{ qa.question }}</label>
+      <span>{{ getFileNameFromUrl(qa.answer) }}</span>
+      <button type="button" class="btn-view btn-success btn-sm" (click)="previewFile(qa.answer)">
+        View
+      </button>
+    </div>
+  } @else {
+    <label>{{ qa.question }}</label>
+    <span>{{ formatAnswerForDisplay(qa.answer) }}</span>
+  }
+</div>
       </div>
     </section>
 

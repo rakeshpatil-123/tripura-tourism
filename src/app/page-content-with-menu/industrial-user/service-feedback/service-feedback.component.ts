@@ -12,7 +12,7 @@ import {
   SelectOption,
 } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { GenericService } from '../../../_service/generic/generic.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-service-feedback',
@@ -39,7 +39,8 @@ export class ServiceFeedbackComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private apiService: GenericService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +92,7 @@ export class ServiceFeedbackComponent implements OnInit {
               'success'
             );
             this.feedbackForm.reset();
+            this.router.navigate(['/dashboard/application-list']);
           } else {
             this.apiService.openSnackBar(
               res.message || 'Failed to submit feedback. Please try again.',

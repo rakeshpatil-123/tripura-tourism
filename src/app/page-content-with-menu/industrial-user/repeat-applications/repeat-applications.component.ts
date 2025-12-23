@@ -53,11 +53,13 @@ export class RepeatApplicationsComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1 && Array.isArray(res.data)) {
-
-             this.applications = res.data.map((app : any) => ({
-          ...app,
-          formatted_latest_workflow_status: this.formatStatus(app.latest_workflow_status),
-        }));
+            this.applications = res.data.map((app: any) => ({
+              ...app,
+              formatted_latest_workflow_status: this.formatStatus(
+                app.latest_workflow_status
+              ),
+              formatted_application_datetime: this.formatDateTime(app.application_date),
+            }));
             this.buildColumns();
           } else {
             this.applications = [];
@@ -72,21 +74,44 @@ export class RepeatApplicationsComponent implements OnInit {
         },
       });
   }
+ formatDateTime(isoString: string | null): string {
+  if (!isoString) return '—';
+
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return '—';
+
+  const day = date.getDate();
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+
+  const time = `${hours}:${minutes} ${ampm}`;
+
+  return `${day} ${month} ${year} - ${time}`;
+}
 
   formatStatus(status: string): string {
-  const map: { [key: string]: string } = {
-    send_back: 'Send Back',
-    extra_payment: 'Extra Payment',
-    re_submitted: 'Re-Submitted',
-    submitted: 'Submitted',
-    approved: 'Approved',
-    draft: 'Draft',
-    saved: 'Saved',
-    pending: 'Pending',
-    rejected: 'Rejected',
-  };
- return map[status] || (status ? status.replace(/_/g, ' ') : '—');
-}
+    const map: { [key: string]: string } = {
+      send_back: 'Send Back',
+      extra_payment: 'Extra Payment',
+      re_submitted: 'Re-Submitted',
+      submitted: 'Submitted',
+      approved: 'Approved',
+      draft: 'Draft',
+      saved: 'Saved',
+      pending: 'Pending',
+      rejected: 'Rejected',
+    };
+    return map[status] || (status ? status.replace(/_/g, ' ') : '—');
+  }
 
   buildColumns(): void {
     if (this.applications.length === 0) return;
@@ -96,20 +121,28 @@ export class RepeatApplicationsComponent implements OnInit {
       'service_title_or_description',
       'application_type',
       'department_name',
-      'application_number',
-      'application_date',
+      'formatted_application_datetime',
       'payment_status',
-         
-  'formatted_latest_workflow_status',
+
+      'formatted_latest_workflow_status',
     ];
 
     const columns: any[] = [];
 
+    columns.push({
+      key: 'application_number',
+      label: 'Application Number',
+      type: 'link',
+      sortable: true,
+      linkHref: (row: any) => {
+        return `/dashboard/user-app-view/${this.serviceId}/${row.application_id}`;
+      },
+    });
     allowedKeys.forEach((key) => {
       let label = key
-  .replace(/^formatted_/, '') 
-  .replace(/_([a-z])/g, (match, letter) => ` ${letter.toUpperCase()}`)
-  .replace(/^./, (str) => str.toUpperCase());
+        .replace(/^formatted_/, '')
+        .replace(/_([a-z])/g, (match, letter) => ` ${letter.toUpperCase()}`)
+        .replace(/^./, (str) => str.toUpperCase());
 
       let type = 'text';
       if (key.includes('status')) {
@@ -150,11 +183,14 @@ export class RepeatApplicationsComponent implements OnInit {
           },
         },
         {
-          label: (row : any) =>   {return row.status === 'draft'
-      ? 'Edit Draft'
-      : 'Re-Submit'},
+          label: (row: any) => {
+            return row.status === 'draft' ? 'Edit Draft' : 'Re-Submit';
+          },
           color: 'warn',
-          visible: (row: any) => row.status === 'send_back' || row.status === 'extra_payment' || row.status === 'draft',
+          visible: (row: any) =>
+            row.status === 'send_back' ||
+            row.status === 'extra_payment' ||
+            row.status === 'draft',
           onClick: (row: any) => {
             this.router.navigate(
               ['/dashboard/service-application', this.serviceId],

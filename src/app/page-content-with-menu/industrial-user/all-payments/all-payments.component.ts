@@ -103,7 +103,7 @@ export class AllPaymentsComponent implements OnInit {
   ): void {
     const payload = {
       payment_status: 'pending',
-      current_page: page,
+      page: page,
       per_page: perPage,
     };
 
@@ -186,7 +186,7 @@ export class AllPaymentsComponent implements OnInit {
   ): void {
     const payload = {
       payment_status: 'paid',
-      current_page: page,
+      page: page,
       per_page: perPage,
     };
 
