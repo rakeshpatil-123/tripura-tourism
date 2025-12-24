@@ -174,7 +174,7 @@ export class ServiceViewComponent implements OnInit {
     if (!obj.hasOwnProperty(key)) continue;
 
     // Skip workflow, application_data, applied_fee, approved_fee
-    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id', 'just_before_final_step', 'history_data', 'is_finally_approved', 'application_id'].includes(key)) {
+    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id', 'just_before_final_step', 'history_data', 'is_finally_approved', 'application_id', 'is_certificate_generated'].includes(key)) {
       continue;
     }
 
@@ -219,10 +219,8 @@ if (data.application_data && typeof data.application_data === 'object') {
 
     const value = data.application_data[key];
 
-    // Case 1: Simple question object (numeric keys like "0", "1")
     if (typeof value === 'object' && !Array.isArray(value) && value.question && value.answer !== undefined) {
       const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(value.answer, value.type);
-      
       qaData.push({
         question: this.sanitizeHtmlTags(value.question || '—'),
         answer: formattedAnswer,
@@ -231,7 +229,21 @@ if (data.application_data && typeof data.application_data === 'object') {
         fileName,
       });
     }
-    // Case 2: Grouped questions (string keys like "TestSection")
+    else if (Array.isArray(value) && key === 'fields') {
+      for (const field of value) {
+        if (field && typeof field === 'object' && field.question && field.answer !== undefined) {
+          const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(field.answer, field.type);
+
+          qaData.push({
+            question: this.sanitizeHtmlTags(field.question || '—'),
+            answer: formattedAnswer,
+            isFile,
+            fileUrl,
+            fileName,
+          });
+        }
+      }
+    }
     else if (Array.isArray(value)) {
       // Add section header with sanitized text
       qaData.push({
@@ -240,13 +252,11 @@ if (data.application_data && typeof data.application_data === 'object') {
         isSection: true,
       });
 
-      // Process nested items in the array
       for (const itemGroup of value) {
         if (Array.isArray(itemGroup)) {
           for (const item of itemGroup) {
-            if (typeof item === 'object' && item.question && item.answer !== undefined) {
-              const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(item.answer);
-              
+            if (item && typeof item === 'object' && item.question && item.answer !== undefined) {
+              const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(item.answer, item.type);
               qaData.push({
                 question: this.sanitizeHtmlTags(item.question || '—'),
                 answer: formattedAnswer,
@@ -256,6 +266,16 @@ if (data.application_data && typeof data.application_data === 'object') {
               });
             }
           }
+        }
+        else if (itemGroup && typeof itemGroup === 'object' && itemGroup.question && itemGroup.answer !== undefined) {
+          const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(itemGroup.answer, itemGroup.type);
+          qaData.push({
+            question: this.sanitizeHtmlTags(itemGroup.question || '—'),
+            answer: formattedAnswer,
+            isFile,
+            fileUrl,
+            fileName,
+          });
         }
       }
     }
@@ -282,6 +302,7 @@ if (data.application_data && typeof data.application_data === 'object') {
         action_taken_by: step.action_taken_by || '—',
         action_taken_at: step.action_taken_at || '—',
         remarks: step.remarks || '—',
+        status_file: step.status_file,
         workflowIndex: index,
       }));
 
@@ -293,6 +314,7 @@ if (data.application_data && typeof data.application_data === 'object') {
         { key: 'action_taken_by', label: 'Action By', type: 'text' },
         { key: 'action_taken_at', label: 'Action At', type: 'text' },
         { key: 'remarks', label: 'Remarks', type: 'text' },
+        { key: 'status_file', label: 'Status File', type: 'view-link', viewLinkText: 'View', },
       ];
 
       const hasPendingSteps = data.workflow.some((step: any) => step.status === 'pending');
@@ -613,11 +635,11 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
     }
   }
   downloadCertificate(): void {
-    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+    // const baseUrl = 'http://swaagatstaging.tripura.cloud/';
     this.apiService.downloadServiceCertificate(this.applicationId).subscribe({
       next: (res: any) => {
         if (res?.download_url) {
-          const openPdf = baseUrl + res.download_url;
+          const openPdf = res.download_url;
           window.open(openPdf, '_blank');
         } else {
           Swal.fire({

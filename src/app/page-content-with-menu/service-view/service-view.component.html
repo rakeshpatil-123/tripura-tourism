@@ -30,7 +30,7 @@
             <span style="color: white;">Preview Certificate</span>
           </button> -->
         <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
-        <button (click)="editCertificateGeneration()" *ngIf="isFinalApproval" class="submit-btn">Certificate
+        <button (click)="downloadCertificate()" *ngIf="isFinalApproval" class="submit-btn">Certificate
           <mat-icon>picture_as_pdf</mat-icon>
         </button>
         <button mat-raised-button color="primary" class="submit-btn" *ngIf="sampleFilePreview" (click)="previewSampleFile()">
