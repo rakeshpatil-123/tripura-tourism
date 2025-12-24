@@ -78,6 +78,7 @@ export class UserProfileComponent implements OnInit {
   isSubdivisionNull = false;
   isUlbNull = false;
   isWardNull = false;
+  isPANNull = false;
   multipleUlbs = false;
 
   hierarchyLevels = [
@@ -120,7 +121,7 @@ export class UserProfileComponent implements OnInit {
         this.isSubdivisionNull = res.data.subdivision_name;
         this.isUlbNull = res.data.ulb_name;
         this.isWardNull = res.data.ward_name;
-        debugger
+        this.isPANNull = res.data.pan;
         this.backendProfile = {
           ...res.data,
           district_id: res.data.district_code,

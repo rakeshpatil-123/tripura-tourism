@@ -56,11 +56,11 @@
         
       <div class="form-footer">
         <span class="text-left small">
-          New User? <a href="/page/registration" class="register-link">Register</a>
+          New User? <a [attr.href]="resolvePath('/page/registration')" class="register-link">Register</a>
         </span>
       
-        <!-- Beautiful, prominent forgot password link -->
-        <a class="forgot-link" href="/page/forgot-password" aria-label="Forgot password">Forgot Password?</a>
+        <a class="forgot-link" [attr.href]="resolvePath('/page/forgot-password')" aria-label="Forgot password">Forgot
+          Password?</a>
       </div>
       </form>
     </div>

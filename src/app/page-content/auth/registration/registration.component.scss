@@ -196,3 +196,30 @@ app-ilogi-input + .otp-section {
   margin-bottom: 6px;
   display: block;
 }
+/* Colors chosen for clarity and professional look (red for errors, teal for success, slate for info) */
+.mobile-status-text {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.2;
+}
+
+/* error (red) */
+.mobile-status-error {
+  color: #dc2626;
+  /* Tailwind red-600 */
+  font-weight: 600;
+}
+
+/* success (teal/green) */
+.mobile-status-success {
+  color: #0f766e;
+  /* teal/emerald-ish */
+  font-weight: 500;
+}
+
+/* info (muted slate) */
+.mobile-status-info {
+  color: #475569;
+  /* slate/gray */
+  font-weight: 600;
+}

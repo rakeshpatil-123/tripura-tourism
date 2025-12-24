@@ -67,6 +67,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
   isSpecialRequired(): boolean {
     return this.sourcePage === 'departmental-users';
   }
+  mobileStatusMessage: string = '';
+  mobileStatusType: 'success' | 'error' | 'info' | '' = '';
   selectedDistricts: Array<{ id: string; subdivisions: Array<{ id: string; blocks: string[] }> }> = [];
   registrationForm: FormGroup;
   districts: SelectOption[] = [];
@@ -84,6 +86,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
   loadingSubdivisions = false;
   loadingUlbs = false;
   loadingWards = false;
+  hideSendOtp: boolean = false;
+  hideVerify: boolean = false;   
   private suppressCascading = false;
   private lastSubdivisionsKey = '';
   private lastUlbsKey = '';
@@ -225,11 +229,31 @@ export class RegistrationComponent implements OnInit, OnChanges {
         });
       }
     });
-    this.registrationForm.get('mobile_no')?.valueChanges.subscribe(() => {
-      this.otpSent = false;
-      this.otpVerified = false;
+ const mobileCtrl = this.registrationForm.get('mobile_no');
+if (mobileCtrl) {
+  mobileCtrl.valueChanges.subscribe((val: any) => {
+    // whenever user changes mobile input, show Send OTP again and reset OTP state
+    // but don't modify server-verified state if you intentionally want to keep it.
+    this.hideSendOtp = false;
+    this.hideVerify = false;
+
+    // clear mobile inline message when user edits (optional)
+    this.mobileStatusMessage = '';
+    this.mobileStatusType = '';
+
+    // reset otp flags so user can request again
+    this.otpSent = false;
+    // keep otpVerified as-is only if you want to preserve verified status across edits,
+    // but since user changed the number, we should clear verified:
+    this.otpVerified = false;
+
+    // optionally clear otpControl value and errors
+    if (this.otpControl) {
       this.otpControl.reset();
-    });
+    }
+  });
+}
+
   }
   ngOnChanges(changes: any): void {
     if (changes['editData'] && this.editData && this.editMode) {
@@ -1463,28 +1487,73 @@ shouldShow(field: string): boolean {
       .getByConditions({ mobile_no: mobile }, 'api/user/send-otp')
       .subscribe({
         next: (res: any) => {
+          // Reset inline message state first
+          this.mobileStatusMessage = '';
+          this.mobileStatusType = '';
+          // Reset control-specific hide flags by default (will set below if needed)
+          this.hideSendOtp = false;
+          this.hideVerify = false;
+
           if (res?.status === 1) {
+            // Successful flow from backend
+            // Determine message text (backend-driven)
+            const msg = (typeof res.message === 'string' ? res.message : '').trim();
+            const msgLower = msg.toLowerCase();
+
+            // OTP was actually sent by backend
             this.otpSent = true;
-            if (res.message.includes('already verified')) {
+            this.mobileStatusMessage = msg || 'OTP sent successfully to your mobile number.';
+            this.mobileStatusType = 'success';
+            this.genericService.openSnackBar(this.mobileStatusMessage, 'Success');
+
+            // If backend indicates number already verified/taken & verified, mark verified and hide verify controls
+            if (msgLower.includes('already') && msgLower.includes('verified')) {
+              // preserve otpVerified semantics
               this.otpVerified = true;
-              this.genericService.openSnackBar(
-                'Mobile already verified.',
-                'Success'
-              );
+              this.hideVerify = true;   // hide OTP input + Verify button
+              this.hideSendOtp = true;  // hide Send OTP (already verified)
             } else {
-              this.genericService.openSnackBar(
-                'OTP sent successfully.',
-                'Success'
-              );
+              // OTP was sent normally — hide the Send OTP button to avoid duplicate sends
+              this.hideSendOtp = true;
+              // keep hideVerify false so Verify UI appears when otpSent && !otpVerified
+            }
+          } else {
+            // Backend returned a non-1 status — show backend message if any
+            this.otpSent = false;
+            this.mobileStatusMessage = res?.message || 'Unable to send OTP.';
+            this.mobileStatusType = 'error';
+            this.hideSendOtp = false; // allow user to try again unless message says otherwise
+            this.genericService.openSnackBar(this.mobileStatusMessage, 'Error');
+
+            // If backend explicitly says "already taken and verified" even with non-1, handle similarly:
+            const msg = (typeof res?.message === 'string' ? res.message : '').trim();
+            const msgLower = msg.toLowerCase();
+            if (msgLower.includes('already') && msgLower.includes('verified')) {
+              this.otpVerified = true;
+              this.hideVerify = true;
+              this.hideSendOtp = true;
             }
           }
         },
         error: (err: any) => {
+          // Extract message using your existing helper (keeps parity)
           const message = this.extractErrorMessage(err);
-          this.genericService.openSnackBar(message, 'Error');
+
+          // Show inline error and snackbar (keeps existing behaviour)
+          this.mobileStatusMessage = message || 'Failed to send OTP. Please try again.';
+          this.mobileStatusType = 'error';
+          this.genericService.openSnackBar(this.mobileStatusMessage, 'Error');
+
+          // preserve flag behaviour
           this.otpSent = false;
+
+          // ensure send otp remains available after error (unless backend said otherwise)
+          this.hideSendOtp = false;
+          this.hideVerify = false;
         },
       });
+
+
   }
 
   verifyOtp(): void {
