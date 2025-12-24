@@ -342,6 +342,29 @@ export class GenericService {
         })
       );
   }
+  getToken(): string | null {
+    return sessionStorage.getItem('token') || localStorage.getItem('token');
+  }
+  logoutUserTab() {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('userId');
+    this.router.navigateByUrl('/login');
+  }
+
+
+  getUserData(): any {
+    const raw = sessionStorage.getItem('userId') ? {
+      userId: sessionStorage.getItem('userId'),
+      userName: sessionStorage.getItem('userName'),
+      // ...
+    } : {
+      userId: localStorage.getItem('userId'),
+      userName: localStorage.getItem('userName'),
+      // ...
+    };
+    return raw;
+  }
+
 
   getPublicApi(apiObject: string, queryParams?: any): Observable<any> {
     // Create options object with query parameters if provided

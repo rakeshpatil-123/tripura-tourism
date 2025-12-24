@@ -40,7 +40,8 @@ export class ServiceViewComponent implements OnInit {
   sampleFilePreview : any = null;
   isLoading: boolean = false;
   isFinalApproval: boolean = false;
-
+  justBeforeApproval: boolean = false;
+  isCerfitificateGenerated: boolean = false;
   infoData: any[] = [];
   infoColumns: TableColumn[] = [];
 
@@ -119,7 +120,10 @@ export class ServiceViewComponent implements OnInit {
             if (res?.data?.history_data?.status_file) {
               this.sampleFilePreview = res?.data?.history_data?.status_file || null;
             }
-            this.isFinalApproval = res.data.status;
+            this.isFinalApproval = res.data.is_finally_approved;
+            this.justBeforeApproval = res.data.just_before_final_step;
+            this.isCerfitificateGenerated = res.data.is_certificate_generated;
+
             console.log('Application Data:', this.applicationData.application_data);
             this.processDataForDisplay();
           } else {
@@ -141,7 +145,7 @@ export class ServiceViewComponent implements OnInit {
 
   processDataForDisplay(): void {
     const data = this.applicationData;
-    this.isFinalApproval = data.is_finally_approved;
+    this.justBeforeApproval = data.just_before_final_step;
     // Define field mapping for readable labels
     const fieldMap: Record<string, string> = {
       'application_id': 'Application ID',
@@ -217,85 +221,21 @@ if (data.application_data && typeof data.application_data === 'object') {
 
     // Case 1: Simple question object (numeric keys like "0", "1")
     if (typeof value === 'object' && !Array.isArray(value) && value.question && value.answer !== undefined) {
-      let formattedAnswer = '—';
-      let isFile = false;
-      let fileUrl: string | undefined;
-      let fileName: string | undefined;
-
-      const detectFileFromString = (ansStr: string) => {
-        const urlRegex = /^https?:\/\//i;
-        const fileExtRegex = /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i;
-        if (urlRegex.test(ansStr) && fileExtRegex.test(ansStr)) {
-          return ansStr;
-        }
-        return null;
-      };
-
-      if (Array.isArray(value.answer)) {
-        if (value.answer.length === 0) {
-          formattedAnswer = '—';
-        } else {
-          const allValues: string[] = [];
-          for (const ans of value.answer) {
-            if (ans === null || ans === undefined) continue;
-            if (typeof ans === 'string') {
-              if (ans.trim()) allValues.push(ans);
-            } else if (typeof ans === 'object') {
-              for (const k in ans) {
-                if (ans.hasOwnProperty(k)) {
-                  const v = ans[k];
-                  if (v !== null && v !== undefined && v !== '') {
-                    allValues.push(String(v));
-                  }
-                }
-              }
-            }
-          }
-          if (allValues.length > 0) {
-            // If single value and it is a file URL, mark as file
-            if (allValues.length === 1) {
-              const maybe = detectFileFromString(allValues[0]);
-              if (maybe) {
-                isFile = true;
-                fileUrl = maybe;
-                fileName = maybe.split('/').pop() || maybe;
-                formattedAnswer = '';
-              } else {
-                formattedAnswer = allValues.join(', ');
-              }
-            } else {
-              formattedAnswer = allValues.join(', ');
-            }
-          } else {
-            formattedAnswer = '—';
-          }
-        }
-      } else if (typeof value.answer === 'string' && value.answer.trim()) {
-        // detect file url
-        const maybeFile = (value.answer && typeof value.answer === 'string') ? detectFileFromString(value.answer) : null;
-        if (maybeFile) {
-          isFile = true;
-          fileUrl = maybeFile;
-          fileName = maybeFile.split('/').pop() || maybeFile;
-          formattedAnswer = '';
-        } else {
-          formattedAnswer = value.answer;
-        }
-      }
-
+      const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(value.answer, value.type);
+      
       qaData.push({
-        question: value.question || '—',
+        question: this.sanitizeHtmlTags(value.question || '—'),
         answer: formattedAnswer,
         isFile,
         fileUrl,
         fileName,
       });
     }
-    // Case 2: Grouped questions (string keys like "10th Class", "12th Class")
+    // Case 2: Grouped questions (string keys like "TestSection")
     else if (Array.isArray(value)) {
-      // Add section header
+      // Add section header with sanitized text
       qaData.push({
-        question: key,
+        question: this.sanitizeHtmlTags(key),
         answer: '',
         isSection: true,
       });
@@ -305,72 +245,10 @@ if (data.application_data && typeof data.application_data === 'object') {
         if (Array.isArray(itemGroup)) {
           for (const item of itemGroup) {
             if (typeof item === 'object' && item.question && item.answer !== undefined) {
-              let formattedAnswer = '—';
-              let isFile = false;
-              let fileUrl: string | undefined;
-              let fileName: string | undefined;
-
-              const detectFileFromString = (ansStr: string) => {
-                const urlRegex = /^https?:\/\//i;
-                const fileExtRegex = /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i;
-                if (urlRegex.test(ansStr) && fileExtRegex.test(ansStr)) {
-                  return ansStr;
-                }
-                return null;
-              };
-
-              if (Array.isArray(item.answer)) {
-                if (item.answer.length === 0) {
-                  formattedAnswer = '—';
-                } else {
-                  const allValues: string[] = [];
-                  for (const ans of item.answer) {
-                    if (ans === null || ans === undefined) continue;
-                    if (typeof ans === 'string') {
-                      if (ans.trim()) allValues.push(ans);
-                    } else if (typeof ans === 'object') {
-                      for (const k in ans) {
-                        if (ans.hasOwnProperty(k)) {
-                          const v = ans[k];
-                          if (v !== null && v !== undefined && v !== '') {
-                            allValues.push(String(v));
-                          }
-                        }
-                      }
-                    }
-                  }
-                  if (allValues.length > 0) {
-                    if (allValues.length === 1) {
-                      const maybe = detectFileFromString(allValues[0]);
-                      if (maybe) {
-                        isFile = true;
-                        fileUrl = maybe;
-                        fileName = maybe.split('/').pop() || maybe;
-                        formattedAnswer = '';
-                      } else {
-                        formattedAnswer = allValues.join(', ');
-                      }
-                    } else {
-                      formattedAnswer = allValues.join(', ');
-                    }
-                  } else {
-                    formattedAnswer = '—';
-                  }
-                }
-              } else if (typeof item.answer === 'string' && item.answer.trim()) {
-                const maybeFile = (item.answer && typeof item.answer === 'string') ? detectFileFromString(item.answer) : null;
-                if (maybeFile) {
-                  isFile = true;
-                  fileUrl = maybeFile;
-                  fileName = maybeFile.split('/').pop() || maybeFile;
-                  formattedAnswer = '';
-                } else {
-                  formattedAnswer = item.answer;
-                }
-              }
-
+              const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(item.answer);
+              
               qaData.push({
-                question: item.question || '—',
+                question: this.sanitizeHtmlTags(item.question || '—'),
                 answer: formattedAnswer,
                 isFile,
                 fileUrl,
@@ -426,7 +304,7 @@ if (data.application_data && typeof data.application_data === 'object') {
           width: '200px',
           actions: [
             {
-              label: (this.isFinalApproval === true) ? 'Final Approve' : 'Approve/Forward',
+              label: (this.justBeforeApproval === true) ? 'Final Approve' : 'Approve/Forward',
               color: 'success',
               visible: (row: any) => row.status === 'pending',
               onClick: (row: any) => {
@@ -484,7 +362,188 @@ if (data.application_data && typeof data.application_data === 'object') {
     this.cdr.detectChanges();
   }
 
-    closeModal(): void {
+    /**
+   * Sanitizes HTML tags from a string while preserving text content
+   * Removes tags like <b>, </b>, <i>, <span>, etc. but keeps the inner text
+   */
+  private sanitizeHtmlTags(text: string): string {
+    if (!text || typeof text !== 'string') return text;
+    // Remove all HTML tags while preserving the text content
+    return text.replace(/<[^>]*>/g, '');
+  }
+
+  /**
+   * Formats date based on type field
+   * Handles: date_mmdd, date_yyyymmdd, date, datetime, timestamp, iso
+   */
+  private formatDateByType(value: string, type?: string): string {
+    if (!value || typeof value !== 'string') return value;
+    
+    const val = value.trim();
+    
+    try {
+      switch (type?.toLowerCase()) {
+        // Format: MMDD -> MM/DD
+        case 'date_mmdd': {
+          if (val.length === 4 && /^\d{4}$/.test(val)) {
+            const month = val.substring(0, 2);
+            const day = val.substring(2, 4);
+            const validMonth = parseInt(month) >= 1 && parseInt(month) <= 12;
+            const validDay = parseInt(day) >= 1 && parseInt(day) <= 31;
+            if (validMonth && validDay) {
+              return `${month}/${day}`;
+            }
+          }
+          return val;
+        }
+
+        // Format: YYYYMMDD -> YYYY-MM-DD
+        case 'date_yyyymmdd': {
+          if (val.length === 8 && /^\d{8}$/.test(val)) {
+            const year = val.substring(0, 4);
+            const month = val.substring(4, 6);
+            const day = val.substring(6, 8);
+            const validYear = parseInt(year) >= 1900 && parseInt(year) <= 2100;
+            const validMonth = parseInt(month) >= 1 && parseInt(month) <= 12;
+            const validDay = parseInt(day) >= 1 && parseInt(day) <= 31;
+            if (validYear && validMonth && validDay) {
+              return `${day}/${month}/${year}`;
+            }
+          }
+          return val;
+        }
+
+        // Format: DDMMYYYY -> DD/MM/YYYY
+        case 'date_ddmmyyyy': {
+          if (val.length === 8 && /^\d{8}$/.test(val)) {
+            const day = val.substring(0, 2);
+            const month = val.substring(2, 4);
+            const year = val.substring(4, 8);
+            const validDay = parseInt(day) >= 1 && parseInt(day) <= 31;
+            const validMonth = parseInt(month) >= 1 && parseInt(month) <= 12;
+            const validYear = parseInt(year) >= 1900 && parseInt(year) <= 2100;
+            if (validDay && validMonth && validYear) {
+              return `${day}/${month}/${year}`;
+            }
+          }
+          return val;
+        }
+
+        // ISO Format or standard date string -> parse and format as DD/MM/YYYY
+        case 'date':
+        case 'datetime':
+        case 'timestamp':
+        case 'iso': {
+          const date = new Date(val);
+          if (!isNaN(date.getTime())) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            
+            if (type?.toLowerCase() === 'datetime' || type?.toLowerCase() === 'timestamp') {
+              return `${day}/${month}/${year} ${hours}:${minutes}`;
+            }
+            return `${day}/${month}/${year}`;
+          }
+          return val;
+        }
+
+        // Default: return as is
+        default:
+          return val;
+      }
+    } catch (e) {
+      console.warn(`Error formatting date: ${val}`, e);
+      return val;
+    }
+  }
+
+  /**
+   * Detects if a string is a file URL based on extension
+   * Returns the URL if it's a file, null otherwise
+   */
+  private detectFileFromString(ansStr: string): string | null {
+    if (!ansStr || typeof ansStr !== 'string') return null;
+    const urlRegex = /^https?:\/\//i;
+    const fileExtRegex = /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i;
+    if (urlRegex.test(ansStr) && fileExtRegex.test(ansStr)) {
+      return ansStr;
+    }
+    return null;
+  }
+
+  /**
+   * Processes answer field and returns formatted answer with file detection
+   * Handles string, array, and object types
+   * Also handles date formatting based on type field
+   */
+  private processAnswer(answer: any, type?: string): { formattedAnswer: string; isFile: boolean; fileUrl?: string; fileName?: string } {
+    let formattedAnswer = '—';
+    let isFile = false;
+    let fileUrl: string | undefined;
+    let fileName: string | undefined;
+
+    if (Array.isArray(answer)) {
+      if (answer.length === 0) {
+        formattedAnswer = '—';
+      } else {
+        const allValues: string[] = [];
+        for (const ans of answer) {
+          if (ans === null || ans === undefined) continue;
+          if (typeof ans === 'string') {
+            if (ans.trim()) allValues.push(ans);
+          } else if (typeof ans === 'object') {
+            for (const k in ans) {
+              if (ans.hasOwnProperty(k)) {
+                const v = ans[k];
+                if (v !== null && v !== undefined && v !== '') {
+                  allValues.push(String(v));
+                }
+              }
+            }
+          }
+        }
+        if (allValues.length > 0) {
+          // If single value and it is a file URL, mark as file
+          if (allValues.length === 1) {
+            const maybe = this.detectFileFromString(allValues[0]);
+            if (maybe) {
+              isFile = true;
+              fileUrl = maybe;
+              fileName = maybe.split('/').pop() || maybe;
+              formattedAnswer = '';
+            } else {
+              // Apply date formatting if type is date-related
+              const isDateType = type && type.toLowerCase().includes('date');
+              formattedAnswer = isDateType ? this.formatDateByType(allValues[0], type) : allValues[0];
+            }
+          } else {
+            formattedAnswer = allValues.join(', ');
+          }
+        } else {
+          formattedAnswer = '—';
+        }
+      }
+    } else if (typeof answer === 'string' && answer.trim()) {
+      const maybeFile = this.detectFileFromString(answer);
+      if (maybeFile) {
+        isFile = true;
+        fileUrl = maybeFile;
+        fileName = maybeFile.split('/').pop() || maybeFile;
+        formattedAnswer = '';
+      } else {
+        // Apply date formatting if type is date-related
+        const isDateType = type && type.toLowerCase().includes('date');
+        formattedAnswer = isDateType ? this.formatDateByType(answer, type) : answer;
+      }
+    }
+
+    return { formattedAnswer, isFile, fileUrl, fileName };
+  }
+
+  closeModal(): void {
       this.statusModal.visible = false;
       this.remarkForm.reset();
       this.remarkForm.get('attachment')?.setValue(null);

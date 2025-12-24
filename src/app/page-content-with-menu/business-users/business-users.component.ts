@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -54,7 +55,8 @@ export class BusinessUsersComponent implements OnInit {
     { field: 'registered_enterprise_address', header: 'Address' },
     { field: 'registered_enterprise_city', header: 'City' },
     { field: 'user_type', header: 'User Type' },
-    { field: 'status', header: 'Status' }
+    { field: 'status', header: 'Status' },
+    { field: 'login', header: 'Login' }
   ];
   totalRecords: number = 0;
   rows: number = 10;
@@ -66,7 +68,8 @@ export class BusinessUsersComponent implements OnInit {
   constructor(
     private genericService: GenericService,
     private fb: FormBuilder,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -177,6 +180,64 @@ export class BusinessUsersComponent implements OnInit {
         this.performExport();
       }
     });
+  }
+  getUserLogin(user: any): void {
+    this.loaderService.showLoader();
+    const payload = {
+      user_id: user.id
+    };
+
+    this.genericService.getByConditions(payload, 'api/admin/login-by-admin')
+      .pipe(finalize(() => this.loaderService.hideLoader()))
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status === 1 && res?.token) {
+            // First, logout the current user to clear old session
+            this.genericService.logoutUser();
+
+            // Then store new token and user data
+            localStorage.setItem('token', res.token);
+            localStorage.setItem('token_type', res.token_type || 'bearer');
+            localStorage.setItem('expires_in', res.expires_in || '');
+
+            // Store new user data
+            localStorage.setItem('userName', res.data?.authorized_person_name || '');
+            localStorage.setItem('userRole', res.data?.user_type || '');
+            localStorage.setItem('email_id', res.data?.email_id || '');
+            localStorage.setItem('user_name', res.data?.user_name || '');
+            localStorage.setItem('bin', res.data?.bin || '');
+            localStorage.setItem('userId', res.data?.id || '');
+            localStorage.setItem('name_of_enterprise', res.data?.name_of_enterprise || '');
+            localStorage.setItem('district', res.data?.district || '');
+            localStorage.setItem('subdivision', res.data?.subdivision || '');
+            localStorage.setItem('ulb', res.data?.ulb || '');
+            localStorage.setItem('ward', res.data?.ward || '');
+
+            // Store complete session data for new user
+            this.genericService.storeSessionData(res, false);
+            this.genericService.setLoginStatus(true);
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Login Successful',
+              text: `Switched to ${res.data?.name_of_enterprise || res.data?.authorized_person_name || res.data?.email_id}`,
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              this.router.navigate(['/dashboard/home']);
+            });
+          } else {
+            Swal.fire('Login Failed', res?.message || 'Unable to login this user.', 'error');
+          }
+        },
+        error: (err: any) => {
+          console.error('Login error:', err);
+          Swal.fire('Error', 'Failed to login user. Please try again.', 'error');
+        }
+      });
+  }
+   logout(): void {
+    this.genericService.logoutUser();
   }
   performExport() {
     const payload: any = {

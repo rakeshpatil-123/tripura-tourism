@@ -56,11 +56,12 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  gap: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 ::ng-deep .p-paginator .p-paginator-page {
@@ -432,9 +433,13 @@
   border-radius: 6px !important;
   color: #374151 !important;
   font-weight: 500 !important;
-  padding: 4px 8px !important;
+  padding: 8px 12px !important;
   transition: all 0.2s ease;
-  min-width: 90px;
+  min-width: 110px !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
 
 ::ng-deep .p-paginator .p-dropdown:hover,
@@ -785,16 +790,20 @@ p-table ::ng-deep .p-datatable-tbody>tr>td {
 :host ::ng-deep .animated-table .p-paginator {
   display: flex !important;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  flex-wrap: wrap;
 }
 
 :host ::ng-deep .animated-table .p-paginator .p-paginator-left {
   display: flex !important;
   align-items: center;
-  gap: 0.5rem;
-  flex: 1 1 auto;
-  min-width: 0;
+  justify-content: center;
+  gap: 0.75rem;
+  flex: 0 1 auto;
+  min-width: auto;
+  flex-wrap: wrap;
 }
 
 :host ::ng-deep .animated-table .p-paginator .p-paginator-left .p-paginator-pages,
@@ -812,24 +821,31 @@ p-table ::ng-deep .p-datatable-tbody>tr>td {
 :host ::ng-deep .animated-table .p-paginator .p-paginator-rpp .p-dropdown,
 :host ::ng-deep .animated-table .p-paginator .p-dropdown.p-paginator-rpp,
 :host ::ng-deep .animated-table .p-paginator .p-dropdown {
-  width: 4.5rem !important;
-  min-width: 4.5rem !important;
+  width: 7rem !important;
+  min-width: 7rem !important;
   font-size: 0.875rem;
-  padding: 0.15rem 0.25rem;
+  padding: 0.6rem 0.8rem !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
 
 :host ::ng-deep .animated-table .p-paginator .p-paginator-rpp .p-dropdown .p-dropdown-label {
-  padding-left: 0.35rem;
+  padding-left: 0.25rem;
   padding-right: 0.35rem;
   white-space: nowrap;
-  text-align: center;
+  text-align: left;
+  overflow: visible !important;
+  text-overflow: clip !important;
 }
 
 :host ::ng-deep .animated-table .p-paginator .p-paginator-right {
   flex: 0 0 auto;
   display: flex !important;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 @media (max-width: 600px) {

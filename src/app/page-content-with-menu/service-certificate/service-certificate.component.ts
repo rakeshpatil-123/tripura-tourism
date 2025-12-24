@@ -1003,13 +1003,70 @@ export class ServiceCertificateComponent implements OnInit {
   }
 
   downloadTemplate(): void {
-    const doc = new jsPDF('p', 'pt', 'a4');
-    doc.html(this.formTemplate, {
-      callback: (pdf) => pdf.save(`${this.serviceName || 'template'}.pdf`),
-      margin: [20, 20, 20, 20],
-      x: 10,
-      y: 10,
-      width: 570
+    // Render the template into a hidden container with explicit table styles
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '794px'; // ~A4 pt at 96dpi
+    container.style.padding = '20px';
+    container.className = 'pdf-render-container';
+
+    // Basic styles to ensure tables render correctly in jsPDF
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .NgxEditor__Content table { width:100%; border-collapse: collapse !important; }
+      .NgxEditor__Content table, .NgxEditor__Content th, .NgxEditor__Content td { border: 1px solid #ccc !important; padding: 6px !important; }
+      table.prosemirror-table { border-collapse: collapse !important; width: 100% !important; }
+      table.prosemirror-table th, table.prosemirror-table td { border: ${this.borderWidth}px solid ${this.borderColor} !important; padding: 8px 10px !important; vertical-align: middle !important; }
+      img { max-width: 100% !important; height: auto !important; }
+      body, .NgxEditor__Content { font-family: Arial, sans-serif; color: #222; }
+    `;
+
+    container.appendChild(style);
+    // Insert the HTML template
+    container.innerHTML += this.formTemplate || '';
+    document.body.appendChild(container);
+
+    // Wait for images to load (if any) before rendering
+    const images = Array.from(container.querySelectorAll('img')) as HTMLImageElement[];
+    const waitImages = images.map(img => {
+      return new Promise<void>((resolve) => {
+        if (img.complete) return resolve();
+        img.addEventListener('load', () => resolve(), { once: true });
+        img.addEventListener('error', () => resolve(), { once: true });
+      });
+    });
+
+    Promise.all(waitImages).then(() => {
+      const doc = new jsPDF('p', 'pt', 'a4');
+      doc.html(container, {
+        callback: (pdf) => {
+          try {
+            pdf.save(`${this.serviceName || 'template'}.pdf`);
+          } finally {
+            // Clean up
+            try { document.body.removeChild(container); } catch (e) { }
+          }
+        },
+        margin: [20, 20, 20, 20],
+        x: 10,
+        y: 10,
+        width: 570,
+        autoPaging: 'text',
+      });
+    }).catch(() => {
+      // Fallback: still try to render
+      const doc = new jsPDF('p', 'pt', 'a4');
+      doc.html(container, {
+        callback: (pdf) => {
+          try { pdf.save(`${this.serviceName || 'template'}.pdf`); } finally { try { document.body.removeChild(container); } catch (e) { } }
+        },
+        margin: [20, 20, 20, 20],
+        x: 10,
+        y: 10,
+        width: 570
+      });
     });
   }
 }
