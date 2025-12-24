@@ -187,34 +187,63 @@ LoginAsDeptUser(user: any): void {
     .subscribe({
       next: (res: any) => {
         if (res?.status === 1 && res?.token) {
-          // keep admin's localStorage session as-is (do NOT overwrite)
-          // store admin's session locally if you still want to (optional)
-          // localStorage.setItem('admin_token', localStorage.getItem('token') ?? '');
+          try {
+            const existingAdminBackup = localStorage.getItem('admin_token_backup');
+            if (!existingAdminBackup) {
+              const currentToken = localStorage.getItem('token') ?? '';
+              if (currentToken) {
+                localStorage.setItem('admin_token_backup', currentToken);
+              }
+            }
+          } catch (e) {
+            console.warn('Could not backup admin token', e);
+          }
 
           // open a new tab to a "switch-user" route that will receive the session
-          const newWin = window.open('/switch-user', '_blank');
+          const switchUrl = `${window.location.origin}/switch-user`;
+          const newWin = window.open(switchUrl, '_blank');
 
-          // Wait for the new tab to signal readiness, then send the payload
+          if (!newWin) {
+            Swal.fire('Popup blocked', 'Please allow popups for this site to switch user.', 'error');
+            return;
+          }
+
+          // Wait for the new tab to signal readiness, then send the payload.
+          // Add a timeout so we don't leave the listener forever.
           const onMessage = (ev: MessageEvent) => {
-            if (ev.origin !== window.location.origin) return; // security
-            if (ev.data === 'SWITCH_USER_READY') {
-              const payloadToSend = {
-                token: res.token,
-                token_type: res.token_type || 'bearer',
-                expires_in: res.expires_in || '',
-                data: res.data
-              };
-              newWin?.postMessage({ action: 'SET_SESSION', payload: payloadToSend }, window.location.origin);
-              window.removeEventListener('message', onMessage);
+            try {
+              if (ev.origin !== window.location.origin) return; // security
+              if (ev.data === 'SWITCH_USER_READY') {
+                const payloadToSend = {
+                  token: res.token,
+                  token_type: res.token_type || 'bearer',
+                  expires_in: res.expires_in || '',
+                  data: res.data
+                };
+                newWin.postMessage({ action: 'SET_SESSION', payload: payloadToSend }, window.location.origin);
+
+                // optional: focus the new tab
+                try { newWin.focus(); } catch (e) { /* ignore */ }
+
+                window.removeEventListener('message', onMessage);
+                clearTimeout(waitTimeout);
+              }
+            } catch (err) {
+              console.warn('Error handling message from switch window', err);
             }
           };
           window.addEventListener('message', onMessage);
 
-          // Now set admin UI/session in this (admin) tab as you already do:
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('token_type', res.token_type || 'bearer');
-          // ... other localStorage admin values as you already had
-          this.genericService.storeSessionData(res, false);
+          const waitTimeout = window.setTimeout(() => {
+            window.removeEventListener('message', onMessage);
+            Swal.fire('Timeout', 'New tab did not respond. Please try again.', 'error');
+          }, 10000); // 10s timeout
+
+          // IMPORTANT: Do NOT overwrite admin's localStorage session values with the impersonated user's token.
+          // Keep admin logged in in this tab. If you must change UI state, do it without replacing admin credentials.
+          // So DO NOT call localStorage.setItem('token', res.token) here.
+
+          // Keep admin UI logged-in (if your app requires a call)
           this.genericService.setLoginStatus(true);
 
           Swal.fire({
@@ -224,7 +253,7 @@ LoginAsDeptUser(user: any): void {
             timer: 1500,
             showConfirmButton: false
           }).then(() => {
-            // do not navigate away so admin remains logged in KEEP IT LOGGGED IN ONLY AND 
+            // intentionally do not navigate away from admin tab — admin remains logged in here.
           });
         } else {
           Swal.fire('Login Failed', res?.message || 'Unable to login this user.', 'error');
@@ -236,6 +265,7 @@ LoginAsDeptUser(user: any): void {
       }
     });
 }
+
 
      logout(): void {
       this.genericService.logoutUser();

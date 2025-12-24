@@ -288,8 +288,7 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
       //   type: 'link',
       //   linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
       // },
-      application_number: { type: 'link', label: 'Application Number', width: '190px', linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`},
-      service_name: { label: 'Service', width: '180px' },
+      application_number: { type: 'text', label: 'Application Number', width: '190px' },      service_name: { label: 'Service', width: '180px' },
       applicant_name: { label: 'Applicant Name', width: '180px' },
       applicant_email: { label: 'Email', width: '200px' },
       applicant_mobile: { label: 'Mobile', width: '140px' },
@@ -330,7 +329,16 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
       icon: 'visibility',
       width: '60px',
       onClick: (row: any) => {
-        this.router.navigate(['/dashboard/service-view', row.application_id]);
+        if (!row || !row.application_id) {
+          console.warn('Cannot navigate: missing application_id', row);
+          return;
+        }
+
+        const path = `/dashboard/service-view/${row.application_id}`;
+        this.router.navigateByUrl(path).catch((err) => {
+          console.error('Router navigation failed, falling back to full reload', err);
+          window.location.href = path;
+        });
       },
       sortable: false,
     });
@@ -380,7 +388,7 @@ export class MyDepartmentalApplicationsComponent implements OnInit {
 
     const remarks = this.remarkForm.get('remarks')?.value;
     const { applicationId, action } = this.statusModal;
-
+    
     this.updateApplicationStatus(applicationId, action, remarks);
     this.closeModal();
   }

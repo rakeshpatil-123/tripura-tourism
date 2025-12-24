@@ -11,21 +11,23 @@ export class SwitchUserComponent implements OnInit, OnDestroy {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
+    // Add message listener first so we don't miss the incoming SET_SESSION message.
+    window.addEventListener('message', this.onMessageHandler, false);
+
     // Tell the opener we are ready to receive the session payload
     try {
       if (window.opener && !window.opener.closed) {
+        // Use same-origin target so opener's origin check matches.
         window.opener.postMessage('SWITCH_USER_READY', window.location.origin);
       }
     } catch (e) {
       console.warn('Could not message opener', e);
     }
-
-    // Listen for session payload
-    window.addEventListener('message', this.onMessageHandler, false);
   }
 
   receiveMessage(event: MessageEvent) {
-    if (event.origin !== window.location.origin) return; // security
+    // Strict same-origin check for security
+    if (event.origin !== window.location.origin) return;
     const data = event.data;
     if (!data || data.action !== 'SET_SESSION' || !data.payload) return;
 
@@ -43,11 +45,24 @@ export class SwitchUserComponent implements OnInit, OnDestroy {
     sessionStorage.setItem('name_of_enterprise', p.data?.name_of_enterprise ?? '');
     // any other fields...
 
-    // Optionally: set a flag so services can detect a sessionStorage-based session
+    // Flag to indicate this tab holds a session in sessionStorage
     sessionStorage.setItem('isTabUserSession', 'true');
 
-    // Navigate to home page (per your app) — route will see sessionStorage token.
-    this.router.navigateByUrl('/dashboard/home');
+    // Optionally tell the opener we have set the session
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage('SWITCH_USER_SESSION_SET', window.location.origin);
+      }
+    } catch (e) {
+      // non-fatal
+    }
+
+    // Navigate to the user's home/dashboard in this tab
+    this.router.navigateByUrl('/dashboard/home').catch(err => {
+      // fallback: reload if navigation fails
+      console.warn('Navigation to dashboard failed, reloading. ', err);
+      window.location.href = '/dashboard/home';
+    });
   }
 
   ngOnDestroy(): void {

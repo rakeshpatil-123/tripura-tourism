@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { MatIconModule } from "@angular/material/icon";
 import { LoaderService } from '../../../_service/loader/loader.service';
 import { finalize } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +40,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     private fb: FormBuilder,
     private genericService: GenericService,
     private loaderService : LoaderService,
-    private router: Router
+    private router: Router,
+    private _matSnackBar: MatSnackBar,
   ) {
     this.loginForm = this.fb.group({
       user_name: ['', Validators.required],
@@ -109,14 +111,38 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           this.generateCaptcha();
         },
         error: (err) => {
+          const isInvalidCredentials =
+            !!err &&
+            !!err.error &&
+            err.error.status === 0 &&
+            String(err.error.message || '').trim().toLowerCase() === 'invalid credentials';
+          if (isInvalidCredentials) {
+            const snackRef = this._matSnackBar.open(
+              'Invalid credentials — Forgot password?',
+              'Forgot password',
+              {
+                duration: 3000,
+                horizontalPosition: 'center',
+                verticalPosition: 'top',
+              }
+            );
+            snackRef.onAction().subscribe(() => {
+              const { origin, pathname } = window.location;
+              const basePath = pathname.startsWith('/new') ? '/new' : '';
+              const forgotPasswordPath = `${basePath}/page/forgot-password`;
+              window.location.href = origin + forgotPasswordPath;
+            });
+            return;
+          }
           this.genericService.openSnackBar(
             'Login failed. Please check your credentials.',
-            'Error'
+            'X'
           );
-          if (err.error.status === 0) {
-            this.genericService.openSnackBar(err.error.message, "Error");
+
+          if (err && err.error && err.error.status === 0) {
+            this.genericService.openSnackBar(err.error.message, 'X');
           }
-          if (err === 401 || err.status === 400) {
+          if (err === 401 || err?.status === 401 || err?.status === 400) {
             this.loginForm.get('user_name')?.setErrors({ invalid: true });
             this.loginForm.get('password')?.setErrors({ invalid: true });
           }

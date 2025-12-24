@@ -126,7 +126,7 @@ export class UserApplicationViewComponent implements OnInit {
   }
 
   checkDownloadUrlAvailability(): void {
-    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+    // const baseUrl = 'http://swaagatstaging.tripura.cloud/';
     this.apiService.downloadServiceCertificate(this.appId).subscribe({
       next: (res: any) => {
         this.hasDownloadUrl = !!res?.download_url;
@@ -280,11 +280,11 @@ export class UserApplicationViewComponent implements OnInit {
   }
 
   downloadCertificate(): void {
-    const baseUrl = 'http://swaagatstaging.tripura.cloud/';
+    // const baseUrl = 'http://swaagatstaging.tripura.cloud/';
     this.apiService.downloadServiceCertificate(this.appId).subscribe({
       next: (res: any) => {
         if (res?.download_url) {
-          const openPdf = baseUrl + res.download_url;
+          const openPdf = res.download_url;
           window.open(openPdf, '_blank');
         } else {
           Swal.fire({

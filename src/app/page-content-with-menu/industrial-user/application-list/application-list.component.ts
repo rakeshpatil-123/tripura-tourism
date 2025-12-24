@@ -514,7 +514,7 @@ private formatDateForBackend(input: string): string {
     this.apiService.downloadUserServiceCertificate(appId).subscribe({
       next: (res: any) => {
         if (res.status === 1 && res?.download_url) {
-          const openPdf = baseUrl + res.download_url;
+          const openPdf = res.download_url;
           window.open(openPdf, '_blank');
         } else {
           this.error =
