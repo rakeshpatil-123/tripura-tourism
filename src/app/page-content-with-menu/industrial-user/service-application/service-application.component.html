@@ -202,9 +202,11 @@
           </div>
           }
           <div class="fee-details fee-horizontal">
+            @if(calculatedFee !== 0) {
             <div class="fee-box fade-in">
               <strong>Final Fee:</strong> ₹{{ calculatedFee }}
             </div>
+            }
 
             @if(previousPaid !== 0 && previousPaid !== 0) {
             <div class="fee-box fade-in">

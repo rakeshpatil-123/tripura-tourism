@@ -74,6 +74,10 @@ export class UserProfileComponent implements OnInit {
   isDepartmentUser = false;
   multipleDistricts = false;
   multipleSubdivisions = false;
+  isDistrictNull = false;
+  isSubdivisionNull = false;
+  isUlbNull = false;
+  isWardNull = false;
   multipleUlbs = false;
 
   hierarchyLevels = [
@@ -112,6 +116,11 @@ export class UserProfileComponent implements OnInit {
       this.loaderService.showLoader();
          this.genericService.getProfile().pipe(finalize(()=>this.loaderService.hideLoader())).subscribe((res: any) => {
       if (res?.success || res?.status === 1) {
+        this.isDistrictNull  = res.data.district;
+        this.isSubdivisionNull = res.data.subdivision_name;
+        this.isUlbNull = res.data.ulb_name;
+        this.isWardNull = res.data.ward_name;
+        debugger
         this.backendProfile = {
           ...res.data,
           district_id: res.data.district_code,
