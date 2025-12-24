@@ -25,7 +25,7 @@
                 placeholder="Enter user type"></app-ilogi-input>
                 <!-- PAN Number -->
                 <ng-container *ngIf="profileForm.get('userType')?.value === 'individual'">
-                  <app-ilogi-input fieldLabel="PAN Number" [disabled]="true" formControlName="pan"></app-ilogi-input>
+                  <app-ilogi-input fieldLabel="PAN Number" [disabled]="isPANNull ? true : false" formControlName="pan"></app-ilogi-input>
                 </ng-container>
               <app-ilogi-select [isReadOnly]="true" *ngIf="profileForm.get('userType')?.value === 'department'" class="mb-10" fieldId="department_id" fieldLabel="Department"
                 formControlName="department_id" [selectOptions]="departments" placeholder="Select department">

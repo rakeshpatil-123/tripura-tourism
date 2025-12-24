@@ -535,12 +535,9 @@ export class GenericService {
     }
   }
 
-  storeSessionData(response: any, rememberme: boolean): void {
-    if (response['data'] && response['token']) {
-      // Clear existing storage
+  storeSessionData(response: any, rememberme: boolean): string[] {
+    if (response?.data && response?.token) {
       localStorage.clear();
-
-      // Required keys from response
       const keysToStore = [
         'token',
         'id',
@@ -556,19 +553,31 @@ export class GenericService {
       ];
 
       keysToStore.forEach((key) => {
-        if (response['data'][key] || response[key]) {
+        const fromData = response['data'] ? response['data'][key] : undefined;
+        const fromRoot = response ? response[key] : undefined;
+        if (fromData !== undefined || fromRoot !== undefined) {
+          const rawValue = fromData !== undefined ? fromData : fromRoot;
           const value =
-            typeof response['data'][key] === 'object'
-              ? JSON.stringify(response['data'][key])
-              : this.encryptData(response['data'][key] || response[key]);
+            typeof rawValue === 'object' ? JSON.stringify(rawValue) : this.encryptData(rawValue);
           localStorage.setItem(key, value);
         }
       });
 
       this.setLoginStatus(true);
-      this.router.navigate(['dashboard/home']);
+      const checkKeys = ['district', 'subdivision', 'ulb', 'ward',];
+      const missing: string[] = [];
+
+      checkKeys.forEach((k) => {
+        const val = (response['data'] && response['data'][k]) ?? response[k];
+        if (val === null || val === undefined || String(val).trim() === '') {
+          missing.push(k);
+        }
+      });
+      return missing;
     }
+    return [];
   }
+
 
   // storeSessionData(response: any, rememberme: boolean): void {
   //   if (response['result'] && response['token']) {

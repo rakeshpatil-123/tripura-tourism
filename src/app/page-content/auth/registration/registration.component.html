@@ -39,36 +39,47 @@
           </small>
           <div>
             <!-- Mobile -->
-            <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true"
-              formControlName="mobile_no" placeholder="Enter mobile number" type="text"></app-ilogi-input>
-            <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched && registrationForm.get('mobile_no')?.invalid">
+            <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
+              placeholder="Enter mobile number" type="text"></app-ilogi-input>
+          
+            <small class="error-text"
+              *ngIf="registrationForm.get('mobile_no')?.touched && registrationForm.get('mobile_no')?.invalid">
               Please enter a valid 10-digit mobile number.
             </small>
-
-
-            <!-- OTP  -->
+          
+            <!-- Inline backend status message for mobile (OTP send / already verified / taken etc.) -->
+            <small style="margin-bottom: 10px;" *ngIf="mobileStatusMessage" [ngClass]="{
+              'mobile-status-success': mobileStatusType === 'success',
+              'mobile-status-error': mobileStatusType === 'error',
+              'mobile-status-info': mobileStatusType === 'info'
+            }" class="mobile-status-text" aria-live="polite">
+              {{ mobileStatusMessage }}
+            </small>
+          
+            <!-- OTP Send section: hide the entire send-otp section when hideSendOtp is true -->
             <div
-              *ngIf="!editMode && sourcePage !== 'departmental-users' && registrationForm.get('mobile_no')?.value?.toString().trim().length >= 10"
-              class="otp-section mb-2">           
+              *ngIf="!editMode && sourcePage !== 'departmental-users' && registrationForm.get('mobile_no')?.value?.toString().trim().length >= 10 && !hideSendOtp"
+              class="otp-section mb-2">
               <button type="button" class="btn-otp" (click)="sendOtp()"
                 [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid">
                 {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
               </button>
-              <!-- <small class="text-muted ml-2"> We’ll send a 6-digit code to verify your number.</small> -->
             </div>
-
-            <!-- OTP Input + Verify Button -->
-            <div *ngIf="otpSent && !otpVerified && !editMode && sourcePage !== 'departmental-users'"
+          
+            <!-- OTP Input + Verify Button: additionally hide when hideVerify is true -->
+            <div *ngIf="otpSent && !otpVerified && !editMode && sourcePage !== 'departmental-users' && !hideVerify"
               class="otp-section mt-2">
               <app-ilogi-input fieldId="otp" fieldLabel="Enter OTP" [mandatory]="true" [formControl]="otpControl"
                 placeholder="Enter 6-digit OTP"></app-ilogi-input>
               <button type="button" class="btn-verify" (click)="verifyOtp()" [disabled]="!otpControl.valid">Verify
                 OTP</button>
             </div>
+          
+            <!-- Verified message remains visible when otpVerified is true -->
+            <!-- <div *ngIf="otpVerified && !editMode && sourcePage !== 'departmental-users'" class="otp-verified mt-1">
+            ✅ Mobile number verified.
+          </div> -->
 
-            <div *ngIf="otpVerified && !editMode && sourcePage !== 'departmental-users'" class="otp-verified mt-1">
-              ✅ Mobile number verified.
-            </div>
           </div>
           <!-- Username -->
           <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
