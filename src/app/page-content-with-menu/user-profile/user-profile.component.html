@@ -5,98 +5,119 @@
         <p-tab value="0">Profile</p-tab>
         <p-tab value="1">Change Password</p-tab>
       </p-tablist>
-      <div class="p-4" >
-      <p-tabpanels>
-        <p-tabpanel value="0">
-          <form [formGroup]="profileForm" class="profile-form">
-            <div class="profile-fields">
-              <app-ilogi-input *ngIf="profileForm.get('userType')?.value !== 'department'" fieldLabel="Enterprise Name" formControlName="enterpriseName"
-                placeholder="Enter enterprise name"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="Authorized Person Name" formControlName="authorized_person_name"
-                placeholder="Enter first name"></app-ilogi-input>
-              <!-- <app-ilogi-input fieldLabel="Last Name" formControlName="lastName"
+      <div class="p-4">
+        <p-tabpanels>
+          <p-tabpanel value="0">
+            <form [formGroup]="profileForm" class="profile-form">
+              <div class="profile-fields">
+                <app-ilogi-input *ngIf="profileForm.get('userType')?.value !== 'department'"
+                  fieldLabel="Enterprise Name" formControlName="enterpriseName"
+                  placeholder="Enter enterprise name"></app-ilogi-input>
+                <app-ilogi-input fieldLabel="Authorized Person Name" formControlName="authorized_person_name"
+                  placeholder="Enter first name"></app-ilogi-input>
+                <!-- <app-ilogi-input fieldLabel="Last Name" formControlName="lastName"
                 placeholder="Enter last name"></app-ilogi-input> -->
-              <app-ilogi-input fieldLabel="Email" type="email" formControlName="email"
-                placeholder="Enter email"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="Phone" type="text" formControlName="phone"
-                placeholder="Enter phone number"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="WhatsApp No" type="text" formControlName="whatsapp_no"
-                placeholder="Enter WhatsApp number"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="City" formControlName="city" placeholder="Enter city"></app-ilogi-input>
-            <app-ilogi-input fieldLabel="User Type" *ngIf="profileForm.get('userType')?.value !== 'individual'
+                <app-ilogi-input fieldLabel="Email" type="email" formControlName="email"
+                  placeholder="Enter email"></app-ilogi-input>
+                <app-ilogi-input fieldLabel="Phone" type="text" formControlName="phone"
+                  placeholder="Enter phone number"></app-ilogi-input>
+                <app-ilogi-input fieldLabel="WhatsApp No" type="text" formControlName="whatsapp_no"
+                  placeholder="Enter WhatsApp number"></app-ilogi-input>
+                <app-ilogi-input fieldLabel="City" formControlName="city" placeholder="Enter city"></app-ilogi-input>
+                <app-ilogi-input fieldLabel="User Type" *ngIf="profileForm.get('userType')?.value !== 'individual'
                   && profileForm.get('userType')?.value !== 'admin'
                   && profileForm.get('userType')?.value !== 'department'" [disabled]="true" formControlName="userType"
-              placeholder="Enter user type">
-            </app-ilogi-input>
+                  placeholder="Enter user type">
+                </app-ilogi-input>
                 <!-- PAN Number -->
                 <ng-container *ngIf="profileForm.get('userType')?.value === 'individual'">
-                  <app-ilogi-input fieldLabel="PAN Number" [readonly]="isPANNull" formControlName="pan"></app-ilogi-input>
+                  <app-ilogi-input fieldLabel="PAN Number" [readonly]="isPANNull"
+                    formControlName="pan"></app-ilogi-input>
                 </ng-container>
-              <app-ilogi-select [isReadOnly]="true" *ngIf="profileForm.get('userType')?.value === 'department'" class="mb-10" fieldId="department_id" fieldLabel="Department"
-                formControlName="department_id" [selectOptions]="departments" placeholder="Select department">
-              </app-ilogi-select>
+                <app-ilogi-select [isReadOnly]="true" *ngIf="profileForm.get('userType')?.value === 'department'"
+                  class="mb-10" fieldId="department_id" fieldLabel="Department" formControlName="department_id"
+                  [selectOptions]="departments" placeholder="Select department">
+                </app-ilogi-select>
 
-              <app-ilogi-select [isReadOnly]="true" *ngIf="profileForm.get('userType')?.value === 'department'" fieldId="hierarchy_level" fieldLabel="Hierarchy Level" formControlName="hierarchy_level"
-                [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level" (change)="onHierarchyChange()">
-              </app-ilogi-select>
+                <app-ilogi-select [isReadOnly]="true" *ngIf="profileForm.get('userType')?.value === 'department'"
+                  fieldId="hierarchy_level" fieldLabel="Hierarchy Level" formControlName="hierarchy_level"
+                  [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level" (change)="onHierarchyChange()">
+                </app-ilogi-select>
 
-              <app-ilogi-select [isReadOnly]="true" *ngIf="shouldShow('district')" [isReadOnly]="isDistrictNull ? true : false" [multiple]="isDepartmentUser" fieldId="district_code" fieldLabel="District"
-                formControlName="district_code" [selectOptions]="districts" placeholder="Select district"
-                [disabled]="loadingDistricts">
-              </app-ilogi-select>
+                <app-ilogi-select [isReadOnly]="true" *ngIf="shouldShow('district')"
+                  [isReadOnly]="isDistrictNull ? true : false" [multiple]="isDepartmentUser" fieldId="district_code"
+                  fieldLabel="District" formControlName="district_code" [selectOptions]="districts"
+                  placeholder="Select district" [disabled]="loadingDistricts">
+                </app-ilogi-select>
 
-              <app-ilogi-select [isReadOnly]="isSubdivisionNull ? true : false" *ngIf="shouldShow('subdivision')" [disabled]="true" [multiple]="isDepartmentUser" fieldId="subdivision_code" fieldLabel="Subdivision"
-                formControlName="subdivision_code" [selectOptions]="subdivisions" placeholder="Select subdivision"
-                [disabled]="!districts.length || loadingSubdivisions">
-              </app-ilogi-select>
-              
-              <app-ilogi-select [isReadOnly]="isUlbNull ? true : false" *ngIf="shouldShow('block')" [multiple]="isDepartmentUser" fieldId="ulb_code" fieldLabel="ULB"
-                formControlName="ulb_code" [selectOptions]="ulbs" placeholder="Select ULB"
-                [disabled]="!subdivisions.length || loadingUlbs">
-              </app-ilogi-select>
+                <app-ilogi-select [isReadOnly]="isSubdivisionNull ? true : false" *ngIf="shouldShow('subdivision')"
+                  [disabled]="true" [multiple]="isDepartmentUser" fieldId="subdivision_code" fieldLabel="Subdivision"
+                  formControlName="subdivision_code" [selectOptions]="subdivisions" placeholder="Select subdivision"
+                  [disabled]="!districts.length || loadingSubdivisions">
+                </app-ilogi-select>
 
-              <app-ilogi-select [isReadOnly]="isWardNull ? true : false" *ngIf="shouldShow('ward') && (profileForm.get('userType')?.value !== 'department')" fieldId="ward_code" fieldLabel="Ward"
-                formControlName="ward_code" [selectOptions]="wards" placeholder="Select Ward"
-                [disabled]="!ulbs.length || loadingWards">
-              </app-ilogi-select>
-              <app-ilogi-input fieldLabel="Address" type="textarea" formControlName="address"
-                placeholder="Enter address"></app-ilogi-input>
-            </div>
-            <div class="form-actions">
-              <button type="button" class="btn btn-success" [disabled]="!isProfileChanged"
-                (click)="updateProfile()">
-                Update
-              </button>
-            </div>
-          </form>
-        </p-tabpanel>
-        <p-tabpanel value="1">
-          <form class="change-password" [formGroup]="passwordForm">
-            <app-ilogi-input fieldLabel="Current Password" type="password" formControlName="currentPassword"
-              placeholder="Enter current password">
-            </app-ilogi-input>
+                <app-ilogi-select [isReadOnly]="isUlbNull ? true : false" *ngIf="shouldShow('block')"
+                  [multiple]="isDepartmentUser" fieldId="ulb_code" fieldLabel="ULB" formControlName="ulb_code"
+                  [selectOptions]="ulbs" placeholder="Select ULB" [disabled]="!subdivisions.length || loadingUlbs">
+                </app-ilogi-select>
 
-            <app-ilogi-input fieldLabel="New Password" type="password" formControlName="newPassword"
-              placeholder="Enter new password">
-            </app-ilogi-input>
+                <app-ilogi-select [isReadOnly]="isWardNull ? true : false"
+                  *ngIf="shouldShow('ward') && (profileForm.get('userType')?.value !== 'department')"
+                  fieldId="ward_code" fieldLabel="Ward" formControlName="ward_code" [selectOptions]="wards"
+                  placeholder="Select Ward" [disabled]="!ulbs.length || loadingWards">
+                </app-ilogi-select>
+                <app-ilogi-input fieldLabel="Address" type="textarea" formControlName="address"
+                  placeholder="Enter address"></app-ilogi-input>
+              </div>
 
-            <app-ilogi-input fieldLabel="Confirm Password" type="password" formControlName="confirmPassword"
-              placeholder="Confirm new password">
-            </app-ilogi-input>
-            <span
-              *ngIf="passwordForm.value.newPassword && passwordForm.value.newPassword !== passwordForm.value.confirmPassword"
-              class="warn">
-              Make sure your passwords match
-            </span>
-            <div class="form-actions">
-              <button type="button" class="btn btn-success" (click)="changePassword()"
-                [disabled]="passwordForm.invalid || passwordForm.value.newPassword !== passwordForm.value.confirmPassword">
-                Change Password 
-              </button>
-            </div>
-          </form>
-        </p-tabpanel>
-      </p-tabpanels>
+              <div class="form-actions mt-4" *ngIf="isProfileChanged">
+                <button *ngIf="!otpSent" type="button" class="btn btn-warning me-3" (click)="sendOtpForUpdate()">
+                  Send OTP
+                </button>
+
+                <div *ngIf="otpSent && !otpVerified" class="d-flex align-items-end gap-2">
+                  <app-ilogi-input fieldId="otp" fieldLabel="Enter OTP" [mandatory]="true" [formControl]="otpControl"
+                    placeholder="6-digit OTP" style="width: 180px;">
+                  </app-ilogi-input>
+                  <button type="button" class="btn btn-primary" [disabled]="otpControl.invalid"
+                    (click)="verifyOtpForUpdate(otpControl.value)">
+                    Verify OTP
+                  </button>
+                </div>
+
+                <button *ngIf="otpVerified" type="button" class="btn btn-success" (click)="updateProfile()">
+                  Update
+                </button>
+              </div>
+            </form>
+          </p-tabpanel>
+          <p-tabpanel value="1">
+            <form class="change-password" [formGroup]="passwordForm">
+              <app-ilogi-input fieldLabel="Current Password" type="password" formControlName="currentPassword"
+                placeholder="Enter current password">
+              </app-ilogi-input>
+
+              <app-ilogi-input fieldLabel="New Password" type="password" formControlName="newPassword"
+                placeholder="Enter new password">
+              </app-ilogi-input>
+
+              <app-ilogi-input fieldLabel="Confirm Password" type="password" formControlName="confirmPassword"
+                placeholder="Confirm new password">
+              </app-ilogi-input>
+              <span
+                *ngIf="passwordForm.value.newPassword && passwordForm.value.newPassword !== passwordForm.value.confirmPassword"
+                class="warn">
+                Make sure your passwords match
+              </span>
+              <div class="form-actions">
+                <button type="button" class="btn btn-success" (click)="changePassword()"
+                  [disabled]="passwordForm.invalid || passwordForm.value.newPassword !== passwordForm.value.confirmPassword">
+                  Change Password
+                </button>
+              </div>
+            </form>
+          </p-tabpanel>
+        </p-tabpanels>
       </div>
     </p-tabs>
   </div>
