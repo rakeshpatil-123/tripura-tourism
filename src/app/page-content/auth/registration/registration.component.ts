@@ -1795,14 +1795,20 @@ getLocationsPayload(): any[] {
   }
 
   verifyOtp(): void {
-    const mobile = this.registrationForm.get('mobile_no')?.value;
-    const otp = this.otpControl.value;
+    const mobile = this.registrationForm.get('mobile_no')?.value?.toString().trim();
+    const otp = this.otpControl?.value?.toString().trim();
 
-    if (!mobile || !otp) {
-      this.genericService.openSnackBar('Please enter mobile and OTP.', 'Error');
+    // basic client-side checks
+    if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+      this.genericService.openSnackBar('Please enter a valid 10-digit mobile number.', 'Error');
+      return;
+    }
+    if (!otp || !/^\d{4,6}$/.test(otp)) { // accept 4-6 digit OTPs; adjust if your OTP length differs
+      this.genericService.openSnackBar('Please enter the OTP.', 'Error');
       return;
     }
 
+    // call backend (keeps the same genericService method you were using)
     this.genericService
       .getByConditions(
         { mobile_no: mobile, otp_code: otp },
@@ -1810,18 +1816,49 @@ getLocationsPayload(): any[] {
       )
       .subscribe({
         next: (res: any) => {
-          if (res?.status === 1) {
+          // Successful verification
+          if (res && res.status === 1) {
+            // update flags and UI state
             this.otpVerified = true;
-            this.genericService.openSnackBar(
-              'OTP verified successfully!',
-              'Success'
-            );
+            this.hideVerify = true;
+            this.otpSent = false;
+            this.mobileChecked = true;
+
+            // use server message if present
+            this.mobileStatusMessage = res.message || 'OTP verified successfully.';
+            this.mobileStatusType = 'success';
+
+            // clear "taken" validation if present
+            const mobileCtrl = this.registrationForm.get('mobile_no');
+            if (mobileCtrl?.hasError('taken')) {
+              mobileCtrl.setErrors(null);
+            }
+
+            // reset OTP control so user can't re-submit the same code
+            if (this.otpControl) {
+              this.otpControl.reset();
+            }
+
+            // notify user (keeps previous snackbar behaviour)
+            this.genericService.openSnackBar(this.mobileStatusMessage, 'Success');
+          } else {
+            // handle explicit failure from server
+            const errMsg = (res && res.message) ? res.message : 'OTP verification failed.';
+            this.mobileStatusMessage = errMsg;
+            this.mobileStatusType = 'error';
+            this.genericService.openSnackBar(errMsg, 'Error');
           }
         },
         error: (err: any) => {
-          const message = this.extractErrorMessage(err);
+          // extractErrorMessage was used previously — keep using it if available
+          const message = (typeof this.extractErrorMessage === 'function')
+            ? this.extractErrorMessage(err)
+            : (err?.message || 'Something went wrong. Please try again.');
+
+          this.mobileStatusMessage = message;
+          this.mobileStatusType = 'error';
           this.genericService.openSnackBar(message, 'Error');
-        },
+        }
       });
   }
 
@@ -1841,4 +1878,15 @@ getLocationsPayload(): any[] {
       );
     }
   }
+  private getRedirectUrl(path: string): string {
+    const { origin, pathname } = window.location;
+    const basePath = pathname === '/' || pathname === '' ? '' : pathname.startsWith('/new') ? '/new' : '';
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${origin}${basePath}${normalized}`;
+  }
+
+  goToLogin(): void {
+    window.location.href = this.getRedirectUrl('/page/login');
+  }
+
 }
