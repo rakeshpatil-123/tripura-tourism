@@ -15,15 +15,35 @@
             Please enter a valid enterprise name.
           </small>
           </ng-container>
-                 <!-- PAN Number -->
-                      <ng-container *ngIf="sourcePage !== 'departmental-users'">
-                        <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
-                          placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
-                         <small class="error-text" *ngIf="registrationForm.get('pan')?.touched && registrationForm.get('pan')?.invalid">
-                          Please enter a valid PAN number.
-                        </small></app-ilogi-input>
-                       
-                      </ng-container>
+                <!-- PAN Number -->
+              <ng-container *ngIf="sourcePage !== 'departmental-users'">
+                <!-- wrapper keeps the input + messages together (prevents grid from flowing the small tags into next column) -->
+                <div class="single-field pan-field">
+                  <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
+                    placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
+                  </app-ilogi-input>
+              
+                  <!-- show validation error ONLY when user has entered full PAN length (10 chars),
+                       control is invalid AND backend 'registered' error is NOT present -->
+                  <small class="error-text" *ngIf="registrationForm.get('pan')?.touched
+                                  && registrationForm.get('pan')?.invalid
+                                  && (registrationForm.get('pan')?.value?.toString()?.trim()?.length === 10)
+                                  && !registrationForm.get('pan')?.hasError('registered')">
+                    Please enter a valid PAN number.
+                  </small>
+              
+                  <!-- Inline backend status message for PAN (shows BE message in red when PAN already registered)
+                       placed directly below the PAN field. When present it will suppress the "Please enter..." message above. -->
+                  <small *ngIf="panStatusMessage" [ngClass]="{
+                           'mobile-status-success': panStatusType === 'success',
+                           'mobile-status-error': panStatusType === 'error',
+                           'mobile-status-info': panStatusType === 'info'
+                         }" class="mobile-status-text pan-status-text" aria-live="polite">
+                    {{ panStatusMessage }}
+                  </small>
+                </div>
+              </ng-container>
+
           <!-- Authorized Person -->
           <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
             formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
@@ -41,12 +61,11 @@
             <!-- Mobile -->
             <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
               placeholder="Enter mobile number" type="text"></app-ilogi-input>
-          
-            <small class="error-text"
-              *ngIf="registrationForm.get('mobile_no')?.touched && registrationForm.get('mobile_no')?.invalid">
+            <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched 
+                     && registrationForm.get('mobile_no')?.invalid 
+                     && !registrationForm.get('mobile_no')?.hasError('taken')">
               Please enter a valid 10-digit mobile number.
             </small>
-          
             <!-- Inline backend status message for mobile (OTP send / already verified / taken etc.) -->
             <small style="margin-bottom: 10px;" *ngIf="mobileStatusMessage" [ngClass]="{
               'mobile-status-success': mobileStatusType === 'success',
@@ -54,17 +73,20 @@
               'mobile-status-info': mobileStatusType === 'info'
             }" class="mobile-status-text" aria-live="polite">
               {{ mobileStatusMessage }}
-            </small>
-          
-            <!-- OTP Send section: hide the entire send-otp section when hideSendOtp is true -->
-            <div
-              *ngIf="!editMode && sourcePage !== 'departmental-users' && registrationForm.get('mobile_no')?.value?.toString().trim().length >= 10 && !hideSendOtp"
-              class="otp-section mb-2">
-              <button type="button" class="btn-otp" (click)="sendOtp()"
-                [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid">
-                {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
-              </button>
-            </div>
+              </small>
+              <!-- OTP Send section: hide the entire send-otp section when hideSendOtp is true -->
+              <!-- OTP Send section: show only when API check completed and number is not taken -->
+              <div *ngIf="!editMode && sourcePage !== 'departmental-users'
+                                 && registrationForm.get('mobile_no')?.value?.toString().trim().length >= 10
+                                 && mobileChecked
+                                 && !hideSendOtp
+                                 && mobileStatusType !== 'error'" class="otp-section mb-2">
+                <button type="button" class="btn-otp" (click)="sendOtp()"
+                  [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid || registrationForm.get('mobile_no')?.hasError('taken')">
+                  {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
+                </button>
+          </div>
+
           
             <!-- OTP Input + Verify Button: additionally hide when hideVerify is true -->
             <div *ngIf="otpSent && !otpVerified && !editMode && sourcePage !== 'departmental-users' && !hideVerify"

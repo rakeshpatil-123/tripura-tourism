@@ -312,11 +312,11 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
                 
                     </div>
                   </div>`,
-                showCancelButton: true,
+                // showCancelButton: true,
                 showCloseButton: false,
                 focusConfirm: true,
                 confirmButtonText: 'Update Profile',
-                cancelButtonText: 'Later',
+                // cancelButtonText: 'Later',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 customClass: {
@@ -373,7 +373,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
             if (isInvalidCredentials) {
               const snackRef = this._matSnackBar.open(
-                'Invalid credentials — Forgot password?',
+                'Invalid Credentials. Pls Re-try. Or reset your password.',
                 'Forgot password',
                 {
                   duration: 3000,

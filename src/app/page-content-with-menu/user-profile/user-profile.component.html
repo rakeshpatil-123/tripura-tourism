@@ -18,14 +18,19 @@
                 placeholder="Enter last name"></app-ilogi-input> -->
               <app-ilogi-input fieldLabel="Email" type="email" formControlName="email"
                 placeholder="Enter email"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="Phone" type="number" formControlName="phone"
+              <app-ilogi-input fieldLabel="Phone" type="text" formControlName="phone"
                 placeholder="Enter phone number"></app-ilogi-input>
+              <app-ilogi-input fieldLabel="WhatsApp No" type="text" formControlName="whatsapp_no"
+                placeholder="Enter WhatsApp number"></app-ilogi-input>
               <app-ilogi-input fieldLabel="City" formControlName="city" placeholder="Enter city"></app-ilogi-input>
-              <app-ilogi-input fieldLabel="User Type" [disabled]="true" formControlName="userType"
-                placeholder="Enter user type"></app-ilogi-input>
+            <app-ilogi-input fieldLabel="User Type" *ngIf="profileForm.get('userType')?.value !== 'individual'
+                  && profileForm.get('userType')?.value !== 'admin'
+                  && profileForm.get('userType')?.value !== 'department'" [disabled]="true" formControlName="userType"
+              placeholder="Enter user type">
+            </app-ilogi-input>
                 <!-- PAN Number -->
                 <ng-container *ngIf="profileForm.get('userType')?.value === 'individual'">
-                  <app-ilogi-input fieldLabel="PAN Number" [disabled]="isPANNull ? true : false" formControlName="pan"></app-ilogi-input>
+                  <app-ilogi-input fieldLabel="PAN Number" [readonly]="isPANNull" formControlName="pan"></app-ilogi-input>
                 </ng-container>
               <app-ilogi-select [isReadOnly]="true" *ngIf="profileForm.get('userType')?.value === 'department'" class="mb-10" fieldId="department_id" fieldLabel="Department"
                 formControlName="department_id" [selectOptions]="departments" placeholder="Select department">

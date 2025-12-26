@@ -15,6 +15,7 @@ export interface BackendProfile {
   authorized_person_name: string;
   email_id: string;
   pan: string,
+  whatsapp_no: string;
   mobile_no: string;
   registered_enterprise_address: string;
   registered_enterprise_city: string;
@@ -114,8 +115,22 @@ export class UserProfileComponent implements OnInit {
     this.getAllDepartmentList();
     this.loadDistricts();
     this.setupCascadingDropdowns();
-      this.loaderService.showLoader();
-         this.genericService.getProfile().pipe(finalize(()=>this.loaderService.hideLoader())).subscribe((res: any) => {
+    this.loaderService.showLoader();
+    this.profileForm.get('userType')?.valueChanges.subscribe((type) => {
+      const panCtrl = this.profileForm.get('pan');
+
+      if (type === 'individual') {
+        panCtrl?.setValidators([
+          Validators.required,
+          Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
+        ]);
+      } else {
+        panCtrl?.clearValidators();
+      }
+
+      panCtrl?.updateValueAndValidity();
+    });
+    this.genericService.getProfile().pipe(finalize(() => this.loaderService.hideLoader())).subscribe((res: any) => {
       if (res?.success || res?.status === 1) {
         this.isDistrictNull  = res.data.district;
         this.isSubdivisionNull = res.data.subdivision_name;
@@ -153,12 +168,15 @@ export class UserProfileComponent implements OnInit {
         email: profile.email_id,
         pan: profile.pan,
         phone: profile.mobile_no,
+        whatsapp_no: profile.whatsapp_no,
         address: profile.registered_enterprise_address,
         city: profile.registered_enterprise_city,
         userType: profile.user_type,
         department_id: profile.department_id,
         hierarchy_level: profile.hierarchy_level || ''
-      });
+    });
+      this.profileForm.markAsDirty();
+      this.profileForm.markAsTouched();   
       this.isDepartmentUser = String(localStorage.getItem('userRole')) === 'department';
       const backendLocations: any[] = (this as any).backendLocations || [];
       if ((window as any) && (this as any).backendProfile && Array.isArray((this as any).backendProfile.locations)) {
@@ -242,8 +260,9 @@ export class UserProfileComponent implements OnInit {
       authorized_person_name: ['', Validators.required],
       // lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      pan: [{ value: '', disabled: true }],
+      pan: ['', [Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)]],
       phone: ['', Validators.required],
+      whatsapp_no: ['', Validators.required],
       address: ['', Validators.required],
       city: ['', Validators.required],
       userType: [{ value: '', disabled: true }],
@@ -282,14 +301,14 @@ export class UserProfileComponent implements OnInit {
       authorized_person_name: `${val.authorized_person_name}`.trim(),
       email_id: val.email,
       pan: val.pan,
-      mobile_no: val.phone.toString(),
+      mobile_no: val.phone ? String(val.phone) : '',
+      whatsapp_no: val.whatsapp_no ? String(val.whatsapp_no) : null,
       registered_enterprise_address: val.address,
       registered_enterprise_city: val.city,
       user_type: val.userType,
       hierarchy_level: val.hierarchy_level,
       department_id: val.department_id
     };
-    
     if (val.userType === 'individual') {
       delete payload.hierarchy_level;
       delete payload.department_id;
@@ -305,20 +324,49 @@ export class UserProfileComponent implements OnInit {
       if (val.ward_code) {
         payload.ward_id = val.ward_code;
       }
-       this.genericService.updateProfile(payload).pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
-        next: (res: any) => {
-          if (res?.status === 1) {
-            this.genericService.openSnackBar(res?.message || 'Profile updated successfully!', 'Success');
-            this.profileForm.markAsPristine();
-          } else {
-            this.genericService.openSnackBar(res?.message || 'Update failed', 'Error');
+      this.genericService.updateProfile(payload)
+        .pipe(finalize(() => this.loaderService.hideLoader()))
+        .subscribe({
+          next: (res: any) => {
+            if (res?.status === 1) {
+              this.genericService.openSnackBar(
+                res?.message || 'Profile updated successfully!',
+                'Success'
+              );
+              this.profileForm.markAsPristine();
+            } else if (res?.status === 0 && res?.errors) {
+              const errorMessages = Object.values(res.errors)
+                .flat()
+                .join(' ');
+              this.genericService.openSnackBar(
+                errorMessages || 'Validation failed',
+                'Error'
+              );
+            } else {
+              this.genericService.openSnackBar(
+                res?.message || 'Update failed',
+                'Error'
+              );
+            }
+          },
+          error: (err: any) => {
+            console.error('Profile update failed:', err);
+
+            let message = 'Something went wrong while updating profile';
+
+            if (err?.error?.errors) {
+              message = Object.values(err.error.errors)
+                .flat()
+                .join(' ');
+            } else if (err?.error?.message) {
+              message = err.error.message;
+            }
+
+            this.genericService.openSnackBar(message, 'Error');
           }
-        },
-        error: (err: any) => {
-          console.error('Profile update failed:', err);
-          this.genericService.openSnackBar('Something went wrong while updating profile', 'Error');
-        }
-      });
+
+        });
+
     }
      else if (val.userType === 'department') {
 

@@ -347,13 +347,13 @@
   color: #003c5b;
   font-weight: 700;
   text-decoration: underline;
-  padding: 8px 12px;
+  padding: 8px 8px;
   border-radius: 6px;
   transition: background 160ms ease, transform 120ms ease;
   cursor: pointer;
   white-space: nowrap;
   flex: 0 0 auto; /* avoid shrinking too much */
-  margin-left: 6px;
+  margin-left: 0px;
   font-size: inherit;
 }
 

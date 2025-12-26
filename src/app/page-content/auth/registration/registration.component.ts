@@ -82,6 +82,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
   otpControl!: FormControl;
   otpSent = false;
   otpVerified = false;
+  mobileChecked = false;
   loadingDistricts = false;
   loadingSubdivisions = false;
   loadingUlbs = false;
@@ -91,6 +92,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
   private suppressCascading = false;
   private lastSubdivisionsKey = '';
   private lastUlbsKey = '';
+  panStatusMessage: string = '';
+  panStatusType: 'success' | 'error' | 'info' | '' = '';
   private departmentsLoaded = false;
   private loadingDepartments = false;
 
@@ -197,14 +200,26 @@ export class RegistrationComponent implements OnInit, OnChanges {
       distinctUntilChanged(),
       tap((upper) => {
         const ctrl = this.registrationForm.get('pan');
-        if (ctrl && ctrl.value !== upper) {
+      if (ctrl && ctrl.value !== upper) {
           ctrl.setValue(upper, { emitEvent: false });
         }
       }),
       debounceTime(500),
-      filter((value: string) => this.PAN_REGEX.test(value)),
-      switchMap((value: string) => {
-        // this.loaderService.showLoader();
+tap((value: string) => {
+  const panCtrl = this.registrationForm.get('pan');
+  const panValue = value?.toString().trim();
+
+  // CLEAR message & error immediately when PAN is empty or invalid
+  if (!panValue || !this.PAN_REGEX.test(panValue)) {
+    this.panStatusMessage = '';
+    this.panStatusType = '';
+    if (panCtrl?.hasError('registered')) {
+      panCtrl.setErrors(null);
+    }
+  }
+}),
+filter((value: string) => this.PAN_REGEX.test(value)),
+switchMap((value: string) => {
         return this.genericService.getByConditions({ pan_no: value }, 'api/user/check-pan-resgistered').pipe(
           finalize(() => this.loaderService.hideLoader()),
           catchError((err) => {
@@ -214,26 +229,34 @@ export class RegistrationComponent implements OnInit, OnChanges {
         );
       })
     ).subscribe((res: any) => {
-      if (!res) return;
-      if (res.is_registered) {
-        const message = res.message || 'Your account already exists. Please login.';
-        Swal.fire({
-          title: 'Account already exists',
-          text: message,
-          icon: 'info',
-          confirmButtonText: 'OK'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // this.router.navigate(['page/login'], { queryParams: { message } });
-          }
-        });
+         
+      const panCtrl = this.registrationForm.get('pan');
+      const panValue = panCtrl?.value?.toString().trim();
+      if (!res) {
+        this.panStatusMessage = '';
+        this.panStatusType = '';
+        const panCtrl = this.registrationForm.get('pan');
+        if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
+        return;
+      }
+  
+
+      if (res.is_registered && panValue) {
+        const message = res.message || 'Account already exists with this PAN number.';
+        this.panStatusMessage = message;
+        this.panStatusType = 'error';
+        panCtrl?.setErrors({ registered: true });
+      } else {
+        this.panStatusMessage = res.message || '';
+        this.panStatusType = res.status === 1 ? 'success' : (res.status === 0 ? 'info' : '');
+        const panCtrl = this.registrationForm.get('pan');
+        if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
       }
     });
- const mobileCtrl = this.registrationForm.get('mobile_no');
+const mobileCtrl = this.registrationForm.get('mobile_no');
 if (mobileCtrl) {
+  // immediate behavior on user edit (preserve existing behavior)
   mobileCtrl.valueChanges.subscribe((val: any) => {
-    // whenever user changes mobile input, show Send OTP again and reset OTP state
-    // but don't modify server-verified state if you intentionally want to keep it.
     this.hideSendOtp = false;
     this.hideVerify = false;
 
@@ -243,15 +266,65 @@ if (mobileCtrl) {
 
     // reset otp flags so user can request again
     this.otpSent = false;
-    // keep otpVerified as-is only if you want to preserve verified status across edits,
-    // but since user changed the number, we should clear verified:
     this.otpVerified = false;
 
-    // optionally clear otpControl value and errors
     if (this.otpControl) {
       this.otpControl.reset();
     }
   });
+  // validation pipeline: debounce + pattern + API check (runtime "is taken" feedback)
+  mobileCtrl.valueChanges.pipe(
+    map((v: any) => (v || '').toString().trim()),
+    distinctUntilChanged(),
+    debounceTime(500),
+    filter((val: string) => /^[6-9]\d{9}$/.test(val)),
+    switchMap((value: string) => {
+      return this.genericService.getByConditions({ mobile_no: value }, 'api/user/check-mobile-resgistered').pipe(
+        catchError((err) => {
+          console.error('Mobile check failed', err);
+          return of(null);
+        })
+      );
+    })
+ ).subscribe((res: any) => {
+    // If API didn't return a useful payload, clear inline state and mark as not-checked
+    if (!res) {
+      this.mobileChecked = false;
+      this.mobileStatusMessage = '';
+      this.mobileStatusType = '';
+      if (mobileCtrl?.hasError('taken')) mobileCtrl.setErrors(null);
+      return;
+    }
+
+    // mark that we've got a definitive response for this value
+    this.mobileChecked = true;
+
+    const taken = !!(res.is_registered || res.exists || (res.status === 0 && !res.is_available));
+    if (taken) {
+      const message = res.message || 'Account already exists with this mobile number.';
+      this.mobileStatusMessage = message;
+      this.mobileStatusType = 'error';
+      mobileCtrl.setErrors({ taken: true });
+
+      // hide OTP UI and reset any OTP state
+      this.hideSendOtp = true;
+      this.hideVerify = true;
+      this.otpSent = false;
+
+      // show one snackbar so user is aware
+      this.genericService.openSnackBar(message, 'Close');
+    } else {
+      // available — show inline success/info and enable OTP UI
+      this.mobileStatusMessage = res.message || 'Mobile number available.';
+      this.mobileStatusType = res.status === 1 ? 'success' : 'info';
+
+      this.hideSendOtp = false;
+      this.hideVerify = false;
+
+      if (mobileCtrl?.hasError('taken')) mobileCtrl.setErrors(null);
+    }
+  });
+
 }
 
   }

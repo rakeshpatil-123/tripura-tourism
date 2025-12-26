@@ -196,25 +196,46 @@ app-ilogi-input + .otp-section {
   margin-bottom: 6px;
   display: block;
 }
-/* Colors chosen for clarity and professional look (red for errors, teal for success, slate for info) */
-.mobile-status-text {
-  display: block;
-  margin-top: 6px;
-  line-height: 1.2;
+.small, small {
+  font-size: -0.125em;
 }
+
 
 /* error (red) */
 .mobile-status-error {
   color: #dc2626;
-  /* Tailwind red-600 */
+  font-size: -0.125em !important;
   font-weight: 600;
 }
 
+.mobile-status-text {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.2;
+  font-size: 12px;
+}
 /* success (teal/green) */
 .mobile-status-success {
   color: #0f766e;
   /* teal/emerald-ish */
   font-weight: 500;
+}
+/* keep existing single-field behaviour, add pan-field to ensure proper block flow in the grid */
+.pan-status-text {
+  display: block;
+  margin-top: -3px;
+  margin-bottom: 6px;
+}
+
+/* wrapper that groups PAN input + messages so they appear directly underneath the input
+   and do not flow into the adjacent grid cell */
+.pan-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  margin: -1px 0;
+  /* keep it occupying the natural grid cell; if you want the PAN block to span a full row uncomment next line:
+     grid-column: 1 / -1; */
 }
 
 /* info (muted slate) */

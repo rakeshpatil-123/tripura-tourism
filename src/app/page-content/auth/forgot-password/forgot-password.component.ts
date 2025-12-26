@@ -64,7 +64,7 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      pan: ['', [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]],
+      identifier: ['', [Validators.required, this.panOrMobileValidator.bind(this)]],
       mobile: ['',],
       otp: ['', []],
       newPassword: ['', []],
@@ -77,6 +77,23 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
     this.startCarousel();
 
     this.primaryLabel = 'Send OTP';
+  }
+  get identifierControl() {
+    return this.form.get('identifier');
+  }
+  panOrMobileValidator(control: import('@angular/forms').AbstractControl) {
+    const val = (control.value ?? '').toString().trim();
+    if (!val) return { required: true };
+
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (panRegex.test(val) || mobileRegex.test(val)) {
+      return null;
+    }
+    return { invalidIdentifier: true };
+  }
+  getIdentifierErrorMessage(): string {
+    return 'Please enter a valid PAN (e.g. ABCDE1234F) or a 10-digit mobile number.';
   }
 
   ngAfterViewInit(): void {
@@ -148,19 +165,23 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
   // 1) Send OTP
   sendOtp(): void {
     if (this.step !== 'enter') return;
-
-    // validate
-    if (this.form.get('pan')?.invalid || this.form.get('mobile')?.invalid) {
-      this.form.get('pan')?.markAsTouched();
-      this.form.get('mobile')?.markAsTouched();
-      this.infoMessage = 'Please fill PAN and Mobile correctly.';
+    if (this.identifierControl?.invalid) {
+      this.identifierControl?.markAsTouched();
+      this.infoMessage = 'Please enter a valid PAN or mobile number.';
       return;
     }
 
-    const payload = {
-      pan_no: this.form.value.pan,
-      // mobile_no: this.form.value.mobile,
-    };
+    const identifier = (this.identifierControl?.value ?? '').toString().trim();
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    const payload: any = {};
+    if (panRegex.test(identifier)) {
+      payload.phone_or_pan = identifier;
+    } else if (mobileRegex.test(identifier)) {
+      payload.phone_or_pan = identifier;
+    }
+
     const selectedApi = this.SEND_OTP_API;
 
     this.showLoaderLocal();
@@ -170,21 +191,19 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
       .pipe(finalize(() => this.hideLoaderLocal()))
       .subscribe({
         next: (res: any) => {
-          // Success behaviour
           this.step = 'verify';
-          this.serverMobileNumber = res.mobile_no || '';
+          this.serverMobileNumber = res?.mobile_no || (mobileRegex.test(identifier) ? identifier : '');
           this.primaryLabel = 'Verify OTP';
           this.sentToMasked = this.maskMobile(this.serverMobileNumber);
-          this.infoMessage = `OTP sent to ${this.sentToMasked}. Enter the ${this.otpLength}-digit code.`;
+          this.infoMessage = `OTP sent to ${this.sentToMasked || 'your registered mobile'}. Enter the ${this.otpLength}-digit code.`;
           this.startOtpTimer(120);
-          // set validators for OTP
           this.form.get('otp')?.setValidators([Validators.required, Validators.minLength(this.otpLength), Validators.maxLength(this.otpLength)]);
           this.form.get('otp')?.updateValueAndValidity();
 
           Swal.fire({
             icon: 'success',
             title: 'OTP Sent',
-            text: `OTP successfully sent to ${this.sentToMasked}.`,
+            text: `OTP successfully sent to ${this.sentToMasked || 'your registered mobile'}.`,
             timer: 1800,
             showConfirmButton: false,
             toast: true,
@@ -192,11 +211,11 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
           });
         },
         error: (err) => {
-          this.infoMessage = 'Failed to send OTP. Please try again.';
+          this.infoMessage = err?.error?.message || 'Failed to send OTP. Please try again.';
           Swal.fire({
             icon: 'error',
             title: 'Send Failed',
-            text: err?.error.message || 'Unable to send OTP.',
+            text: err?.error?.message || 'Unable to send OTP.',
           });
         }
       });
@@ -212,11 +231,16 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
       return;
     }
 
-    const payload = {
-      pan_no: this.form.value.pan,
-      // mobile_no: this.form.value.mobile,
+    const identifier = (this.identifierControl?.value ?? '').toString().trim();
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    const payload: any = {
       otp_code: this.form.value.otp,
     };
+    if (panRegex.test(identifier)) payload.phone_or_pan = identifier;
+    else if (mobileRegex.test(identifier)) payload.phone_or_pan = identifier;
+
     const selectedApi = this.VERIFY_OTP_API;
 
     this.showLoaderLocal();
@@ -261,11 +285,14 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
   resendOtp(): void {
     if (!this.isResendEnabled) return;
 
-    const payload = {
-      pan_no: this.form.value.pan,
-      // mobile: this.form.value.mobile,
-      resend: true
-    };
+    const identifier = (this.identifierControl?.value ?? '').toString().trim();
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    const payload: any = { resend: true };
+    if (panRegex.test(identifier)) payload.phone_or_pan = identifier;
+    else if (mobileRegex.test(identifier)) payload.phone_or_pan = identifier;
+
     const selectedApi = this.SEND_OTP_API;
 
     this.showLoaderLocal();
@@ -276,11 +303,12 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
       .subscribe({
         next: (res: any) => {
           this.startOtpTimer(120);
-          this.infoMessage = `OTP resent to ${this.maskMobile(this.form.value.mobile)}.`;
+          const mobileToShow = res?.mobile_no || (mobileRegex.test(identifier) ? identifier : '');
+          this.infoMessage = `OTP resent to ${this.maskMobile(mobileToShow)}.`;
           Swal.fire({
             icon: 'success',
             title: 'Resent',
-            text: `OTP resent to ${this.maskMobile(this.form.value.mobile)}.`,
+            text: `OTP resent to ${this.maskMobile(mobileToShow)}.`,
             timer: 1500,
             showConfirmButton: false,
             toast: true,
@@ -313,12 +341,17 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
       return;
     }
 
-    const payload = {
-      pan_no: this.form.value.pan,
-      // mobile: this.form.value.mobile,
+    const identifier = (this.identifierControl?.value ?? '').toString().trim();
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    const payload: any = {
       new_password_confirmation: cp,
       new_password: np
     };
+    if (panRegex.test(identifier)) payload.phone_or_pan = identifier;
+    else if (mobileRegex.test(identifier)) payload.phone_or_pan = identifier;
+
     const selectedApi = this.RESET_PASSWORD_API;
 
     this.showLoaderLocal();
@@ -365,6 +398,16 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 
   // Back to login
   backToLogin() {
-    this.router.navigate(['/page/login']);
+    try {
+      this.router.navigate(['/page/login']);
+    } catch {
+      window.location.href = this.getRedirectUrl('/page/login');
+    }
+  }
+  private getRedirectUrl(path: string): string {
+    const { origin, pathname } = window.location;
+    const basePath = pathname.startsWith('/new') ? '/new' : '';
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${origin}${basePath}${normalized}`;
   }
 }
