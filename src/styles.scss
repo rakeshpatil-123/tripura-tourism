@@ -1043,3 +1043,19 @@ body .p-component .p-select-overlay {
   background-color: #fff !important;
   color: #000 !important;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #print-area,
+  #print-area * {
+    visibility: visible;
+  }
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

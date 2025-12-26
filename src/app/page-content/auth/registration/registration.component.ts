@@ -14,7 +14,16 @@ import {
   Validators,
 } from '@angular/forms';
 import { of } from 'rxjs';
-import { debounceTime, map, distinctUntilChanged, filter, switchMap, finalize, catchError, tap } from 'rxjs/operators';
+import {
+  debounceTime,
+  map,
+  distinctUntilChanged,
+  filter,
+  switchMap,
+  finalize,
+  catchError,
+  tap,
+} from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
@@ -96,7 +105,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
   panStatusType: 'success' | 'error' | 'info' | '' = '';
   private departmentsLoaded = false;
   private loadingDepartments = false;
-
+  whatsappSameAsMobile = true;
+  errorMessage: string = '';
   hierarchyLevels = [
     { id: 'block', name: 'Block' },
     { id: 'subdivision1', name: 'Subdivision 1' },
@@ -124,7 +134,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         name_of_enterprise: ['', []],
         authorized_person_name: ['', []],
         email_id: ['', []],
-        pan: ['', [ Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]],
+        pan: ['', [Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]],
         mobile_no: [''],
         user_name: ['', []],
         registered_enterprise_address: ['', []],
@@ -153,7 +163,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadDistricts();
-      this.getAllDepartmentList();
+    this.getAllDepartmentList();
     if (this.sourcePage === 'departmental-users') {
       this.registrationForm.patchValue({ user_type: 'department' });
       ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'].forEach((ctrl) => {
@@ -166,13 +176,16 @@ export class RegistrationComponent implements OnInit, OnChanges {
         this.registrationForm.addControl('inspector', this.fb.control('0'));
       }
       if (!this.registrationForm.contains('hierarchy_level')) {
-        this.registrationForm.addControl('hierarchy_level', this.fb.control(''));
+        this.registrationForm.addControl(
+          'hierarchy_level',
+          this.fb.control('')
+        );
       }
       if (!this.registrationForm.contains('department_id')) {
         this.registrationForm.addControl('department_id', this.fb.control(''));
       }
       if (!this.registrationForm.contains('designation')) {
-      this.registrationForm.addControl('designation', this.fb.control(''));
+        this.registrationForm.addControl('designation', this.fb.control(''));
       }
     } else {
       this.registrationForm.patchValue({ user_type: 'individual' });
@@ -352,38 +365,36 @@ if (mobileCtrl) {
       }, 0);
     }
   }
-    /**
+  /**
    * Called whenever hierarchy_level changes.
    * Resets district_id, subdivision_id, ulb_id and ward_id controls in a way
    * that plays well with both single-value selects and multi-select arrays
    * (departmental-users uses arrays).
    */
-onHierarchyChange(): void {
-  const keys = ['district_id', 'subdivision_id', 'ulb_id'];
+  onHierarchyChange(): void {
+    const keys = ['district_id', 'subdivision_id', 'ulb_id'];
 
-  keys.forEach(key => {
-    const ctrl = this.registrationForm.get(key);
-    if (!ctrl) return;
+    keys.forEach((key) => {
+      const ctrl = this.registrationForm.get(key);
+      if (!ctrl) return;
 
-    const current = ctrl.value;
-    // perform silent reset — don't emit valueChanges while programmatic
-    if (Array.isArray(current)) {
-      ctrl.setValue([], { emitEvent: false });
-    } else {
-      ctrl.setValue('', { emitEvent: false });
-    }
-    ctrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-  });
+      const current = ctrl.value;
+      // perform silent reset — don't emit valueChanges while programmatic
+      if (Array.isArray(current)) {
+        ctrl.setValue([], { emitEvent: false });
+      } else {
+        ctrl.setValue('', { emitEvent: false });
+      }
+      ctrl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
 
-  this.subdivisions = [];
-  this.ulbs = [];
-  this.wards = [];
+    this.subdivisions = [];
+    this.ulbs = [];
+    this.wards = [];
 
-  // Clear selected districts grouping safely
-  this.selectedDistricts = [];
-}
-
-
+    // Clear selected districts grouping safely
+    this.selectedDistricts = [];
+  }
 
   private normalizeToArray(v: any): string[] {
     if (v === null || v === undefined) return [];
@@ -392,7 +403,10 @@ onHierarchyChange(): void {
       const trimmed = v.trim();
       if (!trimmed) return [];
       if (trimmed.includes(',')) {
-        return trimmed.split(',').map((x) => x.trim()).filter(Boolean);
+        return trimmed
+          .split(',')
+          .map((x) => x.trim())
+          .filter(Boolean);
       }
       return [trimmed];
     }
@@ -407,7 +421,16 @@ onHierarchyChange(): void {
         this.registrationForm.addControl(name, this.fb.control(defaultValue));
       }
     };
-    ['district_id', 'subdivision_id', 'ulb_id', 'ward_id', 'hierarchy_level', 'department_id', 'designation', 'inspector'].forEach(c => ensureControl(c));
+    [
+      'district_id',
+      'subdivision_id',
+      'ulb_id',
+      'ward_id',
+      'hierarchy_level',
+      'department_id',
+      'designation',
+      'inspector',
+    ].forEach((c) => ensureControl(c));
 
     const prefill = {
       name_of_enterprise: data.name_of_enterprise || '',
@@ -430,13 +453,17 @@ onHierarchyChange(): void {
     };
     const { hierarchy_level, ...otherFields } = prefill;
     this.registrationForm.patchValue(otherFields);
-    this.registrationForm.get('hierarchy_level')?.setValue(prefill.hierarchy_level, { emitEvent: false });
+    this.registrationForm
+      .get('hierarchy_level')
+      ?.setValue(prefill.hierarchy_level, { emitEvent: false });
 
     const districtArrLegacy = this.normalizeToArray(prefill.district_id);
     const subdivisionArrLegacy = this.normalizeToArray(prefill.subdivision_id);
     const ulbArrLegacy = this.normalizeToArray(prefill.ulb_id);
     const wardArrLegacy = this.normalizeToArray(prefill.ward_id);
-    const locations: any[] = Array.isArray(data.locations) ? data.locations : [];
+    const locations: any[] = Array.isArray(data.locations)
+      ? data.locations
+      : [];
 
     const setArrayControlWhenReady = (
       controlName: string,
@@ -450,7 +477,8 @@ onHierarchyChange(): void {
 
       ids = ids.map((id: any) => String(id));
 
-      const allPresent = () => ids.every(id => optionList.some(o => String(o.id) === String(id)));
+      const allPresent = () =>
+        ids.every((id) => optionList.some((o) => String(o.id) === String(id)));
 
       if (allPresent()) {
         this.registrationForm.get(controlName)?.setValue(ids);
@@ -458,15 +486,23 @@ onHierarchyChange(): void {
         return;
       }
       if (typeof triggerLoad === 'function') {
-        try { triggerLoad(ids); } catch (_e) { }
+        try {
+          triggerLoad(ids);
+        } catch (_e) {}
       }
-      const missing = ids.filter(id => !optionList.some(o => String(o.id) === id));
+      const missing = ids.filter(
+        (id) => !optionList.some((o) => String(o.id) === id)
+      );
       if (missing.length > 0) {
-        const placeholderPrefix = controlName.includes('district') ? 'District' :
-          controlName.includes('subdivision') ? 'Subdivision' :
-            controlName.includes('ulb') ? 'ULB' : 'Item';
-        missing.forEach(mid => {
-          if (!optionList.some(o => String(o.id) === mid)) {
+        const placeholderPrefix = controlName.includes('district')
+          ? 'District'
+          : controlName.includes('subdivision')
+          ? 'Subdivision'
+          : controlName.includes('ulb')
+          ? 'ULB'
+          : 'Item';
+        missing.forEach((mid) => {
+          if (!optionList.some((o) => String(o.id) === mid)) {
             optionList.push({ id: mid, name: `${placeholderPrefix} ${mid}` });
           }
         });
@@ -484,7 +520,9 @@ onHierarchyChange(): void {
         }
         if (attempts >= maxAttempts) {
           clearInterval(iv);
-          const available = ids.filter(id => optionList.some(o => String(o.id) === String(id)));
+          const available = ids.filter((id) =>
+            optionList.some((o) => String(o.id) === String(id))
+          );
           if (available.length > 0) {
             this.registrationForm.get(controlName)?.setValue(available);
             this.registrationForm.get(controlName)?.updateValueAndValidity();
@@ -497,15 +535,38 @@ onHierarchyChange(): void {
       const districtSet = new Set<string>();
       const subdivisionSet = new Set<string>();
       const blockSet = new Set<string>();
-      const grouped: Record<string, { id: string; name?: string; subdivisionsMap: Record<string, { name?: string; blocks: Map<string, { name?: string }> }> }> = {};
+      const grouped: Record<
+        string,
+        {
+          id: string;
+          name?: string;
+          subdivisionsMap: Record<
+            string,
+            { name?: string; blocks: Map<string, { name?: string }> }
+          >;
+        }
+      > = {};
 
       locations.forEach((loc: any) => {
-        const dId = loc.district_id !== undefined && loc.district_id !== null ? String(loc.district_id) : '';
-        const sId = loc.subdivision_id !== undefined && loc.subdivision_id !== null ? String(loc.subdivision_id) : '';
-        const bId = loc.block_id !== undefined && loc.block_id !== null ? String(loc.block_id) : '';
+        const dId =
+          loc.district_id !== undefined && loc.district_id !== null
+            ? String(loc.district_id)
+            : '';
+        const sId =
+          loc.subdivision_id !== undefined && loc.subdivision_id !== null
+            ? String(loc.subdivision_id)
+            : '';
+        const bId =
+          loc.block_id !== undefined && loc.block_id !== null
+            ? String(loc.block_id)
+            : '';
 
         const dName = loc.district_name ?? loc.district ?? undefined;
-        const sName = loc.subdivision_name ?? loc.subdivision ?? loc.sub_division ?? undefined;
+        const sName =
+          loc.subdivision_name ??
+          loc.subdivision ??
+          loc.sub_division ??
+          undefined;
         const bName = loc.block_name ?? loc.block ?? loc.ulb_name ?? undefined;
 
         if (dId) districtSet.add(dId);
@@ -522,7 +583,10 @@ onHierarchyChange(): void {
 
         if (dId && sId) {
           if (!grouped[dId].subdivisionsMap[sId]) {
-            grouped[dId].subdivisionsMap[sId] = { name: sName, blocks: new Map() };
+            grouped[dId].subdivisionsMap[sId] = {
+              name: sName,
+              blocks: new Map(),
+            };
           } else if (!grouped[dId].subdivisionsMap[sId].name && sName) {
             grouped[dId].subdivisionsMap[sId].name = sName;
           }
@@ -580,31 +644,50 @@ onHierarchyChange(): void {
         }
       });
 
-      this.selectedDistricts = Object.keys(grouped).map(dKey => {
-        const subdivs = Object.keys(grouped[dKey].subdivisionsMap).map(sKey => {
-          const blocks = Array.from(grouped[dKey].subdivisionsMap[sKey].blocks.keys());
-          return { id: sKey, blocks };
-        });
+      this.selectedDistricts = Object.keys(grouped).map((dKey) => {
+        const subdivs = Object.keys(grouped[dKey].subdivisionsMap).map(
+          (sKey) => {
+            const blocks = Array.from(
+              grouped[dKey].subdivisionsMap[sKey].blocks.keys()
+            );
+            return { id: sKey, blocks };
+          }
+        );
         return { id: dKey, subdivisions: subdivs };
       });
       // if (districtIds.length) this.loadSubdivisions(districtIds);
       // if (subdivisionIds.length) this.loadUlbs(subdivisionIds);
-      setArrayControlWhenReady('district_id', districtIds, this.districts, (ids) => this.loadSubdivisions(ids));
-      setArrayControlWhenReady('subdivision_id', subdivisionIds, this.subdivisions, (ids) =>{this.loadUlbs(ids) } );
+      setArrayControlWhenReady(
+        'district_id',
+        districtIds,
+        this.districts,
+        (ids) => this.loadSubdivisions(ids)
+      );
+      setArrayControlWhenReady(
+        'subdivision_id',
+        subdivisionIds,
+        this.subdivisions,
+        (ids) => {
+          this.loadUlbs(ids);
+        }
+      );
       setArrayControlWhenReady('ulb_id', ulbIds, this.ulbs);
-      const wardIdsFromLocations: string[] = (locations.filter(l => l.ward_id).map(l => String(l.ward_id)));
+      const wardIdsFromLocations: string[] = locations
+        .filter((l) => l.ward_id)
+        .map((l) => String(l.ward_id));
       if (wardIdsFromLocations.length > 0) {
         const uniqueWardIds = Array.from(new Set(wardIdsFromLocations));
-        uniqueWardIds.forEach(wId => {
-          if (!this.wards.some(w => String(w.id) === wId)) {
-            const wName = (locations.find(l => String(l.ward_id) === wId)?.ward_name) ?? `Ward ${wId}`;
+        uniqueWardIds.forEach((wId) => {
+          if (!this.wards.some((w) => String(w.id) === wId)) {
+            const wName =
+              locations.find((l) => String(l.ward_id) === wId)?.ward_name ??
+              `Ward ${wId}`;
             this.wards.push({ id: wId, name: wName });
           }
         });
         this.registrationForm.get('ward_id')?.setValue(uniqueWardIds);
         this.registrationForm.get('ward_id')?.updateValueAndValidity();
       }
-
     } else {
       districtArrLegacy.forEach((dCode) => {
         if (!this.districts.some((d) => String(d.id) === String(dCode))) {
@@ -625,12 +708,21 @@ onHierarchyChange(): void {
             if (this.subdivisions.length > 0) {
               clearInterval(subInterval);
               subdivisionArrLegacy.forEach((sCode) => {
-                if (!this.subdivisions.some((s) => String(s.id) === String(sCode))) {
-                  this.subdivisions.push({ id: sCode, name: data.subdivision || `Subdivision ${sCode}` });
+                if (
+                  !this.subdivisions.some((s) => String(s.id) === String(sCode))
+                ) {
+                  this.subdivisions.push({
+                    id: sCode,
+                    name: data.subdivision || `Subdivision ${sCode}`,
+                  });
                 }
               });
-              this.registrationForm.get('subdivision_id')?.setValue(subdivisionArrLegacy);
-              this.registrationForm.get('subdivision_id')?.updateValueAndValidity();
+              this.registrationForm
+                .get('subdivision_id')
+                ?.setValue(subdivisionArrLegacy);
+              this.registrationForm
+                .get('subdivision_id')
+                ?.updateValueAndValidity();
 
               // if (subdivisionArrLegacy.length > 0) {
               //   this.loadUlbs(subdivisionArrLegacy);
@@ -668,13 +760,20 @@ onHierarchyChange(): void {
           const subInterval = setInterval(() => {
             if (this.subdivisions.length > 0) {
               clearInterval(subInterval);
-              if (subdivisionArrLegacy[0] && !this.subdivisions.some((s) => s.id === subdivisionArrLegacy[0])) {
+              if (
+                subdivisionArrLegacy[0] &&
+                !this.subdivisions.some((s) => s.id === subdivisionArrLegacy[0])
+              ) {
                 this.subdivisions.push({
                   id: subdivisionArrLegacy[0],
-                  name: data.subdivision || `Subdivision ${subdivisionArrLegacy[0]}`,
+                  name:
+                    data.subdivision ||
+                    `Subdivision ${subdivisionArrLegacy[0]}`,
                 });
               }
-              this.registrationForm.patchValue({ subdivision_id: subdivisionArrLegacy[0] ?? '' });
+              this.registrationForm.patchValue({
+                subdivision_id: subdivisionArrLegacy[0] ?? '',
+              });
               // if (subdivisionArrLegacy[0]) {
               //   this.loadUlbs(subdivisionArrLegacy[0]);
               //   const ulbInterval = setInterval(() => {
@@ -734,21 +833,22 @@ onHierarchyChange(): void {
         user_type: prefill.user_type,
         inspector: prefill.inspector,
       });
-      this.registrationForm.get('hierarchy_level')?.setValue(prefill.hierarchy_level, { emitEvent: false });
+      this.registrationForm
+        .get('hierarchy_level')
+        ?.setValue(prefill.hierarchy_level, { emitEvent: false });
       this.suppressCascading = false;
     }, 500);
   }
 
   private areSameValues(a: any, b: any): boolean {
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    const A = [...a].map(String).sort();
-    const B = [...b].map(String).sort();
-    return A.every((v, i) => v === B[i]);
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      const A = [...a].map(String).sort();
+      const B = [...b].map(String).sort();
+      return A.every((v, i) => v === B[i]);
+    }
+    return String(a) === String(b);
   }
-  return String(a) === String(b);
-}
-
 
   setupCascadingDropdowns(): void {
     // this.registrationForm.get('district_id')?.valueChanges.subscribe((district) => {
@@ -800,79 +900,107 @@ onHierarchyChange(): void {
     //     }
     //   }
     // });
-    this.registrationForm.get('district_id')?.valueChanges
-  .pipe(distinctUntilChanged((a, b) => this.areSameValues(a, b)))
-  .subscribe((district) => {
-    if (this.suppressCascading) return;
+    this.registrationForm
+      .get('district_id')
+      ?.valueChanges.pipe(
+        distinctUntilChanged((a, b) => this.areSameValues(a, b))
+      )
+      .subscribe((district) => {
+        if (this.suppressCascading) return;
 
-    // reset request caches when parent changes
-    this.lastSubdivisionsKey = '';
-    this.lastUlbsKey = '';
+        // reset request caches when parent changes
+        this.lastSubdivisionsKey = '';
+        this.lastUlbsKey = '';
 
-    if (Array.isArray(district)) {
-      this.registrationForm.get('subdivision_id')?.setValue([], { emitEvent: false });
-      this.registrationForm.get('ulb_id')?.setValue([], { emitEvent: false });
-      this.registrationForm.get('ward_id')?.setValue([], { emitEvent: false });
-    } else {
-      this.registrationForm.get('subdivision_id')?.reset({ emitEvent: false });
-      this.registrationForm.get('ulb_id')?.reset({ emitEvent: false });
-      this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
-    }
+        if (Array.isArray(district)) {
+          this.registrationForm
+            .get('subdivision_id')
+            ?.setValue([], { emitEvent: false });
+          this.registrationForm
+            .get('ulb_id')
+            ?.setValue([], { emitEvent: false });
+          this.registrationForm
+            .get('ward_id')
+            ?.setValue([], { emitEvent: false });
+        } else {
+          this.registrationForm
+            .get('subdivision_id')
+            ?.reset({ emitEvent: false });
+          this.registrationForm.get('ulb_id')?.reset({ emitEvent: false });
+          this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
+        }
 
-    this.subdivisions = [];
-    this.ulbs = [];
-    this.wards = [];
+        this.subdivisions = [];
+        this.ulbs = [];
+        this.wards = [];
 
-    if (district && (Array.isArray(district) ? district.length > 0 : true)) {
-      this.loadSubdivisions(district);
-    }
-  });
+        if (
+          district &&
+          (Array.isArray(district) ? district.length > 0 : true)
+        ) {
+          this.loadSubdivisions(district);
+        }
+      });
 
-this.registrationForm.get('subdivision_id')?.valueChanges
-  .pipe(distinctUntilChanged((a, b) => this.areSameValues(a, b)))
-  .subscribe((subdivision) => {
-    if (this.suppressCascading) return;
+    this.registrationForm
+      .get('subdivision_id')
+      ?.valueChanges.pipe(
+        distinctUntilChanged((a, b) => this.areSameValues(a, b))
+      )
+      .subscribe((subdivision) => {
+        if (this.suppressCascading) return;
 
-    // reset ulb cache when subdivision changes
-    this.lastUlbsKey = '';
+        // reset ulb cache when subdivision changes
+        this.lastUlbsKey = '';
 
-    if (Array.isArray(subdivision)) {
-      this.registrationForm.get('ulb_id')?.setValue([], { emitEvent: false });
-      this.registrationForm.get('ward_id')?.setValue([], { emitEvent: false });
-    } else {
-      this.registrationForm.get('ulb_id')?.reset({ emitEvent: false });
-      this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
-    }
+        if (Array.isArray(subdivision)) {
+          this.registrationForm
+            .get('ulb_id')
+            ?.setValue([], { emitEvent: false });
+          this.registrationForm
+            .get('ward_id')
+            ?.setValue([], { emitEvent: false });
+        } else {
+          this.registrationForm.get('ulb_id')?.reset({ emitEvent: false });
+          this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
+        }
 
-    this.ulbs = [];
-    this.wards = [];
+        this.ulbs = [];
+        this.wards = [];
 
-    if (subdivision && (Array.isArray(subdivision) ? subdivision.length > 0 : true)) {
-      this.loadUlbs(subdivision);
-    }
-  });
+        if (
+          subdivision &&
+          (Array.isArray(subdivision) ? subdivision.length > 0 : true)
+        ) {
+          this.loadUlbs(subdivision);
+        }
+      });
 
-this.registrationForm.get('ulb_id')?.valueChanges
-  .pipe(distinctUntilChanged((a, b) => this.areSameValues(a, b)))
-  .subscribe((ulb) => {
-    if (this.suppressCascading) return;
+    this.registrationForm
+      .get('ulb_id')
+      ?.valueChanges.pipe(
+        distinctUntilChanged((a, b) => this.areSameValues(a, b))
+      )
+      .subscribe((ulb) => {
+        if (this.suppressCascading) return;
 
-    if (Array.isArray(ulb)) {
-      this.registrationForm.get('ward_id')?.setValue([], { emitEvent: false });
-    } else {
-      this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
-    }
-    this.wards = [];
+        if (Array.isArray(ulb)) {
+          this.registrationForm
+            .get('ward_id')
+            ?.setValue([], { emitEvent: false });
+        } else {
+          this.registrationForm.get('ward_id')?.reset({ emitEvent: false });
+        }
+        this.wards = [];
 
-    if (ulb && (Array.isArray(ulb) ? ulb.length > 0 : true)) {
-      if (this.sourcePage === 'departmental-users') {
-        // departmental-users handles wards differently — keep same logic
-      } else {
-        this.loadWards(ulb);
-      }
-    }
-  });
-
+        if (ulb && (Array.isArray(ulb) ? ulb.length > 0 : true)) {
+          if (this.sourcePage === 'departmental-users') {
+            // departmental-users handles wards differently — keep same logic
+          } else {
+            this.loadWards(ulb);
+          }
+        }
+      });
   }
 
   loadDistricts(): void {
@@ -901,38 +1029,40 @@ loadSubdivisions(districtCodes: string | string[]): void {
   this.loadingSubdivisions = true;
   const codesRaw = Array.isArray(districtCodes) ? districtCodes : [districtCodes];
 
-  // normalize & remove falsy values
-  const codes = codesRaw.map((c: any) => String(c).trim()).filter((c: string) => c !== '' && c !== 'null' && c !== 'undefined');
+    // normalize & remove falsy values
+    const codes = codesRaw
+      .map((c: any) => String(c).trim())
+      .filter((c: string) => c !== '' && c !== 'null' && c !== 'undefined');
 
-  // nothing valid to query
-  if (codes.length === 0) {
-    this.loadingSubdivisions = false;
-    return;
-  }
-
-  // prevent duplicate identical requests (use normalized codes)
-  const key = codes.map(String).sort().join(',');
-  if (key === this.lastSubdivisionsKey) {
-    this.loadingSubdivisions = false;
-    return;
-  }
-  this.lastSubdivisionsKey = key;
-
-  let payload: any;
-  let endpoint = 'api/tripura/get-sub-subdivisions';
-
-  if (this.sourcePage === 'departmental-users' && codes.length >= 1) {
-    const numeric = codes.map((c) => Number(c)).filter(n => !isNaN(n));
-    if (numeric.length === 0) {
+    // nothing valid to query
+    if (codes.length === 0) {
       this.loadingSubdivisions = false;
       return;
     }
-    payload = { districts: numeric };
-    endpoint = 'api/tripura/get-multiple-subdivisions';
-  } else {
-    payload = { district: codes[0] };
-    endpoint = 'api/tripura/get-sub-subdivisions';
-  }
+
+    // prevent duplicate identical requests (use normalized codes)
+    const key = codes.map(String).sort().join(',');
+    if (key === this.lastSubdivisionsKey) {
+      this.loadingSubdivisions = false;
+      return;
+    }
+    this.lastSubdivisionsKey = key;
+
+    let payload: any;
+    let endpoint = 'api/tripura/get-sub-subdivisions';
+
+    if (this.sourcePage === 'departmental-users' && codes.length >= 1) {
+      const numeric = codes.map((c) => Number(c)).filter((n) => !isNaN(n));
+      if (numeric.length === 0) {
+        this.loadingSubdivisions = false;
+        return;
+      }
+      payload = { districts: numeric };
+      endpoint = 'api/tripura/get-multiple-subdivisions';
+    } else {
+      payload = { district: codes[0] };
+      endpoint = 'api/tripura/get-sub-subdivisions';
+    }
 
   this.genericService.getByConditions(payload, endpoint).subscribe({
     next: (res: any) => {
@@ -1001,42 +1131,46 @@ loadSubdivisions(districtCodes: string | string[]): void {
 
 
 
-loadUlbs(subdivisionCodes: string | string[]): void {
-  this.loadingUlbs = true;
-  const codesRaw = Array.isArray(subdivisionCodes) ? subdivisionCodes : [subdivisionCodes];
+  loadUlbs(subdivisionCodes: string | string[]): void {
+    this.loadingUlbs = true;
+    const codesRaw = Array.isArray(subdivisionCodes)
+      ? subdivisionCodes
+      : [subdivisionCodes];
 
-  // normalize & remove falsy values
-  const codes = codesRaw.map((c: any) => String(c).trim()).filter((c: string) => c !== '' && c !== 'null' && c !== 'undefined');
+    // normalize & remove falsy values
+    const codes = codesRaw
+      .map((c: any) => String(c).trim())
+      .filter((c: string) => c !== '' && c !== 'null' && c !== 'undefined');
 
-  // nothing valid to query
-  if (codes.length === 0) {
-    this.loadingUlbs = false;
-    return;
-  }
-
-  // prevent duplicate identical requests (use normalized codes)
-  const key = codes.map(String).sort().join(',');
-  if (key === this.lastUlbsKey) {
-    this.loadingUlbs = false;
-    return;
-  }
-  this.lastUlbsKey = key;
-
-  let payload: any;
-  let endpoint = 'api/tripura/get-block-names';
-
-  if (this.sourcePage === 'departmental-users' && codes.length >= 1) {
-    const numeric = codes.map((c) => Number(c)).filter(n => !isNaN(n));
-    if (numeric.length === 0) {
+    // nothing valid to query
+    if (codes.length === 0) {
       this.loadingUlbs = false;
       return;
     }
-    payload = { subdivisions: numeric };
-    endpoint = 'api/tripura/get-multiple-block';
-  } else {
-    payload = { subdivision: codes[0] };
-    endpoint = 'api/tripura/get-block-names';
-  }
+
+    // prevent duplicate identical requests (use normalized codes)
+    const key = codes.map(String).sort().join(',');
+    if (key === this.lastUlbsKey) {
+      this.loadingUlbs = false;
+      return;
+    }
+    this.lastUlbsKey = key;
+
+    let payload: any;
+    let endpoint = 'api/tripura/get-block-names';
+
+    if (this.sourcePage === 'departmental-users' && codes.length >= 1) {
+      const numeric = codes.map((c) => Number(c)).filter((n) => !isNaN(n));
+      if (numeric.length === 0) {
+        this.loadingUlbs = false;
+        return;
+      }
+      payload = { subdivisions: numeric };
+      endpoint = 'api/tripura/get-multiple-block';
+    } else {
+      payload = { subdivision: codes[0] };
+      endpoint = 'api/tripura/get-block-names';
+    }
 
   this.genericService.getByConditions(payload, endpoint).subscribe({
     next: (res: any) => {
@@ -1105,10 +1239,7 @@ loadUlbs(subdivisionCodes: string | string[]): void {
   loadWards(ulbCodes: string | string[]): void {
     this.loadingWards = true;
     const codes = Array.isArray(ulbCodes) ? ulbCodes : [ulbCodes];
-    const payload =
-      codes.length === 1
-        ? { ulb: codes[0] }
-        : { ulb: codes };
+    const payload = codes.length === 1 ? { ulb: codes[0] } : { ulb: codes };
 
     this.genericService
       .getByConditions(payload, 'api/tripura/get-gp-vc-wards')
@@ -1152,12 +1283,19 @@ loadUlbs(subdivisionCodes: string | string[]): void {
     }
 
     if (!this.registrationForm.valid) {
-      this.genericService.openSnackBar('Please fill all required fields.', 'Error');
+      this.genericService.openSnackBar(
+        'Please fill all required fields.',
+        'Error'
+      );
       return;
     }
     try {
-      const { confirmPassword, ...raw } = this.registrationForm.value;
-      const payload: any = { ...raw }
+      const { confirmPassword, whatsapp_no: formWhatsappNo, ...raw } =
+        this.registrationForm.value;
+      const payload: any = { ...raw };
+      payload.whatsapp_no = this.whatsappSameAsMobile
+        ? raw.mobile_no
+        : formWhatsappNo;
       if (payload.hasOwnProperty('inspector')) {
         const ins = payload.inspector;
         if (ins === '1' || ins === 1 || String(ins).toLowerCase() === 'yes') {
@@ -1167,7 +1305,12 @@ loadUlbs(subdivisionCodes: string | string[]): void {
         }
       }
 
-      const cascadeFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
+      const cascadeFields = [
+        'district_id',
+        'subdivision_id',
+        'ulb_id',
+        'ward_id',
+      ];
       const hierarchy = this.registrationForm.get('hierarchy_level')?.value;
       const isStateLevel = ['state1', 'state2', 'state3'].includes(hierarchy);
 
@@ -1187,9 +1330,15 @@ loadUlbs(subdivisionCodes: string | string[]): void {
             const showDistrict = this.shouldShow('district');
             const showSubdivision = this.shouldShow('subdivision');
             const showBlock = this.shouldShow('block');
-            const distArr = showDistrict ? this.normalizeToArray(payload.district_id) : [null];
-            const subArr = showSubdivision ? this.normalizeToArray(payload.subdivision_id) : [null];
-            const blockArr = showBlock ? this.normalizeToArray(payload.ulb_id) : [null];
+            const distArr = showDistrict
+              ? this.normalizeToArray(payload.district_id)
+              : [null];
+            const subArr = showSubdivision
+              ? this.normalizeToArray(payload.subdivision_id)
+              : [null];
+            const blockArr = showBlock
+              ? this.normalizeToArray(payload.ulb_id)
+              : [null];
             const built: any[] = [];
             distArr.forEach((d) => {
               subArr.forEach((s) => {
@@ -1203,11 +1352,16 @@ loadUlbs(subdivisionCodes: string | string[]): void {
               });
             });
             const filtered = built.filter(
-              (loc) => loc.district_id !== null || loc.subdivision_id !== null || loc.block_id !== null
+              (loc) =>
+                loc.district_id !== null ||
+                loc.subdivision_id !== null ||
+                loc.block_id !== null
             );
             const uniq = new Map<string, any>();
             filtered.forEach((loc) => {
-              const key = `${loc.district_id ?? ''}|${loc.subdivision_id ?? ''}|${loc.block_id ?? ''}`;
+              const key = `${loc.district_id ?? ''}|${
+                loc.subdivision_id ?? ''
+              }|${loc.block_id ?? ''}`;
               if (!uniq.has(key)) uniq.set(key, loc);
             });
             locations = Array.from(uniq.values());
@@ -1248,7 +1402,12 @@ loadUlbs(subdivisionCodes: string | string[]): void {
         delete payload.hierarchy_level;
         delete payload.inspector;
       }
-      const hierarchyFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
+      const hierarchyFields = [
+        'district_id',
+        'subdivision_id',
+        'ulb_id',
+        'ward_id',
+      ];
       const fieldToCheck: Record<string, string> = {
         district_id: 'district',
         subdivision_id: 'subdivision',
@@ -1267,7 +1426,10 @@ loadUlbs(subdivisionCodes: string | string[]): void {
 
         this.genericService.updateProfile(payloadWithId).subscribe({
           next: (res: any) => {
-            this.genericService.openSnackBar('User updated successfully!', 'Success');
+            this.genericService.openSnackBar(
+              'User updated successfully!',
+              'Success'
+            );
             this.registrationSuccess.emit();
           },
           error: (err: any) => {
@@ -1280,7 +1442,10 @@ loadUlbs(subdivisionCodes: string | string[]): void {
         this.registerNewUser(payload);
       }
     } catch (ex) {
-      this.genericService.openSnackBar('Something went wrong. Please try again.', 'Error');
+      this.genericService.openSnackBar(
+        'Something went wrong. Please try again.',
+        'Error'
+      );
     }
   }
 
@@ -1489,55 +1654,55 @@ getLocationsPayload(): any[] {
     }
     return err?.error?.message || 'Something went wrong. Please try again.';
   }
-getAllDepartmentList(): void {
-  if (this.departmentsLoaded || this.loadingDepartments) return;
-  this.loadingDepartments = true;
+  getAllDepartmentList(): void {
+    if (this.departmentsLoaded || this.loadingDepartments) return;
+    this.loadingDepartments = true;
 
-  this.genericService
-    .getByConditions({}, 'api/department-get-all-departments')
-    .subscribe({
-      next: (res: any) => {
-        if (res?.status === 1 && Array.isArray(res.data)) {
-          this.departments = res.data.map((d: any) => ({
-            id: String(d.id ?? d.department_id),
-            name: d.name ?? d.department_name ?? 'Unnamed Department',
-          }));
-          this.departmentsLoaded = true;
-        } else {
+    this.genericService
+      .getByConditions({}, 'api/department-get-all-departments')
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status === 1 && Array.isArray(res.data)) {
+            this.departments = res.data.map((d: any) => ({
+              id: String(d.id ?? d.department_id),
+              name: d.name ?? d.department_name ?? 'Unnamed Department',
+            }));
+            this.departmentsLoaded = true;
+          } else {
+            this.departments = [];
+          }
+          this.loadingDepartments = false;
+        },
+        error: (err) => {
+          console.error('Error fetching departments:', err);
           this.departments = [];
-        }
-        this.loadingDepartments = false;
-      },
-      error: (err) => {
-        console.error('Error fetching departments:', err);
-        this.departments = [];
-        this.loadingDepartments = false;
-      },
-    });
-}
+          this.loadingDepartments = false;
+        },
+      });
+  }
 
-shouldShow(field: string): boolean {
-  const h = this.registrationForm.get('hierarchy_level')?.value;
-  const u = this.registrationForm.get('user_type')?.value;
-  if (field === 'ulb') field = 'block';
-  if (u === 'individual') return true;
-  if (['state1', 'state2', 'state3'].includes(h)) {
+  shouldShow(field: string): boolean {
+    const h = this.registrationForm.get('hierarchy_level')?.value;
+    const u = this.registrationForm.get('user_type')?.value;
+    if (field === 'ulb') field = 'block';
+    if (u === 'individual') return true;
+    if (['state1', 'state2', 'state3'].includes(h)) {
+      return false;
+    }
+    if (h === 'district1' || h === 'district2' || h === 'district3') {
+      return field === 'district';
+    }
+
+    if (h === 'subdivision1' || h === 'subdivision2' || h === 'subdivision3') {
+      return ['district', 'subdivision'].includes(field);
+    }
+    if (h === 'block') {
+      if (field === 'ward') return true;
+      return ['district', 'subdivision', 'block'].includes(field);
+    }
+
     return false;
   }
-  if (h === 'district1' || h === 'district2' || h === 'district3') {
-    return field === 'district';
-  }
-
-  if (h === 'subdivision1' || h === 'subdivision2' || h === 'subdivision3') {
-    return ['district', 'subdivision'].includes(field);
-  }
-  if (h === 'block') {
-    if (field === 'ward') return true;
-    return ['district', 'subdivision', 'block'].includes(field);
-  }
-
-  return false;
-}
 
   getRadioOptions() {
     return [
@@ -1658,5 +1823,22 @@ shouldShow(field: string): boolean {
           this.genericService.openSnackBar(message, 'Error');
         },
       });
+  }
+
+  toggleWhatsappSameAsMobile(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.whatsappSameAsMobile = checked;
+
+    if (checked) {
+      this.registrationForm.removeControl('whatsapp_no');
+    } else {
+      this.registrationForm.addControl(
+        'whatsapp_no',
+        this.fb.control('', [
+          Validators.required,
+          Validators.pattern(/^\d{10}$/),
+        ])
+      );
+    }
   }
 }

@@ -11,14 +11,19 @@
   </div>
 
   <div class="application-card" *ngIf="application && !isLoading">
+    <div class="app-header">
+      <h2 class="app-title">Application Information</h2>
+      <!-- Show Download Certificate button only if not third-party AND has download URL -->
+      <button class="btn-download" *ngIf=" hasDownloadUrl" (click)="downloadCertificate()">
+        Download Certificate
+      </button>
+      <button class="btn-print " (click)="printPage()">
+        🖨 Print Application
+      </button>
+    </div>
+    <div id="print-area">
+      
     <section class="section">
-      <div class="app-header">
-        <h2 class="app-title">Application Information</h2>
-        <!-- Show Download Certificate button only if not third-party AND has download URL -->
-        <button class="btn-download" *ngIf=" hasDownloadUrl" (click)="downloadCertificate()">
-          Download Certificate
-        </button>
-      </div>
       <div class="grid">
         <div class="field" *ngIf="application?.applicationId">
           <label>Application Number</label>
@@ -158,9 +163,9 @@
         </div>
       </div>
     </section>
+ </div>
 
-
-    <section class="section">
+    <section class="section mt-5">
       <h2>Application History</h2>
       <app-dynamic-table [searchable]="false" [columns]="historyColumns" [data]="historyDetails">
       </app-dynamic-table>
@@ -172,5 +177,6 @@
       <app-dynamic-table [searchable]="false" [columns]="transactionColumns"
         [data]="transactionDetails"></app-dynamic-table>
     </section>
+   
   </div>
 </div>
