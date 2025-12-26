@@ -369,4 +369,56 @@ export class UserApplicationViewComponent implements OnInit {
     traverse(data);
     return result;
   }
+
+printPage(): void {
+  const printContent = document.getElementById('print-area');
+  if (!printContent) {
+    console.warn('Print area not found');
+    return;
+  }
+
+  setTimeout(() => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Blocked',
+        text: 'Popup blocked. Please allow popups to print.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+      .map((style) => style.outerHTML)
+      .join('');
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Application</title>
+          ${styles}
+          <style>
+            body { margin: 20px; padding-top:12px; font-family: Arial, sans-serif; }
+            @media print {
+              body { margin: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    printWindow.onload = () => {
+      printWindow.print();
+    
+    };
+
+  }, 500);
+}
 }
