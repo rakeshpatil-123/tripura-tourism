@@ -59,21 +59,27 @@ export class HeaderNewComponent implements OnInit, OnDestroy, AfterViewInit {
     this.genericService.logoutUser();
     localStorage.removeItem('token');
     this.isLoggedIn = false;
-    window.location.href = '/';
+    // window.location.href = '/';
+    window.location.href = this.getRedirectUrl('/');
+  }
+  private getRedirectUrl(path: string): string {
+    const { origin, pathname } = window.location;
+    const basePath = pathname.startsWith('/new') ? '/new' : '';
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${origin}${basePath}${normalized}`;
   }
 
   navigateToRegister() {
-    console.log('Navigating to registration page...');
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       this.router.navigate(['/page/registration']).then(
         (success: boolean) => {
-          console.log('Registration navigation successful:', success);
         },
         (error: any) => {
-          console.error('Registration navigation failed:', error);
-          window.location.href = '/page/registration';
+          window.location.href = this.getRedirectUrl('/page/registration');
         }
       );
+    }).catch(() => {
+      window.location.href = this.getRedirectUrl('/page/registration');
     });
   }
 

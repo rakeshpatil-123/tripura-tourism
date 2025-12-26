@@ -564,7 +564,7 @@ export class GenericService {
       });
 
       this.setLoginStatus(true);
-      const checkKeys = ['district', 'subdivision', 'ulb', 'ward',];
+      const checkKeys = ['district', 'subdivision', 'ulb', 'ward', 'pan'];
       const missing: string[] = [];
 
       checkKeys.forEach((k) => {
@@ -677,7 +677,7 @@ export class GenericService {
         }).then(() => {
           this.removeSessionData();
           // this.router.navigate(['/']);
-          window.location.href = '/';
+          window.location.href = this.getRedirectUrl('/');
         });
       },
       error: (error) => {
@@ -704,7 +704,7 @@ export class GenericService {
           icon: 'warning',
         }).then(() => {
           this.removeSessionData();
-          window.location.href = '/';
+          window.location.href = this.getRedirectUrl('/');
           // this.router.navigate(['/']);
         });
       },
@@ -737,10 +737,16 @@ export class GenericService {
       },
     }).then(() => {
       // this.router.navigate(['/page/login']);
-      window.location.href = '/page/login';
+      // window.location.href = '/page/login';
+      window.location.href = this.getRedirectUrl('/page/login');
     });
   }
-
+  private getRedirectUrl(path: string): string {
+    const { origin, pathname } = window.location;
+    const basePath = pathname.startsWith('/new') ? '/new' : '';
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${origin}${basePath}${normalized}`;
+  }
   encryptData(data: any): string {
     try {
       return CryptoJS.AES.encrypt(
