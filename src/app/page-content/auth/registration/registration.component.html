@@ -77,18 +77,16 @@
             }" class="mobile-status-text" aria-live="polite">
               {{ mobileStatusMessage }}
               </small>
-              <!-- OTP Send section: hide the entire send-otp section when hideSendOtp is true -->
-              <!-- OTP Send section: show only when API check completed and number is not taken -->
-              <div *ngIf="!editMode && sourcePage !== 'departmental-users'
-                                 && registrationForm.get('mobile_no')?.value?.toString().trim().length >= 10
-                                 && mobileChecked
-                                 && !hideSendOtp
-                                 && mobileStatusType !== 'error'" class="otp-section mb-2">
-                <button type="button" class="btn-otp" (click)="sendOtp()"
-                  [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid || registrationForm.get('mobile_no')?.hasError('taken')">
-                  {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
-                </button>
-          </div>
+            <div *ngIf="!editMode && sourcePage !== 'departmental-users'
+                                     && registrationForm.get('mobile_no')?.value?.toString().trim().length === 10
+                                     && registrationForm.get('mobile_no')?.valid
+                                     && !hideSendOtp
+                                     && mobileStatusType !== 'error'" class="otp-section mb-2">
+              <button type="button" class="btn-otp" (click)="sendOtp()"
+                [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid || registrationForm.get('mobile_no')?.hasError('taken')">
+                {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
+              </button>
+            </div>
 
           <div
               *ngIf="registrationForm.get('mobile_no')?.value?.toString().trim().length === 10 && registrationForm.get('mobile_no')?.valid"
@@ -210,8 +208,10 @@
         </div>
       </form>
 
-      <span *ngIf="!(sourcePage === 'departmental-users')" class="text-center small mt-2">Already Registered? <a
-          href="/page/login">Login</a></span>
+      <span *ngIf="sourcePage !== 'departmental-users'" class="text-center small mt-2">
+        Already Registered?
+        <a role="button"  (click)="goToLogin()" class="login-link">Login</a>
+      </span>
     </div>
   </div>
 </div>

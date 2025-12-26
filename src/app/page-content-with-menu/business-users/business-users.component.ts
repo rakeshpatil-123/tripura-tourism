@@ -48,6 +48,7 @@ export class BusinessUsersComponent implements OnInit {
     { field: 'mobile_no', header: 'Mobile' },
     { field: 'user_name', header: 'Username' },
     { field: 'bin', header: 'BIN' },
+    { field: 'pan', header: 'PAN' },
     { field: 'district_name', header: 'District Name' },
     { field: 'subdivision_name', header: 'Subdivision Name' },
     { field: 'ulb_name', header: 'ULB Name' },

@@ -22,5 +22,11 @@ export const routes: Routes = [
         path: 'unauthorized',
         loadComponent: () =>
             import('./page-template/unauthorized/unauthorizedd/unauthorizedd.component').then(m => m.UnauthorizeddComponent)
-    }
+    },
+    // {
+    //     path: 'switch-user',
+    //     loadComponent: () =>
+    //         import('./page-content-with-menu/switch-user/switch-user.component')
+    //             .then(m => m.SwitchUserComponent)
+    // }
 ];
