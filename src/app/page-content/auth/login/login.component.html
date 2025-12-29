@@ -74,3 +74,24 @@
     </div>
   </div>
 </div>
+
+@if(goToForgetPassword === true){
+<div class="popup-overlay">
+  <div class="popup-content">
+    <div class="success-icon">✓</div>
+
+    <h4 class="popup-title">Password reset required.</h4>
+
+    <div class="popup-details">
+      <h5 >Please reset your password.
+      </h5>
+    </div>
+
+    <button class="btn btn-success popup-btn" (click)="goTo()">
+      Reset
+    </button>
+  </div>
+</div>
+
+
+}

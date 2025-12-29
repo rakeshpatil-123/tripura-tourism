@@ -117,7 +117,6 @@ export class RepeatApplicationsComponent implements OnInit {
     if (this.applications.length === 0) return;
 
     const allowedKeys = [
-      'application_id',
       'service_title_or_description',
       'application_type',
       'department_name',

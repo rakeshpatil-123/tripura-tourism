@@ -120,6 +120,7 @@ export class ServiceApplicationComponent implements OnInit {
   defaultValue: any = null;
   existingFileUrls: { [questionId: number]: string } = {};
   public Object = Object;
+  isCalculated: boolean  = false;
   calculatedFee: number | null = null;
   previousPaid: number | null = null;
   effectiveFee: number | null = null;
@@ -1233,6 +1234,7 @@ export class ServiceApplicationComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res?.status === 1) {
+            this.isCalculated = true;
             this.calculatedFee = Number(res.data.final_fee);
             this.effectiveFee = Number(res.data.effective_fee);
             this.previousPaid = Number(res.data.previous_paid);

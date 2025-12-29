@@ -1,10 +1,22 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { Router } from '@angular/router';
-import { MatIconModule } from "@angular/material/icon";
+import { MatIconModule } from '@angular/material/icon';
 import { LoaderService } from '../../../_service/loader/loader.service';
 import { finalize } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,7 +25,12 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IlogiInputComponent, MatIconModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    IlogiInputComponent,
+    MatIconModule,
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
@@ -24,13 +41,11 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   //   // '../../../../assets/images/Second_Department-list.png',
   //   '../../../../assets/images/Login_ Page_ Banner.png'
   // ];
-  images: string[] = [
-    'assets/images/Login_ Page_ Banner.png'
-  ];
+  images: string[] = ['assets/images/Login_ Page_ Banner.png'];
   currentImageIndex = 0;
   previousImageIndex = 0;
   private intervalId: any;
-
+  goToForgetPassword: boolean = false;
   @ViewChild('captchaCanvas') captchaCanvas!: ElementRef<HTMLCanvasElement>;
   captchaCode: string = '';
   length: number = 6; // standard captcha length
@@ -41,27 +56,27 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private genericService: GenericService,
-    private loaderService : LoaderService,
+    private loaderService: LoaderService,
     private router: Router,
-    private _matSnackBar: MatSnackBar,
+    private _matSnackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
       user_name: ['', Validators.required],
       password: ['', Validators.required],
-      captchaInput: ['',]
+      captchaInput: [''],
     });
   }
 
   ngOnInit(): void {
     this.basePath = this.getBasePath();
-    this.images = this.images.map(src => encodeURI(src));
-    this.images.forEach(src => {
+    this.images = this.images.map((src) => encodeURI(src));
+    this.images.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
     this.startCarousel();
   }
-   ngAfterViewInit(): void {
+  ngAfterViewInit(): void {
     this.generateCaptcha();
   }
   ngOnDestroy(): void {
@@ -71,10 +86,13 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   startCarousel(): void {
     this.intervalId = setInterval(() => {
       this.previousImageIndex = this.currentImageIndex;
-      this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
+      this.currentImageIndex =
+        (this.currentImageIndex + 1) % this.images.length;
     }, 5000);
   }
-
+  goTo() {
+    this.router.navigate(['page/forgot-password']);
+  }
   onSubmit(): void {
     // small inline escape helper to avoid needing a separate class method
     const escapeHtmlInline = (unsafe: string | null | undefined): string => {
@@ -89,7 +107,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // --- CAPTCHA check (unchanged logic) ---
     if (!this.captchaValid) {
-      this.genericService.openSnackBar('Please enter the correct CAPTCHA!', 'Error');
+      this.genericService.openSnackBar(
+        'Please enter the correct CAPTCHA!',
+        'Error'
+      );
       return;
     }
 
@@ -99,49 +120,67 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loaderService.showLoader();
 
       // call login API, hide loader after observable completes
-      this.genericService.loginUser(payload)
+      this.genericService
+        .loginUser(payload)
         .pipe(finalize(() => this.loaderService.hideLoader()))
         .subscribe({
           next: (response) => {
-            // preserve existing behaviour exactly: token + session storage
+            if (
+              response.status === 0 &&
+              response.password_reset_required === true
+            ) {
+              this.goToForgetPassword = true;
+              return;
+            }
             if (response?.token) {
+              this.goToForgetPassword = false;
+
               localStorage.setItem('token', response.token);
             }
 
-            // storeSessionData now returns array of missing profile fields
-            const missing = this.genericService.storeSessionData(response, payload.rememberMe || false);
+            const missing = this.genericService.storeSessionData(
+              response,
+              payload.rememberMe || false
+            );
 
-            // still keep other local storage items (if required)
-            localStorage.setItem('userName', response.data.authorized_person_name || '');
+            localStorage.setItem(
+              'userName',
+              response.data.authorized_person_name || ''
+            );
             localStorage.setItem('userRole', response.data.user_type || '');
             localStorage.setItem('email_id', response.data.email_id || '');
             localStorage.setItem('deptId', response.data.department_id || '');
-            localStorage.setItem('deptName', response.data.department_name || '');
+            localStorage.setItem(
+              'deptName',
+              response.data.department_name || ''
+            );
             localStorage.setItem('hierarchy', response.data.hierarchy || '');
-            localStorage.setItem('designation', response.data.designation || '');
+            localStorage.setItem(
+              'designation',
+              response.data.designation || ''
+            );
             localStorage.setItem('district', response.data.district || '');
-            localStorage.setItem('subdivision', response.data.subdivision || '');
+            localStorage.setItem(
+              'subdivision',
+              response.data.subdivision || ''
+            );
             localStorage.setItem('ulb', response.data.ulb || '');
             localStorage.setItem('ward', response.data.ward || '');
             localStorage.setItem('userId', response.data.id || '');
             localStorage.setItem('bin', response.data.bin || '');
-            // ...any other items you keep...
 
-            // friendly success feedback (keeps original snackbar call)
             this.genericService.openSnackBar('Login successful!', 'Success');
             this.genericService.setLoginStatus(true);
 
-            // reset form + captcha (unchanged)
             this.loginForm.reset();
             this.captchaValid = false;
             this.generateCaptcha();
 
-            // Decide next navigation:
-            // If user is an 'individual' and there are missing profile fields -> show popup and redirect to profile page
-            const isIndividual = String(response?.data?.user_type || '').toLowerCase() === 'individual';
+            const isIndividual =
+              String(response?.data?.user_type || '').toLowerCase() ===
+              'individual';
             const missingForIndividual = isIndividual ? missing : [];
 
-            // ---------- Stylish, animated, responsive SweetAlert2 modal ----------
             // We'll inject a small stylesheet (once) to give the modal a professional non-black background, animations and responsive layout.
             const STYLE_ID = 'swal-custom-professional-styles';
             if (!document.getElementById(STYLE_ID)) {
@@ -282,18 +321,21 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
             }
 
             // Build nice human-friendly list string and html (one item per line, with bullet)
-            const humanList = (missingForIndividual || []).map(f => this.humanizeMissingField(f));
+            const humanList = (missingForIndividual || []).map((f) =>
+              this.humanizeMissingField(f)
+            );
             const listHtml = humanList.length
-              ? `<ul class="custom-missing-list">${humanList.map(h => `<li>${escapeHtmlInline(h)}</li>`).join('')}</ul>`
+              ? `<ul class="custom-missing-list">${humanList
+                  .map((h) => `<li>${escapeHtmlInline(h)}</li>`)
+                  .join('')}</ul>`
               : '';
-
 
             // If there are missing fields, show the bespoke, animated SweetAlert2 modal.
             if (missingForIndividual && missingForIndividual.length > 0) {
               Swal.fire({
-                title: '<span style="display:block">Profile update required</span>',
-                html:
-                  `<div class="custom-professional-content" style="display:flex; gap:12px; align-items:flex-start;">
+                title:
+                  '<span style="display:block">Profile update required</span>',
+                html: `<div class="custom-professional-content" style="display:flex; gap:12px; align-items:flex-start;">
                     <div aria-hidden="true" style="flex:0 0 46px; display:flex; align-items:center; justify-content:center;">
                       <div style="width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center;
                                   background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));
@@ -324,18 +366,30 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
                   title: 'custom-professional-title',
                   actions: 'custom-professional-actions',
                   confirmButton: 'custom-professional-confirm',
-                  cancelButton: 'custom-professional-cancel'
+                  cancelButton: 'custom-professional-cancel',
                 },
                 willOpen: () => {
-                  const confirmBtn = document.querySelector('.swal2-confirm') as HTMLElement | null;
-                  const cancelBtn = document.querySelector('.swal2-cancel') as HTMLElement | null;
-                  if (confirmBtn) { confirmBtn.setAttribute('aria-label', 'Update Profile'); }
-                  if (cancelBtn) { cancelBtn.setAttribute('aria-label', 'Later, update dashboard home'); }
-                }
-              }).then(result => {
+                  const confirmBtn = document.querySelector(
+                    '.swal2-confirm'
+                  ) as HTMLElement | null;
+                  const cancelBtn = document.querySelector(
+                    '.swal2-cancel'
+                  ) as HTMLElement | null;
+                  if (confirmBtn) {
+                    confirmBtn.setAttribute('aria-label', 'Update Profile');
+                  }
+                  if (cancelBtn) {
+                    cancelBtn.setAttribute(
+                      'aria-label',
+                      'Later, update dashboard home'
+                    );
+                  }
+                },
+              }).then((result) => {
                 const { origin, pathname } = window.location;
                 const basePath = pathname.startsWith('/new') ? '/new' : '';
-                const profileUrl = origin + basePath + '/dashboard/user-profile';
+                const profileUrl =
+                  origin + basePath + '/dashboard/user-profile';
                 const homeUrl = origin + basePath + '/dashboard/home';
 
                 if (result.isConfirmed) {
@@ -356,10 +410,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
                 showConfirmButton: false,
                 timer: 2200,
                 timerProgressBar: true,
-                customClass: { popup: 'custom-professional-popup' }
+                customClass: { popup: 'custom-professional-popup' },
               }).fire({
                 icon: 'success',
-                title: 'Welcome back — redirecting to your dashboard'
+                title: 'Welcome back — redirecting to your dashboard',
               });
             }
           },
@@ -369,7 +423,9 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
               !!err &&
               !!err.error &&
               err.error.status === 0 &&
-              String(err.error.message || '').trim().toLowerCase() === 'invalid credentials';
+              String(err.error.message || '')
+                .trim()
+                .toLowerCase() === 'invalid credentials';
 
             if (isInvalidCredentials) {
               const snackRef = this._matSnackBar.open(
@@ -405,7 +461,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
             }
 
             // === Then show an enhanced, animated, professional error modal (keeps parity with snackbar) ===
-            const message = (err && err.error && err.error.message) ? err.error.message : (err?.message || 'Login failed. Please try again later.');
+            const message =
+              err && err.error && err.error.message
+                ? err.error.message
+                : err?.message || 'Login failed. Please try again later.';
             const escaped = escapeHtmlInline(message);
 
             Swal.fire({
@@ -416,8 +475,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
               confirmButtonText: 'OK',
               customClass: {
                 popup: 'custom-professional-popup show-swal-animate',
-                confirmButton: 'custom-professional-confirm'
-              }
+                confirmButton: 'custom-professional-confirm',
+              },
             });
 
             // also call your existing service-based snackbar (keeps parity)
@@ -433,7 +492,6 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
   // Add this helper method inside the same component class (e.g. LoginComponent)
   private escapeHtml(unsafe: string | null | undefined): string {
     const s = (unsafe || '').toString();
@@ -447,9 +505,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private humanizeMissingField(key: string): string {
     if (!key) return '';
-    return key
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+    return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   }
   generateCaptcha(): void {
     let code = '';
@@ -503,7 +559,13 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     for (let i = 0; i < 30; i++) {
       ctx.fillStyle = this.randomColor();
       ctx.beginPath();
-      ctx.arc(Math.random() * width, Math.random() * height, 1.5, 0, Math.PI * 2);
+      ctx.arc(
+        Math.random() * width,
+        Math.random() * height,
+        1.5,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
     }
   }
