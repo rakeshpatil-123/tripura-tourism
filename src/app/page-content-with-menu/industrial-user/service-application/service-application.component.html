@@ -52,7 +52,7 @@
               <ng-container *ngIf="q.question_type === 'file'">
                 <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
                   [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024"
-                  [fileUrl]="getDefaultFileUrl(q.id)" [mandatory]="q.is_required === 'yes'" >
+                  [fileUrl]="getDefaultFileUrl(q.id)" [mandatory]="q.is_required === 'yes'">
                 </app-ilogi-file-upload>
                 <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button" class="sample"
                   (click)="downloadSample(q.sample_format)">
@@ -133,7 +133,7 @@
                           <ng-container *ngIf="q.question_type === 'file'">
                             <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
                               [fileUrl]="getDefaultFileUrl(q.id)" [accept]="q.validation_rule?.pattern || '*'"
-                              [maxFileSize]="5 * 1024 * 1024" [mandatory]="q.is_required === 'yes'" >
+                              [maxFileSize]="5 * 1024 * 1024" [mandatory]="q.is_required === 'yes'">
                             </app-ilogi-file-upload>
                             <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button"
                               class="sample" (click)="downloadSample(q.sample_format)">
@@ -180,7 +180,7 @@
         </div>
       </div>
       <div class="btnss  p-4">
-        @if(applicationStatus === 'draft' || applicationStatus === null) {
+        @if((applicationStatus === 'draft' || applicationStatus === null) && !isCalculated) {
         <button type="button" (click)="draft()" class="btn draft calculate-btn submit-btn" [disabled]="apiCalling">Save
           as Draft</button>
         }
