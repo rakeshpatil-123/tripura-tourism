@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { PageContentComponent } from "./page-content.component";
 import { LoginComponent } from "./auth/login/login.component";
+import { guestGuard } from "../guards/guards/guest.guard";
 
 export const PAGE_CONTENT_ROUTES: Routes = [
     {
@@ -10,21 +11,25 @@ export const PAGE_CONTENT_ROUTES: Routes = [
             {
                 path: 'login',
                 loadComponent: () =>
-                    import('./auth/login/login.component').then(m => m.LoginComponent)
+                    import('./auth/login/login.component').then(m => m.LoginComponent),
+                canActivate: [guestGuard]
             },
             {
                 path: 'registration',
                 loadComponent: () =>
-                    import('./auth/registration/registration.component').then(m => m.RegistrationComponent)
+                    import('./auth/registration/registration.component').then(m => m.RegistrationComponent),
+                canActivate: [guestGuard]
             },
             {
                 path: 'forgot-password',
                 loadComponent: () =>
-                    import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+                    import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
+                canActivate: [guestGuard]
             },
             {
                 path: 'admin',
-                loadComponent: () => import('./auth/admin-login/admin-login.component').then(m => m.AdminLoginComponent)
+                loadComponent: () => import('./auth/admin-login/admin-login.component').then(m => m.AdminLoginComponent),
+                canActivate: [guestGuard]
             },
             {
                 path: 'about-us',

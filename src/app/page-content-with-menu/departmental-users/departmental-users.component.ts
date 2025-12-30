@@ -47,6 +47,7 @@ export class DepartmentalUsersComponent implements OnInit {
   rowsPerPageOptions: number[] = [5, 10, 20];
   displayDialog: boolean = false;
   private readonly STORAGE_KEY = 'selectedDepartment';
+  basePath: string = '';
   usersBackup: any[] = [];
   departments: any[] = [];
   searchChanged: Subject<string> = new Subject<string>();
@@ -79,6 +80,7 @@ export class DepartmentalUsersComponent implements OnInit {
   constructor(private genericService: GenericService, private loaderService: LoaderService, private router: Router) { }
 
   ngOnInit(): void {
+    this.basePath = this.getBasePath();
     const saved = localStorage.getItem(this.STORAGE_KEY);
     this.userRole = localStorage.getItem('userRole');
     const hierarchyLevel = localStorage.getItem('hierarchy');
@@ -97,6 +99,15 @@ export class DepartmentalUsersComponent implements OnInit {
     });
     this.fetchProfile(this.pagination.current_page, this.pagination.row_count);
     this.loadDepartments();
+  }
+  private getBasePath(): string {
+    if (typeof window === 'undefined') return '';
+    const anyWin = window as any;
+    if (typeof anyWin.__BASE_PATH__ === 'string') {
+      return anyWin.__BASE_PATH__.replace(/\/$/, '');
+    }
+    const { pathname } = window.location;
+    return pathname.startsWith('/new') ? '/new' : '';
   }
   applyFilters() {
     this.pagination.current_page = 1;
@@ -178,94 +189,151 @@ export class DepartmentalUsersComponent implements OnInit {
       }
     });
   }
-LoginAsDeptUser(user: any): void {
-  this.loaderService.showLoader();
-  const payload = { user_id: user.id };
+  LoginAsDeptUser(user: any): void {
+    this.loaderService.showLoader();
+    const payload = { user_id: user.id };
 
-  this.genericService.getByConditions(payload, 'api/admin/login-by-admin')
-    .pipe(finalize(() => this.loaderService.hideLoader()))
-    .subscribe({
-      next: (res: any) => {
-        if (res?.status === 1 && res?.token) {
-          try {
-            const existingAdminBackup = localStorage.getItem('admin_token_backup');
-            if (!existingAdminBackup) {
-              const currentToken = localStorage.getItem('token') ?? '';
-              if (currentToken) {
-                localStorage.setItem('admin_token_backup', currentToken);
-              }
-            }
-          } catch (e) {
-            console.warn('Could not backup admin token', e);
-          }
-
-          // open a new tab to a "switch-user" route that will receive the session
-          const switchUrl = `${window.location.origin}/switch-user`;
-          const newWin = window.open(switchUrl, '_blank');
-
-          if (!newWin) {
-            Swal.fire('Popup blocked', 'Please allow popups for this site to switch user.', 'error');
+    this.genericService.getByConditions(payload, 'api/admin/login-by-admin')
+      .pipe(finalize(() => this.loaderService.hideLoader()))
+      .subscribe({
+        next: (res: any) => {
+          if (!(res && res.status === 1 && res.token)) {
+            Swal.fire('Login Failed', res?.message || 'Unable to login this user.', 'error');
             return;
           }
-
-          // Wait for the new tab to signal readiness, then send the payload.
-          // Add a timeout so we don't leave the listener forever.
-          const onMessage = (ev: MessageEvent) => {
-            try {
-              if (ev.origin !== window.location.origin) return; // security
-              if (ev.data === 'SWITCH_USER_READY') {
-                const payloadToSend = {
-                  token: res.token,
-                  token_type: res.token_type || 'bearer',
-                  expires_in: res.expires_in || '',
-                  data: res.data
-                };
-                newWin.postMessage({ action: 'SET_SESSION', payload: payloadToSend }, window.location.origin);
-
-                // optional: focus the new tab
-                try { newWin.focus(); } catch (e) { /* ignore */ }
-
-                window.removeEventListener('message', onMessage);
-                clearTimeout(waitTimeout);
-              }
-            } catch (err) {
-              console.warn('Error handling message from switch window', err);
+          try {
+            const backupKey = 'admin_session_backup_v1';
+            if (!localStorage.getItem(backupKey)) {
+              const adminSnapshot: any = {
+                token: localStorage.getItem('token') || '',
+                userName: localStorage.getItem('userName') || '',
+                userRole: localStorage.getItem('userRole') || '',
+              };
+              localStorage.setItem(backupKey, JSON.stringify(adminSnapshot));
             }
+          } catch (e) {
+            console.warn('Backup admin session failed', e);
+          }
+          const data = res.data || {};
+          const keysToEncrypt = [
+            'token',
+            'id',
+            'name_of_enterprise',
+            'authorized_person_name',
+            'mobile_no',
+            'user_name',
+            'bin',
+            'registered_enterprise_address',
+            'registered_enterprise_city',
+            'user_type',
+            'status'
+          ];
+
+          const encryptedMap: { [k: string]: string } = {};
+          try {
+            keysToEncrypt.forEach((k) => {
+              let rawValue: any = undefined;
+              if (data && (data as any)[k] !== undefined) rawValue = (data as any)[k];
+              else if (res && (res as any)[k] !== undefined) rawValue = (res as any)[k];
+
+              if (rawValue !== undefined && rawValue !== null) {
+                const toStore = (typeof rawValue === 'object') ? JSON.stringify(rawValue) : String(rawValue);
+                try {
+                  if (this.genericService && typeof (this.genericService as any).encryptData === 'function') {
+                    encryptedMap[k] = (this.genericService as any).encryptData(toStore);
+                  } else {
+                    encryptedMap[k] = toStore;
+                  }
+                } catch (e) {
+                  console.warn('encryptData failed for key', k, e);
+                  encryptedMap[k] = String(toStore);
+                }
+              }
+            });
+          } catch (e) {
+            console.warn('Failed to prepare encryptedMap', e);
+          }
+          const plainMap: { [k: string]: string } = {
+            userName: data.authorized_person_name ?? '',
+            userRole: data.user_type ?? '',
+            email_id: data.email_id ?? '',
+            deptId: String(data.department_id ?? ''),
+            deptName: data.department_name ?? '',
+            hierarchy: data.hierarchy ?? '',
+            designation: data.designation ?? '',
+            district: data.district ?? '',
+            subdivision: data.subdivision ?? '',
+            ulb: data.ulb ?? '',
+            ward: data.ward ?? '',
+            userId: String(data.id ?? ''),
+            bin: data.bin ?? '',
+            user_name: data.user_name ?? ''
           };
-          window.addEventListener('message', onMessage);
+          try {
+            localStorage.clear();
+          } catch (e) {
+            console.warn('localStorage.clear failed', e);
+          }
+          const finalStore: { [k: string]: string } = {};
+          Object.keys(encryptedMap).forEach(k => { finalStore[k] = encryptedMap[k]; });
+          Object.keys(plainMap).forEach(k => { finalStore[k] = plainMap[k]; });
+          const redirectPath = this.resolvePath('/dashboard/home');
+          const redirectUrl = `${window.location.origin}${redirectPath}`;
+          const jsonStr = JSON.stringify(finalStore);
+          const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
-          const waitTimeout = window.setTimeout(() => {
-            window.removeEventListener('message', onMessage);
-            Swal.fire('Timeout', 'New tab did not respond. Please try again.', 'error');
-          }, 10000); // 10s timeout
-
-          // IMPORTANT: Do NOT overwrite admin's localStorage session values with the impersonated user's token.
-          // Keep admin logged in in this tab. If you must change UI state, do it without replacing admin credentials.
-          // So DO NOT call localStorage.setItem('token', res.token) here.
-
-          // Keep admin UI logged-in (if your app requires a call)
-          this.genericService.setLoginStatus(true);
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Login Successful',
-            text: `Switched to ${res.data?.name_of_enterprise || res.data?.authorized_person_name || res.data?.email_id}`,
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            // intentionally do not navigate away from admin tab — admin remains logged in here.
-          });
-        } else {
-          Swal.fire('Login Failed', res?.message || 'Unable to login this user.', 'error');
+          const html = `
+          <!doctype html>
+          <html>
+            <head><meta charset="utf-8"/><title>Starting user session...</title></head>
+            <body>
+              <script>
+                (function(){
+                  try {
+                    var dataJson = decodeURIComponent(escape(window.atob('${base64}')));
+                    var data = JSON.parse(dataJson);
+                    for (var k in data) {
+                      if (Object.prototype.hasOwnProperty.call(data, k)) {
+                        try { localStorage.setItem(k, data[k]); } catch(e) { console.warn('ls set failed', e); }
+                      }
+                    }
+                    try { if (window.opener && !window.opener.closed) { window.opener.postMessage({ type: 'IMPERSONATION_DONE', userId: data.userId }, location.origin); } } catch(e) {}
+                    window.location.replace('${redirectUrl}');
+                  } catch(err) {
+                    try { window.location.replace('${this.resolvePath('/page/login')}'); } catch(e) { window.location.href = '${this.resolvePath('/page/login')}'; }
+                  }
+                })();
+              </script>
+            </body>
+          </html>
+        `;
+          try {
+            Object.keys(finalStore).forEach(k => localStorage.setItem(k, finalStore[k]));
+            window.location.replace(redirectUrl);
+          } catch (e) {
+            console.warn('Seeding localStorage or redirect failed', e);
+            Swal.fire('Failed', 'Unable to start user session. Check browser settings or try again.', 'error');
+            return;
+          }
+          Swal.fire({ icon: 'success', title: 'Switched user — new tab opened', timer: 1400, showConfirmButton: false });
+        },
+        error: (err: any) => {
+          console.error('Login as user error:', err);
+          Swal.fire('Error', 'Failed to login user. Please try again.', 'error');
         }
-      },
-      error: (err: any) => {
-        console.error('Login error:', err);
-        Swal.fire('Error', 'Failed to login user. Please try again.', 'error');
-      }
-    });
-}
+      });
+  }
 
+  resolvePath(path: string): string {
+    if (!path) return path;
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) return path;
+    const p = path.startsWith('/') ? path : '/' + path;
+    const base = this.basePath || '';
+    if (!base) return p;
+    if (p === base) return p;
+    if (p.startsWith(base + '/')) return p;
+    return base + p;
+  }
 
      logout(): void {
       this.genericService.logoutUser();

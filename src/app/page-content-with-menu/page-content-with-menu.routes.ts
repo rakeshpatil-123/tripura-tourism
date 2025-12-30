@@ -208,15 +208,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department',] }
       },
-      {
-        path: 'json-to-excel',
-        loadComponent: () =>
-          import(
-            '../page-content-with-menu/sales-report/sales-report.component'
-          ).then((m) => m.SalesReportComponent),
-        canActivate: [authGuard],
-        data: { roles: ['department', 'individual', 'admin'] }
-      },
+      // {
+      //   path: 'json-to-excel',
+      //   loadComponent: () =>
+      //     import(
+      //       '../page-content-with-menu/sales-report/sales-report.component'
+      //     ).then((m) => m.SalesReportComponent),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department', 'individual', 'admin'] }
+      // },
       {
         path: 'all-service-application/:departmentId/:serviceId',
         loadComponent: () =>
