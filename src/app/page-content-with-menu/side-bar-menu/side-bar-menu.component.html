@@ -15,7 +15,7 @@
   <div class="sidebar-header">
     <div class="brand-section" *ngIf="!isCollapsed">
       <div class="brand-logo">
-        <span class="brand-name">SWAAGAT</span>
+        <span class="brand-name">SWAAGAT 2.0</span>
       </div>
     </div>
     <button class="toggle-btn" (click)="toggleSidebar()"
@@ -44,7 +44,7 @@
       <!-- Admin User -->
       <ng-container *ngIf="currentUserType === 'admin'">
         <div class="user-name">
-          <span class="name">{{ userName | titlecase }}</span>
+          <span class="name">{{ auth_person | titlecase }}</span>
         </div>
         <div class="user-role">
           <span class="badge">{{ currentUserType }}</span>
