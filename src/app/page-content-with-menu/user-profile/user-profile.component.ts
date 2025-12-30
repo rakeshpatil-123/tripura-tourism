@@ -408,11 +408,18 @@ export class UserProfileComponent implements OnInit {
       this.onHierarchyChange();
     });
 
-    this.passwordForm = this.fb.group({
-      currentPassword: ['', Validators.required],
-      newPassword: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
-    });
+   this.passwordForm = this.fb.group({
+  currentPassword: ['', [Validators.required]],
+  newPassword: [
+    '',
+    [
+      Validators.required,
+      Validators.minLength(6),
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/)
+    ]
+  ],
+  confirmPassword: ['', [Validators.required]],
+});
   }
 
   get isProfileChanged(): boolean {

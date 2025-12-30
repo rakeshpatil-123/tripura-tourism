@@ -78,7 +78,10 @@ export class RegistrationComponent implements OnInit, OnChanges {
   }
   mobileStatusMessage: string = '';
   mobileStatusType: 'success' | 'error' | 'info' | '' = '';
-  selectedDistricts: Array<{ id: string; subdivisions: Array<{ id: string; blocks: string[] }> }> = [];
+  selectedDistricts: Array<{
+    id: string;
+    subdivisions: Array<{ id: string; blocks: string[] }>;
+  }> = [];
   registrationForm: FormGroup;
   districts: SelectOption[] = [];
   subdivisions: SelectOption[] = [];
@@ -97,7 +100,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
   loadingUlbs = false;
   loadingWards = false;
   hideSendOtp: boolean = false;
-  hideVerify: boolean = false;   
+  hideVerify: boolean = false;
   private suppressCascading = false;
   private lastSubdivisionsKey = '';
   private lastUlbsKey = '';
@@ -140,7 +143,14 @@ export class RegistrationComponent implements OnInit, OnChanges {
         registered_enterprise_address: ['', []],
         registered_enterprise_city: ['', []],
         user_type: ['individual', []],
-        password: ['', []],
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(6),
+            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/),
+          ],
+        ],
         confirmPassword: ['', []],
         district_id: ['', []],
         subdivision_id: ['', []],
@@ -208,138 +218,157 @@ export class RegistrationComponent implements OnInit, OnChanges {
       this.onHierarchyChange();
     });
 
-    this.registrationForm.get('pan')?.valueChanges.pipe(
-      map((v: string) => (v || '').toString().toUpperCase()),
-      distinctUntilChanged(),
-      tap((upper) => {
-        const ctrl = this.registrationForm.get('pan');
-      if (ctrl && ctrl.value !== upper) {
-          ctrl.setValue(upper, { emitEvent: false });
-        }
-      }),
-      debounceTime(500),
-tap((value: string) => {
-  const panCtrl = this.registrationForm.get('pan');
-  const panValue = value?.toString().trim();
+    this.registrationForm
+      .get('pan')
+      ?.valueChanges.pipe(
+        map((v: string) => (v || '').toString().toUpperCase()),
+        distinctUntilChanged(),
+        tap((upper) => {
+          const ctrl = this.registrationForm.get('pan');
+          if (ctrl && ctrl.value !== upper) {
+            ctrl.setValue(upper, { emitEvent: false });
+          }
+        }),
+        debounceTime(500),
+        tap((value: string) => {
+          const panCtrl = this.registrationForm.get('pan');
+          const panValue = value?.toString().trim();
 
-  // CLEAR message & error immediately when PAN is empty or invalid
-  if (!panValue || !this.PAN_REGEX.test(panValue)) {
-    this.panStatusMessage = '';
-    this.panStatusType = '';
-    if (panCtrl?.hasError('registered')) {
-      panCtrl.setErrors(null);
-    }
-  }
-}),
-filter((value: string) => this.PAN_REGEX.test(value)),
-switchMap((value: string) => {
-        return this.genericService.getByConditions({ pan_no: value }, 'api/user/check-pan-resgistered').pipe(
-          finalize(() => this.loaderService.hideLoader()),
-          catchError((err) => {
-            console.error('PAN check failed', err);
-            return of(null);
-          })
-        );
-      })
-    ).subscribe((res: any) => {
-         
-      const panCtrl = this.registrationForm.get('pan');
-      const panValue = panCtrl?.value?.toString().trim();
-      if (!res) {
-        this.panStatusMessage = '';
-        this.panStatusType = '';
-        const panCtrl = this.registrationForm.get('pan');
-        if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
-        return;
-      }
-  
-
-      if (res.is_registered && panValue) {
-        const message = res.message || 'Account already exists with this PAN number.';
-        this.panStatusMessage = message;
-        this.panStatusType = 'error';
-        panCtrl?.setErrors({ registered: true });
-      } else {
-        this.panStatusMessage = res.message || '';
-        this.panStatusType = res.status === 1 ? 'success' : (res.status === 0 ? 'info' : '');
-        const panCtrl = this.registrationForm.get('pan');
-        if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
-      }
-    });
-const mobileCtrl = this.registrationForm.get('mobile_no');
-if (mobileCtrl) {
-  // immediate behavior on user edit (preserve existing behavior)
-  mobileCtrl.valueChanges.subscribe((val: any) => {
-    this.hideSendOtp = false;
-    this.hideVerify = false;
-
-    // clear mobile inline message when user edits (optional)
-    this.mobileStatusMessage = '';
-    this.mobileStatusType = '';
-
-    // reset otp flags so user can request again
-    this.otpSent = false;
-    this.otpVerified = false;
-
-    if (this.otpControl) {
-      this.otpControl.reset();
-    }
-  });
-  // validation pipeline: debounce + pattern + API check (runtime "is taken" feedback)
-  mobileCtrl.valueChanges.pipe(
-    map((v: any) => (v || '').toString().trim()),
-    distinctUntilChanged(),
-    debounceTime(500),
-    filter((val: string) => /^[6-9]\d{9}$/.test(val)),
-    switchMap((value: string) => {
-      return this.genericService.getByConditions({ mobile_no: value }, 'api/user/check-mobile-resgistered').pipe(
-        catchError((err) => {
-          console.error('Mobile check failed', err);
-          return of(null);
+          // CLEAR message & error immediately when PAN is empty or invalid
+          if (!panValue || !this.PAN_REGEX.test(panValue)) {
+            this.panStatusMessage = '';
+            this.panStatusType = '';
+            if (panCtrl?.hasError('registered')) {
+              panCtrl.setErrors(null);
+            }
+          }
+        }),
+        filter((value: string) => this.PAN_REGEX.test(value)),
+        switchMap((value: string) => {
+          return this.genericService
+            .getByConditions(
+              { pan_no: value },
+              'api/user/check-pan-resgistered'
+            )
+            .pipe(
+              finalize(() => this.loaderService.hideLoader()),
+              catchError((err) => {
+                console.error('PAN check failed', err);
+                return of(null);
+              })
+            );
         })
-      );
-    })
- ).subscribe((res: any) => {
-    // If API didn't return a useful payload, clear inline state and mark as not-checked
-    if (!res) {
-      this.mobileChecked = false;
-      this.mobileStatusMessage = '';
-      this.mobileStatusType = '';
-      if (mobileCtrl?.hasError('taken')) mobileCtrl.setErrors(null);
-      return;
+      )
+      .subscribe((res: any) => {
+        const panCtrl = this.registrationForm.get('pan');
+        const panValue = panCtrl?.value?.toString().trim();
+        if (!res) {
+          this.panStatusMessage = '';
+          this.panStatusType = '';
+          const panCtrl = this.registrationForm.get('pan');
+          if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
+          return;
+        }
+
+        if (res.is_registered && panValue) {
+          const message =
+            res.message || 'Account already exists with this PAN number.';
+          this.panStatusMessage = message;
+          this.panStatusType = 'error';
+          panCtrl?.setErrors({ registered: true });
+        } else {
+          this.panStatusMessage = res.message || '';
+          this.panStatusType =
+            res.status === 1 ? 'success' : res.status === 0 ? 'info' : '';
+          const panCtrl = this.registrationForm.get('pan');
+          if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
+        }
+      });
+    const mobileCtrl = this.registrationForm.get('mobile_no');
+    if (mobileCtrl) {
+      // immediate behavior on user edit (preserve existing behavior)
+      mobileCtrl.valueChanges.subscribe((val: any) => {
+        this.hideSendOtp = false;
+        this.hideVerify = false;
+
+        // clear mobile inline message when user edits (optional)
+        this.mobileStatusMessage = '';
+        this.mobileStatusType = '';
+
+        // reset otp flags so user can request again
+        this.otpSent = false;
+        this.otpVerified = false;
+
+        if (this.otpControl) {
+          this.otpControl.reset();
+        }
+      });
+      // validation pipeline: debounce + pattern + API check (runtime "is taken" feedback)
+      mobileCtrl.valueChanges
+        .pipe(
+          map((v: any) => (v || '').toString().trim()),
+          distinctUntilChanged(),
+          debounceTime(500),
+          filter((val: string) => /^[6-9]\d{9}$/.test(val)),
+          switchMap((value: string) => {
+            return this.genericService
+              .getByConditions(
+                { mobile_no: value },
+                'api/user/check-mobile-resgistered'
+              )
+              .pipe(
+                catchError((err) => {
+                  console.error('Mobile check failed', err);
+                  return of(null);
+                })
+              );
+          })
+        )
+        .subscribe((res: any) => {
+          // If API didn't return a useful payload, clear inline state and mark as not-checked
+          if (!res) {
+            this.mobileChecked = false;
+            this.mobileStatusMessage = '';
+            this.mobileStatusType = '';
+            if (mobileCtrl?.hasError('taken')) mobileCtrl.setErrors(null);
+            return;
+          }
+
+          // mark that we've got a definitive response for this value
+          this.mobileChecked = true;
+
+          const taken = !!(
+            res.is_registered ||
+            res.exists ||
+            (res.status === 0 && !res.is_available)
+          );
+          if (taken) {
+            const message =
+              res.message || 'Account already exists with this mobile number.';
+            this.mobileStatusMessage = message;
+            this.mobileStatusType = 'error';
+            mobileCtrl.setErrors({ taken: true });
+
+            // hide OTP UI and reset any OTP state
+            this.hideSendOtp = true;
+            this.hideVerify = true;
+            this.otpSent = false;
+
+            // show one snackbar so user is aware
+            this.genericService.openSnackBar(message, 'Close');
+          } else {
+            // available — show inline success/info and enable OTP UI
+            this.mobileStatusMessage =
+              res.message || 'Mobile number available.';
+            this.mobileStatusType = res.status === 1 ? 'success' : 'info';
+
+            this.hideSendOtp = false;
+            this.hideVerify = false;
+
+            if (mobileCtrl?.hasError('taken')) mobileCtrl.setErrors(null);
+          }
+        });
     }
-
-    // mark that we've got a definitive response for this value
-    this.mobileChecked = true;
-
-    const taken = !!(res.is_registered || res.exists || (res.status === 0 && !res.is_available));
-    if (taken) {
-      const message = res.message || 'Account already exists with this mobile number.';
-      this.mobileStatusMessage = message;
-      this.mobileStatusType = 'error';
-      mobileCtrl.setErrors({ taken: true });
-
-      // hide OTP UI and reset any OTP state
-      this.hideSendOtp = true;
-      this.hideVerify = true;
-      this.otpSent = false;
-
-      // show one snackbar so user is aware
-      this.genericService.openSnackBar(message, 'Close');
-    } else {
-      // available — show inline success/info and enable OTP UI
-      this.mobileStatusMessage = res.message || 'Mobile number available.';
-      this.mobileStatusType = res.status === 1 ? 'success' : 'info';
-
-      this.hideSendOtp = false;
-      this.hideVerify = false;
-
-      if (mobileCtrl?.hasError('taken')) mobileCtrl.setErrors(null);
-    }
-  });
-
-}
-
   }
   ngOnChanges(changes: any): void {
     if (changes['editData'] && this.editData && this.editMode) {
@@ -1025,9 +1054,11 @@ if (mobileCtrl) {
       });
   }
 
-loadSubdivisions(districtCodes: string | string[]): void {
-  this.loadingSubdivisions = true;
-  const codesRaw = Array.isArray(districtCodes) ? districtCodes : [districtCodes];
+  loadSubdivisions(districtCodes: string | string[]): void {
+    this.loadingSubdivisions = true;
+    const codesRaw = Array.isArray(districtCodes)
+      ? districtCodes
+      : [districtCodes];
 
     // normalize & remove falsy values
     const codes = codesRaw
@@ -1064,72 +1095,100 @@ loadSubdivisions(districtCodes: string | string[]): void {
       endpoint = 'api/tripura/get-sub-subdivisions';
     }
 
-  this.genericService.getByConditions(payload, endpoint).subscribe({
-    next: (res: any) => {
-      const list = res?.subdivision ?? res?.subdivisions ?? [];
-      const incoming = Array.isArray(list) ? list : [];
+    this.genericService.getByConditions(payload, endpoint).subscribe({
+      next: (res: any) => {
+        const list = res?.subdivision ?? res?.subdivisions ?? [];
+        const incoming = Array.isArray(list) ? list : [];
 
-      // helper to compute canonical id for a subdivision
-      const subKey = (s: any) => String(s?.sub_lgd_code ?? s?.sub_division_code ?? s?.subdivision_code ?? s?.id ?? '').trim();
+        // helper to compute canonical id for a subdivision
+        const subKey = (s: any) =>
+          String(
+            s?.sub_lgd_code ??
+              s?.sub_division_code ??
+              s?.subdivision_code ??
+              s?.id ??
+              ''
+          ).trim();
 
-      // Merge raw subdivisions into this.subdivisionsRaw (avoid overwriting previous batches)
-      const mergedSubMap = new Map<string, any>();
-      // start with existing raw items
-      (this.subdivisionsRaw || []).forEach((s: any) => {
-        const k = subKey(s);
-        if (k) mergedSubMap.set(k, s);
-      });
-      // merge incoming, prefer incoming non-empty names to fill gaps
-      incoming.forEach((s: any) => {
-        const k = subKey(s);
-        if (!k) return;
-        const existing = mergedSubMap.get(k);
-        if (!existing) {
-          mergedSubMap.set(k, s);
-        } else {
-          // if existing has no sensible name but incoming has, replace
-          const existingName = String(existing?.sub_division_name ?? existing?.subdivision_name ?? existing?.sub_division ?? '').trim();
-          const incomingName = String(s?.sub_division ?? s?.sub_division_name ?? s?.subdivision_name ?? s?.name ?? '').trim();
-          if ((!existingName || existingName === '') && incomingName) {
+        // Merge raw subdivisions into this.subdivisionsRaw (avoid overwriting previous batches)
+        const mergedSubMap = new Map<string, any>();
+        // start with existing raw items
+        (this.subdivisionsRaw || []).forEach((s: any) => {
+          const k = subKey(s);
+          if (k) mergedSubMap.set(k, s);
+        });
+        // merge incoming, prefer incoming non-empty names to fill gaps
+        incoming.forEach((s: any) => {
+          const k = subKey(s);
+          if (!k) return;
+          const existing = mergedSubMap.get(k);
+          if (!existing) {
             mergedSubMap.set(k, s);
+          } else {
+            // if existing has no sensible name but incoming has, replace
+            const existingName = String(
+              existing?.sub_division_name ??
+                existing?.subdivision_name ??
+                existing?.sub_division ??
+                ''
+            ).trim();
+            const incomingName = String(
+              s?.sub_division ??
+                s?.sub_division_name ??
+                s?.subdivision_name ??
+                s?.name ??
+                ''
+            ).trim();
+            if ((!existingName || existingName === '') && incomingName) {
+              mergedSubMap.set(k, s);
+            }
           }
+        });
+        this.subdivisionsRaw = Array.from(mergedSubMap.values());
+
+        // Build UI-friendly subdivisions array and merge (avoid duplicates)
+        const incomingOptions = incoming
+          .map((s: any) => ({
+            id: subKey(s),
+            name: String(
+              s.sub_division ??
+                s.sub_division_name ??
+                s.subdivision_name ??
+                s.name ??
+                ''
+            ),
+          }))
+          .filter((o) => o.id);
+
+        const uiMap = new Map<string, SelectOption>();
+        (this.subdivisions || []).forEach((o: any) => {
+          if (o && o.id) uiMap.set(String(o.id), o);
+        });
+        incomingOptions.forEach((o) => {
+          if (!uiMap.has(o.id)) uiMap.set(o.id, o);
+        });
+        this.subdivisions = Array.from(uiMap.values());
+
+        // if API returned empty but we have existing UI options, keep them (don't clear)
+        if (
+          !(res?.status === 1 && Array.isArray(list)) &&
+          (!this.subdivisions || this.subdivisions.length === 0)
+        ) {
+          this.subdivisions = [];
         }
-      });
-      this.subdivisionsRaw = Array.from(mergedSubMap.values());
 
-      // Build UI-friendly subdivisions array and merge (avoid duplicates)
-      const incomingOptions = incoming.map((s: any) => ({
-        id: subKey(s),
-        name: String(s.sub_division ?? s.sub_division_name ?? s.subdivision_name ?? s.name ?? ''),
-      })).filter(o => o.id);
-
-      const uiMap = new Map<string, SelectOption>();
-      (this.subdivisions || []).forEach((o: any) => {
-        if (o && o.id) uiMap.set(String(o.id), o);
-      });
-      incomingOptions.forEach((o) => {
-        if (!uiMap.has(o.id)) uiMap.set(o.id, o);
-      });
-      this.subdivisions = Array.from(uiMap.values());
-
-      // if API returned empty but we have existing UI options, keep them (don't clear)
-      if (!(res?.status === 1 && Array.isArray(list)) && (!this.subdivisions || this.subdivisions.length === 0)) {
-        this.subdivisions = [];
-      }
-
-      this.loadingSubdivisions = false;
-    },
-    error: (err: any) => {
-      console.error('Failed to load subdivisions:', err);
-      this.genericService.openSnackBar('Failed to load subdivisions', 'Error');
-      this.loadingSubdivisions = false;
-    },
-  });
-}
-
-
-
-
+        this.loadingSubdivisions = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to load subdivisions:', err);
+        this.genericService.openSnackBar(
+          'Failed to load subdivisions',
+          'Error'
+        );
+        this.loadingSubdivisions = false;
+      },
+    });
+  }
 
   loadUlbs(subdivisionCodes: string | string[]): void {
     this.loadingUlbs = true;
@@ -1172,69 +1231,78 @@ loadSubdivisions(districtCodes: string | string[]): void {
       endpoint = 'api/tripura/get-block-names';
     }
 
-  this.genericService.getByConditions(payload, endpoint).subscribe({
-    next: (res: any) => {
-      const list = res?.ulbs ?? res?.blocks ?? res?.data ?? [];
-      const incoming = Array.isArray(list) ? list : [];
+    this.genericService.getByConditions(payload, endpoint).subscribe({
+      next: (res: any) => {
+        const list = res?.ulbs ?? res?.blocks ?? res?.data ?? [];
+        const incoming = Array.isArray(list) ? list : [];
 
-      // helper to compute canonical id for a ULB
-      const ulKey = (u: any) => String(u?.ulb_lgd_code ?? u?.block_code ?? u?.block_lgd_code ?? u?.id ?? '').trim();
+        // helper to compute canonical id for a ULB
+        const ulKey = (u: any) =>
+          String(
+            u?.ulb_lgd_code ?? u?.block_code ?? u?.block_lgd_code ?? u?.id ?? ''
+          ).trim();
 
-      // Merge raw ulbs into this.ulbsRaw (preserve previously loaded ULBs)
-      const mergedUlMap = new Map<string, any>();
-      (this.ulbsRaw || []).forEach((u: any) => {
-        const k = ulKey(u);
-        if (k) mergedUlMap.set(k, u);
-      });
-      incoming.forEach((u: any) => {
-        const k = ulKey(u);
-        if (!k) return;
-        const existing = mergedUlMap.get(k);
-        if (!existing) {
-          mergedUlMap.set(k, u);
-        } else {
-          // prefer incoming to fill missing name or parent info
-          const existingName = String(existing?.ulb_name ?? existing?.block_name ?? existing?.name ?? '').trim();
-          const incomingName = String(u?.ulb_name ?? u?.block_name ?? u?.name ?? '').trim();
-          if ((!existingName || existingName === '') && incomingName) {
+        // Merge raw ulbs into this.ulbsRaw (preserve previously loaded ULBs)
+        const mergedUlMap = new Map<string, any>();
+        (this.ulbsRaw || []).forEach((u: any) => {
+          const k = ulKey(u);
+          if (k) mergedUlMap.set(k, u);
+        });
+        incoming.forEach((u: any) => {
+          const k = ulKey(u);
+          if (!k) return;
+          const existing = mergedUlMap.get(k);
+          if (!existing) {
             mergedUlMap.set(k, u);
+          } else {
+            // prefer incoming to fill missing name or parent info
+            const existingName = String(
+              existing?.ulb_name ?? existing?.block_name ?? existing?.name ?? ''
+            ).trim();
+            const incomingName = String(
+              u?.ulb_name ?? u?.block_name ?? u?.name ?? ''
+            ).trim();
+            if ((!existingName || existingName === '') && incomingName) {
+              mergedUlMap.set(k, u);
+            }
           }
+        });
+        this.ulbsRaw = Array.from(mergedUlMap.values());
+
+        // Build UI-friendly ULBs array and merge (avoid duplicates)
+        const incomingOptions = incoming
+          .map((u: any) => ({
+            id: ulKey(u),
+            name: String(u.ulb_name ?? u.block_name ?? u.name ?? ''),
+          }))
+          .filter((o) => o.id);
+
+        const uiMap = new Map<string, SelectOption>();
+        (this.ulbs || []).forEach((o: any) => {
+          if (o && o.id) uiMap.set(String(o.id), o);
+        });
+        incomingOptions.forEach((o) => {
+          if (!uiMap.has(o.id)) uiMap.set(o.id, o);
+        });
+        this.ulbs = Array.from(uiMap.values());
+
+        // if API returned empty but we have existing UI options, keep them (don't clear)
+        if (
+          !(res?.status === 1 && Array.isArray(list)) &&
+          (!this.ulbs || this.ulbs.length === 0)
+        ) {
+          this.ulbs = [];
         }
-      });
-      this.ulbsRaw = Array.from(mergedUlMap.values());
 
-      // Build UI-friendly ULBs array and merge (avoid duplicates)
-      const incomingOptions = incoming.map((u: any) => ({
-        id: ulKey(u),
-        name: String(u.ulb_name ?? u.block_name ?? u.name ?? ''),
-      })).filter(o => o.id);
-
-      const uiMap = new Map<string, SelectOption>();
-      (this.ulbs || []).forEach((o: any) => {
-        if (o && o.id) uiMap.set(String(o.id), o);
-      });
-      incomingOptions.forEach((o) => {
-        if (!uiMap.has(o.id)) uiMap.set(o.id, o);
-      });
-      this.ulbs = Array.from(uiMap.values());
-
-      // if API returned empty but we have existing UI options, keep them (don't clear)
-      if (!(res?.status === 1 && Array.isArray(list)) && (!this.ulbs || this.ulbs.length === 0)) {
-        this.ulbs = [];
-      }
-
-      this.loadingUlbs = false;
-    },
-    error: (err: any) => {
-      console.error('Failed to load ULBs:', err);
-      this.genericService.openSnackBar('Failed to load ULBs', 'Error');
-      this.loadingUlbs = false;
-    },
-  });
-}
-
-
-
+        this.loadingUlbs = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to load ULBs:', err);
+        this.genericService.openSnackBar('Failed to load ULBs', 'Error');
+        this.loadingUlbs = false;
+      },
+    });
+  }
 
   loadWards(ulbCodes: string | string[]): void {
     this.loadingWards = true;
@@ -1290,8 +1358,11 @@ loadSubdivisions(districtCodes: string | string[]): void {
       return;
     }
     try {
-      const { confirmPassword, whatsapp_no: formWhatsappNo, ...raw } =
-        this.registrationForm.value;
+      const {
+        confirmPassword,
+        whatsapp_no: formWhatsappNo,
+        ...raw
+      } = this.registrationForm.value;
       const payload: any = { ...raw };
       payload.whatsapp_no = this.whatsappSameAsMobile
         ? raw.mobile_no
@@ -1479,165 +1550,232 @@ loadSubdivisions(districtCodes: string | string[]): void {
       },
     });
   }
-getLocationsPayload(): any[] {
-  const locations: Array<{ district_id: number | null; subdivision_id: number | null; block_id: number | null }> = [];
-  const rawDistrict = this.registrationForm.get('district_id')?.value;
-  const rawSubdivision = this.registrationForm.get('subdivision_id')?.value;
-  const rawUlb = this.registrationForm.get('ulb_id')?.value;
+  getLocationsPayload(): any[] {
+    const locations: Array<{
+      district_id: number | null;
+      subdivision_id: number | null;
+      block_id: number | null;
+    }> = [];
+    const rawDistrict = this.registrationForm.get('district_id')?.value;
+    const rawSubdivision = this.registrationForm.get('subdivision_id')?.value;
+    const rawUlb = this.registrationForm.get('ulb_id')?.value;
 
-  const toArr = (v: any): string[] => {
-    if (v === null || v === undefined) return [];
-    if (Array.isArray(v)) return v.map(x => String(x)).filter(Boolean);
-    const s = String(v).trim();
-    if (!s) return [];
-    return s.includes(',') ? s.split(',').map(x => x.trim()).filter(Boolean) : [s];
-  };
+    const toArr = (v: any): string[] => {
+      if (v === null || v === undefined) return [];
+      if (Array.isArray(v)) return v.map((x) => String(x)).filter(Boolean);
+      const s = String(v).trim();
+      if (!s) return [];
+      return s.includes(',')
+        ? s
+            .split(',')
+            .map((x) => x.trim())
+            .filter(Boolean)
+        : [s];
+    };
 
-  const distArr = toArr(rawDistrict);     // selected district codes (strings)
-  const subArr = toArr(rawSubdivision);   // selected subdivision ids (strings)
-  const blockArr = toArr(rawUlb);        // selected block/ulb ids (strings)
+    const distArr = toArr(rawDistrict); // selected district codes (strings)
+    const subArr = toArr(rawSubdivision); // selected subdivision ids (strings)
+    const blockArr = toArr(rawUlb); // selected block/ulb ids (strings)
 
-  // helper: canonicalize possible id fields from API raw objects
-  const getSubId = (s: any) => String(s?.sub_lgd_code ?? s?.sub_lgd ?? s?.sub_division_code ?? s?.subdivision_code ?? s?.sub_division ?? s?.id ?? '').trim();
-  const getSubDistrict = (s: any) => String(s?.district_code ?? s?.district_id ?? s?.district_code ?? '').trim();
-  const getUlId = (u: any) => String(u?.ulb_lgd_code ?? u?.block_code ?? u?.block_lgd_code ?? u?.id ?? '').trim();
-  const getUlSub = (u: any) => String(u?.subdivision_code ?? u?.sub_division_code ?? u?.subdivision_id ?? u?.sub_division ?? '').trim();
-  const getUlDistrict = (u: any) => String(u?.district_code ?? u?.district_id ?? u?.district_code ?? '').trim();
+    // helper: canonicalize possible id fields from API raw objects
+    const getSubId = (s: any) =>
+      String(
+        s?.sub_lgd_code ??
+          s?.sub_lgd ??
+          s?.sub_division_code ??
+          s?.subdivision_code ??
+          s?.sub_division ??
+          s?.id ??
+          ''
+      ).trim();
+    const getSubDistrict = (s: any) =>
+      String(
+        s?.district_code ?? s?.district_id ?? s?.district_code ?? ''
+      ).trim();
+    const getUlId = (u: any) =>
+      String(
+        u?.ulb_lgd_code ?? u?.block_code ?? u?.block_lgd_code ?? u?.id ?? ''
+      ).trim();
+    const getUlSub = (u: any) =>
+      String(
+        u?.subdivision_code ??
+          u?.sub_division_code ??
+          u?.subdivision_id ??
+          u?.sub_division ??
+          ''
+      ).trim();
+    const getUlDistrict = (u: any) =>
+      String(
+        u?.district_code ?? u?.district_id ?? u?.district_code ?? ''
+      ).trim();
 
-  // Build maps from raw API responses (these raw arrays come from loadSubdivisions/loadUlbs)
-  const subdivToDistrict = new Map<string, string>();
-  (this.subdivisionsRaw || []).forEach((s: any) => {
-    const sid = getSubId(s);
-    const did = getSubDistrict(s);
-    if (sid) subdivToDistrict.set(sid, did || '');
-  });
+    // Build maps from raw API responses (these raw arrays come from loadSubdivisions/loadUlbs)
+    const subdivToDistrict = new Map<string, string>();
+    (this.subdivisionsRaw || []).forEach((s: any) => {
+      const sid = getSubId(s);
+      const did = getSubDistrict(s);
+      if (sid) subdivToDistrict.set(sid, did || '');
+    });
 
-  const ulbMap = new Map<string, any>(); // ulbId -> raw ulb object
-  (this.ulbsRaw || []).forEach((u: any) => {
-    const uid = getUlId(u);
-    if (uid) ulbMap.set(uid, u);
-  });
+    const ulbMap = new Map<string, any>(); // ulbId -> raw ulb object
+    (this.ulbsRaw || []).forEach((u: any) => {
+      const uid = getUlId(u);
+      if (uid) ulbMap.set(uid, u);
+    });
 
-  // also create subdivision -> list of ulb ids (from ulbsRaw) for fast lookup
-  const subdivToUlbs = new Map<string, string[]>();
-  (this.ulbsRaw || []).forEach((u: any) => {
-    const uid = getUlId(u);
-    const sid = getUlSub(u);
-    if (!uid || !sid) return;
-    const arr = subdivToUlbs.get(sid) ?? [];
-    if (!arr.includes(uid)) arr.push(uid);
-    subdivToUlbs.set(sid, arr);
-  });
+    // also create subdivision -> list of ulb ids (from ulbsRaw) for fast lookup
+    const subdivToUlbs = new Map<string, string[]>();
+    (this.ulbsRaw || []).forEach((u: any) => {
+      const uid = getUlId(u);
+      const sid = getUlSub(u);
+      if (!uid || !sid) return;
+      const arr = subdivToUlbs.get(sid) ?? [];
+      if (!arr.includes(uid)) arr.push(uid);
+      subdivToUlbs.set(sid, arr);
+    });
 
-  const selectedDistSet = new Set(distArr.map(String));
-  const selectedSubSet = new Set(subArr.map(String));
-  const selectedBlockSet = new Set(blockArr.map(String));
+    const selectedDistSet = new Set(distArr.map(String));
+    const selectedSubSet = new Set(subArr.map(String));
+    const selectedBlockSet = new Set(blockArr.map(String));
 
-  // 1) If blocks are selected -> produce one location per selected block, resolved to its real parent subdivision & district
-  if (blockArr.length > 0) {
-    blockArr.forEach(bRaw => {
-      const b = String(bRaw);
-      // find ulb raw entry
-      const ulbRaw = ulbMap.get(b) ?? (this.ulbsRaw || []).find((u: any) => getUlId(u) === b) ?? null;
+    // 1) If blocks are selected -> produce one location per selected block, resolved to its real parent subdivision & district
+    if (blockArr.length > 0) {
+      blockArr.forEach((bRaw) => {
+        const b = String(bRaw);
+        // find ulb raw entry
+        const ulbRaw =
+          ulbMap.get(b) ??
+          (this.ulbsRaw || []).find((u: any) => getUlId(u) === b) ??
+          null;
 
-      // if found, get parent subdivision and district directly from it
-      let parentSub = ulbRaw ? getUlSub(ulbRaw) || null : null;
-      let parentDist = ulbRaw ? getUlDistrict(ulbRaw) || null : null;
+        // if found, get parent subdivision and district directly from it
+        let parentSub = ulbRaw ? getUlSub(ulbRaw) || null : null;
+        let parentDist = ulbRaw ? getUlDistrict(ulbRaw) || null : null;
 
-      // if not found in ulbsRaw, attempt fallback via selectedDistricts grouping (prefill)
-      if (!parentSub && this.selectedDistricts && this.selectedDistricts.length) {
-        for (const d of this.selectedDistricts) {
-          for (const s of d.subdivisions || []) {
-            const blocks = (s.blocks || []).map((x: any) => String(x));
-            if (blocks.includes(b)) {
-              parentSub = String(s.id);
-              parentDist = String(d.id);
-              break;
+        // if not found in ulbsRaw, attempt fallback via selectedDistricts grouping (prefill)
+        if (
+          !parentSub &&
+          this.selectedDistricts &&
+          this.selectedDistricts.length
+        ) {
+          for (const d of this.selectedDistricts) {
+            for (const s of d.subdivisions || []) {
+              const blocks = (s.blocks || []).map((x: any) => String(x));
+              if (blocks.includes(b)) {
+                parentSub = String(s.id);
+                parentDist = String(d.id);
+                break;
+              }
             }
+            if (parentSub) break;
           }
-          if (parentSub) break;
         }
-      }
 
-      // if user explicitly selected subdivisions, ensure the block belongs to one of them
-      if (selectedSubSet.size > 0) {
-        if (!parentSub) return; // cannot confirm parent -> skip block
-        if (!selectedSubSet.has(parentSub)) return; // block's sub not selected -> skip
-      }
-
-      // if parentSub still not found -> skip (safe, prevents cross-mapping)
-      if (!parentSub) return;
-
-      // if parentDist not present from ulbRaw, try subdivisionsRaw map
-      if ((!parentDist || parentDist === '') && parentSub) {
-        parentDist = subdivToDistrict.get(parentSub) ?? parentDist ?? null;
-        if ((!parentDist || parentDist === '') && this.subdivisionsRaw && this.subdivisionsRaw.length) {
-          const found = this.subdivisionsRaw.find((ss: any) => getSubId(ss) === parentSub);
-          if (found) parentDist = getSubDistrict(found) || null;
+        // if user explicitly selected subdivisions, ensure the block belongs to one of them
+        if (selectedSubSet.size > 0) {
+          if (!parentSub) return; // cannot confirm parent -> skip block
+          if (!selectedSubSet.has(parentSub)) return; // block's sub not selected -> skip
         }
-      }
 
-      // if user explicitly selected districts, ensure this block belongs to one of them
-      if (selectedDistSet.size > 0) {
-        if (!parentDist) return; // cannot resolve district -> skip
-        if (!selectedDistSet.has(parentDist)) return; // belongs to unselected district -> skip
-      }
+        // if parentSub still not found -> skip (safe, prevents cross-mapping)
+        if (!parentSub) return;
 
-      locations.push({
-        district_id: parentDist ? Number(parentDist) : null,
-        subdivision_id: parentSub ? Number(parentSub) : null,
-        block_id: Number(b)
-      });
-    });
-  }
-  // 2) No blocks selected but subdivisions selected -> output each selected subdivision paired with its actual district
-  else if (subArr.length > 0) {
-    subArr.forEach(sRaw => {
-      const s = String(sRaw);
-      // resolve district from subdivisionsRaw map
-      let parentDist = subdivToDistrict.get(s) ?? null;
+        // if parentDist not present from ulbRaw, try subdivisionsRaw map
+        if ((!parentDist || parentDist === '') && parentSub) {
+          parentDist = subdivToDistrict.get(parentSub) ?? parentDist ?? null;
+          if (
+            (!parentDist || parentDist === '') &&
+            this.subdivisionsRaw &&
+            this.subdivisionsRaw.length
+          ) {
+            const found = this.subdivisionsRaw.find(
+              (ss: any) => getSubId(ss) === parentSub
+            );
+            if (found) parentDist = getSubDistrict(found) || null;
+          }
+        }
 
-      if ((!parentDist || parentDist === '') && this.subdivisionsRaw && this.subdivisionsRaw.length) {
-        const found = this.subdivisionsRaw.find((ss: any) => getSubId(ss) === s);
-        if (found) parentDist = getSubDistrict(found) || null;
-      }
+        // if user explicitly selected districts, ensure this block belongs to one of them
+        if (selectedDistSet.size > 0) {
+          if (!parentDist) return; // cannot resolve district -> skip
+          if (!selectedDistSet.has(parentDist)) return; // belongs to unselected district -> skip
+        }
 
-      // if the user explicitly selected districts, ensure this subdivision belongs to one of them
-      if (selectedDistSet.size > 0) {
-        if (!parentDist) return; // can't resolve district -> skip
-        if (!selectedDistSet.has(parentDist)) return; // subdivision belongs to unselected district -> skip
-      }
-
-      locations.push({
-        district_id: parentDist ? Number(parentDist) : null,
-        subdivision_id: Number(s),
-        block_id: null
-      });
-    });
-  }
-  // 3) Only districts selected -> output district-only entries
-  else if (distArr.length > 0) {
-    distArr.forEach(d => {
-      locations.push({ district_id: Number(d), subdivision_id: null, block_id: null });
-    });
-  }
-
-  // dedupe (same as before)
-  const uniq = new Map<string, { district_id: number | null; subdivision_id: number | null; block_id: number | null }>();
-  locations.forEach(loc => {
-    const key = `${loc.district_id ?? ''}|${loc.subdivision_id ?? ''}|${loc.block_id ?? ''}`;
-    if (!uniq.has(key)) {
-      uniq.set(key, {
-        district_id: loc.district_id === null ? null : Number(loc.district_id),
-        subdivision_id: loc.subdivision_id === null ? null : Number(loc.subdivision_id),
-        block_id: loc.block_id === null ? null : Number(loc.block_id)
+        locations.push({
+          district_id: parentDist ? Number(parentDist) : null,
+          subdivision_id: parentSub ? Number(parentSub) : null,
+          block_id: Number(b),
+        });
       });
     }
-  });
+    // 2) No blocks selected but subdivisions selected -> output each selected subdivision paired with its actual district
+    else if (subArr.length > 0) {
+      subArr.forEach((sRaw) => {
+        const s = String(sRaw);
+        // resolve district from subdivisionsRaw map
+        let parentDist = subdivToDistrict.get(s) ?? null;
 
-  return Array.from(uniq.values());
-}
+        if (
+          (!parentDist || parentDist === '') &&
+          this.subdivisionsRaw &&
+          this.subdivisionsRaw.length
+        ) {
+          const found = this.subdivisionsRaw.find(
+            (ss: any) => getSubId(ss) === s
+          );
+          if (found) parentDist = getSubDistrict(found) || null;
+        }
 
+        // if the user explicitly selected districts, ensure this subdivision belongs to one of them
+        if (selectedDistSet.size > 0) {
+          if (!parentDist) return; // can't resolve district -> skip
+          if (!selectedDistSet.has(parentDist)) return; // subdivision belongs to unselected district -> skip
+        }
+
+        locations.push({
+          district_id: parentDist ? Number(parentDist) : null,
+          subdivision_id: Number(s),
+          block_id: null,
+        });
+      });
+    }
+    // 3) Only districts selected -> output district-only entries
+    else if (distArr.length > 0) {
+      distArr.forEach((d) => {
+        locations.push({
+          district_id: Number(d),
+          subdivision_id: null,
+          block_id: null,
+        });
+      });
+    }
+
+    // dedupe (same as before)
+    const uniq = new Map<
+      string,
+      {
+        district_id: number | null;
+        subdivision_id: number | null;
+        block_id: number | null;
+      }
+    >();
+    locations.forEach((loc) => {
+      const key = `${loc.district_id ?? ''}|${loc.subdivision_id ?? ''}|${
+        loc.block_id ?? ''
+      }`;
+      if (!uniq.has(key)) {
+        uniq.set(key, {
+          district_id:
+            loc.district_id === null ? null : Number(loc.district_id),
+          subdivision_id:
+            loc.subdivision_id === null ? null : Number(loc.subdivision_id),
+          block_id: loc.block_id === null ? null : Number(loc.block_id),
+        });
+      }
+    });
+
+    return Array.from(uniq.values());
+  }
 
   private extractErrorMessage(err: any): string {
     if (err?.error?.errors) {
@@ -1735,21 +1873,27 @@ getLocationsPayload(): any[] {
           if (res?.status === 1) {
             // Successful flow from backend
             // Determine message text (backend-driven)
-            const msg = (typeof res.message === 'string' ? res.message : '').trim();
+            const msg = (
+              typeof res.message === 'string' ? res.message : ''
+            ).trim();
             const msgLower = msg.toLowerCase();
 
             // OTP was actually sent by backend
             this.otpSent = true;
-            this.mobileStatusMessage = msg || 'OTP sent successfully to your mobile number.';
+            this.mobileStatusMessage =
+              msg || 'OTP sent successfully to your mobile number.';
             this.mobileStatusType = 'success';
-            this.genericService.openSnackBar(this.mobileStatusMessage, 'Success');
+            this.genericService.openSnackBar(
+              this.mobileStatusMessage,
+              'Success'
+            );
 
             // If backend indicates number already verified/taken & verified, mark verified and hide verify controls
             if (msgLower.includes('already') && msgLower.includes('verified')) {
               // preserve otpVerified semantics
               this.otpVerified = true;
-              this.hideVerify = true;   // hide OTP input + Verify button
-              this.hideSendOtp = true;  // hide Send OTP (already verified)
+              this.hideVerify = true; // hide OTP input + Verify button
+              this.hideSendOtp = true; // hide Send OTP (already verified)
             } else {
               // OTP was sent normally — hide the Send OTP button to avoid duplicate sends
               this.hideSendOtp = true;
@@ -1764,7 +1908,9 @@ getLocationsPayload(): any[] {
             this.genericService.openSnackBar(this.mobileStatusMessage, 'Error');
 
             // If backend explicitly says "already taken and verified" even with non-1, handle similarly:
-            const msg = (typeof res?.message === 'string' ? res.message : '').trim();
+            const msg = (
+              typeof res?.message === 'string' ? res.message : ''
+            ).trim();
             const msgLower = msg.toLowerCase();
             if (msgLower.includes('already') && msgLower.includes('verified')) {
               this.otpVerified = true;
@@ -1778,7 +1924,8 @@ getLocationsPayload(): any[] {
           const message = this.extractErrorMessage(err);
 
           // Show inline error and snackbar (keeps existing behaviour)
-          this.mobileStatusMessage = message || 'Failed to send OTP. Please try again.';
+          this.mobileStatusMessage =
+            message || 'Failed to send OTP. Please try again.';
           this.mobileStatusType = 'error';
           this.genericService.openSnackBar(this.mobileStatusMessage, 'Error');
 
@@ -1790,20 +1937,25 @@ getLocationsPayload(): any[] {
           this.hideVerify = false;
         },
       });
-
-
   }
 
   verifyOtp(): void {
-    const mobile = this.registrationForm.get('mobile_no')?.value?.toString().trim();
+    const mobile = this.registrationForm
+      .get('mobile_no')
+      ?.value?.toString()
+      .trim();
     const otp = this.otpControl?.value?.toString().trim();
 
     // basic client-side checks
     if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
-      this.genericService.openSnackBar('Please enter a valid 10-digit mobile number.', 'Error');
+      this.genericService.openSnackBar(
+        'Please enter a valid 10-digit mobile number.',
+        'Error'
+      );
       return;
     }
-    if (!otp || !/^\d{4,6}$/.test(otp)) { // accept 4-6 digit OTPs; adjust if your OTP length differs
+    if (!otp || !/^\d{4,6}$/.test(otp)) {
+      // accept 4-6 digit OTPs; adjust if your OTP length differs
       this.genericService.openSnackBar('Please enter the OTP.', 'Error');
       return;
     }
@@ -1825,7 +1977,8 @@ getLocationsPayload(): any[] {
             this.mobileChecked = true;
 
             // use server message if present
-            this.mobileStatusMessage = res.message || 'OTP verified successfully.';
+            this.mobileStatusMessage =
+              res.message || 'OTP verified successfully.';
             this.mobileStatusType = 'success';
 
             // clear "taken" validation if present
@@ -1840,10 +1993,14 @@ getLocationsPayload(): any[] {
             }
 
             // notify user (keeps previous snackbar behaviour)
-            this.genericService.openSnackBar(this.mobileStatusMessage, 'Success');
+            this.genericService.openSnackBar(
+              this.mobileStatusMessage,
+              'Success'
+            );
           } else {
             // handle explicit failure from server
-            const errMsg = (res && res.message) ? res.message : 'OTP verification failed.';
+            const errMsg =
+              res && res.message ? res.message : 'OTP verification failed.';
             this.mobileStatusMessage = errMsg;
             this.mobileStatusType = 'error';
             this.genericService.openSnackBar(errMsg, 'Error');
@@ -1851,14 +2008,15 @@ getLocationsPayload(): any[] {
         },
         error: (err: any) => {
           // extractErrorMessage was used previously — keep using it if available
-          const message = (typeof this.extractErrorMessage === 'function')
-            ? this.extractErrorMessage(err)
-            : (err?.message || 'Something went wrong. Please try again.');
+          const message =
+            typeof this.extractErrorMessage === 'function'
+              ? this.extractErrorMessage(err)
+              : err?.message || 'Something went wrong. Please try again.';
 
           this.mobileStatusMessage = message;
           this.mobileStatusType = 'error';
           this.genericService.openSnackBar(message, 'Error');
-        }
+        },
       });
   }
 
@@ -1880,7 +2038,12 @@ getLocationsPayload(): any[] {
   }
   private getRedirectUrl(path: string): string {
     const { origin, pathname } = window.location;
-    const basePath = pathname === '/' || pathname === '' ? '' : pathname.startsWith('/new') ? '/new' : '';
+    const basePath =
+      pathname === '/' || pathname === ''
+        ? ''
+        : pathname.startsWith('/new')
+        ? '/new'
+        : '';
     const normalized = path.startsWith('/') ? path : `/${path}`;
     return `${origin}${basePath}${normalized}`;
   }
@@ -1888,5 +2051,4 @@ getLocationsPayload(): any[] {
   goToLogin(): void {
     window.location.href = this.getRedirectUrl('/page/login');
   }
-
 }
