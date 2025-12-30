@@ -1,11 +1,11 @@
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit
-} from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { IlogiInputComponent } from '../../../customInputComponents/ilogi-input/ilogi-input.component';
 import { GenericService } from '../../../_service/generic/generic.service';
 import { Router } from '@angular/router';
@@ -17,11 +17,18 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IlogiInputComponent, MatIconModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    IlogiInputComponent,
+    MatIconModule,
+  ],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
-export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ForgotPasswordComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   form!: FormGroup;
 
   // step state: enter -> verify -> reset
@@ -48,7 +55,7 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
   images: string[] = [
     // '../../../../assets/images/First_Department-list.png',
     // '../../../../assets/images/Second_Department-list.png',
-    '../../../../assets/images/Login_ Page_ Banner.png'
+    '../../../../assets/images/Login_ Page_ Banner.png',
   ];
   currentImageIndex = 0;
   previousImageIndex = 0;
@@ -60,17 +67,20 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
     private genericService: GenericService,
     private loaderService: LoaderService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      identifier: ['', [Validators.required, this.panOrMobileValidator.bind(this)]],
-      mobile: ['',],
+      identifier: [
+        '',
+        [Validators.required, this.panOrMobileValidator.bind(this)],
+      ],
+      mobile: [''],
       otp: ['', []],
       newPassword: ['', []],
       confirmPassword: ['', []],
     });
-    this.images.forEach(src => {
+    this.images.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
@@ -110,18 +120,27 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
   startCarousel(): void {
     this.intervalId = setInterval(() => {
       this.previousImageIndex = this.currentImageIndex;
-      this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
+      this.currentImageIndex =
+        (this.currentImageIndex + 1) % this.images.length;
     }, 5000);
   }
 
   // ---------- Helpers ----------
   private showLoaderLocal() {
     this.isLoading = true;
-    try { this.loaderService.showLoader(); } catch { /* ignore if loader service differs */ }
+    try {
+      this.loaderService.showLoader();
+    } catch {
+      /* ignore if loader service differs */
+    }
   }
   private hideLoaderLocal() {
     this.isLoading = false;
-    try { this.loaderService.hideLoader(); } catch { /* ignore if loader service differs */ }
+    try {
+      this.loaderService.hideLoader();
+    } catch {
+      /* ignore if loader service differs */
+    }
   }
 
   private maskMobile(m: string) {
@@ -152,13 +171,17 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   get otpTimerDisplay(): string {
-    const mm = Math.floor(this.otpTimerSeconds / 60).toString().padStart(2, '0');
+    const mm = Math.floor(this.otpTimerSeconds / 60)
+      .toString()
+      .padStart(2, '0');
     const ss = (this.otpTimerSeconds % 60).toString().padStart(2, '0');
     return `${mm}:${ss}`;
   }
 
   get isResendEnabled(): boolean {
-    return this.step === 'verify' && this.otpTimerSeconds === 0 && !this.isLoading;
+    return (
+      this.step === 'verify' && this.otpTimerSeconds === 0 && !this.isLoading
+    );
   }
 
   // ---------- Flow actions ----------
@@ -187,37 +210,50 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
     this.showLoaderLocal();
     this.infoMessage = 'Sending OTP to your registered mobile...';
 
-    this.genericService.getByConditions(payload, selectedApi)
+    this.genericService
+      .getByConditions(payload, selectedApi)
       .pipe(finalize(() => this.hideLoaderLocal()))
       .subscribe({
         next: (res: any) => {
           this.step = 'verify';
-          this.serverMobileNumber = res?.mobile_no || (mobileRegex.test(identifier) ? identifier : '');
+          this.serverMobileNumber =
+            res?.mobile_no || (mobileRegex.test(identifier) ? identifier : '');
           this.primaryLabel = 'Verify OTP';
           this.sentToMasked = this.maskMobile(this.serverMobileNumber);
-          this.infoMessage = `OTP sent to ${this.sentToMasked || 'your registered mobile'}. Enter the ${this.otpLength}-digit code.`;
+          this.infoMessage = `OTP sent to ${
+            this.sentToMasked || 'your registered mobile'
+          }. Enter the ${this.otpLength}-digit code.`;
           this.startOtpTimer(120);
-          this.form.get('otp')?.setValidators([Validators.required, Validators.minLength(this.otpLength), Validators.maxLength(this.otpLength)]);
+          this.form
+            .get('otp')
+            ?.setValidators([
+              Validators.required,
+              Validators.minLength(this.otpLength),
+              Validators.maxLength(this.otpLength),
+            ]);
           this.form.get('otp')?.updateValueAndValidity();
 
           Swal.fire({
             icon: 'success',
             title: 'OTP Sent',
-            text: `OTP successfully sent to ${this.sentToMasked || 'your registered mobile'}.`,
+            text: `OTP successfully sent to ${
+              this.sentToMasked || 'your registered mobile'
+            }.`,
             timer: 1800,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end'
+            position: 'top-end',
           });
         },
         error: (err) => {
-          this.infoMessage = err?.error?.message || 'Failed to send OTP. Please try again.';
+          this.infoMessage =
+            err?.error?.message || 'Failed to send OTP. Please try again.';
           Swal.fire({
             icon: 'error',
             title: 'Send Failed',
             text: err?.error?.message || 'Unable to send OTP.',
           });
-        }
+        },
       });
   }
 
@@ -246,7 +282,8 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
     this.showLoaderLocal();
     this.infoMessage = 'Verifying OTP...';
 
-    this.genericService.getByConditions(payload, selectedApi)
+    this.genericService
+      .getByConditions(payload, selectedApi)
       .pipe(finalize(() => this.hideLoaderLocal()))
       .subscribe({
         next: (res: any) => {
@@ -255,8 +292,18 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
           this.infoMessage = 'OTP verified — enter a new password below.';
 
           // set validators for passwords
-          this.form.get('newPassword')?.setValidators([Validators.required, Validators.minLength(6)]);
-          this.form.get('confirmPassword')?.setValidators([Validators.required]);
+          this.form
+            .get('newPassword')
+            ?.setValidators([
+              Validators.required,
+              Validators.minLength(6),
+              Validators.pattern(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/
+              ),
+            ]);
+          this.form
+            .get('confirmPassword')
+            ?.setValidators([Validators.required]);
           this.form.get('newPassword')?.updateValueAndValidity();
           this.form.get('confirmPassword')?.updateValueAndValidity();
 
@@ -267,7 +314,7 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
             timer: 1500,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end'
+            position: 'top-end',
           });
         },
         error: (err) => {
@@ -277,7 +324,7 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
             title: 'OTP Invalid',
             text: err?.error.message || 'OTP verification failed.',
           });
-        }
+        },
       });
   }
 
@@ -298,12 +345,14 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
     this.showLoaderLocal();
     this.infoMessage = 'Resending OTP...';
 
-    this.genericService.getByConditions(payload, selectedApi)
+    this.genericService
+      .getByConditions(payload, selectedApi)
       .pipe(finalize(() => this.hideLoaderLocal()))
       .subscribe({
         next: (res: any) => {
           this.startOtpTimer(120);
-          const mobileToShow = res?.mobile_no || (mobileRegex.test(identifier) ? identifier : '');
+          const mobileToShow =
+            res?.mobile_no || (mobileRegex.test(identifier) ? identifier : '');
           this.infoMessage = `OTP resent to ${this.maskMobile(mobileToShow)}.`;
           Swal.fire({
             icon: 'success',
@@ -312,7 +361,7 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
             timer: 1500,
             showConfirmButton: false,
             toast: true,
-            position: 'top-end'
+            position: 'top-end',
           });
         },
         error: (err) => {
@@ -322,33 +371,45 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
             title: 'Resend Failed',
             text: err?.error.message || 'Unable to resend OTP.',
           });
-        }
+        },
       });
   }
 
-  // 4) Reset password
-  resetPassword(): void {
-    if (this.step !== 'reset') return;
+ resetPassword(): void {
+  if (this.step !== 'reset') return;
 
-    const np = this.form.value.newPassword;
-    const cp = this.form.value.confirmPassword;
-    if (!np || np.length < 6) {
-      Swal.fire({ icon: 'warning', title: 'Weak Password', text: 'Password must be at least 6 characters.' });
-      return;
+  const npControl = this.form.get('newPassword');
+  const cpControl = this.form.get('confirmPassword');
+
+  // Validate
+  if (npControl?.invalid) {
+    let msg = 'Password is invalid.';
+    if (npControl.hasError('minlength')) {
+      msg = 'Password must be at least 6 characters long.';
+    } else if (npControl.hasError('pattern')) {
+      msg = 'Password must contain uppercase, lowercase, and a special character.';
     }
-    if (np !== cp) {
-      Swal.fire({ icon: 'warning', title: 'Mismatch', text: 'New password and confirmation do not match.' });
-      return;
-    }
+    Swal.fire({ icon: 'warning', title: 'Invalid Password', text: msg });
+    return;
+  }
 
-    const identifier = (this.identifierControl?.value ?? '').toString().trim();
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
-    const mobileRegex = /^[6-9]\d{9}$/;
+  const np = npControl?.value; 
+  const cp = cpControl?.value; 
 
-    const payload: any = {
-      new_password_confirmation: cp,
-      new_password: np
-    };
+  if (cp !== np) {
+    Swal.fire({ icon: 'warning', title: 'Mismatch', text: 'Passwords do not match.' });
+    return;
+  }
+
+  // Now np and cp are defined ✅
+  const identifier = (this.identifierControl?.value ?? '').toString().trim();
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+  const mobileRegex = /^[6-9]\d{9}$/;
+
+  const payload: any = {
+    new_password_confirmation: cp,
+    new_password: np
+  };
     if (panRegex.test(identifier)) payload.phone_or_pan = identifier;
     else if (mobileRegex.test(identifier)) payload.phone_or_pan = identifier;
 
@@ -357,7 +418,8 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
     this.showLoaderLocal();
     this.infoMessage = 'Resetting password...';
 
-    this.genericService.getByConditions(payload, selectedApi)
+    this.genericService
+      .getByConditions(payload, selectedApi)
       .pipe(finalize(() => this.hideLoaderLocal()))
       .subscribe({
         next: (res: any) => {
@@ -369,7 +431,7 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
             timer: 2000,
             willClose: () => {
               this.router.navigate(['/page/login']);
-            }
+            },
           });
         },
         error: (err) => {
@@ -379,7 +441,7 @@ export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy
             title: 'Reset Failed',
             text: err?.error.message || 'Unable to reset password.',
           });
-        }
+        },
       });
   }
 

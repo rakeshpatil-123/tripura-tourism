@@ -96,10 +96,22 @@
               <app-ilogi-input fieldLabel="Current Password" type="password" formControlName="currentPassword"
                 placeholder="Enter current password">
               </app-ilogi-input>
+            
 
-              <app-ilogi-input fieldLabel="New Password" type="password" formControlName="newPassword"
-                placeholder="Enter new password">
-              </app-ilogi-input>
+                <app-ilogi-input fieldLabel="New Password" type="password" formControlName="newPassword"
+                  placeholder="Enter new password">
+                </app-ilogi-input>
+                <small class="error-text"
+                  *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.hasError('required')">
+                  New password is required.
+                </small>
+                <small class="error-text" *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+                  Password must be at least 6 characters long.
+                </small>
+                <small class="error-text" *ngIf="passwordForm.get('newPassword')?.hasError('pattern')">
+                  Password must contain uppercase, lowercase, and a special character.
+                </small>
+            
 
               <app-ilogi-input fieldLabel="Confirm Password" type="password" formControlName="confirmPassword"
                 placeholder="Confirm new password">

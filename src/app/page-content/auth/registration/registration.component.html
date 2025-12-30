@@ -16,34 +16,34 @@
               Please enter a valid enterprise name.
             </small>
           </ng-container>
-                <!-- PAN Number -->
-              <ng-container *ngIf="sourcePage !== 'departmental-users'">
-                <!-- wrapper keeps the input + messages together (prevents grid from flowing the small tags into next column) -->
-                <div class="single-field pan-field">
-                  <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
-                    placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
-                  </app-ilogi-input>
-              
-                  <!-- show validation error ONLY when user has entered full PAN length (10 chars),
+          <!-- PAN Number -->
+          <ng-container *ngIf="sourcePage !== 'departmental-users'">
+            <!-- wrapper keeps the input + messages together (prevents grid from flowing the small tags into next column) -->
+            <div class="single-field pan-field">
+              <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
+                placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
+              </app-ilogi-input>
+
+              <!-- show validation error ONLY when user has entered full PAN length (10 chars),
                        control is invalid AND backend 'registered' error is NOT present -->
-                  <small class="error-text" *ngIf="registrationForm.get('pan')?.touched
+              <small class="error-text" *ngIf="registrationForm.get('pan')?.touched
                                   && registrationForm.get('pan')?.invalid
                                   && (registrationForm.get('pan')?.value?.toString()?.trim()?.length === 10)
                                   && !registrationForm.get('pan')?.hasError('registered')">
-                    Please enter a valid PAN number.
-                  </small>
-              
-                  <!-- Inline backend status message for PAN (shows BE message in red when PAN already registered)
+                Please enter a valid PAN number.
+              </small>
+
+              <!-- Inline backend status message for PAN (shows BE message in red when PAN already registered)
                        placed directly below the PAN field. When present it will suppress the "Please enter..." message above. -->
-                  <small *ngIf="panStatusMessage" [ngClass]="{
+              <small *ngIf="panStatusMessage" [ngClass]="{
                            'mobile-status-success': panStatusType === 'success',
                            'mobile-status-error': panStatusType === 'error',
                            'mobile-status-info': panStatusType === 'info'
                          }" class="mobile-status-text pan-status-text" aria-live="polite">
-                    {{ panStatusMessage }}
-                  </small>
-                </div>
-              </ng-container>
+                {{ panStatusMessage }}
+              </small>
+            </div>
+          </ng-container>
 
           <!-- Authorized Person -->
           <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
@@ -62,8 +62,8 @@
           </small>
           <div>
             <!-- Mobile -->
-            <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true" formControlName="mobile_no"
-              placeholder="Enter mobile number" type="text"></app-ilogi-input>
+            <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true"
+              formControlName="mobile_no" placeholder="Enter mobile number" type="text"></app-ilogi-input>
             <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched 
                      && registrationForm.get('mobile_no')?.invalid 
                      && !registrationForm.get('mobile_no')?.hasError('taken')">
@@ -76,7 +76,7 @@
               'mobile-status-info': mobileStatusType === 'info'
             }" class="mobile-status-text" aria-live="polite">
               {{ mobileStatusMessage }}
-              </small>
+            </small>
             <div *ngIf="!editMode && sourcePage !== 'departmental-users'
                                      && registrationForm.get('mobile_no')?.value?.toString().trim().length === 10
                                      && registrationForm.get('mobile_no')?.valid
@@ -88,7 +88,7 @@
               </button>
             </div>
 
-          <div
+            <div
               *ngIf="registrationForm.get('mobile_no')?.value?.toString().trim().length === 10 && registrationForm.get('mobile_no')?.valid"
               class="box mt-2">
               <input type="checkbox" [checked]="whatsappSameAsMobile" (change)="toggleWhatsappSameAsMobile($event)" />
@@ -102,10 +102,10 @@
               <button type="button" class="btn-verify" (click)="verifyOtp()" [disabled]="!otpControl.valid">Verify
                 OTP</button>
             </div>
-          
+
             <!-- Verified message remains visible when otpVerified is true -->
             <!-- <div *ngIf="otpVerified && !editMode && sourcePage !== 'departmental-users'" class="otp-verified mt-1">
-            ✅ Mobile number verified.
+            Mobile number verified.
           </div> -->
 
           </div>
@@ -187,9 +187,21 @@
 
         <div class="enterprise-form">
           <!-- Password -->
-          <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
-            type="password" placeholder="Enter password"></app-ilogi-input>
+          <div>
+            <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
+              type="password" placeholder="Enter password"></app-ilogi-input>
 
+            <small class="error-text"
+              *ngIf="registrationForm.get('password')?.touched && registrationForm.get('password')?.hasError('required')">
+              Password is required.
+            </small>
+            <small class="error-text" *ngIf="registrationForm.get('password')?.hasError('minlength')">
+              Password must be at least 6 characters long.
+            </small>
+            <small class="error-text" *ngIf="registrationForm.get('password')?.hasError('pattern')">
+              Password must contain at least one uppercase letter, one lowercase letter, and one special character.
+            </small>
+          </div>
           <!-- Confirm Password -->
           <app-ilogi-input fieldId="confirmPassword" fieldLabel="Confirm Password" [mandatory]="true"
             formControlName="confirmPassword" type="password" placeholder="Re-enter password"
@@ -210,7 +222,7 @@
 
       <span *ngIf="sourcePage !== 'departmental-users'" class="text-center small mt-2">
         Already Registered?
-        <a role="button"  (click)="goToLogin()" class="login-link">Login</a>
+        <a role="button" (click)="goToLogin()" class="login-link">Login</a>
       </span>
     </div>
   </div>
