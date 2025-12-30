@@ -134,6 +134,89 @@
   justify-content: center;
   align-items: center;
 }
+.my-swal-popup {
+  background: linear-gradient(135deg, #0b1220 0%, #0f4c5c 60%, #06b6d4 100%);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 12px 40px rgba(2,6,23,0.65);
+  font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-width: 360px;
+  max-width: 720px;
+}
+
+@keyframes popupEnter {
+  0% { transform: translateY(20px) scale(0.98); opacity: 0; }
+  60% { transform: translateY(-6px) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes popupLeave {
+  to { transform: translateY(8px) scale(0.98); opacity: 0; }
+}
+.swal2-popup-enter { animation: popupEnter .44s cubic-bezier(.2,.9,.2,1); }
+.swal2-popup-leave { animation: popupLeave .28s ease-in; }
+
+.my-swal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: 0.2px;
+}
+.my-swal-html {
+  color: rgba(255,255,255,0.95);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+.my-swal-html p { margin: 8px 0; }
+.my-swal-html ul {
+  margin: 8px 0 0 18px;
+  padding: 0;
+  color: rgba(255,255,255,0.92);
+}
+.my-swal-html li { margin-bottom: 6px; }
+
+.my-swal-html .swal-illustration {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.my-swal-confirm {
+  background: linear-gradient(90deg,#06b6d4,#3b82f6) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 10px 18px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 18px rgba(59,130,246,0.18) !important;
+  transform: translateZ(0);
+}
+.my-swal-confirm:hover { transform: translateY(-2px); transition: transform .18s ease; }
+
+@keyframes btnPulse {
+  0% { box-shadow: 0 6px 18px rgba(59,130,246,0.12); }
+  50% { box-shadow: 0 14px 34px rgba(59,130,246,0.18); transform: translateY(-1px); }
+  100% { box-shadow: 0 6px 18px rgba(59,130,246,0.12); transform: translateY(0); }
+}
+.my-swal-confirm { animation: btnPulse 2.8s ease-in-out infinite; }
+
+.my-swal-cancel {
+  background: transparent !important;
+  color: rgba(255,255,255,0.95) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  padding: 9px 16px !important;
+  border-radius: 10px !important;
+}
+.my-swal-close {
+  color: rgba(255,255,255,0.7) !important;
+}
+
+@media (max-width: 420px) {
+  .my-swal-popup { padding: 18px; min-width: 300px; }
+  .my-swal-title { font-size: 1rem; }
+}
 
 .error-text{
   color: #e74c3c;

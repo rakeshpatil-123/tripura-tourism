@@ -359,8 +359,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private helpService: HelpService 
   ) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
-    this.userName =
-      this.genericService.decryptLocalStorageItem('user_name') || 'User';
+    this.userName = this.genericService.decryptLocalStorageItem('user_name') || 'User';
     this.deptName = localStorage.getItem('deptName') || '';
     this.emailId = localStorage.getItem('email_id') || '';
     this.currentUserEnterpriseName = this.genericService.decryptLocalStorageItem('name_of_enterprise') || '';

@@ -26,11 +26,6 @@
           (change)="onDepartmentSelect(filterForm.value.serivce)">
         </app-ilogi-select>
       </div>
-      <div class="control-item search-box stagger-item">
-        <app-ilogi-input fieldId="user_name" fieldLabel="Username or Feedback" formControlName="user_name" type="text"
-          placeholder="Search by username or feedback">
-        </app-ilogi-input>
-      </div>
       <div class="control-item small-filter stagger-item mb-10">
         <app-ilogi-input-date formControlName="from_dt" name="from_dt" fieldLabel="From Date" fieldId="from_dt"
           [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false">
@@ -40,6 +35,11 @@
         <app-ilogi-input-date formControlName="to_dt" name="to_dt" fieldLabel="To Date" fieldId="to_dt"
           [monthsRange]="24" [allowFutureDates]="true" placeholder="DD-MM-YYYY" [mandatory]="false">
         </app-ilogi-input-date>
+      </div>
+      <div class="control-item search-box stagger-item">
+        <app-ilogi-input fieldId="user_name" fieldLabel="Username or Feedback" formControlName="user_name" type="text"
+          placeholder="Search by username or feedback">
+        </app-ilogi-input>
       </div>
       <div class="control-item actions-slot stagger-item"></div>
     </form>

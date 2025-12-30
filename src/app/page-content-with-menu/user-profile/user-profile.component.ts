@@ -16,7 +16,8 @@ import {
   SelectOption,
 } from '../../customInputComponents/ilogi-select/ilogi-select.component';
 import { LoaderService } from '../../_service/loader/loader.service';
-import { finalize } from 'rxjs';
+import { distinctUntilChanged, finalize, take } from 'rxjs';
+import Swal from 'sweetalert2';
 
 export interface BackendProfile {
   id?: number;
@@ -130,7 +131,9 @@ export class UserProfileComponent implements OnInit {
     this.isDepartmentUser =
       String(localStorage.getItem('userRole')) === 'department';
     this.initForms();
-
+    const userRole = localStorage.getItem('userRole');
+    const districtAlreadyMapped = !!localStorage.getItem('district');
+    const alertShownKey = 'districtAlertShown_v1';
       this.otpControl = this.fb.control('', [
     Validators.required,
     Validators.pattern(/^\d{6}$/)
@@ -139,7 +142,64 @@ export class UserProfileComponent implements OnInit {
     this.loadDistricts();
     this.setupCascadingDropdowns();
     this.loaderService.showLoader();
-    this.profileForm.get('userType')?.valueChanges.subscribe((type) => {
+    if (userRole === 'individual' && !districtAlreadyMapped && !localStorage.getItem(alertShownKey)) {
+      const districtControl = this.profileForm.get('district_code');
+      if (!districtControl) return;
+      districtControl.valueChanges
+        .pipe(
+          distinctUntilChanged(),
+          take(1)
+        )
+        .subscribe(() => {
+          Swal.fire({
+            title: 'Confirm your district selection',
+            html:
+              `
+               <div class="swal-text">
+                 <p><strong>Please make sure you select the correct district, subdivision & block.</strong></p>
+                 <p>Your application will be mapped to the corresponding district.</p>
+                 <ul>
+                   <li>Verify the district name before submission</li>
+                   <li>Verify subdivision name before submission</li>
+                   <li>Verify ulb (block) name before submission</li>
+                 </ul>
+               </div>`,
+            icon: 'warning',
+            showCloseButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'I understand — continue',
+            cancelButtonText: 'Edit selection',
+            focusConfirm: false,
+            allowOutsideClick: false,
+            reverseButtons: false,
+            customClass: {
+              popup: 'my-swal-popup',
+              title: 'my-swal-title',
+              htmlContainer: 'my-swal-html',
+              confirmButton: 'my-swal-confirm',
+              cancelButton: 'my-swal-cancel',
+              closeButton: 'my-swal-close'
+            },
+            showClass: {
+              popup: 'swal2-popup-enter'
+            },
+            hideClass: {
+              popup: 'swal2-popup-leave'
+            }
+          }).then((result) => {
+            if (result.isConfirmed || result.isDismissed || result.isDenied) {
+              localStorage.setItem(alertShownKey, 'true');
+            }
+            if (result.dismiss === Swal.DismissReason.cancel) {
+              setTimeout(() => {
+                const el = document.querySelector('[formControlName="district_code"]') as HTMLElement | null;
+                el?.focus();
+              }, 150);
+            }
+          });
+        });
+    }
+     this.profileForm.get('userType')?.valueChanges.subscribe((type) => {
       const panCtrl = this.profileForm.get('pan');
 
       if (type === 'individual') {

@@ -74,7 +74,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   position: relative;
-  z-index: 9999;
   align-items: end;
 }
 
@@ -91,7 +90,6 @@ app-ilogi-input {
 .actions-slot {
   width: 100%;
   position: relative;
-  z-index: 5000;
 }
 
 .control-item {
