@@ -65,6 +65,7 @@ export class BusinessUsersComponent implements OnInit {
 
   globalFilterFields: string[] = this.columns.map(c => c.field);
   searchText: string = '';
+  basePath: string = '';
 
   constructor(
     private genericService: GenericService,
@@ -184,61 +185,165 @@ export class BusinessUsersComponent implements OnInit {
   }
   getUserLogin(user: any): void {
     this.loaderService.showLoader();
-    const payload = {
-      user_id: user.id
-    };
+    const payload = { user_id: user.id };
 
     this.genericService.getByConditions(payload, 'api/admin/login-by-admin')
       .pipe(finalize(() => this.loaderService.hideLoader()))
       .subscribe({
         next: (res: any) => {
-          if (res?.status === 1 && res?.token) {
-            // First, logout the current user to clear old session
-            this.genericService.logoutUser();
-
-            // Then store new token and user data
-            localStorage.setItem('token', res.token);
-            localStorage.setItem('token_type', res.token_type || 'bearer');
-            localStorage.setItem('expires_in', res.expires_in || '');
-
-            // Store new user data
-            localStorage.setItem('userName', res.data?.authorized_person_name || '');
-            localStorage.setItem('userRole', res.data?.user_type || '');
-            localStorage.setItem('email_id', res.data?.email_id || '');
-            localStorage.setItem('user_name', res.data?.user_name || '');
-            localStorage.setItem('bin', res.data?.bin || '');
-            localStorage.setItem('userId', res.data?.id || '');
-            localStorage.setItem('name_of_enterprise', res.data?.name_of_enterprise || '');
-            localStorage.setItem('district', res.data?.district || '');
-            localStorage.setItem('subdivision', res.data?.subdivision || '');
-            localStorage.setItem('ulb', res.data?.ulb || '');
-            localStorage.setItem('ward', res.data?.ward || '');
-
-            // Store complete session data for new user
-            this.genericService.storeSessionData(res, false);
-            this.genericService.setLoginStatus(true);
-
-            Swal.fire({
-              icon: 'success',
-              title: 'Login Successful',
-              text: `Switched to ${res.data?.name_of_enterprise || res.data?.authorized_person_name || res.data?.email_id}`,
-              timer: 1500,
-              showConfirmButton: false
-            }).then(() => {
-              this.router.navigate(['/dashboard/home']);
-            });
-          } else {
+          if (!(res && res.status === 1 && res.token)) {
             Swal.fire('Login Failed', res?.message || 'Unable to login this user.', 'error');
+            return;
+          }
+          try {
+            const backupKey = 'admin_session_backup_v1';
+            if (!localStorage.getItem(backupKey)) {
+              const snap: { [k: string]: string | null } = {};
+              for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k) snap[k] = localStorage.getItem(k);
+              }
+              localStorage.setItem(backupKey, JSON.stringify(snap));
+            }
+          } catch (e) {
+            console.warn('Backup admin session failed', e);
+          }
+          try {
+            localStorage.setItem('token', res.token || '');
+          } catch (e) {
+            console.warn('Unable to set token before storeSessionData', e);
+          }
+          try {
+            this.genericService.storeSessionData(res, false);
+          } catch (e) {
+            console.warn('storeSessionData failed', e);
+          }
+          const d = res.data || {};
+          try {
+            localStorage.setItem('token_type', res.token_type || 'bearer');
+            localStorage.setItem('expires_in', String(res.expires_in ?? ''));
+
+            localStorage.setItem('userName', d.authorized_person_name ?? '');
+            localStorage.setItem('userRole', d.user_type ?? '');
+            localStorage.setItem('email_id', d.email_id ?? '');
+            localStorage.setItem('user_name', d.user_name ?? '');
+            localStorage.setItem('bin', d.bin ?? '');
+            localStorage.setItem('userId', String(d.id ?? ''));
+            localStorage.setItem('name_of_enterprise', d.name_of_enterprise ?? '');
+            localStorage.setItem('deptId', String(d.department_id ?? ''));
+            localStorage.setItem('deptName', d.department_name ?? '');
+            localStorage.setItem('hierarchy', d.hierarchy ?? '');
+            localStorage.setItem('designation', d.designation ?? '');
+            localStorage.setItem('district', d.district ?? '');
+            localStorage.setItem('subdivision', d.subdivision ?? '');
+            localStorage.setItem('ulb', d.ulb ?? '');
+            localStorage.setItem('ward', d.ward ?? '');
+          } catch (e) {
+            console.warn('Setting plain localStorage items failed', e);
+          }
+          try {
+            this.genericService.setLoginStatus(true);
+            try {
+              const gsAny: any = this.genericService as any;
+              if (typeof gsAny.refreshSession === 'function') {
+                gsAny.refreshSession();
+              } else if (typeof gsAny.loadSessionFromLocalStorage === 'function') {
+                gsAny.loadSessionFromLocalStorage();
+              } else if (gsAny.user$ && typeof gsAny.user$.next === 'function') {
+                gsAny.user$.next(d);
+              } else if (gsAny.currentUser && typeof gsAny.currentUser.next === 'function') {
+                gsAny.currentUser.next(d);
+              } else if (gsAny.setCurrentUser && typeof gsAny.setCurrentUser === 'function') {
+                gsAny.setCurrentUser(d);
+              }
+            } catch (refreshErr) {
+              console.warn('session refresh helper call failed', refreshErr);
+            }
+            try {
+              const evt = new CustomEvent('app.sessionChanged', { detail: { user: d } });
+              window.dispatchEvent(evt);
+            } catch (evtErr) {
+            }
+            try {
+              window.dispatchEvent(new Event('session-changed'));
+            } catch { }
+            const displayName = (d.authorized_person_name || d.user_name || d.name_of_enterprise || d.email_id || 'User');
+            const displayEnterprise = d.name_of_enterprise ? String(d.name_of_enterprise) : '';
+            const initials = displayName.split(' ').map((s: any) => s[0]).slice(0, 2).join('').toUpperCase();
+            Swal.fire({
+              html: `
+              <div style="display:flex;flex-direction:row;align-items:center;gap:14px;padding:6px 10px;">
+                <div style="flex:0 0 64px; height:64px; border-radius:12px; display:flex;align-items:center;justify-content:center;
+                            background: linear-gradient(135deg,#0ea5e9,#0369a1);
+                            box-shadow: 0 8px 22px rgba(3,37,65,0.18); color:#fff; font-weight:700; font-size:20px;">
+                  ${this.escapeHtml(initials)}
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:1.05rem; font-weight:700; color:#04263f; line-height:1.1;">
+                    Welcome, ${this.escapeHtml(displayName)}
+                  </div>
+                  <div style="font-size:0.88rem; color:#556b7a; margin-top:4px;">
+                    ${displayEnterprise ? this.escapeHtml(displayEnterprise) + ' · ' : ''}Signed in successfully
+                  </div>
+                </div>
+                <div style="flex:0 0 auto; margin-left:6px;">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="0" y="0" width="24" height="24" rx="6" fill="#10b981"></rect>
+                    <path d="M7 12.5l2.5 2.5L17 8.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            `,
+              showConfirmButton: false,
+              showCloseButton: false,
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              backdrop: true,
+              timer: 1400,
+              didOpen: (popup) => {
+                try {
+                  (popup as HTMLElement).style.transition = 'transform 360ms cubic-bezier(.2,.9,.3,1), opacity 260ms ease';
+                  (popup as HTMLElement).style.transform = 'translateY(-6px) scale(1.01)';
+                  setTimeout(() => { (popup as HTMLElement).style.transform = ''; }, 80);
+                } catch (e) { }
+              }
+            }).then(() => {
+              try {
+                const redirectPath = this.resolvePath('/dashboard/home');
+                const redirectUrl = `${window.location.origin}${redirectPath}`;
+                window.location.replace(redirectUrl);
+              } catch (navErr) {
+                const redirectPath = this.resolvePath('/dashboard/home');
+                const redirectUrl = `${window.location.origin}${redirectPath}`;
+                window.location.replace(redirectUrl);
+              }
+            });
+          } catch (e) {
+            console.warn('Post-login actions failed', e);
           }
         },
         error: (err: any) => {
-          console.error('Login error:', err);
+          console.error('Login as user error:', err);
           Swal.fire('Error', 'Failed to login user. Please try again.', 'error');
         }
       });
   }
-   logout(): void {
-    this.genericService.logoutUser();
+
+  private escapeHtml(unsafe: string | null | undefined): string {
+    const s = (unsafe || '').toString();
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+
+
+  resolvePath(path: string): string {
+    if (!path) return path;
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) return path;
+    const p = path.startsWith('/') ? path : '/' + path;
+    const base = this.basePath || '';
+    if (!base) return p;
+    if (p === base) return p;
+    if (p.startsWith(base + '/')) return p;
+    return base + p;
   }
   performExport() {
     const payload: any = {
