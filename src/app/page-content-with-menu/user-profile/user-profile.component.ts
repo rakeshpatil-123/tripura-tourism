@@ -437,7 +437,6 @@ export class UserProfileComponent implements OnInit {
       name_of_enterprise: val.enterpriseName,
       authorized_person_name: `${val.authorized_person_name}`.trim(),
       email_id: val.email,
-      pan: val.pan,
       mobile_no: val.phone ? String(val.phone) : '',
       whatsapp_no: val.whatsapp_no ? String(val.whatsapp_no) : null,
       registered_enterprise_address: val.address,
@@ -449,6 +448,9 @@ export class UserProfileComponent implements OnInit {
     if (val.userType === 'individual') {
       delete payload.hierarchy_level;
       delete payload.department_id;
+      if (!!val.pan) {
+        payload.pan = val.pan
+      }
       if (val.district_code) {
         payload.district_id = val.district_code;
       }
