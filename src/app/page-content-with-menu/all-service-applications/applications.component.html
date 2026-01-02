@@ -69,6 +69,7 @@
         <app-ilogi-select
           class="filter-item dropdown-fix"
           [selectOptions]="districts"
+          [enableSearch]="true"
           formControlName="district_id"
           [fieldLabel]="'District'"
           placeholder="District"
@@ -76,6 +77,7 @@
         ></app-ilogi-select>
         <app-ilogi-select
           class="filter-item dropdown-fix"
+          [enableSearch]="true"
           [selectOptions]="subdivisions"
           [fieldLabel]="'Subdivision'"
           formControlName="subdivision_id"
@@ -83,10 +85,10 @@
           aria-label="Filter by subdivision"
         ></app-ilogi-select>
 
-        <app-ilogi-select class="filter-item dropdown-fix" [fieldLabel]="'Hierarchy level'" [selectOptions]="hierarchyLevels"
+        <app-ilogi-select class="filter-item dropdown-fix" [enableSearch]="true" [fieldLabel]="'Hierarchy level'" [selectOptions]="hierarchyLevels"
           formControlName="hierarchy_level" placeholder="Hierarchy" aria-label="Hierarchy level"></app-ilogi-select>
 
-        <app-ilogi-select class="filter-item dropdown-fix" [fieldLabel]="'Status'" [selectOptions]="statusOptions"
+        <app-ilogi-select class="filter-item dropdown-fix" [enableSearch]="true" [fieldLabel]="'Status'" [selectOptions]="statusOptions"
           formControlName="current_status" placeholder="Status" aria-label="Filter by status"></app-ilogi-select>
       </div>
 

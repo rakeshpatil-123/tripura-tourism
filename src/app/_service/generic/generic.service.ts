@@ -18,30 +18,39 @@ import Swal from 'sweetalert2';
   providedIn: 'root', // Makes the service available app-wide in standalone setup
 })
 export class GenericService {
-  // Development URLs
-  // static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  // static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  // static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  // static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  // static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  
-  //Production URLs 
-  static DEV_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
-  static QA_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
-  static UAT_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
-  static CERTIN_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
+  // Development / Staging and Production URLs
+  static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static QA_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
+  static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   static PRODUCTION_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
 
-
   public static BACKEND_URL(): string {
-    console.log(window.location.origin);
-    if (window.location.origin.includes('swaagat-qa')) {
-      return GenericService.QA_BACKEND_URL;
-    } else if (window.location.origin.includes('swaagat-uat')) {
-      return GenericService.UAT_BACKEND_URL;
-    } else if (window.location.origin.includes('swaagat-certin')) {
-      return GenericService.CERTIN_BACKEND_URL;
-    } else if (window.location.origin.includes('swaagatstaging.tripura')) {
+    if (typeof window === 'undefined' || !window.location) {
+      return GenericService.DEV_BACKEND_URL;
+    }
+    const host = window.location.hostname.toLowerCase();
+    // DEV (staging backend) also included localhost as well
+    if (
+      host === 'localhost' ||
+      host === '::1' ||
+      host === '127.0.0.1' ||
+      host.startsWith('192.168.') ||
+      host.startsWith('10.') ||
+      host.startsWith('172.')
+    ) {
+      return GenericService.DEV_BACKEND_URL;
+    }
+    // QA/UAT - DEV/staging also for testing as well
+    if (host.includes('swaagat-qa') || host.includes('swaagat-uat') || host.includes('swaagat-certin')) {
+      return GenericService.DEV_BACKEND_URL;
+    }
+    // tripura.cloud / swaagatstaging -> DEV/staging
+    if (host.includes('tripura.cloud') || host.includes('swaagatstaging')) {
+      return GenericService.DEV_BACKEND_URL;
+    }
+    // Production domains -> production backend
+    if (host.includes('tripura.gov.in') || host.includes('swaagatbackend')) {
       return GenericService.PRODUCTION_BACKEND_URL;
     }
     return GenericService.DEV_BACKEND_URL;

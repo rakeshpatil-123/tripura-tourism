@@ -1,43 +1,40 @@
-<div class="service-view-container">
-  <!-- <h2 class="page-head mb-3">Application Details</h2> -->
-
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-2">Loading application details...</p>
+<div *ngIf="workflowData.length > 0" class="workflow-header new-workflow-header" role="banner"
+  aria-label="Workflow header">
+  <div class="header-side header-left">
+    <button type="button" mat-icon-button class="icon-btn back-btn" (click)="goBack()" aria-label="Go back">
+      <mat-icon class="back-icon">arrow_back</mat-icon>
+      <span class="back-label" aria-hidden="true">Back</span>
+    </button>
   </div>
-
-  <div *ngIf="!isLoading && !applicationData" class="text-center text-muted py-5">
-    <p> Application not found.</p>
-
+    <div class="header-center" aria-live="polite">
+      <h1 class="page-head centered-head">
+        <span class="head-main">Workflow Steps</span>
+      <span class="service-name" aria-hidden="false">{{serviceName}}</span>
+    </h1>
+    <div class="title-subtle-underline" aria-hidden="true"></div>
   </div>
-
-  <div *ngIf="!isLoading && applicationData">
-
-    <!-- Workflow History -->
-    <div *ngIf="workflowData.length > 0" class="btn-right">
-      <h3 class=" page-head">Workflow Steps</h3>
-
+    <div class="header-side header-right">
       <div class="btn-group-right">
-        <button class="btn btn-primary" *ngIf="isFinalApproval"
-          mat-raised-button class="generate-btn" (click)="editCertificateGeneration()">
-          <mat-icon style="color: white;" class="mr-2">workspace_premium</mat-icon>
-          <span style="color: white;">{{isCerfitificateGenerated ? 'Re-Generate Certificate' : 'Generate Certificate'}}</span>
+        <button type="button" class="btn-gradient ghost-action" (click)="navigateToCAF()" aria-label="Open CAF">
+          <mat-icon class="icon-left">visibility</mat-icon>
+          <span class="btn-label">CAF</span>
         </button>
-         <!-- <button class="btn btn-primary" *ngIf="isFinalApproval"
-            mat-raised-button color="primary" (click)="previewCertificate()">
-            <span style="color: white;">Preview Certificate</span>
-          </button> -->
-        <button (click)="navigateToCAF()" class="btn btn-success">CAF <mat-icon>visibility</mat-icon></button>
-        <button (click)="downloadCertificate()" *ngIf="isFinalApproval" class="submit-btn">Certificate
-          <mat-icon>picture_as_pdf</mat-icon>
+        <button *ngIf="isFinalApproval" mat-raised-button class="btn-gradient primary-action generate-btn"
+          (click)="editCertificateGeneration()" aria-label="Generate or re-generate certificate">
+          <mat-icon class="icon-left animate-icon">workspace_premium</mat-icon>
+          <span class="btn-label">{{isCerfitificateGenerated ? 'Re-Generate Certificate' : 'Generate Certificate'}}</span>
         </button>
-        <button mat-raised-button color="primary" class="submit-btn" *ngIf="sampleFilePreview" (click)="previewSampleFile()">
+        <button *ngIf="isFinalApproval" type="button" class="btn-gradient pdf-action" (click)="downloadCertificate()"
+          aria-label="Download certificate as PDF">
+          <mat-icon class="icon-left animate-pulse">picture_as_pdf</mat-icon>
+          <span class="btn-label">Certificate</span>
+      </button>
+      <!-- <button mat-raised-button color="primary" class="submit-btn" *ngIf="sampleFilePreview" (click)="previewSampleFile()">
           Preview Sample File
-        </button>
-      </div>
+        </button> -->
     </div>
+  </div>
+</div>
     <app-dynamic-table [data]="workflowData" [columns]="workflowColumns" [showPagination]="true" [pageSize]="5"
       [searchable]="true"></app-dynamic-table>
 
@@ -63,16 +60,93 @@
         No application questions provided.
       </div>
     </ng-template>
-
-    <!-- Main Application Summary -->
-    <div *ngIf="infoData.length > 0">
-      <h3 class="mt-4 page-head">Application Summary</h3>
-      <app-dynamic-table [data]="infoData" [columns]="infoColumns" [showPagination]="false"
-        [searchable]="false"></app-dynamic-table>
+    <div *ngIf="infoData.length > 0" class="app-summary-wrapper">
+      <div class="app-summary-container">
+        <h3 class="page-head">Application Summary</h3>
+        <section class="summary-card highlights" role="group" aria-label="Key highlights">
+          <div class="summary-top">
+            <div class="left">
+              <div class="label">Application Number</div>
+              <div class="value big">{{ applicationData?.application_number || '—' }}</div>
+              <div class="sub-row">
+                <div>
+                  <div class="small-label">Service</div>
+                  <div class="small-val">{{ applicationData?.service_name || '—' }}</div>
+                </div>
+                <div>
+                  <div class="small-label">Applied On</div>
+                  <div class="small-val">{{ applicationData?.created_at ? (applicationData?.created_at | date:'dd/MM/yyyy')
+                    : '—' }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="right">
+              <div class="chip-wrap">
+                <div class="chip-block">
+                  <div class="chip-label">Status</div>
+                  <div class="chip" role="status"
+                    [attr.aria-label]="'Application status: ' + (formatStatusLabel(applicationData?.status) || 'Unknown')"
+                    title="{{ formatStatusLabel(applicationData?.status) || 'Unknown' }}">
+                    <span class="status-chip" [ngClass]="statusClass(applicationData?.status)">
+                      <span class="dot" aria-hidden="true"></span>
+                      <span class="chip-text">{{ formatStatusLabel(applicationData?.status) }}</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="chip-block">
+                  <div class="chip-label">Payment</div>
+                  <div class="chip" role="note"
+                    [attr.aria-label]="'Payment status: ' + (formatPaymentLabel(applicationData?.payment_status) || 'Pending')"
+                    title="{{ formatPaymentLabel(applicationData?.payment_status) || 'Pending' }}">
+                    <span class="payment-chip" [ngClass]="paymentClass(applicationData?.payment_status)">
+                      <span class="dot" aria-hidden="true"></span>
+                      <span class="chip-text">{{ formatPaymentLabel(applicationData?.payment_status) }}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+    
+              <!-- <div class="action-row">
+                <button class="btn primary" (click)="previewCertificate()">Preview</button>
+                <button class="btn outline" (click)="downloadCertificate()">Download</button>
+              </div> -->
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="fees-row">
+            <div class="fee">
+              <div class="small-label">Application Fee</div>
+              <div class="fee-val">{{ applicationData?.application_fee || '—' }}</div>
+            </div>
+            <div class="fee">
+              <div class="small-label">Extra Raised</div>
+              <div class="fee-val">{{ applicationData?.extra_payment || '—' }}</div>
+            </div>
+            <div class="fee">
+              <div class="small-label">Total Fee</div>
+              <div class="fee-val">{{ applicationData?.total_fee || '—' }}</div>
+            </div>
+          </div>
+    
+        </section>
+        <section class="details-accordion" aria-label="Application details">
+          <div *ngFor="let item of infoData; let idx = index" class="accordion-card"
+            [class.open]="expandedInfoIndex === idx">
+            <button class="accordion-header" (click)="toggleInfo(idx)" type="button"
+              [attr.aria-expanded]="expandedInfoIndex === idx">
+              <div class="title">{{ item.key }}</div>
+              <div class="preview">{{ item.value && item.value.length > 90 ? (item.value | slice:0:90) + '...' : item.value
+                }}</div>
+            </button>
+    
+            <div class="accordion-body" *ngIf="expandedInfoIndex === idx">
+              <div class="full-val">{{ item.value || '—' }}</div>
+            </div>
+          </div>
+        </section>
+    
+      </div>
     </div>
-
-
-  </div>
 
   <!-- Status Action Modal -->
   <div *ngIf="statusModal.visible" class="modal-overlay">

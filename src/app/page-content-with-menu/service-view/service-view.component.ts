@@ -44,11 +44,14 @@ export class ServiceViewComponent implements OnInit {
   isCerfitificateGenerated: boolean = false;
   infoData: any[] = [];
   infoColumns: TableColumn[] = [];
-
+  expandedInfoIndex: number | null = null;
   workflowColumns: TableColumn[] = [];
   workflowData: any[] = [];
-
+  approvedWorkflowPercent: string = '0%';
+  approvedWorkflowCount: number = 0;
+  totalWorkflowCount: number = 0;
   applicationQATableData: any[] = [];
+  serviceName: string = '';
   applicationQAColumns: TableColumn[] = [];
   isFinallyApproved: boolean = false;
   statusModal: StatusActionModal = {
@@ -123,6 +126,7 @@ export class ServiceViewComponent implements OnInit {
             this.isFinalApproval = res.data.is_finally_approved;
             this.justBeforeApproval = res.data.just_before_final_step;
             this.isCerfitificateGenerated = res.data.is_certificate_generated;
+            this.serviceName = res.data.service_name;
 
             console.log('Application Data:', this.applicationData.application_data);
             this.processDataForDisplay();
@@ -142,7 +146,9 @@ export class ServiceViewComponent implements OnInit {
         },
       });
   }
-
+  goBack() {
+    window.history.back();
+  }
   processDataForDisplay(): void {
     const data = this.applicationData;
     this.justBeforeApproval = data.just_before_final_step;
@@ -296,7 +302,7 @@ if (data.application_data && typeof data.application_data === 'object') {
       this.workflowData = data.workflow.map((step: any, index: number) => ({
         ...step,
         step_number: step.step_number,
-        step_type: step.step_type,
+        step_type: this.toTitleCase(step.step_type || ''),
         department: step.department,
         status: step.status,
         action_taken_by: step.action_taken_by || '—',
@@ -305,6 +311,16 @@ if (data.application_data && typeof data.application_data === 'object') {
         status_file: step.status_file,
         workflowIndex: index,
       }));
+      this.totalWorkflowCount = Array.isArray(this.workflowData) ? this.workflowData.length : 0;
+      this.approvedWorkflowCount = Array.isArray(this.workflowData)
+        ? this.workflowData.filter(function (step: any) { return step && step.status === 'approved'; }).length
+        : 0;
+      if (this.totalWorkflowCount > 0) {
+        const pct = (this.approvedWorkflowCount / this.totalWorkflowCount) * 100;
+        this.approvedWorkflowPercent = `${Math.round(pct * 10) / 10}%`;
+      } else {
+        this.approvedWorkflowPercent = '0%';
+      }
 
       this.workflowColumns = [
         { key: 'step_number', label: 'Step', type: 'number' },
@@ -363,6 +379,38 @@ if (data.application_data && typeof data.application_data === 'object') {
     } else {
       this.workflowData = [];
       this.workflowColumns = [];
+    }
+  }
+
+  toggleInfo(index: number): void {
+    this.expandedInfoIndex = this.expandedInfoIndex === index ? null : index;
+  }
+  copyToClipboard(text?: string): void {
+    const payload = String(text ?? '');
+    if (!payload) {
+      this.apiService.openSnackBar('Nothing to copy', 'Close');
+      return;
+    }
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(payload).then(
+        () => this.apiService.openSnackBar('Copied to clipboard', 'Close'),
+        () => this.apiService.openSnackBar('Unable to copy', 'Close')
+      );
+    } else {
+      // fallback: create temporary textarea
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = payload;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        this.apiService.openSnackBar('Copied to clipboard', 'Close');
+      } catch {
+        this.apiService.openSnackBar('Unable to copy', 'Close');
+      }
     }
   }
 
@@ -650,11 +698,11 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
           });
         }
       },
-      error: () => {
+      error: (err: any) => {
         Swal.fire({
           icon: 'error',
           title: 'Download Failed',
-          text: 'Something went wrong while fetching the certificate.',
+          text: `${err.error.message || 'Something went wrong while fetching the certificate.'}`,
           confirmButtonText: 'Retry'
         });
       }
@@ -876,5 +924,59 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
       Swal.fire('Error', 'No sample file available to preview.', 'error');
     }
   }
+  formatStatusLabel(status?: string | null): string {
+    if (!status) return '—';
+    const s = String(status).trim().toLowerCase();
 
+    const map: Record<string, string> = {
+      'under_review': 'Under Review',
+      'under-review': 'Under Review',
+      'pending': 'Pending',
+      'approved': 'Approved',
+      'rejected': 'Rejected',
+      'send_back': 'Sent Back',
+      'send-back': 'Sent Back',
+      'extra_payment': 'Extra Payment',
+      'extra-payment': 'Extra Payment',
+      'in_progress': 'In Progress'
+    };
+
+    if (map[s]) return map[s];
+    return this.toTitleCase(s.replace(/_|-/g, ' '));
+  }
+
+  statusClass(status?: string | null): string {
+    if (!status) return 'status-unknown';
+    const s = String(status).toLowerCase();
+    if (s.includes('approved')) return 'status-approved';
+    if (s.includes('under') || s.includes('review') || s.includes('in progress')) return 'status-under-review';
+    if (s.includes('pending')) return 'status-pending';
+    if (s.includes('reject')) return 'status-rejected';
+    if (s.includes('extra')) return 'status-extra';
+    if (s.includes('send') || s.includes('back')) return 'status-pending';
+    return 'status-unknown';
+  }
+  formatPaymentLabel(paymentStatus?: string | null): string {
+    if (!paymentStatus) return 'Pending';
+    const p = String(paymentStatus).trim().toLowerCase();
+    const map: Record<string, string> = {
+      'paid': 'Paid',
+      'success': 'Paid',
+      'completed': 'Paid',
+      'pending': 'Pending',
+      'failed': 'Failed'
+    };
+    return map[p] || this.toTitleCase(p.replace(/_|-/g, ' '));
+  }
+
+  paymentClass(paymentStatus?: string | null): string {
+    if (!paymentStatus) return 'payment-pending';
+    const p = String(paymentStatus).toLowerCase();
+    if (p.includes('paid') || p.includes('success') || p.includes('completed')) return 'payment-paid';
+    if (p.includes('pending')) return 'payment-pending';
+    return 'payment-unknown';
+  }
+  private toTitleCase(text: string): string {
+    return text.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+  }
 }

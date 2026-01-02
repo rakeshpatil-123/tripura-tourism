@@ -75,6 +75,7 @@ export class BusinessUsersComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.basePath = this.getBasePath();
     this.fetchUsers(1);
   }
   fetchUsers(page: number = 1, rowCount: number = this.rows) {
@@ -328,6 +329,15 @@ export class BusinessUsersComponent implements OnInit {
         }
       });
   }
+  private getBasePath(): string {
+    if (typeof window === 'undefined') return '';
+    const anyWin = window as any;
+    if (typeof anyWin.__BASE_PATH__ === 'string') {
+      return anyWin.__BASE_PATH__.replace(/\/$/, '');
+    }
+    const { pathname } = window.location;
+    return pathname.startsWith('/new') ? '/new' : '';
+  }
 
   private escapeHtml(unsafe: string | null | undefined): string {
     const s = (unsafe || '').toString();
@@ -339,8 +349,19 @@ export class BusinessUsersComponent implements OnInit {
     if (!path) return path;
     if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) return path;
     const p = path.startsWith('/') ? path : '/' + path;
-    const base = this.basePath || '';
+    let base = this.basePath || '';
+    try {
+      if (!base) {
+        const baseHref = document.querySelector('base')?.getAttribute('href') || '';
+        base = baseHref || '';
+      }
+    } catch (e) {
+      base = base || '';
+    }
+
     if (!base) return p;
+    if (!base.startsWith('/')) base = '/' + base;
+    if (base.endsWith('/')) base = base.slice(0, -1);
     if (p === base) return p;
     if (p.startsWith(base + '/')) return p;
     return base + p;

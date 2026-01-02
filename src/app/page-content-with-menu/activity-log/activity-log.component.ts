@@ -1,3 +1,160 @@
+// import { Component, OnInit } from '@angular/core';
+// import { trigger, transition, style, animate } from '@angular/animations';
+// import { TableModule } from 'primeng/table';
+// import { DialogModule } from 'primeng/dialog';
+// import { ChartModule } from 'primeng/chart';
+// import { MultiSelectModule } from 'primeng/multiselect';
+// import { InputTextModule } from 'primeng/inputtext';
+// import { ButtonModule } from 'primeng/button';
+// import { TooltipModule } from 'primeng/tooltip';
+
+// import { LoaderService } from '../../_service/loader/loader.service';
+// import { GenericService } from '../../_service/generic/generic.service';
+// import { finalize } from 'rxjs';
+// import { CommonModule, DatePipe } from '@angular/common';
+// import { IlogiSelectComponent } from '../../customInputComponents/ilogi-select/ilogi-select.component';
+// import { FormsModule } from '@angular/forms';
+
+// import { ActivityLoggerService } from '../../_service/activity-log/activity-logger.service';
+
+// interface Activity {
+//   id?: string | number;
+//   date: Date;
+//   action: string;
+//   by: string;
+//   forWhom: string;
+//   module: string;
+//   platform: string;
+//   oldValue?: string;
+//   newValue?: string;
+// }
+
+// @Component({
+//   selector: 'app-activity-log',
+//   templateUrl: './activity-log.component.html',
+//   styleUrls: ['./activity-log.component.scss'],
+//   standalone: true,
+//   imports: [
+//     CommonModule,
+//     DatePipe,
+//     TableModule,
+//     DialogModule,
+//     ChartModule,
+//     MultiSelectModule,
+//     InputTextModule,
+//     ButtonModule,
+//     FormsModule,
+//     TooltipModule,
+//     IlogiSelectComponent
+//   ],
+//   animations: [
+//     trigger('fadeIn', [
+//       transition(':enter', [
+//         style({ opacity: 0, transform: 'translateY(10px)' }),
+//         animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+//       ])
+//     ])
+//   ]
+// })
+// export class ActivityLogComponent implements OnInit {
+//   activityData: Activity[] = [];
+//   filteredData: Activity[] = [];
+//   displayDialog = false;
+//   selectedActivity: Activity | null = null;
+//   actionTypes: any[] = [{ label: 'Create', value: 'Create' }, { label: 'Update', value: 'Update' }, { label: 'Delete', value: 'Delete' }];
+//   platforms: any[] = [{ name: 'Web' }, { name: 'Android' }, { name: 'iOS' }];
+
+//   constructor(
+//     private genericService: GenericService,
+//     private loaderService: LoaderService,
+//     // private activityLogger: ActivityLoggerService
+//   ) {}
+
+//   ngOnInit(): void {
+//     // this.activityLogger.setUserProvider(() => {
+//     //   try {
+//     //     const raw = localStorage.getItem('userDetails') || localStorage.getItem('user');
+//     //     if (!raw) return null;
+
+//     //     const user = JSON.parse(raw);
+
+//     //     return {
+//     //       id: user.userId ?? null,
+//     //       dept_id: user.deptId || null,
+//     //       role: user.userRole ?? null
+//     //     };
+//     //   } catch {
+//     //     return null;
+//     //   }
+//     // });
+
+//     /**
+//      * 🧾 Log: Admin opened Activity Log page
+//      */
+//     // this.activityLogger.log({
+//     //   action: 'activity_log.open',
+//     //   metadata: { page: 'ActivityLog' }
+//     // });
+
+//     this.getActivityLogData();
+//   }
+
+//   getActivityLogData(): void {
+//     const payload = {
+//       department_id: this.getDeptIdFromStorage()
+//     };
+
+//     this.loaderService.showLoader();
+
+//     this.genericService
+//       .getByConditions(payload, 'get-activity-log')
+//       .pipe(finalize(() => this.loaderService.hideLoader()))
+//       .subscribe((res: any) => {
+//         this.activityData = Array.isArray(res?.data) ? res.data : [];
+//         this.filteredData = [...this.activityData];
+//       });
+//   }
+
+//   viewDetails(activity: Activity): void {
+//     this.selectedActivity = activity;
+//     this.displayDialog = true;
+
+//     // this.activityLogger.log({
+//     //   action: 'activity_log.view',
+//     //   resource_type: 'activity',
+//     //   resource_id: activity.id ?? activity.date.toISOString(),
+//     //   payload_summary: {
+//     //     action: activity.action,
+//     //     module: activity.module
+//     //   }
+//     // });
+//   }
+
+//   clearFilters(table: any): void {
+//     table.clear();
+
+//     // this.activityLogger.log({
+//     //   action: 'activity_log.clear_filters'
+//     // });
+//   }
+
+
+//   private getDeptIdFromStorage(): number | null {
+//     try {
+//       const raw = localStorage.getItem('userDetails') || localStorage.getItem('user');
+//       if (!raw) return null;
+//       const user = JSON.parse(raw);
+//       return user.deptId ? Number(user.deptId) : null;
+//     } catch {
+//       return null;
+//     }
+//   }
+// }
+
+
+// ---------------------------------------------------------------------------------------------------
+
+
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { TableModule } from 'primeng/table';
