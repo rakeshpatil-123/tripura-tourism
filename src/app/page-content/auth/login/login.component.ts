@@ -129,6 +129,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
             if (response?.token) {
               this.goToForgetPassword = false;
               localStorage.setItem('token', response.token);
+              this.router.navigate(['/dashboard/home']);
             }
 
             // preserve your session-store behaviour
@@ -170,7 +171,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
               );
               snackRef.onAction().subscribe(() => {
                 const { origin, pathname } = window.location;
-                const basePath = pathname.startsWith('/new') ? '/new' : '';
+                const basePath = pathname.startsWith('/') ? '/new' : '';
                 const forgotPasswordPath = `${basePath}/page/forgot-password`;
                 window.location.href = origin + forgotPasswordPath;
               });
@@ -301,15 +302,16 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private getBasePath(): string {
-    if (typeof window === 'undefined') return '';
-    const anyWin = window as any;
-    if (typeof anyWin.__BASE_PATH__ === 'string') {
-      return anyWin.__BASE_PATH__.replace(/\/$/, '');
-    }
-    const { pathname } = window.location;
-    return pathname.startsWith('/new') ? '/new' : '';
+ private getBasePath(): string {
+  if (typeof window === 'undefined') return '';
+
+  const baseEl = document.querySelector('base');
+  if (baseEl && baseEl.getAttribute('href')) {
+    return baseEl.getAttribute('href')!.replace(/\/$/, '');
   }
+
+  return '';
+}
 
   resolvePath(path: string): string {
     if (!path) return path;

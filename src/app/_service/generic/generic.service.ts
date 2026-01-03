@@ -703,7 +703,7 @@ export class GenericService {
         }).then(() => {
           this.removeSessionData();
           // this.router.navigate(['/']);
-          window.location.href = this.getRedirectUrl('/');
+          window.location.href = this.getRedirectUrl('/');//also handle here for the base path /onlineservice 
         });
       },
       error: (error) => {
@@ -764,15 +764,23 @@ export class GenericService {
     }).then(() => {
       // this.router.navigate(['/page/login']);
       // window.location.href = '/page/login';
-      window.location.href = this.getRedirectUrl('/page/login');
+      window.location.href = this.getRedirectUrl('/');
     });
   }
-  private getRedirectUrl(path: string): string {
-    const { origin, pathname } = window.location;
-    const basePath = pathname.startsWith('/new') ? '/new' : '';
-    const normalized = path.startsWith('/') ? path : `/${path}`;
-    return `${origin}${basePath}${normalized}`;
+  getRedirectUrl(path: string): string {
+    if (!path) return path;
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) {
+      return path;
+    }
+
+    const p = path.startsWith('/') ? path : '/' + path;
+
+    const baseEl = document.querySelector('base');
+    const baseHref = baseEl?.getAttribute('href')?.replace(/\/$/, '') || '';
+
+    return baseHref + p;
   }
+
   encryptData(data: any): string {
     try {
       return CryptoJS.AES.encrypt(

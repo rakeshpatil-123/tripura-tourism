@@ -15,12 +15,19 @@ export class UnauthorizeddComponent {
     // this.router.navigate(['/page/login']);
     window.location.href = this.getRedirectUrl('/page/login');
   }
-  private getRedirectUrl(path: string): string {
-    const { origin, pathname } = window.location;
-    const basePath = pathname.startsWith('/new') ? '/new' : '';
-    const normalized = path.startsWith('/') ? path : `/${path}`;
-    return `${origin}${basePath}${normalized}`;
-  }
+private getRedirectUrl(path: string): string {
+  const { origin } = window.location;
+
+  // Replace old '/new' logic with '/onlineservice'
+  const basePath = '/onlineservice';
+
+  // Ensure the path starts with '/'
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+
+  // Return full URL
+  return `${origin}${basePath}${normalized}`;
+}
+ 
   goBack() {
     this.location.back();
   }

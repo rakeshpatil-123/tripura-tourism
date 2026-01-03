@@ -2036,19 +2036,20 @@ export class RegistrationComponent implements OnInit, OnChanges {
       );
     }
   }
-  private getRedirectUrl(path: string): string {
-    const { origin, pathname } = window.location;
-    const basePath =
-      pathname === '/' || pathname === ''
-        ? ''
-        : pathname.startsWith('/new')
-        ? '/new'
-        : '';
-    const normalized = path.startsWith('/') ? path : `/${path}`;
-    return `${origin}${basePath}${normalized}`;
-  }
+getRedirectUrl(path: string): string {
+  if (!path) return path;
 
-  goToLogin(): void {
-    window.location.href = this.getRedirectUrl('/page/login');
-  }
+  // external URLs untouched
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) return path;
+
+  const p = path.startsWith('/') ? path : '/' + path;
+
+  const baseEl = document.querySelector('base');
+  const baseHref = baseEl?.getAttribute('href')?.replace(/\/$/, '') || '';
+
+  return baseHref + p;
+}
+goToLogin(): void {
+  window.location.href = this.getRedirectUrl('/page/login');
+}
 }

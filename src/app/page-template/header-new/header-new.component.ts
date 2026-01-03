@@ -87,12 +87,21 @@ export class HeaderNewComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private getRedirectUrl(path: string): string {
-    const { origin, pathname } = window.location;
-    const basePath = pathname.startsWith('/new') ? '/new' : '';
-    const normalized = path.startsWith('/') ? path : `/${path}`;
-    return `${origin}${basePath}${normalized}`;
-  }
+private getRedirectUrl(path: string): string {
+  if (!path) return '';
+
+  const { origin } = window.location;
+
+  // Ensure path starts with '/'
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+
+  // Read base href from <base> tag (Angular safe)
+  const baseEl = document.querySelector('base');
+  const basePath = baseEl?.getAttribute('href')?.replace(/\/$/, '') || '';
+
+  return `${origin}${basePath}${normalized}`;
+}
+
 
   ngOnDestroy(): void {
     if (this.loginSubscription) {
