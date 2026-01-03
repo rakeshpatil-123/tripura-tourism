@@ -1,97 +1,114 @@
-<div class="login-container">
-  <div class="video-bg">
-    <video autoplay muted loop playsinline class="video-bg">
-      <source src="assets/videos/TirangaFlag.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  </div>
-  <!-- <div class="logo-container">
-    <a href="/" class="logo-link">
-      <img src="../../../../assets/logo/SWAAGAT_2.0_removed-bg.png" alt="logo" class="swaagat-logo"
-        width="500" height="200" />
-    </a>
-  </div> -->
+<!-- login.component.html -->
+<div class="page-wrapper">
+  <video autoplay muted loop playsinline class="bg-video" aria-hidden="true">
+    <source src="assets/videos/tripura-tourism-video.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-  <div class="content-wrapper">
-    <div class="signup-form">
-      <!-- <a href="/">
-        <img src="assets/logo/SWAAGAT2.0LogoRecreated.png" alt="logo" class="signupLogo" width="150" height="80" />
-      </a> -->
+  <div class="bg-overlay" aria-hidden="true"></div>
 
-      <h2 class="title"><b>Sign In</b></h2>
-      <p class="subtitle">To access your dashboard and apply for approvals.</p>
+  <div class="center-stage" role="main" aria-label="Login area">
+    <div class="auth-card" >
+      <div class="card-inner">
+        <header class="card-header" role="banner">
+          <a class="brand" aria-label="Home" [attr.href]="resolvePath('/')">
+            <img src="assets/logo/tripuratourismlogo.png" alt="Tripura Tourism logo" />
+          </a>
+          <div class="title-block">
+            <h1 class="heading">Sign In</h1>
+            <p class="lead">Access your visiting places and bookings</p>
+          </div>
+        </header>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
-        <app-ilogi-input fieldId="user_name" fieldLabel="User ID (Username / PAN / BIN)" [mandatory]="true" formControlName="user_name"
-          type="text" placeholder="Enter username, PAN, or BIN">
-        </app-ilogi-input>
-        <small class="error-text" *ngIf="loginForm.get('user_name')?.hasError('invalid')">
-          Invalid username.
-        </small>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-grid" novalidate>
+          <div class="input-wrap">
+            <app-ilogi-input
+              fieldId="user_name"
+              fieldLabel="User username"
+              [mandatory]="true"
+              formControlName="user_name"
+              type="text"
+              placeholder="Enter username">
+            </app-ilogi-input>
+            <small class="error-text" *ngIf="loginForm.get('user_name')?.hasError('invalid')">
+              Invalid username.
+            </small>
+          </div>
 
-        <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password" type="password"
-          placeholder="Enter your password">
-        </app-ilogi-input>
-        <small class="error-text" *ngIf="loginForm.get('password')?.hasError('invalid')">
-          Invalid password.
-        </small>
-        <div class="captcha-wrapper">
-          <canvas #captchaCanvas width="140" height="50" (click)="reloadCaptcha()" class="captcha-canvas"></canvas>
-          <button type="button" class="reload-btn" (click)="reloadCaptcha()" aria-label="Reload CAPTCHA">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-              <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 1 1 .908-.418A6 6 0 1 1 8 2v1z" />
-              <path d="M8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 8 0z" />
+          <div class="input-wrap">
+            <app-ilogi-input
+              fieldId="password"
+              fieldLabel="Password"
+              [mandatory]="true"
+              formControlName="password"
+              type="password"
+              placeholder="Enter your password">
+            </app-ilogi-input>
+            <small class="error-text" *ngIf="loginForm.get('password')?.hasError('invalid')">
+              Invalid password.
+            </small>
+          </div>
+
+          <div class="captcha-group">
+            <div class="captcha-left">
+              <canvas #captchaCanvas width="160" height="56" (click)="reloadCaptcha()" class="captcha-canvas"
+                title="Click to refresh CAPTCHA" aria-label="CAPTCHA image"></canvas>
+            </div>
+
+            <div class="captcha-actions">
+              <button type="button" class="reload-btn" (click)="reloadCaptcha()" aria-label="Reload CAPTCHA">
+                <svg viewBox="0 0 24 24" width="18" height="18" focusable="false" aria-hidden="true">
+                  <path fill="currentColor"
+                    d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 .85-.21 1.65-.58 2.36l1.46 1.19C18.14 15.4 18.5 14.24 18.5 13c0-3.59-2.91-6.5-6.5-6.5zM6.08 5.64L4.62 4.45C3.86 5.59 3.5 6.75 3.5 8c0 3.59 2.91 6.5 6.5 6.5V21l4-4-4-4v3.5c-2.76 0-5-2.24-5-5 0-.85.21-1.65.58-2.36z" />
+                </svg>
+              </button>
+              <small class="captcha-hint">refresh</small>
+            </div>
+          </div>
+
+          <div class="input-wrap">
+            <app-ilogi-input
+              fieldId="captcha_input"
+              fieldLabel="Enter CAPTCHA"
+              [mandatory]="true"
+              formControlName="captchaInput"
+              type="text"
+              placeholder="Enter the characters you see above"
+              (input)="checkCaptcha()">
+            </app-ilogi-input>
+            <small class="error-text" *ngIf="loginForm.get('captchaInput')?.hasError('invalidCaptcha')">
+              Invalid CAPTCHA entered. Please try again.
+            </small>
+          </div>
+
+          <button type="submit" class="btn-submit" [disabled]="!loginForm.valid || !captchaValid" aria-label="Login">
+            <span class="btn-text">Login</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path fill="currentColor" d="M12 4l1.41 1.41L8.83 10H20v2H8.83l4.58 4.59L12 18l-7-7z"/>
             </svg>
           </button>
-        </div>
 
-        <app-ilogi-input fieldId="captcha_input" fieldLabel="Enter CAPTCHA" [mandatory]="true" formControlName="captchaInput"
-          type="text" placeholder="Enter the characters you see above" (input)="checkCaptcha()">
-        </app-ilogi-input>
-        <small class="error-text" *ngIf="loginForm.get('captchaInput')?.hasError('invalidCaptcha')">
-          Invalid CAPTCHA entered. Please try again.
-        </small>
-
-        <button type="submit" class="btn-submit" [disabled]="!loginForm.valid || !captchaValid">Login</button>
-        
-      <div class="form-footer">
-        <span class="text-left small">
-          New User? <a [attr.href]="resolvePath('/page/registration')" class="register-link">Register Here</a>
-        </span>
-      
-        <a class="forgot-link" [attr.href]="resolvePath('/page/forgot-password')" aria-label="Forgot password">Forgot
-          Password?</a>
-      </div>
-      </form>
-    </div>
-    <div class="side-image">
-      <div class="carousel">
-        <div *ngFor="let image of images; let i = index" class="carousel-item" [class.active]="i === currentImageIndex"
-          [class.prev]="i === previousImageIndex && i !== currentImageIndex">
-          <img [src]="image" alt="slide image" />
-        </div>
+          <div class="form-footer">
+            <span class="small">
+              New User? <a [attr.href]="resolvePath('/page/registration')" class="register-link">Register Here</a>
+            </span>
+            <a class="forgot-link" [attr.href]="resolvePath('/page/forgot-password')" aria-label="Forgot password">Forgot
+              Password?</a>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-</div>
 
-@if(goToForgetPassword === true){
-<div class="popup-overlay">
-  <div class="popup-content">
-    <div class="success-icon">✓</div>
-
-    <h4 class="popup-title">Password reset required.</h4>
-
-    <div class="popup-details">
-      <h5 >Please reset your password.
-      </h5>
+  <!-- Password reset popup -->
+  <div class="popup-overlay" *ngIf="goToForgetPassword">
+    <div class="popup-content" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+      <div class="success-icon">✓</div>
+      <h4 id="popupTitle" class="popup-title">Password reset required</h4>
+      <div class="popup-details">
+        <h5>Please reset your password to continue.</h5>
+      </div>
+      <button class="btn popup-btn" (click)="goTo()">Reset</button>
     </div>
-
-    <button class="btn btn-success popup-btn" (click)="goTo()">
-      Reset
-    </button>
   </div>
 </div>
-
-
-}

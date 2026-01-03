@@ -1,17 +1,96 @@
+
+<!-- HERO SECTION : ONLY FOR BASE ROUTE -->
+<div *ngIf="currentUrl === '/'" class="hero-container">
+  
+  <!-- Background Video -->
+  <video
+    autoplay
+    muted
+    loop
+    playsinline
+    class="bg-video"
+    aria-hidden="true"
+  >
+    <source src="assets/videos/tripura-tourism-video.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Overlay -->
+  <div class="hero-overlay"></div>
+
+  <!-- Centered Text -->
+  <div class="hero-content">
+    <div class="site-name-anim">
+      <a
+        [routerLink]="['/']"
+        class="site-name"
+        title="Tripura Tourism Home"
+      >
+        Tripura Tourism
+      </a>
+    </div>
+
+    <div class="site-tagline">
+      Tripura, where culture meets nature
+    </div>
+  </div>
+
+</div>
+
+
 <app-header-new></app-header-new>
 <app-new-nav [isLogged]="isLoggedIn"
     *ngIf="currentUrl === '/' || (currentUrl && currentUrl.startsWith('/page'))"></app-new-nav>
-<div [style.padding-top]="isLoggedIn ? '10vh' : '16vh'">
-    <router-outlet></router-outlet>
+<div
+  *ngIf="!isLoggedIn"
+  class="top-gap-space"
+  aria-hidden="false"
+>
+  <div class="top-gap-marquee" aria-label="What's New Updates">
+    <div class="marquee-container">
+      <span class="marquee-title">What’s New</span>
+
+      <div class="marquee-track">
+  <div class="marquee-content">
+    <span>
+      Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
+      Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
+      Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
+      Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
+      Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
+      Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
+      Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
+    </span>
+
+    <!-- DUPLICATE FOR SEAMLESS LOOP -->
+    <span>
+      Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
+      Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
+      Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
+      Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
+      Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
+      Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
+      Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
+    </span>
+  </div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div [style.padding-top]="isLoggedIn ? '10vh' : '0vh'">
+  <router-outlet></router-outlet>
 </div>
 <!-- Help Components -->
 <!-- Hide floating button when logged in -->
-<app-help-floating-button 
+<!-- <app-help-floating-button 
     (toggleSidebarEvent)="openHelpSidebar()" 
     *ngIf="!helpSidebarOpen">
 </app-help-floating-button>
 <app-help-sidebar [isOpen]="helpSidebarOpen" (closeSidebarEvent)="closeHelpSidebar()"></app-help-sidebar>
 <app-logo-footer *ngIf="!isLoggedIn"/>
 <app-footer *ngIf="!isLoggedIn"></app-footer>
+
+<app-loader *ngIf="showLoader"></app-loader> -->
 <app-mini-footer *ngIf="!isLoggedIn"></app-mini-footer>
-<app-loader *ngIf="showLoader"></app-loader>

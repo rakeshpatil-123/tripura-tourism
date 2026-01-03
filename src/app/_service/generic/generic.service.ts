@@ -26,11 +26,11 @@ export class GenericService {
   // static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
   
   //Production URLs 
-  static DEV_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
-  static QA_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
-  static UAT_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
-  static CERTIN_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
-  static PRODUCTION_BACKEND_URL = 'https://swaagatbackend.tripura.gov.in/new';
+  static DEV_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static QA_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static UAT_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static CERTIN_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static PRODUCTION_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
 
 
   public static BACKEND_URL(): string {

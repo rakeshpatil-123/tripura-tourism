@@ -1,229 +1,157 @@
-<!-- registration.component.html -->
-<div class="swgt-container">
-  <div class="registration-container">
-    <div class="card">
-      <h2 class="title">{{ editMode ? 'Edit User Registration' : 'New User Registration' }}</h2>
-      <p class="subtitle">Fill in your details to {{ editMode ? 'update' : 'register' }}</p>
+<div class="page-wrapper">
+  <!-- Background Video -->
+  <video autoplay muted loop playsinline class="bg-video" aria-hidden="true">
+    <source src="assets/videos/tripura-tourism-video.mp4" type="video/mp4" />
+  </video>
+  <div class="bg-overlay" aria-hidden="true"></div>
 
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form">
-        <div class="enterprise-form">
-          <!-- Enterprise Name -->
-          <ng-container *ngIf="sourcePage !== 'departmental-users'">
-            <app-ilogi-input fieldId="name_of_enterprise" fieldLabel="Name of Enterprise" [mandatory]="true"
-              formControlName="name_of_enterprise" placeholder="Enter enterprise name"></app-ilogi-input>
-            <small class="error-text"
-              *ngIf="registrationForm.get('name_of_enterprise')?.touched && registrationForm.get('name_of_enterprise')?.invalid">
-              Please enter a valid enterprise name.
-            </small>
-          </ng-container>
-          <!-- PAN Number -->
-          <ng-container *ngIf="sourcePage !== 'departmental-users'">
-            <!-- wrapper keeps the input + messages together (prevents grid from flowing the small tags into next column) -->
-            <div class="single-field pan-field">
-              <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
-                placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
-              </app-ilogi-input>
+  <!-- Centered Card -->
+  <div class="center-stage">
+    <div class="auth-card">
+      <div class="card">
+        <div class="logo-wrapper">
+          <img src="assets/logo/tripuratourismlogo.png" alt="Tripura Tourism Logo" class="logo" />
+        </div>
 
-              <!-- show validation error ONLY when user has entered full PAN length (10 chars),
-                       control is invalid AND backend 'registered' error is NOT present -->
-              <small class="error-text" *ngIf="registrationForm.get('pan')?.touched
-                                  && registrationForm.get('pan')?.invalid
-                                  && (registrationForm.get('pan')?.value?.toString()?.trim()?.length === 10)
-                                  && !registrationForm.get('pan')?.hasError('registered')">
-                Please enter a valid PAN number.
-              </small>
+        <h2 class="title">{{ editMode ? 'Edit Registration' : 'User Registration' }}</h2>
+        <p class="subtitle">Create your account to continue</p>
 
-              <!-- Inline backend status message for PAN (shows BE message in red when PAN already registered)
-                       placed directly below the PAN field. When present it will suppress the "Please enter..." message above. -->
-              <small *ngIf="panStatusMessage" [ngClass]="{
-                           'mobile-status-success': panStatusType === 'success',
-                           'mobile-status-error': panStatusType === 'error',
-                           'mobile-status-info': panStatusType === 'info'
-                         }" class="mobile-status-text pan-status-text" aria-live="polite">
-                {{ panStatusMessage }}
-              </small>
-            </div>
-          </ng-container>
+        <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="form">
 
-          <!-- Authorized Person -->
-          <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
-            formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
-          <small class="error-text"
-            *ngIf="registrationForm.get('authorized_person_name')?.touched && registrationForm.get('authorized_person_name')?.invalid">
-            Please enter a valid name.
-          </small>
-
-          <!-- Email -->
-          <app-ilogi-input fieldId="email_id" fieldLabel="Email ID" [mandatory]="true" formControlName="email_id"
-            placeholder="Enter email" type="email"></app-ilogi-input>
-          <small class="error-text"
-            *ngIf="registrationForm.get('email_id')?.touched && registrationForm.get('email_id')?.invalid">
-            Please enter a valid email address.
-          </small>
-          <div>
-            <!-- Mobile -->
-            <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true"
-              formControlName="mobile_no" placeholder="Enter mobile number" type="text"></app-ilogi-input>
-            <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched 
-                     && registrationForm.get('mobile_no')?.invalid 
-                     && !registrationForm.get('mobile_no')?.hasError('taken')">
-              Please enter a valid 10-digit mobile number.
-            </small>
-            <!-- Inline backend status message for mobile (OTP send / already verified / taken etc.) -->
-            <small style="margin-bottom: 10px;" *ngIf="mobileStatusMessage" [ngClass]="{
-              'mobile-status-success': mobileStatusType === 'success',
-              'mobile-status-error': mobileStatusType === 'error',
-              'mobile-status-info': mobileStatusType === 'info'
-            }" class="mobile-status-text" aria-live="polite">
-              {{ mobileStatusMessage }}
-            </small>
-            <div *ngIf="!editMode && sourcePage !== 'departmental-users'
-                                     && registrationForm.get('mobile_no')?.value?.toString().trim().length === 10
-                                     && registrationForm.get('mobile_no')?.valid
-                                     && !hideSendOtp
-                                     && mobileStatusType !== 'error'" class="otp-section mb-2">
-              <button type="button" class="btn-otp" (click)="sendOtp()"
-                [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid || registrationForm.get('mobile_no')?.hasError('taken')">
-                {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
-              </button>
-            </div>
-
-            <div
-              *ngIf="registrationForm.get('mobile_no')?.value?.toString().trim().length === 10 && registrationForm.get('mobile_no')?.valid"
-              class="box mt-2">
-              <input type="checkbox" [checked]="whatsappSameAsMobile" (change)="toggleWhatsappSameAsMobile($event)" />
-              <small class="text-sm">Is WhatsApp number same as mobile number?</small>
-            </div>
-            <!-- OTP Input + Verify Button: additionally hide when hideVerify is true -->
-            <div *ngIf="otpSent && !otpVerified && !editMode && sourcePage !== 'departmental-users' && !hideVerify"
-              class="otp-section mt-2">
-              <app-ilogi-input fieldId="otp" fieldLabel="Enter OTP" [mandatory]="true" [formControl]="otpControl"
-                placeholder="Enter 6-digit OTP"></app-ilogi-input>
-              <button type="button" class="btn-verify" (click)="verifyOtp()" [disabled]="!otpControl.valid">Verify
-                OTP</button>
-            </div>
-
-            <!-- Verified message remains visible when otpVerified is true -->
-            <!-- <div *ngIf="otpVerified && !editMode && sourcePage !== 'departmental-users'" class="otp-verified mt-1">
-            Mobile number verified.
-          </div> -->
-
-          </div>
-          <!-- Username -->
-          <app-ilogi-input fieldId="user_name" fieldLabel="Username" [mandatory]="true" formControlName="user_name"
-            placeholder="Choose a username"></app-ilogi-input>
-          <small class="error-text"
-            *ngIf="registrationForm.get('user_name')?.touched && registrationForm.get('user_name')?.invalid">
-            Please enter a valid username.
-          </small>
-
-
-          <!-- City -->
-          <app-ilogi-input *ngIf="!(sourcePage === 'departmental-users')" fieldId="registered_enterprise_city"
-            fieldLabel="City" [mandatory]="true" formControlName="registered_enterprise_city"
-            placeholder="Enter city"></app-ilogi-input>
-          <small class="error-text"
-            *ngIf="registrationForm.get('registered_enterprise_city')?.touched && registrationForm.get('registered_enterprise_city')?.invalid">
-            Please enter a valid city.
-          </small>
-
-          <app-ilogi-input *ngIf="!whatsappSameAsMobile" fieldId="whatsapp_no" fieldLabel="WhatsApp Number"
-            [mandatory]="true" formControlName="whatsapp_no" placeholder="Enter WhatsApp number" type="text">
+          <!-- NAME -->
+          <app-ilogi-input
+            fieldId="name"
+            fieldLabel="Full Name"
+            [mandatory]="true"
+            formControlName="name"
+            placeholder="Enter your full name">
           </app-ilogi-input>
-          <small class="error-text"
-            *ngIf="!whatsappSameAsMobile && registrationForm.get('whatsapp_no')?.touched && registrationForm.get('whatsapp_no')?.invalid">
-            Please enter a valid WhatsApp number.
-          </small>
-        </div>
 
-        <div *ngIf="!(sourcePage === 'departmental-users')" class="single-field">
-          <!-- Address -->
-          <app-ilogi-input class="height-20" fieldId="registered_enterprise_address"
-            fieldLabel="Registered Enterprise Address" [mandatory]="true"
-            formControlName="registered_enterprise_address" placeholder="Enter full address"></app-ilogi-input>
-          <small class="error-text"
-            *ngIf="registrationForm.get('registered_enterprise_address')?.touched && registrationForm.get('registered_enterprise_address')?.invalid">
-            Please enter a valid address.
-          </small>
-        </div>
-        <div *ngIf="(sourcePage === 'departmental-users')">
-          <app-ilogi-select fieldId="hierarchy_level" fieldLabel="Hierarchy Level" [mandatory]="true"
-            formControlName="hierarchy_level" [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
-          </app-ilogi-select>
-          <app-ilogi-radio formControlName="inspector" fieldLabel="Is Inspector">
-          </app-ilogi-radio>
-          <app-ilogi-select class="mb-10" fieldId="department_id" fieldLabel="Department" [mandatory]="true"
-            formControlName="department_id" [selectOptions]="departments" placeholder="Select department">
-          </app-ilogi-select>
-          <app-ilogi-input fieldId="designation" fieldLabel="Designation" [mandatory]="true"
-            formControlName="designation" placeholder="Enter designation">
+          <!-- EMAIL -->
+          <app-ilogi-input
+            fieldId="email_id"
+            fieldLabel="Email ID"
+            [mandatory]="true"
+            formControlName="email_id"
+            type="email"
+            placeholder="Enter your email">
           </app-ilogi-input>
-        </div>
-        <!-- District -->
-        <app-ilogi-select *ngIf="shouldShow('district')" [multiple]="sourcePage === 'departmental-users'"
-          fieldId="district_id" fieldLabel="District" [mandatory]="true" formControlName="district_id"
-          [selectOptions]="districts" placeholder="Select district">
-        </app-ilogi-select>
 
-        <!-- Subdivision -->
-        <app-ilogi-select *ngIf="shouldShow('subdivision')" [multiple]="sourcePage === 'departmental-users'"
-          fieldId="subdivision_id" fieldLabel="Subdivision" [mandatory]="true" formControlName="subdivision_id"
-          [selectOptions]="subdivisions" placeholder="Select subdivision"
-          [disabled]="!districts.length || loadingDistricts">
-        </app-ilogi-select>
+          <!-- MOBILE -->
+          <app-ilogi-input
+            fieldId="mobile_no"
+            fieldLabel="Mobile Number"
+            [mandatory]="true"
+            formControlName="mobile_no"
+            placeholder="Enter 10-digit mobile number"
+            type="text">
+          </app-ilogi-input>
 
-        <!-- ULB -->
-        <app-ilogi-select *ngIf="shouldShow('block')" [multiple]="sourcePage === 'departmental-users'" fieldId="ulb_id"
-          fieldLabel="ULB/Block" [mandatory]="true" formControlName="ulb_id" [selectOptions]="ulbs"
-          placeholder="Select ULB/Block" [disabled]="!subdivisions.length || loadingSubdivisions">
-        </app-ilogi-select>
+          <small class="error-text"
+            *ngIf="registrationForm.get('mobile_no')?.touched && registrationForm.get('mobile_no')?.invalid">
+            Enter a valid 10-digit mobile number
+          </small>
 
-        <!-- Ward -->
-        <app-ilogi-select *ngIf="shouldShow('ward') && sourcePage !== 'departmental-users'"
-          [multiple]="sourcePage === 'departmental-users'" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true"
-          formControlName="ward_id" [selectOptions]="wards" placeholder="Select ward"
-          [disabled]="!ulbs.length || loadingUlbs">
-        </app-ilogi-select>
-
-        <div class="enterprise-form">
-          <!-- Password -->
-          <div>
-            <app-ilogi-input fieldId="password" fieldLabel="Password" [mandatory]="true" formControlName="password"
-              type="password" placeholder="Enter password"></app-ilogi-input>
-
-            <small class="error-text"
-              *ngIf="registrationForm.get('password')?.touched && registrationForm.get('password')?.hasError('required')">
-              Password is required.
-            </small>
-            <small class="error-text" *ngIf="registrationForm.get('password')?.hasError('minlength')">
-              Password must be at least 6 characters long.
-            </small>
-            <small class="error-text" *ngIf="registrationForm.get('password')?.hasError('pattern')">
-              Password must contain at least one uppercase letter, one lowercase letter, and one special character.
-            </small>
+          <!-- SEND OTP -->
+          <div *ngIf="registrationForm.get('mobile_no')?.valid && !otpSent" class="otp-row">
+            <button type="button" class="btn-secondary" (click)="sendOtp()">Send OTP</button>
           </div>
-          <!-- Confirm Password -->
-          <app-ilogi-input fieldId="confirmPassword" fieldLabel="Confirm Password" [mandatory]="true"
-            formControlName="confirmPassword" type="password" placeholder="Re-enter password"
-            errorMessage="Passwords do not match"></app-ilogi-input>
-        </div>
-        <div *ngIf="editMode && sourcePage === 'departmental-users' && editData" class="password-hint mt-1"
-          role="status" aria-live="polite">
-          <small class="text-danger">
-            Enter a new password to change it. Leave both fields blank to keep your current password. </small>
-        </div>
-        <!-- Submit Button -->
-        <div class="form-actions">
-          <button type="submit" class="btn-submit btn btn-primary" [disabled]="!registrationForm.valid">
-            {{editMode ? 'Update' : 'Register'}}
+
+          <!-- VERIFY OTP -->
+          <div *ngIf="otpSent && !otpVerified" class="otp-row">
+            <app-ilogi-input
+              fieldId="otp"
+              fieldLabel="OTP"
+              [mandatory]="true"
+              [formControl]="otpControl"
+              placeholder="Enter OTP">
+            </app-ilogi-input>
+            <button type="button" class="btn-verify" (click)="verifyOtp()">Verify</button>
+          </div>
+
+          <!-- USERNAME -->
+          <app-ilogi-input
+            fieldId="user_name"
+            fieldLabel="Username"
+            [mandatory]="true"
+            formControlName="user_name"
+            placeholder="Choose a username">
+          </app-ilogi-input>
+
+          <!-- WHATSAPP -->
+          <app-ilogi-input
+            fieldId="whatsapp_no"
+            fieldLabel="WhatsApp Number"
+            [mandatory]="true"
+            formControlName="whatsapp_no"
+            placeholder="Enter WhatsApp number"
+            type="text">
+          </app-ilogi-input>
+
+          <!-- ADDRESS -->
+          <app-ilogi-input
+            fieldId="registered_enterprise_address"
+            fieldLabel="Address"
+            [mandatory]="true"
+            formControlName="registered_enterprise_address"
+            placeholder="Enter your address">
+          </app-ilogi-input>
+
+          <!-- LOCATION -->
+          <app-ilogi-select
+            fieldId="district_id"
+            fieldLabel="District"
+            [mandatory]="true"
+            formControlName="district_id"
+            [selectOptions]="districts">
+          </app-ilogi-select>
+
+          <app-ilogi-select
+            fieldId="subdivision_id"
+            fieldLabel="Subdivision"
+            [mandatory]="true"
+            formControlName="subdivision_id"
+            [selectOptions]="subdivisions">
+          </app-ilogi-select>
+
+          <app-ilogi-select
+            fieldId="ulb_id"
+            fieldLabel="ULB / Block"
+            [mandatory]="true"
+            formControlName="ulb_id"
+            [selectOptions]="ulbs">
+          </app-ilogi-select>
+
+          <!-- PASSWORD -->
+          <app-ilogi-input
+            fieldId="password"
+            fieldLabel="Password"
+            [mandatory]="true"
+            formControlName="password"
+            type="password"
+            placeholder="Enter password">
+          </app-ilogi-input>
+
+          <app-ilogi-input
+            fieldId="confirmPassword"
+            fieldLabel="Confirm Password"
+            [mandatory]="true"
+            formControlName="confirmPassword"
+            type="password"
+            placeholder="Re-enter password">
+          </app-ilogi-input>
+
+          <!-- SUBMIT -->
+          <button type="submit" class="btn-submit" [disabled]="!registrationForm.valid">
+            {{ editMode ? 'Update' : 'Register' }}
           </button>
-        </div>
-      </form>
 
-      <span *ngIf="sourcePage !== 'departmental-users'" class="text-center small mt-2">
-        Already Registered?
-        <a role="button" (click)="goToLogin()" class="login-link">Login</a>
-      </span>
+          <p class="login-text">
+            Already registered?
+            <a (click)="goToLogin()">Login</a>
+          </p>
+        </form>
+      </div>
     </div>
   </div>
 </div>

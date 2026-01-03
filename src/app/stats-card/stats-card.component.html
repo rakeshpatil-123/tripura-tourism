@@ -1,0 +1,11 @@
+ <div class="stats-card" [ngClass]="'stats-card--' + type">
+      <div class="stats-card__content">
+        <div class="stats-card__header">
+          <h3 class="stats-card__title">{{ title }}</h3>
+          <div class="stats-card__icon" [ngClass]="'stats-card__icon--' + type">
+            <i [class]="iconClass"></i>
+          </div>
+        </div>
+        <div class="stats-card__value">{{ animatedValue }}</div>
+      </div>
+    </div>

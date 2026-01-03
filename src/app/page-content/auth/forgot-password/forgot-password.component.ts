@@ -103,7 +103,7 @@ export class ForgotPasswordComponent
     return { invalidIdentifier: true };
   }
   getIdentifierErrorMessage(): string {
-    return 'Please enter a valid PAN (e.g. ABCDE1234F) or a 10-digit mobile number.';
+    return 'Please enter a valid 10-digit mobile number.';
   }
 
   ngAfterViewInit(): void {
