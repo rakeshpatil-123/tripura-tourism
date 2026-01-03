@@ -1,193 +1,302 @@
 @use 'sass:color';
 
-// Variables
-$primary-blue: #004aad;
-$secondary-blue: #00b4d8;
+// Colors — professional, accessible palette suitable for government site
+$primary-blue: #003c8f; // deep, trustworthy blue
+$accent-teal: #00a6c9;
+$warm-amber: #f6c85f;
 $white: #ffffff;
-$gray-100: #f3f4f6;
-$gray-300: #e5e7eb;
-$gray-500: #4b5563;
-$success-green: #10b981;
-$success-green-dark: #047857;
+$bg-surface: #ffffff;
+$muted-600: #4b5563;
+$muted-300: #e6e9ee;
+$glass: rgba(0,0,0,0.04);
 
-// Mixins
-@mixin button-base {
-  display: flex;
-  align-items: center;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 600;
-  background: none;
-  gap: 8px;
-  padding: 12px 16px;
-  font-size: 14px;
-  text-decoration: none;
-  outline: none;
-}
-
-@mixin icon-hover {
-  &:hover svg {
-    transform: scale(1.1);
-  }
-}
-
-// Main header container
+// Base header
 .brand-header {
-  background-color: $white;
-  border-bottom: 1px solid $gray-300;
-  height: 10vh;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 5vw;
-  max-width: 1440px;
-  min-width: 100vw;
-  margin: 0 auto;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
-}
-
-// Logo section
-.logo-section {
+  height: 10vh;
+  min-height: 64px;
+  z-index: 1100;
   display: flex;
   align-items: center;
-
-  .logo {
-    max-width: 20vw;
-    height: auto;
-  }
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,252,0.98));
+  border-bottom: 1px solid $muted-300;
+  box-shadow: 0 6px 18px rgba(6, 21, 49, 0.06);
+  padding: 0 4vw;
+  overscroll-behavior: none;
 }
 
-// Action section (right side)
-.action-section {
+/* inner container to center content and allow spacing */
+.brand-inner {
+  width: 100%;
+  max-width: 1440px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
 }
 
-// Action buttons
+/* Left block: logo + site name */
+.left-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Logo animation & sizing */
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(3, 30, 66, 0.06);
+  transform-origin: center;
+  animation: floatLogo 6s ease-in-out infinite;
+  transition: transform 0.26s ease;
+}
+@keyframes floatLogo {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-0.5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* Title & tagline */
+.title-wrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.site-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $primary-blue;
+  text-decoration: none;
+  letter-spacing: 0.2px;
+  display: inline-block;
+  position: relative;
+  padding-right: 6px;
+  transition: color 0.24s ease, transform 0.24s ease;
+  &:hover { color: color.scale($primary-blue, $lightness: -8%); transform: translateY(-2px); }
+}
+.site-tagline {
+  font-size: 0.78rem;
+  color: $muted-600;
+  margin-top: 2px;
+  opacity: 0.95;
+  transform-origin: left;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  text-transform: lowercase;
+}
+
+/* Right block: actions */
+.action-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+  justify-content: flex-end;
+}
+
+/* Button base */
 .action-btn {
-  @include button-base;
-  @include icon-hover;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(3, 30, 66, 0.06);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: $primary-blue;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  min-height: 40px;
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+}
+.action-btn .main-icon { width: 18px; height: 18px; stroke: currentColor; opacity: 0.95; transition: transform 0.18s ease; }
 
-  &.secondary {
-    color: $gray-500;
-
-    &:hover {
-      color: $primary-blue;
-      background-color: $gray-100;
-    }
-  }
-
-  &.primary {
-    background: linear-gradient(135deg, #a30000, #ff3e13);
-    color: $white;
-    box-shadow: 0 4px 6px rgba(255, 175, 175, 0.1);
-    cursor: pointer;
-    
-    &:hover {
-      background: linear-gradient(135deg, #fc4c00, #ffa25a);
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-    }
-  }
-
-  // New registration button styling
-  &.register-btn {
-    background: linear-gradient(to right, #003c5b, #004aad, #0066cc, #00b4d8);
-    color: $white;
-    box-shadow: 0 4px 6px rgba(0, 81, 180, 0.3);
-    position: relative;
-    overflow: hidden;
-    
-    &:hover {
-      background: linear-gradient(to right, #003d91, #003d84, #003d92);
-      box-shadow: 0 6px 12px rgba(0, 81, 180, 0.4);
-      transform: translateY(-1px);
-    }
-    
-    &:active {
-      transform: translateY(0);
-    }
-    
-    // Subtle animation effect
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-    
-    &:hover::before {
-      left: 100%;
-    }
-  }
-
-  .main-icon {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition: transform 0.2s ease;
+/* Secondary style (login / dashboard) */
+.action-btn.secondary {
+  background: rgba(3, 30, 66, 0.02);
+  color: $primary-blue;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(3,30,66,0.06);
+    background: rgba(3, 30, 66, 0.04);
   }
 }
 
-// Responsive design
-@media (max-width: 768px) {
-  .brand-header {
-    padding: 0 16px;
-    height: 10vh;
-  }
-
-  .logo-section .logo {
-    max-width: 25vw;
-  }
-
-  .action-section {
-    gap: 12px;
-  }
-
-  .action-btn {
-    padding: 10px 12px;
-    font-size: 13px;
-
-    span {
-      display: none;
-    }
+/* Primary style (logout) */
+.action-btn.primary {
+  background: linear-gradient(90deg, $primary-blue, $accent-teal);
+  color: $white;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0, 70, 160, 0.14);
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 70, 160, 0.18);
+    filter: saturate(1.02);
   }
 }
 
-@media (max-width: 480px) {
-  .brand-header {
-    padding: 0 12px;
-    height: 10vh;
+/* Register button special shimmer */
+.register-btn {
+  position: relative;
+  background: linear-gradient(90deg, $primary-blue 0%, $accent-teal 100%);
+  color: $white;
+  box-shadow: 0 10px 28px rgba(0, 70, 160, 0.12);
+  overflow: hidden;
+  border: none;
+}
+.register-btn::before {
+  content: '';
+  position: absolute;
+  left: -60%;
+  top: -10%;
+  width: 40%;
+  height: 120%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  transition: all 0.9s cubic-bezier(.2,.9,.2,1);
+  opacity: 0.0;
+}
+.register-btn:hover::before { left: 120%; opacity: 1; }
+
+/* small translate box styling */
+.translate-box {
+  min-width: 36px;
+  display: inline-block;
+  margin-left: 8px;
+  transform-origin: center;
+}
+
+/* responsive adjustments */
+@media (max-width: 992px) {
+  .site-name { font-size: 1.05rem; }
+  .logo { width: 48px; height: 48px; }
+  .action-section { min-width: 180px; gap: 8px; }
+  .action-btn span { display: none; } /* icon only */
+  .site-tagline { display: none; }
+}
+
+@media (max-width: 640px) {
+  .brand-header { height: auto; min-height: 72px; padding: 8px 12px; }
+  .brand-inner { padding: 6px 0; align-items: center; }
+  .left-block { gap: 10px; }
+  .logo { width: 44px; height: 44px; }
+  .action-section { gap: 8px; }
+  .action-btn { padding: 8px; min-height: 36px; border-radius: 9px; }
+  .translate-box { display: none; } /* hide google translate on very small screens */
+}
+
+/* Accessibility: focus ring */
+.action-btn:focus {
+  box-shadow: 0 0 0 4px rgba(0, 122, 204, 0.12);
+  transform: translateY(-2px);
+}
+
+/* subtle entrance animation for header content */
+.brand-inner { animation: fadeInUp 520ms cubic-bezier(.2,.9,.2,1) both; }
+@keyframes fadeInUp {
+  from { transform: translateY(6px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+/* Accessibility bar (white navbar friendly) */
+.accessibility-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1f2937; /* slate-800: highly readable on white */
+  animation: fadeSlideDown 0.6s ease both;
+}
+
+/* subtle separators */
+.accessibility-bar .divider {
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Screen reader text */
+.sr-access {
+  cursor: pointer;
+  color: #0f172a; /* deep navy */
+  transition: color 0.25s ease;
+}
+
+.sr-access:hover {
+  color: #2563eb; /* govt blue */
+}
+
+/* Helpline */
+.helpline {
+  color: #92400e; /* deep saffron/brown */
+  text-decoration: none;
+  font-weight: 800;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.helpline:hover {
+  color: #b45309;
+  transform: translateY(-1px);
+}
+
+/* Font size buttons */
+.font-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.font-btn {
+  background: #f8fafc; /* subtle off-white */
+  border: 1px solid #cbd5e1; /* gray-300 */
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.font-btn:hover {
+  background: #e0f2fe; /* light blue */
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.font-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .accessibility-bar {
+    display: none;
   }
+}
 
-  .logo-section .logo {
-    max-width: 35vw;
+/* Animation */
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
-
-  .action-section {
-    gap: 8px;
-  }
-
-  .action-btn {
-    padding: 8px;
-
-    .main-icon {
-      width: 18px;
-      height: 18px;
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

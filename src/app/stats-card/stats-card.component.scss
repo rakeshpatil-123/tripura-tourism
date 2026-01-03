@@ -1,0 +1,192 @@
+ 
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px; 
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      height: 120px;
+      display: flex;
+      align-items: center;
+    }
+    .stats-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+    .stats-card__content {
+      width: 100%;
+    }
+    .stats-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .stats-card__title {
+      margin: 0;
+      font-size: 14px; 
+      font-weight: 500;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stats-card__icon {
+      width: 40px; 
+      height: 40px; 
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px; 
+    }
+    
+    .stats-card__icon--total {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0d6efd;
+    }
+    .stats-card__icon--approved {
+      background: rgba(25, 135, 84, 0.1);
+      color: #198754;
+    }
+    .stats-card__icon--pending {
+      background: rgba(255, 193, 7, 0.1);
+      color: #ffc107;
+    }
+    .stats-card__icon--rejected {
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+    }
+    .stats-card__value {
+      font-size: 36px; 
+      font-weight: 700;
+      color: #212529;
+      line-height: 1;
+    }
+    
+    .stats-card--approved .stats-card__value {
+      color: #198754;
+    }
+    .stats-card--pending .stats-card__value {
+      color: #ffc107;
+    }
+    .stats-card--rejected .stats-card__value {
+      color: #dc3545;
+    }
+    .stats-card--total .stats-card__value {
+      color: #0d6efd;
+    }
+    
+    
+    
+    @media (max-width: 768px) {
+      .stats-card {
+        padding: 16px; 
+        height: 100px; 
+      }
+      .stats-card__header {
+        margin-bottom: 8px; 
+      }
+      .stats-card__title {
+        font-size: 12px; 
+      }
+      .stats-card__icon {
+        width: 32px; 
+        height: 32px; 
+        font-size: 16px; 
+      }
+      .stats-card__value {
+        font-size: 28px; 
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .stats-card {
+        padding: 12px;
+        height: 90px;
+      }
+      .stats-card__title {
+        font-size: 11px;
+      }
+      .stats-card__icon {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+      }
+      .stats-card__value {
+        font-size: 24px;
+      }
+    }
+    
+    
+    .stats-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 576px) {
+      .stats-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+    }
+
+    .stats-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px var(--shadow-medium);
+  border: 1px solid var(--color-border-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--shadow-dark);
+}
+
+.stats-card__title {
+  color: var(--color-text-medium);
+}
+
+.stats-card__value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+
+// Color overrides by type
+.stats-card--approved .stats-card__value {
+  color: var(--color-poppy-green);
+}
+.stats-card--pending .stats-card__value {
+  color: var(--color-poppy-yellow);
+}
+.stats-card--rejected .stats-card__value {
+  color: var(--color-poppy-red);
+}
+.stats-card--total .stats-card__value {
+  color: var(--color-tertiary);
+}
+
+// Icons
+.stats-card__icon--total {
+  background: var(--color-red-100);
+  color: var(--color-tertiary);
+}
+.stats-card__icon--approved {
+  background: hsl(142, 76%, 95%);
+  color: var(--color-poppy-green);
+}
+.stats-card__icon--pending {
+  background: hsl(45, 100%, 95%);
+  color: var(--color-poppy-yellow);
+}
+.stats-card__icon--rejected {
+  background: var(--color-notification-error-bg);
+  color: var(--color-poppy-red);
+}

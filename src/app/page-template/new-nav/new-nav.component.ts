@@ -22,200 +22,251 @@ export class NewNavComponent implements OnDestroy, OnInit {
   constructor(private router: Router) {}
   @Input() isLogged: boolean = false;
   navigationItems: NavigationItem[] = [
-    {
-      label: 'Home',
-      path: '',
-      hasDropdown: false,
-      isActive: true,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'About us',
-      path: '/page/about-us',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'Services',
-      path: '/page/services',
-      hasDropdown: true,
-      isActive: false,
-      dropdownOpen: false,
-      children: [
-        {
-          label: 'SWAAGAT Certificate Verification',
-          path: '/page/swaagat-certificate-verification',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        },
-        // {
-        //   label: 'Incentive',
-        //   path: '/page/incentive',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        // {
-        //   label: 'Investor Facilitation Cell',
-        //   path: '/page/investor-facilitation-cell',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        // {
-        //   label: 'Central Inspection System',
-        //   path: '/page/central-inspection-system',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        // {
-        //   label: 'MIS Reports',
-        //   path: '/page/mis-reports',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        // {
-        //   label: 'Land Availability',
-        //   path: '/page/land-availability',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        // {
-        //   label: 'Land Availability - GIS',
-        //   path: '/page/land-availability-gis',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        // {
-        //   label: 'List of Services',
-        //   path: '/page/list-of-services',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        // {
-        //   label: 'Query/Feedback',
-        //   path: '/page/query-feedback',
-        //   hasDropdown: false,
-        //   isActive: false,
-        //   dropdownOpen: false,
-        //   children: []
-        // },
-        {
-          label: 'Investor Query',
-          path: '/page/investor-query',
-          hasDropdown: false,
-          isActive: false,
-          dropdownOpen: false,
-          children: []
-        }
-      ]
-    },
-    {
-      label: 'Departments',
-      path: '/page/related-departments',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'Land',
-      path: 'https://landbank.tripura.gov.in/',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'KYA',
-      path: '/page/kya',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    // {
-    //   label: 'Information Wizard',
-    //   path: '/page/information-wizard',
-    //   hasDropdown: false,
-    //   isActive: false,
-    //   dropdownOpen: false,
-    //   children: []
-    // },
-    {
-      label: 'Acts & Rules',
-      path: '/page/acts-rules',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    // {
-    //   label: 'Contact Us',
-    //   path: '/page/contact-us',
-    //   hasDropdown: false,
-    //   isActive: false,
-    //   dropdownOpen: false,
-    //   children: []
-    // },
-    {
-      label: 'NSWS',
-      path: 'https://www.nsws.gov.in/',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'Feedback & Query',
-      path: '/page/feedback-rating',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'Incentive Calculator',
-      path: '/page/incentive-calculator',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'Login',
-      path: '/page/login',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-    {
-      label: 'Register',
-      path: '/page/registration',
-      hasDropdown: false,
-      isActive: false,
-      dropdownOpen: false,
-      children: []
-    },
-  ];
+  {
+    label: 'Home',
+    path: '/',
+    hasDropdown: false,
+    isActive: true,
+    dropdownOpen: false,
+    children: []
+  },
+
+  {
+    label: 'About Tripura',
+    path: '',
+    hasDropdown: true,
+    isActive: false,
+    dropdownOpen: false,
+    children: [
+      {
+        label: 'Origin & History of Tripura',
+        path: '/about/origin-history',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Geographical Profile',
+        path: '/about/geographical-profile',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'State Symbols',
+        path: '/about/state-symbols',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'How to Reach',
+        path: '/about/how-to-reach',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Tribes & Cultural Heritage',
+        path: '/about/tribes-culture',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Fairs & Festivals',
+        path: '/about/fairs-festivals',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Food & Cuisines of Tripura',
+        path: '/about/food-cuisine',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      }
+    ]
+  },
+
+  {
+    label: 'Destinations',
+    path: '/destinations',
+    hasDropdown: false,
+    isActive: false,
+    dropdownOpen: false,
+    children: []
+  },
+
+  {
+    label: 'Accommodation',
+    path: '',
+    hasDropdown: true,
+    isActive: false,
+    dropdownOpen: false,
+    children: [
+      {
+        label: 'TTDCL Accommodations',
+        path: '/accommodation/ttdcl',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Registered Private Hotels',
+        path: '/accommodation/private-hotels',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Leased-out TTDCL Accommodations',
+        path: '/accommodation/leased-ttdcl',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Homestays',
+        path: '/accommodation/homestays',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      }
+    ]
+  },
+
+  {
+    label: 'Galleries',
+    path: '',
+    hasDropdown: true,
+    isActive: false,
+    dropdownOpen: false,
+    children: [
+      {
+        label: 'Photo Gallery',
+        path: '/galleries/photos',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Video Gallery',
+        path: '/galleries/videos',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      }
+    ]
+  },
+
+  {
+    label: 'Tourist Corner',
+    path: '',
+    hasDropdown: true,
+    isActive: false,
+    dropdownOpen: false,
+    children: [
+      {
+        label: 'Package Tours',
+        path: '/tourist-corner/package-tours',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Conducted Tours',
+        path: '/tourist-corner/conducted-tours',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Guidelines',
+        path: '/tourist-corner/guidelines',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Publications',
+        path: '/tourist-corner/publications',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      }
+    ]
+  },
+
+  {
+    label: 'Department Info',
+    path: '',
+    hasDropdown: true,
+    isActive: false,
+    dropdownOpen: false,
+    children: [
+      {
+        label: 'Notifications',
+        path: '/department/notifications',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Tenders',
+        path: '/department/tenders',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Who is Who',
+        path: '/department/who-is-who',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Tripura Tourism Policy',
+        path: '/department/tourism-policy',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      },
+      {
+        label: 'Recruitment',
+        path: '/department/recruitment',
+        hasDropdown: false,
+        isActive: false,
+        dropdownOpen: false,
+        children: []
+      }
+    ]
+  }
+];
+
 
   isMobileMenuOpen = false;
   private hoverTimeout: any = null;

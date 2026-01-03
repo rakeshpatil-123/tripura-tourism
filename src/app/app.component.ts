@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { HeaderNewComponent } from './page-template/header-new/header-new.component';
@@ -28,6 +28,7 @@ import { HelpSidebarComponent } from "./page-template/help-sidebar/help-sidebar.
     LoaderComponent,
     FooterComponent,
     FontAwesomeModule,
+    RouterLink,
     NewNavComponent,
     PageContentComponent,
     MiniFooterComponent,
