@@ -44,7 +44,7 @@
                   [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level" (change)="onHierarchyChange()">
                 </app-ilogi-select>
 
-                <app-ilogi-select [isReadOnly]="true" *ngIf="shouldShow('district')"
+                <app-ilogi-select [ngClass]="profileForm.get('userType')?.value === 'individual' ? 'mt-20' : ''" [isReadOnly]="true" *ngIf="shouldShow('district')"
                   [isReadOnly]="isDistrictNull ? true : false" [multiple]="isDepartmentUser" fieldId="district_code"
                   fieldLabel="District" formControlName="district_code" [selectOptions]="districts"
                   placeholder="Select district" [disabled]="loadingDistricts">

@@ -72,7 +72,7 @@
         <th>
           <div class="header-wrapper">Is Inspector</div>
         </th>
-        <th *ngIf="userRole === 'admin'">
+        <th>
           <div class="header-wrapper">Status</div>
         </th>
         <th>
@@ -136,11 +136,11 @@
           {{ user.department_name || '----' }}
         </td>
         <td pTooltip="{{ user.inspector }}" tooltipPosition="right">
-          {{ user.inspector || '----' }}
+          {{ user.inspector || 'No' }}
         </td>
-        <td *ngIf="userRole === 'admin'">
+        <td >
           <form [formGroup]="userForms[user.id]">
-            <p-toggleswitch [readonly]="userRole === 'admin' ? true : false" [disabled]="userRole === 'admin' ? true : false" formControlName="status" (onChange)="confirmStatusChange($event, user)">
+            <p-toggleswitch [readonly]="userRole === 'admin' ? false : true" [disabled]="userRole === 'admin' ? false : true" formControlName="status" (onChange)="confirmStatusChange($event, user)">
             </p-toggleswitch>
           </form>
         </td>

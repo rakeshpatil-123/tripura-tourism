@@ -13,11 +13,11 @@
       </div>
     </div>
     <div class="form-group small">
-      <app-ilogi-select fieldLabel="Select Department" formControlName="department" [selectOptions]="departments">
+      <app-ilogi-select fieldLabel="Select Department" [enableSearch]="true" formControlName="department" [selectOptions]="departments">
       </app-ilogi-select>
     </div>
     <div class="form-group small">
-      <app-ilogi-select fieldLabel="Select Report Type" formControlName="reportType" [selectOptions]="reportTypes">
+      <app-ilogi-select fieldLabel="Select Report Type" [enableSearch]="true" formControlName="reportType" [selectOptions]="reportTypes">
       </app-ilogi-select>
     </div>
     <div class="button-row proper-buttons">
