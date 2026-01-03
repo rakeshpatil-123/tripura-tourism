@@ -78,6 +78,41 @@ $shadow: 0 25px 60px rgba(2,12,27,.35);
   object-fit: contain;
 }
 
+.otp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+
+  .btn-otp,
+  .btn-verify {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: fit-content;
+    min-width: 100px;
+
+    &:hover:not(:disabled) {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+  }
+}
+
 /* LOGO CENTERED ABOVE TITLE */
 .logo-wrapper {
   display: flex;

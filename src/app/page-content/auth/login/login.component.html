@@ -90,9 +90,9 @@
 
           <div class="form-footer">
             <span class="small">
-              New User? <a routerLink="/page/registration" class="register-link">Register Here</a>
+              New User? <a [attr.href]="resolvePath('/page/registration')" class="register-link">Register Here</a>
             </span>
-            <a routerLink="/page/forgot-password" class="forgot-link">Forgot Password?</a>
+            <a [attr.href]="resolvePath('/page/forgot-password')" class="forgot-link">Forgot Password?</a>
           </div>
         </form>
       </div>

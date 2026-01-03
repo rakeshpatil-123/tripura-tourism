@@ -125,13 +125,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/holidays',
       roles: ['admin'],
     },
-    {
-      id: 'common-application-form',
-      title: 'Common Application Form',
-      icon: 'assignment',
-      route: '/dashboard/caf',
-      roles: ['individual', 'user', 'moderator', 'guest'],
-    },
+    // {
+    //   id: 'common-application-form',
+    //   title: 'Common Application Form',
+    //   icon: 'assignment',
+    //   route: '/dashboard/caf',
+    //   roles: ['individual', 'user', 'moderator', 'guest'],
+    // },
     {
       id: 'services',
       title: 'Services',
