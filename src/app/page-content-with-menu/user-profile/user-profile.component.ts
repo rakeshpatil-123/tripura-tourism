@@ -249,8 +249,11 @@ export class UserProfileComponent implements OnInit {
 
   private prefillFormOnceOptionsAreReady(): void {
     const tryPatch = () => {
-      const districtsReady = this.districts.length > 0;
+      const userType = this.backendProfile?.user_type;
+      
+      // For admin users, only check departments; for others, check both
       const departmentsReady = this.departments.length > 0;
+      const districtsReady = userType === 'admin' || this.districts.length >= 0;
 
       if (!districtsReady || !departmentsReady) {
         setTimeout(tryPatch, 100);

@@ -92,15 +92,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
           canActivate: [authGuard],
           data: { roles: ['individual'] }
       },
-      {
-        path: 'caf',
-        loadComponent: () =>
-          import('./industrial-user/caf/caf.component').then(
-            (m) => m.ApplicationFormComponent
-          ),
-        canActivate: [authGuard, profileCompletionGuard],
-        data: { roles: ['individual'] }
-      },
+      // {
+      //   path: 'caf',
+      //   loadComponent: () =>
+      //     import('./industrial-user/caf/caf.component').then(
+      //       (m) => m.ApplicationFormComponent
+      //     ),
+      //   canActivate: [authGuard, profileCompletionGuard],
+      //   data: { roles: ['individual'] }
+      // },
       {
         path: 'services',
         loadComponent: () =>

@@ -590,7 +590,7 @@ export class GenericService {
       });
 
       this.setLoginStatus(true);
-      const checkKeys = ['district', 'subdivision', 'ulb', 'ward', 'pan'];
+      const checkKeys = ['district', 'subdivision', 'ulb', 'ward'];
       const missing: string[] = [];
 
       checkKeys.forEach((k) => {

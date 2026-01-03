@@ -36,38 +36,58 @@
             type="email"
             placeholder="Enter your email">
           </app-ilogi-input>
-
-          <!-- MOBILE -->
-          <app-ilogi-input
-            fieldId="mobile_no"
-            fieldLabel="Mobile Number"
-            [mandatory]="true"
-            formControlName="mobile_no"
-            placeholder="Enter 10-digit mobile number"
-            type="text">
-          </app-ilogi-input>
-
+            <!-- Authorized Person -->
+          <app-ilogi-input fieldId="authorized_person_name" fieldLabel="Authorized Person Name" [mandatory]="true"
+            formControlName="authorized_person_name" placeholder="Enter full name"></app-ilogi-input>
           <small class="error-text"
-            *ngIf="registrationForm.get('mobile_no')?.touched && registrationForm.get('mobile_no')?.invalid">
-            Enter a valid 10-digit mobile number
+            *ngIf="registrationForm.get('authorized_person_name')?.touched && registrationForm.get('authorized_person_name')?.invalid">
+            Please enter a valid name.
           </small>
+           <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true"
+              formControlName="mobile_no" placeholder="Enter mobile number" type="text"></app-ilogi-input>
+            <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched 
+                     && registrationForm.get('mobile_no')?.invalid 
+                     && !registrationForm.get('mobile_no')?.hasError('taken')">
+              Please enter a valid 10-digit mobile number.
+            </small>
+            <!-- Inline backend status message for mobile (OTP send / already verified / taken etc.) -->
+            <small *ngIf="mobileStatusMessage" [ngClass]="{
+              'mobile-status-success': mobileStatusType === 'success',
+              'mobile-status-error': mobileStatusType === 'error',
+              'mobile-status-info': mobileStatusType === 'info'
+            }" class="mobile-status-text" aria-live="polite">
+              {{ mobileStatusMessage }}
+            </small>
+            <div *ngIf="!editMode && sourcePage !== 'departmental-users'
+                                     && registrationForm.get('mobile_no')?.value?.toString().trim().length === 10
+                                     && registrationForm.get('mobile_no')?.valid
+                                     && !hideSendOtp
+                                     && mobileStatusType !== 'error'" class="otp-section mb-2">
+              <button type="button" class="btn-otp" (click)="sendOtp()"
+                [disabled]="otpSent || registrationForm.get('mobile_no')?.invalid || registrationForm.get('mobile_no')?.hasError('taken')">
+                {{ otpSent ? 'OTP Sent' : 'Send OTP' }}
+              </button>
+            </div>
 
-          <!-- SEND OTP -->
-          <div *ngIf="registrationForm.get('mobile_no')?.valid && !otpSent" class="otp-row">
-            <button type="button" class="btn-secondary" (click)="sendOtp()">Send OTP</button>
-          </div>
+            <div
+              *ngIf="registrationForm.get('mobile_no')?.value?.toString().trim().length === 10 && registrationForm.get('mobile_no')?.valid"
+              class="box mt-2">
+              <input type="checkbox" [checked]="whatsappSameAsMobile" (change)="toggleWhatsappSameAsMobile($event)" />
+              <small class="text-sm">Is WhatsApp number same as mobile number?</small>
+            </div>
+            <!-- OTP Input + Verify Button: additionally hide when hideVerify is true -->
+            <div *ngIf="otpSent && !otpVerified && !editMode && sourcePage !== 'departmental-users' && !hideVerify"
+              class="otp-section mt-2">
+              <app-ilogi-input fieldId="otp" fieldLabel="Enter OTP" [mandatory]="true" [formControl]="otpControl"
+                placeholder="Enter 6-digit OTP"></app-ilogi-input>
+              <button type="button" class="btn-verify" (click)="verifyOtp()" [disabled]="!otpControl.valid">Verify
+                OTP</button>
+            </div>
 
-          <!-- VERIFY OTP -->
-          <div *ngIf="otpSent && !otpVerified" class="otp-row">
-            <app-ilogi-input
-              fieldId="otp"
-              fieldLabel="OTP"
-              [mandatory]="true"
-              [formControl]="otpControl"
-              placeholder="Enter OTP">
-            </app-ilogi-input>
-            <button type="button" class="btn-verify" (click)="verifyOtp()">Verify</button>
-          </div>
+            <!-- Verified message remains visible when otpVerified is true -->
+            <!-- <div *ngIf="otpVerified && !editMode && sourcePage !== 'departmental-users'" class="otp-verified mt-1">
+            Mobile number verified.
+          </div> -->
 
           <!-- USERNAME -->
           <app-ilogi-input
@@ -80,6 +100,7 @@
 
           <!-- WHATSAPP -->
           <app-ilogi-input
+            *ngIf="!whatsappSameAsMobile"
             fieldId="whatsapp_no"
             fieldLabel="WhatsApp Number"
             [mandatory]="true"
@@ -96,6 +117,26 @@
             formControlName="registered_enterprise_address"
             placeholder="Enter your address">
           </app-ilogi-input>
+          <!-- <ng-container *ngIf="sourcePage !== 'departmental-users'">
+            <div class="single-field pan-field">
+              <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
+                placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
+              </app-ilogi-input>
+              <small class="error-text" *ngIf="registrationForm.get('pan')?.touched
+                                            && registrationForm.get('pan')?.invalid
+                                            && (registrationForm.get('pan')?.value?.toString()?.trim()?.length === 10)
+                                            && !registrationForm.get('pan')?.hasError('registered')">
+                Please enter a valid PAN number.
+              </small>
+              <small *ngIf="panStatusMessage" [ngClass]="{
+                                    'mobile-status-success': panStatusType === 'success',
+                                    'mobile-status-error': panStatusType === 'error',
+                                    'mobile-status-info': panStatusType === 'info'
+                                  }" class="mobile-status-text pan-status-text" aria-live="polite">
+                {{ panStatusMessage }}
+              </small>
+            </div>
+          </ng-container> -->
 
           <!-- LOCATION -->
           <app-ilogi-select
@@ -121,6 +162,11 @@
             formControlName="ulb_id"
             [selectOptions]="ulbs">
           </app-ilogi-select>
+            <app-ilogi-select *ngIf="shouldShow('ward') && sourcePage !== 'departmental-users'"
+              [multiple]="sourcePage === 'departmental-users'" fieldId="ward_id" fieldLabel="Ward" [mandatory]="true"
+              formControlName="ward_id" [selectOptions]="wards" placeholder="Select ward" [disabled]="!ulbs.length || loadingUlbs">
+            </app-ilogi-select>
+
 
           <!-- PASSWORD -->
           <app-ilogi-input

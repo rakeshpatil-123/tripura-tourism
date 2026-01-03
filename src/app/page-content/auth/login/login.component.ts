@@ -170,10 +170,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
                 { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' }
               );
               snackRef.onAction().subscribe(() => {
-                const { origin, pathname } = window.location;
-                const basePath = pathname.startsWith('/') ? '/new' : '';
-                const forgotPasswordPath = `${basePath}/page/forgot-password`;
-                window.location.href = origin + forgotPasswordPath;
+                const forgotPasswordPath = this.getRedirectUrl('/page/forgot-password');
+                window.location.href = window.location.origin + forgotPasswordPath;
               });
               return;
             }
@@ -302,25 +300,49 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
- private getBasePath(): string {
+private getBasePath(): string {
   if (typeof window === 'undefined') return '';
 
   const baseEl = document.querySelector('base');
-  if (baseEl && baseEl.getAttribute('href')) {
-    return baseEl.getAttribute('href')!.replace(/\/$/, '');
-  }
-
-  return '';
+  return baseEl?.getAttribute('href')?.replace(/\/$/, '') || '';
 }
 
-  resolvePath(path: string): string {
+resolvePath(path: string): string {
+  if (!path) return path;
+
+  // absolute URL → return as is
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) {
+    return path;
+  }
+
+  const p = path.startsWith('/') ? path : '/' + path;
+  const base = this.getBasePath();
+
+  // if app is running under /onlineservice
+  if (base.includes('/onlineservice')) {
+    // avoid duplicate
+    if (p.startsWith('/onlineservice')) {
+      return p;
+    }
+    return '/onlineservice' + p;
+  }
+
+  // normal app (no onlineservice)
+  return p;
+}
+
+
+  getRedirectUrl(path: string): string {
     if (!path) return path;
-    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) return path;
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) {
+      return path;
+    }
+
     const p = path.startsWith('/') ? path : '/' + path;
-    const base = this.basePath || '';
-    if (!base) return p;
-    if (p === base) return p;
-    if (p.startsWith(base + '/')) return p;
-    return base + p;
+
+    const baseEl = document.querySelector('base');
+    const baseHref = baseEl?.getAttribute('href')?.replace(/\/$/, '') || '';
+
+    return baseHref + p;
   }
 }
