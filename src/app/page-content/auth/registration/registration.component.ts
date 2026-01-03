@@ -1048,7 +1048,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         },
         error: (err: any) => {
           console.error('Failed to load districts:', err);
-          this.genericService.openSnackBar('Failed to load districts', 'Error');
+          // this.genericService.openSnackBar('Failed to load districts', 'Error');
           this.loadingDistricts = false;
         },
       });
