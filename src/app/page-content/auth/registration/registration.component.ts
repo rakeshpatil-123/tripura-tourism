@@ -8,7 +8,9 @@ import {
 } from '@angular/core';
 import {
   FormBuilder,
-  FormControl,
+  FormControl,AbstractControl,
+  ValidationErrors,
+   ValidatorFn,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -143,14 +145,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         registered_enterprise_address: ['', []],
         registered_enterprise_city: ['', []],
         user_type: ['individual', []],
-        password: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(6),
-            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/),
-          ],
-        ],
+        password: ['', []],
         confirmPassword: ['', []],
         district_id: ['', []],
         subdivision_id: ['', []],
@@ -164,6 +159,15 @@ export class RegistrationComponent implements OnInit, OnChanges {
         validators: this.passwordMatchValidator,
       }
     );
+    this.registrationForm.setValidators(this.passwordMatchValidator);
+    // create otp control as before
+    this.otpControl = this.fb.control('', [
+      Validators.required,
+      Validators.pattern(/^\d{6}$/),
+    ]);
+
+    // IMPORTANT: ensure validators are correct for current sourcePage
+    this.setPasswordValidators();
 
     this.otpControl = this.fb.control('', [
       Validators.required,
@@ -285,7 +289,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         }
       });
     const mobileCtrl = this.registrationForm.get('mobile_no');
-    if (mobileCtrl) {
+    if (mobileCtrl && !(this.editMode && this.sourcePage === 'departmental-users' && this.editData)) {
       // immediate behavior on user edit (preserve existing behavior)
       mobileCtrl.valueChanges.subscribe((val: any) => {
         this.hideSendOtp = false;
@@ -371,6 +375,10 @@ export class RegistrationComponent implements OnInit, OnChanges {
     }
   }
   ngOnChanges(changes: any): void {
+    if (changes['sourcePage']) {
+    // when sourcePage toggles, update validators
+    this.setPasswordValidators();
+  }
     if (changes['editData'] && this.editData && this.editMode) {
       setTimeout(() => {
         if (this.sourcePage === 'departmental-users') {
@@ -1048,7 +1056,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         },
         error: (err: any) => {
           console.error('Failed to load districts:', err);
-          // this.genericService.openSnackBar('Failed to load districts', 'Error');
+          this.genericService.openSnackBar('Failed to load districts', 'Error');
           this.loadingDistricts = false;
         },
       });
@@ -1325,17 +1333,17 @@ export class RegistrationComponent implements OnInit, OnChanges {
         },
         error: (err: any) => {
           console.error('Failed to load wards:', err);
-          // this.genericService.openSnackBar('Failed to load wards', 'Error');
+          this.genericService.openSnackBar('Failed to load wards', 'Error');
           this.loadingWards = false;
         },
       });
   }
 
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { mismatch: true };
-  }
+  // passwordMatchValidator(form: FormGroup) {
+  //   const password = form.get('password')?.value;
+  //   const confirmPassword = form.get('confirmPassword')?.value;
+  //   return password === confirmPassword ? null : { mismatch: true };
+  // }
 
   onSubmit(): void {
     if (
@@ -1491,11 +1499,15 @@ export class RegistrationComponent implements OnInit, OnChanges {
           delete payload[field];
         }
       });
+      if (this.sourcePage === 'departmental-users' && payload.pan === '') {
+        delete payload.pan;
+      }
 
       if (this.editMode && this.editData?.user_id) {
         const payloadWithId = { ...payload, id: this.editData.user_id };
 
-        this.genericService.updateProfile(payloadWithId).subscribe({
+        this.loaderService.showLoader();
+        this.genericService.updateProfile(payloadWithId).pipe(finalize(() => this.loaderService.hideLoader())).subscribe({
           next: (res: any) => {
             this.genericService.openSnackBar(
               'User updated successfully!',
@@ -2036,20 +2048,86 @@ export class RegistrationComponent implements OnInit, OnChanges {
       );
     }
   }
-getRedirectUrl(path: string): string {
-  if (!path) return path;
+  private getRedirectUrl(path: string): string {
+    const { origin, pathname } = window.location;
+    const basePath =
+      pathname === '/' || pathname === ''
+        ? ''
+        : pathname.startsWith('/new')
+        ? '/new'
+        : '';
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${origin}${basePath}${normalized}`;
+  }
 
-  // external URLs untouched
-  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) return path;
+  goToLogin(): void {
+    window.location.href = this.getRedirectUrl('/page/login');
+  }
+  /**
+ * Update password & confirmPassword validators based on sourcePage and editMode.
+ * - If sourcePage === 'departmental-users' => password NOT required.
+ * - Otherwise => password required + minlength + pattern; confirmPassword required.
+ * Also call updateValueAndValidity to refresh form validity state.
+ */
+private setPasswordValidators(): void {
+  const pwdCtrl = this.registrationForm.get('password');
+  const confCtrl = this.registrationForm.get('confirmPassword');
 
-  const p = path.startsWith('/') ? path : '/' + path;
+  if (!pwdCtrl || !confCtrl) return;
 
-  const baseEl = document.querySelector('base');
-  const baseHref = baseEl?.getAttribute('href')?.replace(/\/$/, '') || '';
+  if (this.sourcePage === 'departmental-users') {
+    // departmental users: password optional
+    pwdCtrl.clearValidators();
+    pwdCtrl.setValidators([]); // optional
+    // confirm password optional as well
+    confCtrl.clearValidators();
+    confCtrl.setValidators([]);
+  } else {
+    // normal users: password required
+    pwdCtrl.clearValidators();
+    pwdCtrl.setValidators([
+      Validators.required,
+      Validators.minLength(6),
+      Validators.pattern(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/
+      ),
+    ]);
 
-  return baseHref + p;
+    confCtrl.clearValidators();
+    confCtrl.setValidators([Validators.required]);
+  }
+
+  pwdCtrl.updateValueAndValidity({ emitEvent: false });
+  confCtrl.updateValueAndValidity({ emitEvent: false });
+
+  // ensure group-level validator re-evaluates
+  this.registrationForm.updateValueAndValidity({ onlySelf: false, emitEvent: false });
 }
-goToLogin(): void {
-  window.location.href = this.getRedirectUrl('/page/login');
-}
+
+/**
+ * ValidatorFn for password match. Compatible with Angular's ValidatorFn signature.
+ * - If sourcePage === 'departmental-users' => skip validation.
+ * - If both fields empty => skip validation (no error).
+ * - Otherwise enforce equality.
+ */
+private passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  try {
+    // skip entire check for departmental users
+    if (this.sourcePage === 'departmental-users') return null;
+
+    const form = control as FormGroup;
+    const pwd = form.get('password')?.value;
+    const conf = form.get('confirmPassword')?.value;
+
+    // if both empty -> no error
+    if ((pwd === null || pwd === '' || pwd === undefined) && (conf === null || conf === '' || conf === undefined)) {
+      return null;
+    }
+
+    return pwd !== conf ? { passwordMismatch: true } : null;
+  } catch (e) {
+    return null;
+  }
+};
+
 }
