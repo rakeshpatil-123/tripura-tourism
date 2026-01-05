@@ -21,11 +21,240 @@ $shadow: 0 25px 60px rgba(2,12,27,.35);
   z-index: 0;
 }
 
-.bg-overlay {
+
+.center-stage {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.enterprise-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-card {
+  animation: floatIn 700ms cubic-bezier(.2,.9,.3,1) both;
+}
+
+.registration-container {
+  position: relative;
+  z-index: 2;
+  display: block;              /* 🔑 allow natural flow */
+  min-height: auto;            /* 🔑 allow scroll */
+  padding: 1rem 6rem;
+}
+
+
+.card {
+  background: rgba(255, 255, 255, 0.97);
+  width: 100%;
+  max-width: 620px; /* slightly larger to look good inside dialog */
+  padding: 34px;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(2, 12, 27, 0.35);
+  text-align: center;
+  margin: 0 auto;
+  position: relative;
+  transform: none;
+}
+
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.logo {
+  width: 95px;
+  height: 95px;
+  object-fit: contain;
+}
+
+.otp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+
+  .btn-otp,
+  .btn-verify {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: fit-content;
+    min-width: 100px;
+
+    &:hover:not(:disabled) {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* LOGO CENTERED ABOVE TITLE */
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.registration-logo {
+  height: 52px;
+  max-width: 160px;
+  object-fit: contain;
+  animation: fadeScale 0.9s ease-out;
+}
+
+/* SMOOTH PROFESSIONAL ANIMATION */
+@keyframes fadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #01203a;
+}
+
+.subtitle {
+  font-size: .9rem;
+  color: #6b7280;
+  margin-bottom: 18px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-submit {
+  margin-top: 14px;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #03202a;
+  background: linear-gradient(90deg, $accent, $accent-dark);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 10px 30px rgba(63,208,212,.25);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 50px rgba(63,208,212,.35);
+  }
+
+  &:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary,
+.btn-verify {
+  background: $accent;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-text {
+  margin-top: 14px;
+  font-size: .9rem;
+  color: #475569;
+
+  a {
+    color: $accent-dark;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.error-text {
+  font-size: 12px;
+  color: #dc2626;
+  text-align: left;
+}
+
+@keyframes floatIn {
+  from {
+    transform: translateY(20px) scale(.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 22px;
+  }
+}
+// (Keep your existing variables & rules — below we append dialog-specific overrides)
+$accent: #3FD0D4;
+$accent-dark: #24aeb1;
+$bg-dark: rgba(2, 12, 27, 0.65);
+$card-bg: rgba(255, 255, 255, 0.97);
+$shadow: 0 25px 60px rgba(2,12,27,.35);
+
+/* ---------- ORIGINAL STYLES (keep exactly as you had them) ---------- */
+.page-wrapper {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  font-family: Inter, "Segoe UI", Roboto, Arial;
+}
+
+.bg-video {
   position: fixed;
   inset: 0;
-  background: linear-gradient(135deg, rgba(3,19,54,.7), rgba(0,46,65,.6));
-  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.55) contrast(1.1);
+  z-index: 0;
+}
+
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  // background: linear-gradient(135deg, rgba(3,19,54,.7), rgba(0,46,65,.6));
+  z-index: 0;
+  pointer-events: none;
 }
 
 .center-stage {
@@ -37,33 +266,27 @@ $shadow: 0 25px 60px rgba(2,12,27,.35);
   justify-content: center;
   padding: 24px;
 }
+.enterprise-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 
 .auth-card {
   animation: floatIn 700ms cubic-bezier(.2,.9,.3,1) both;
 }
 
-.registration-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 1rem;
-}
-
-/* PERFECT CENTER EVEN WITH 186% WIDTH */
 .card {
   background: rgba(255, 255, 255, 0.97);
-  width: 186%;
-  max-width: 541px;
+  width: 100%;
+  max-width: 620px; /* slightly larger to look good inside dialog */
   padding: 34px;
   border-radius: 16px;
   box-shadow: 0 25px 60px rgba(2, 12, 27, 0.35);
   text-align: center;
-
-  /* critical centering fix */
+  margin: 0 auto;
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  transform: none;
 }
 .logo-wrapper {
   display: flex;
@@ -224,5 +447,88 @@ $shadow: 0 25px 60px rgba(2,12,27,.35);
 @media (max-width: 520px) {
   .card {
     padding: 22px;
+  }
+}
+
+/* ---------- DIALOG-SPECIFIC OVERRIDES (safe & scoped) ---------- */
+
+/* When the component is used inside the p-dialog with class "custom-dialog",
+   force the registration card to behave like a normal centered card inside dialog. */
+.custom-dialog .swgt-container,
+.custom-dialog .page-wrapper {
+  /* ensure dialog content area doesn't get clipped by fixed video */
+  position: relative;
+  overflow: visible;
+  background: transparent;
+}
+
+/* center the inner container in dialog */
+.custom-dialog .registration-container {
+  min-height: auto;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.registration-container .card {
+  margin: 2rem auto;
+}
+::ng-deep .custom-dialog .card {
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.custom-dialog .bg-video,
+.custom-dialog .bg-overlay {
+  position: absolute !important;
+}
+
+
+/* make the card responsive and centered INSIDE the dialog (remove 186% hack) */
+.custom-dialog .card {
+  width: 100% !important;
+  max-width: 620px; /* dialog width is 55vw, so keep card narrower than that */
+  left: 0 !important;
+  transform: none !important;
+  position: relative !important;
+  margin: 0 auto;
+  box-shadow: $shadow;
+}
+
+/* ensure the video & overlay visually de-emphasize when departmental users mode is ON */
+.swgt-container.dialog-mode .bg-video {
+  /* darker, less distracting video when in departmental dialog */
+  filter: brightness(0.22) contrast(1.05) saturate(0.8);
+  transition: filter 240ms ease;
+}
+
+/* optionally increase overlay darkness in dialog-mode */
+.swgt-container.dialog-mode .bg-overlay {
+  // background: linear-gradient(135deg, rgba(3,19,54,.85), rgba(0,46,65,.8));
+  transition: background 240ms ease;
+}
+
+/* Make sure prime dialog close button sits above background/video.
+   PrimeNG uses several variants of the close button class depending on version:
+   .p-dialog-titlebar-close, .p-dialog-header-close, .p-dialog-close, etc. */
+.custom-dialog .p-dialog-titlebar-close,
+.custom-dialog .p-dialog-header-close,
+.custom-dialog .p-dialog-close {
+  z-index: 10005 !important;
+  position: relative;
+  /* improve contrast so icon is visible */
+  color: #ffffff !important;
+}
+
+/* ensure dialog container itself is above the video */
+.custom-dialog {
+  z-index: 10003 !important;
+}
+
+/* small tweak for very small screens inside dialog */
+@media (max-width: 520px) {
+  .custom-dialog .card {
+    padding: 18px;
   }
 }

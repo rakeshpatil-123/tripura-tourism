@@ -501,19 +501,31 @@ export class UserProfileComponent implements OnInit {
               );
             }
           },
-          error: (err: any) => {
-            console.error('Profile update failed:', err);
+        error: (err: any) => {
+  console.error('Profile update failed:', err);
 
-            let message = 'Something went wrong while updating profile';
+  let message = 'Something went wrong while updating profile';
 
-            if (err?.error?.errors) {
-              message = Object.values(err.error.errors).flat().join(' ');
-            } else if (err?.error?.message) {
-              message = err.error.message;
-            }
+  // Case 1: backend sent structured validation errors
+  if (err?.error?.errors) {
+    message = Object.values(err.error.errors).flat().join(' ');
+  }
+  // Case 2: backend sent { status, message }
+  else if (err?.error?.message) {
+    message = err.error.message;
+  }
+  // Case 3: backend sent plain text error
+  else if (typeof err?.error === 'string') {
+    message = err.error;
+  }
+  // Case 4: HttpErrorResponse message fallback
+  else if (err?.message) {
+    message = err.message;
+  }
 
-            this.genericService.openSnackBar(message, 'Error');
-          },
+  this.genericService.openSnackBar(message, 'Error');
+},
+
         });
     } else if (val.userType === 'department') {
       if (isDeptRole) {

@@ -28,6 +28,7 @@
   min-width: max-content;
 }
 
+
 ::ng-deep .p-datatable-tbody>tr>td {
   white-space: nowrap;
   overflow: hidden;
@@ -599,21 +600,80 @@ p-table ::ng-deep .p-datatable-tbody>tr>td {
 .header-bg-color {
   background-color: #003c5b;
 }
-
-::ng-deep .custom-dialog .p-dialog {
-  border-radius: 12px !important;
-  overflow: hidden;
-  animation: fadeInScale 0.3s ease-out;
+/* Ensure the PrimeNG dialog sits above the page video/overlay */
+::ng-deep .custom-dialog {
+  z-index: 10050 !important; /* make sure dialog overlays the page video/overlay */
 }
 
 ::ng-deep .custom-dialog .p-dialog-header {
-  background: #003c5b !important;
-  color: #ffffff !important;
-  font-weight: 600;
-  font-size: 1.1rem;
-  padding: 1rem;
-  border-bottom: none;
+  position: relative;
+  z-index: 10010;
 }
+
+::ng-deep .custom-dialog .p-dialog-header-close,
+::ng-deep .custom-dialog .p-dialog-titlebar-close,
+::ng-deep .custom-dialog .p-dialog-close {
+  opacity: 1 !important;
+  color: #ffffff !important;
+  background: rgba(0,0,0,0.35) !important; /* contrast */
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+
+::ng-deep .custom-dialog .p-dialog-header-close:hover {
+  background: rgba(0,0,0,0.55) !important;
+}
+
+::ng-deep .custom-dialog .p-dialog-content {
+  display: block !important;
+  max-height: calc(100vh - 120px); /* header + padding */
+  overflow-y: auto;                /* 🔑 scrolling */
+  padding: 1.5rem !important;
+}
+
+/* Ensure the in-dialog card is constrained and centered (won't overflow) */
+::ng-deep .custom-dialog .p-dialog-content .card {
+  width: 100% !important;
+  max-width: 600px !important;
+  margin: 0 !important;
+  box-shadow: 0 25px 60px rgba(2, 12, 27, 0.35) !important;
+}
+
+/* Make the dialog close (X) button clearly visible and on top */
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon,
+::ng-deep .custom-dialog .p-dialog-header-close,
+::ng-deep .custom-dialog .p-dialog-titlebar-close,
+::ng-deep .custom-dialog .p-dialog-close {
+  z-index: 10060 !important;
+  color: #ffffff !important;        /* white color for icon */
+  background: transparent !important;
+  border: none !important;
+  opacity: 1 !important;
+}
+
+/* Slightly enlarge the hit area and make hover feel responsive */
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:hover,
+::ng-deep .custom-dialog .p-dialog-header-close:hover,
+::ng-deep .custom-dialog .p-dialog-titlebar-close:hover {
+  background: rgba(255,255,255,0.06) !important;
+  border-radius: 6px !important;
+}
+
+/* If the registration component marks dialog-mode, dim background video slightly more */
+/* (this selector matches if your registration component root includes class dialog-mode) */
+::ng-deep .custom-dialog .swgt-container.dialog-mode .bg-video,
+::ng-deep .swgt-container.dialog-mode .bg-video {
+  filter: brightness(0.28) contrast(1) saturate(0.85) !important;
+  transition: filter 200ms ease !important;
+}
+
+/* Also ensure overlay doesn't cover dialog by being behind */
+::ng-deep .custom-dialog .swgt-container.dialog-mode .bg-overlay,
+::ng-deep .swgt-container.dialog-mode .bg-overlay {
+  z-index: 0 !important;
+}
+
 
 ::ng-deep .custom-dialog .p-dialog-header-icon {
   color: #ffffff !important;

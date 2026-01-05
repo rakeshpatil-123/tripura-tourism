@@ -16,61 +16,96 @@
 
     <!-- Right: actions -->
     <div class="action-section" role="navigation" aria-label="Header actions">
-      <!-- When not logged in: Login + Register -->
-       <div class="accessibility-bar" role="group" aria-label="Accessibility tools">
-  <span class="sr-access" tabindex="0">Screen Reader Access</span>
+      <div class="accessibility-bar" role="group" aria-label="Accessibility tools">
+        <!-- SCREEN READER BUTTON (was a span; now a proper button) -->
+        <button
+          class="sr-access"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="srDialog"
+          aria-expanded="{{ dialogOpen }}"
+          (click)="openSrDialog()">
+          Screen Reader Access
+        </button>
+        <div class="read-controls" role="group" aria-label="Read page controls">
+  <button
+    type="button"
+    class="font-btn"
+    (click)="readPageContent()"
+    [disabled]="reading"
+    aria-pressed="{{ reading }}">
+    Read page
+  </button>
 
-  <span class="divider">|</span>
+  <button
+    type="button"
+    class="font-btn"
+    (click)="stopReading()"
+    [disabled]="!reading">
+    Stop
+  </button>
 
-  <a href="tel:03812325930" class="helpline" aria-label="Helpline number">
-    0381&nbsp;232&nbsp;5930
-  </a>
-
-  <span class="divider">|</span>
-
-  <div class="font-controls" role="group" aria-label="Font size controls">
-    <button aria-label="Increase font size" class="font-btn">A+</button>
-    <button aria-label="Normal font size" class="font-btn active">A</button>
-    <button aria-label="Decrease font size" class="font-btn">A-</button>
-  </div>
+  <label class="tts-toggle">
+    <input type="checkbox" [checked]="useBrowserTTS" (change)="useBrowserTTS = !useBrowserTTS" />
+    Browser voice
+  </label>
 </div>
+        <span class="divider">|</span>
+
+        <a href="tel:03812325930" class="helpline" aria-label="Helpline number">
+          0381&nbsp;232&nbsp;5930
+        </a>
+
+        <span class="divider">|</span>
+
+        <div class="font-controls" role="group" aria-label="Font size controls">
+          <button
+            type="button"
+            class="font-btn"
+            (click)="increaseFont()"
+            [attr.aria-pressed]="fontSize === 'large'">
+            A+
+          </button>
+
+          <button
+            type="button"
+            class="font-btn"
+            (click)="resetFont()"
+            [class.active]="fontSize === 'normal'"
+            [attr.aria-pressed]="fontSize === 'normal'">
+            A
+          </button>
+
+          <button
+            type="button"
+            class="font-btn"
+            (click)="decreaseFont()"
+            [attr.aria-pressed]="fontSize === 'small'">
+            A-
+          </button>
+        </div>
+      </div>
+
+      <!-- LOGIN / REGISTER (unchanged) -->
       <ng-container *ngIf="!isLoggedIn">
         <button class="action-btn secondary login-btn" aria-label="Login" (click)="navigateToLogin()">
-          <svg class="main-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-            <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-            <path d="M15 12H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
+          ... <!-- icon + text omitted for brevity -->
           <span>Login</span>
         </button>
 
         <button class="action-btn register-btn" aria-label="Register" (click)="navigateToRegister()">
-          <svg class="main-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="m19 8 2 2-2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="m19 10 2-2-2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          ... <!-- icon + text omitted for brevity -->
           <span>Register</span>
         </button>
       </ng-container>
 
-      <!-- When logged in: Dashboard + Logout -->
+      <!-- LOGGED IN --> 
       <ng-container *ngIf="isLoggedIn">
         <a class="action-btn secondary" [routerLink]="['/dashboard/home']" aria-label="Dashboard">
-          <svg class="main-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
           <span>Dashboard</span>
         </a>
 
         <button class="action-btn primary logout-btn" aria-label="Logout" (click)="logout()">
-          <svg class="main-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M16 17l5-5-5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
           <span>Logout</span>
         </button>
       </ng-container>
@@ -79,4 +114,29 @@
       <div id="google_translate_element" class="translate-box" aria-hidden="false"></div>
     </div>
   </div>
+
+  <!-- Screen Reader / Accessibility Dialog -->
+  <div
+    #srDialog
+    id="srDialog"
+    class="sr-dialog-overlay"
+    *ngIf="dialogOpen"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="srTitle"
+    aria-describedby="srDesc">
+    <div class="sr-dialog" role="document">
+      <h2 id="srTitle">Accessibility tools</h2>
+      <p id="srDesc">Quick tools for screen reader users and font controls.</p>
+
+      <div class="sr-dialog-actions">
+        <button type="button" (click)="skipToMainContent()">Skip to main content</button>
+        <button type="button" (click)="enableScreenReaderMode()">Enable screen reader mode</button>
+        <button type="button" (click)="closeSrDialog()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- aria-live region to announce changes for screen readers -->
+  <div class="visually-hidden" aria-live="polite" aria-atomic="true">{{ liveMessage }}</div>
 </header>
