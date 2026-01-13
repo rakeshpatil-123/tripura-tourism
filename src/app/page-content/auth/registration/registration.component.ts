@@ -139,7 +139,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         name_of_enterprise: ['', []],
         authorized_person_name: ['', []],
         email_id: ['', []],
-        pan: ['', [Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]],
+        // pan: ['', [Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]],
         mobile_no: [''],
         user_name: ['', []],
         registered_enterprise_address: ['', []],
@@ -222,72 +222,72 @@ export class RegistrationComponent implements OnInit, OnChanges {
       this.onHierarchyChange();
     });
 
-    this.registrationForm
-      .get('pan')
-      ?.valueChanges.pipe(
-        map((v: string) => (v || '').toString().toUpperCase()),
-        distinctUntilChanged(),
-        tap((upper) => {
-          const ctrl = this.registrationForm.get('pan');
-          if (ctrl && ctrl.value !== upper) {
-            ctrl.setValue(upper, { emitEvent: false });
-          }
-        }),
-        debounceTime(500),
-        tap((value: string) => {
-          const panCtrl = this.registrationForm.get('pan');
-          const panValue = value?.toString().trim();
+    // this.registrationForm
+    //   .get('pan')
+    //   ?.valueChanges.pipe(
+    //     map((v: string) => (v || '').toString().toUpperCase()),
+    //     distinctUntilChanged(),
+    //     tap((upper) => {
+    //       const ctrl = this.registrationForm.get('pan');
+    //       if (ctrl && ctrl.value !== upper) {
+    //         ctrl.setValue(upper, { emitEvent: false });
+    //       }
+    //     }),
+    //     debounceTime(500),
+    //     tap((value: string) => {
+    //       const panCtrl = this.registrationForm.get('pan');
+    //       const panValue = value?.toString().trim();
 
-          // CLEAR message & error immediately when PAN is empty or invalid
-          if (!panValue || !this.PAN_REGEX.test(panValue)) {
-            this.panStatusMessage = '';
-            this.panStatusType = '';
-            if (panCtrl?.hasError('registered')) {
-              panCtrl.setErrors(null);
-            }
-          }
-        }),
-        filter((value: string) => this.PAN_REGEX.test(value)),
-        switchMap((value: string) => {
-          return this.genericService
-            .getByConditions(
-              { pan_no: value },
-              'api/user/check-pan-resgistered'
-            )
-            .pipe(
-              finalize(() => this.loaderService.hideLoader()),
-              catchError((err) => {
-                console.error('PAN check failed', err);
-                return of(null);
-              })
-            );
-        })
-      )
-      .subscribe((res: any) => {
-        const panCtrl = this.registrationForm.get('pan');
-        const panValue = panCtrl?.value?.toString().trim();
-        if (!res) {
-          this.panStatusMessage = '';
-          this.panStatusType = '';
-          const panCtrl = this.registrationForm.get('pan');
-          if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
-          return;
-        }
+    //       // CLEAR message & error immediately when PAN is empty or invalid
+    //       if (!panValue || !this.PAN_REGEX.test(panValue)) {
+    //         this.panStatusMessage = '';
+    //         this.panStatusType = '';
+    //         if (panCtrl?.hasError('registered')) {
+    //           panCtrl.setErrors(null);
+    //         }
+    //       }
+    //     }),
+    //     filter((value: string) => this.PAN_REGEX.test(value)),
+    //     switchMap((value: string) => {
+    //       return this.genericService
+    //         .getByConditions(
+    //           { pan_no: value },
+    //           'api/user/check-pan-resgistered'
+    //         )
+    //         .pipe(
+    //           finalize(() => this.loaderService.hideLoader()),
+    //           catchError((err) => {
+    //             console.error('PAN check failed', err);
+    //             return of(null);
+    //           })
+    //         );
+    //     })
+    //   )
+    //   .subscribe((res: any) => {
+    //     const panCtrl = this.registrationForm.get('pan');
+    //     const panValue = panCtrl?.value?.toString().trim();
+    //     if (!res) {
+    //       this.panStatusMessage = '';
+    //       this.panStatusType = '';
+    //       const panCtrl = this.registrationForm.get('pan');
+    //       if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
+    //       return;
+    //     }
 
-        if (res.is_registered && panValue) {
-          const message =
-            res.message || 'Account already exists with this PAN number.';
-          this.panStatusMessage = message;
-          this.panStatusType = 'error';
-          panCtrl?.setErrors({ registered: true });
-        } else {
-          this.panStatusMessage = res.message || '';
-          this.panStatusType =
-            res.status === 1 ? 'success' : res.status === 0 ? 'info' : '';
-          const panCtrl = this.registrationForm.get('pan');
-          if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
-        }
-      });
+    //     if (res.is_registered && panValue) {
+    //       const message =
+    //         res.message || 'Account already exists with this PAN number.';
+    //       this.panStatusMessage = message;
+    //       this.panStatusType = 'error';
+    //       panCtrl?.setErrors({ registered: true });
+    //     } else {
+    //       this.panStatusMessage = res.message || '';
+    //       this.panStatusType =
+    //         res.status === 1 ? 'success' : res.status === 0 ? 'info' : '';
+    //       const panCtrl = this.registrationForm.get('pan');
+    //       if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
+    //     }
+    //   });
     const mobileCtrl = this.registrationForm.get('mobile_no');
     if (mobileCtrl && !(this.editMode && this.sourcePage === 'departmental-users' && this.editData)) {
       // immediate behavior on user edit (preserve existing behavior)
@@ -473,7 +473,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
       name_of_enterprise: data.name_of_enterprise || '',
       authorized_person_name: data.authorized_person_name || '',
       email_id: data.email_id || '',
-      pan: data.pan || '',
+      // pan: data.pan || '',
       mobile_no: data.mobile_no || '',
       user_name: data.user_name || '',
       registered_enterprise_address: data.registered_enterprise_address || '',
@@ -860,7 +860,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
         name_of_enterprise: prefill.name_of_enterprise,
         authorized_person_name: prefill.authorized_person_name,
         email_id: prefill.email_id,
-        pan: prefill.pan,
+        // pan: prefill.pan,
         mobile_no: prefill.mobile_no,
         user_name: prefill.user_name,
         registered_enterprise_address: prefill.registered_enterprise_address,

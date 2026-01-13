@@ -14,15 +14,14 @@ export const profileCompletionGuard: CanActivateFn = (route, state) => {
         take(1),
         map((res: any) => {
             const data = res?.data || res;
-            const pan = (data?.pan ?? '').toString().trim();
+            // const pan = (data?.pan ?? '').toString().trim();
             const district = (data?.district_code ?? data?.district ?? '').toString().trim();
             const subdivision = (data?.subdivision_code ?? data?.subdivision_name ?? '').toString().trim();
             const ulb = (data?.ulb_code ?? data?.ulb_name ?? '').toString().trim();
 
-            const allPresent = pan !== '' && district !== '' && subdivision !== '' && ulb !== '';
+            const allPresent = district !== '' && subdivision !== '' && ulb !== '';
             const missingFields: string[] = [];
 
-            if (!pan) missingFields.push('PAN');
             if (!district) missingFields.push('District');
             if (!subdivision) missingFields.push('Subdivision');
             if (!ulb) missingFields.push('ULB');
