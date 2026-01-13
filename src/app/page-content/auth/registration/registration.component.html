@@ -20,24 +20,17 @@
               </small>
             </ng-container>
             <!-- PAN Number -->
-            <ng-container *ngIf="sourcePage !== 'departmental-users'">
-              <!-- wrapper keeps the input + messages together (prevents grid from flowing the small tags into next column) -->
+            <!-- <ng-container *ngIf="sourcePage !== 'departmental-users'">
               <div class="single-field pan-field">
-                <app-ilogi-input fieldId="pan" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
+                <app-ilogi-input fieldId="pan" maxlength="10" fieldLabel="PAN Number" [mandatory]="true" formControlName="pan"
                   placeholder="Enter PAN (e.g. ABCDE1234F)" type="text">
                 </app-ilogi-input>
-
-                <!-- show validation error ONLY when user has entered full PAN length (10 chars),
-                         control is invalid AND backend 'registered' error is NOT present -->
                 <small class="error-text" *ngIf="registrationForm.get('pan')?.touched
                                     && registrationForm.get('pan')?.invalid
                                     && (registrationForm.get('pan')?.value?.toString()?.trim()?.length === 10)
                                     && !registrationForm.get('pan')?.hasError('registered')">
                   Please enter a valid PAN number.
                 </small>
-
-                <!-- Inline backend status message for PAN (shows BE message in red when PAN already registered)
-                         placed directly below the PAN field. When present it will suppress the "Please enter..." message above. -->
                 <small *ngIf="panStatusMessage" [ngClass]="{
                              'mobile-status-success': panStatusType === 'success',
                              'mobile-status-error': panStatusType === 'error',
@@ -46,7 +39,7 @@
                   {{ panStatusMessage }}
                 </small>
               </div>
-            </ng-container>
+            </ng-container> -->
 
             <!-- Authorized Person -->
             <app-ilogi-input fieldId="authorized_person_name" [fieldLabel]="sourcePage === 'departmental-users' ? 'Dept User Name' : 'Authorized Person Name'" [mandatory]="true"

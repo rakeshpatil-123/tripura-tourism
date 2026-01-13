@@ -204,7 +204,6 @@ export class UserProfileComponent implements OnInit {
 
       if (type === 'individual') {
         panCtrl?.setValidators([
-          Validators.required,
           Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/),
         ]);
       } else {
