@@ -18,6 +18,10 @@ import Swal from 'sweetalert2';
   providedIn: 'root', // Makes the service available app-wide in standalone setup
 })
 export class GenericService {
+
+  //ng build --configuration production --base-href /onlineservice/ --deploy-url /onlineservice/
+ //command for build with base href and deploy url
+  
 // <<<<<<< changes-for-landing-page
 //   // Development URLs
 //   // static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
