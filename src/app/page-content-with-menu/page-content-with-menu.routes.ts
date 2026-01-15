@@ -65,24 +65,24 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['individual'] }
       },
-      {
-        path: 'inspection-list',
-        loadComponent: () =>
-          import('./industrial-user/inspection/inspection.component').then(
-            (m) => m.InspectionComponent
-          ),
-          canActivate: [authGuard, profileCompletionGuard],
-          data: { roles: ['individual'] }
-      },
-      {
-        path: 'inspection-view/:inspectionId',
-        loadComponent: () =>
-          import('./industrial-user/inspection-view/inspection-view.component').then(
-            (m) => m.InspectionViewComponent
-          ),
-          canActivate: [authGuard, profileCompletionGuard],
-          data: { roles: ['individual'] }
-      },
+      // {
+      //   path: 'inspection-list',
+      //   loadComponent: () =>
+      //     import('./industrial-user/inspection/inspection.component').then(
+      //       (m) => m.InspectionComponent
+      //     ),
+      //     canActivate: [authGuard, profileCompletionGuard],
+      //     data: { roles: ['individual'] }
+      // },
+      // {
+      //   path: 'inspection-view/:inspectionId',
+      //   loadComponent: () =>
+      //     import('./industrial-user/inspection-view/inspection-view.component').then(
+      //       (m) => m.InspectionViewComponent
+      //     ),
+      //     canActivate: [authGuard, profileCompletionGuard],
+      //     data: { roles: ['individual'] }
+      // },
       {
         path: 'appeal-list',
         loadComponent: () =>
@@ -110,24 +110,24 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard, profileCompletionGuard],
         data: { roles: ['individual'] }
       },
-      {
-        path: 'eligibility',
-        loadComponent: () =>
-          import('./industrial-user/incentive/eligibility/eligibility.component').then(
-            (m) => m.EligibilityComponent
-          ),
-        canActivate: [authGuard, profileCompletionGuard],
-        data: { roles: ['department', 'individual'] }
-      },
-      {
-        path: 'claim',
-        loadComponent: () =>
-          import('./industrial-user/incentive/claim/claim.component').then(
-            (m) => m.ClaimComponent
-          ),
-        canActivate: [authGuard, profileCompletionGuard],
-        data: { roles: ['department', 'individual'] }
-      },
+      // {
+      //   path: 'eligibility',
+      //   loadComponent: () =>
+      //     import('./industrial-user/incentive/eligibility/eligibility.component').then(
+      //       (m) => m.EligibilityComponent
+      //     ),
+      //   canActivate: [authGuard, profileCompletionGuard],
+      //   data: { roles: ['department', 'individual'] }
+      // },
+      // {
+      //   path: 'claim',
+      //   loadComponent: () =>
+      //     import('./industrial-user/incentive/claim/claim.component').then(
+      //       (m) => m.ClaimComponent
+      //     ),
+      //   canActivate: [authGuard, profileCompletionGuard],
+      //   data: { roles: ['department', 'individual'] }
+      // },
       {
         path: 'proforma-questionnaire-view/:proformaId/:schemeId',
         loadComponent: () =>
@@ -245,15 +245,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: [ 'department'] }
       },
 
-      {
-        path: 'upload-existing-licence',
-        loadComponent: () =>
-          import(
-            './industrial-user/upload-existing-licence/upload-existing-licence.component'
-          ).then((m) => m.UploadExistingLicenceComponent),
-        canActivate: [authGuard, profileCompletionGuard],
-        data: { roles: ['individual'] }
-      },
+      // {
+      //   path: 'upload-existing-licence',
+      //   loadComponent: () =>
+      //     import(
+      //       './industrial-user/upload-existing-licence/upload-existing-licence.component'
+      //     ).then((m) => m.UploadExistingLicenceComponent),
+      //   canActivate: [authGuard, profileCompletionGuard],
+      //   data: { roles: ['individual'] }
+      // },
       {
         path: 'licence-details/:id',
         loadComponent: () =>
@@ -324,31 +324,31 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['admin'] }
       },
-      {
-        path: 'admin-incentive',
-        loadComponent: () =>
-          import('./admin-incentive/admin-incentive.component').then(
-            (m) => m.AdminIncentiveComponent
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['admin'] }
-      },
-      {
-        path: 'admin-incentive/:schemeId/proformas',
-        loadComponent: () =>
-          import('./proforma-list/proforma-list.component').then(m => m.ProformaListComponent),
-        canActivate: [authGuard],
-        data: { roles: ['admin'] }
-      },
-      {
-        path: 'admin-incentive/:schemeId/proformas/:proformaId/questions',
-        loadComponent: () =>
-          import('./incentive-questions/incentive-questions.component').then(
-            (m) => m.IncentiveQuestionsComponent
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['admin'] }
-      },
+      // {
+      //   path: 'admin-incentive',
+      //   loadComponent: () =>
+      //     import('./admin-incentive/admin-incentive.component').then(
+      //       (m) => m.AdminIncentiveComponent
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['admin'] }
+      // },
+      // {
+      //   path: 'admin-incentive/:schemeId/proformas',
+      //   loadComponent: () =>
+      //     import('./proforma-list/proforma-list.component').then(m => m.ProformaListComponent),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['admin'] }
+      // },
+      // {
+      //   path: 'admin-incentive/:schemeId/proformas/:proformaId/questions',
+      //   loadComponent: () =>
+      //     import('./incentive-questions/incentive-questions.component').then(
+      //       (m) => m.IncentiveQuestionsComponent
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['admin'] }
+      // },
       {
         path: 'departmental-user',
         loadComponent: () =>
@@ -358,58 +358,58 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['admin', 'department'] }
       },
-      {
-        path: 'incentive-applications',
-        loadComponent: () =>
-          import('./incentive-applications/incentive-applications.component').then((m) => m.IncentiveApplicationsComponent),
-        canActivate: [authGuard],
-        data: { roles: ['department'] }
-      },
-      {
-        path: 'departmental-inspection',
-        loadComponent: () =>
-          import('./departmental-inspection/departmental-inspection.component').then(
-            (m) => m.DepartmentalInspectionComponent
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department'] },
-      },
-      {
-        path: 'create-inspection',
-        loadComponent: () =>
-          import('./add-departmental-inspection/add-departmental-inspection.component').then(
-            (m) => m.AddDepartmentalInspectionComponent
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department'] },
-      },
-      {
-        path: 'departmental-inspection-list',
-        loadComponent: () =>
-          import('./departmental-inspection-list/departmental-inspection-list.component').then(
-            (m) => m.DepartmentalInspectionListComponent
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department'] },
-      },
-      {
-        path: 'departmental-inspection-request',
-        loadComponent: () =>
-          import('./departmental-inspection-request/departmental-inspection-request.component').then(
-            (m) => m.DepartmentalInspectionRequestComponent
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department'] },
-      },
-      {
-        path: 'incentive-applications/:id',
-        loadComponent: () =>
-          import(
-            './incentive-application-details/incentive-application-details.component'
-          ).then((m) => m.IncentiveApplicationDetailsComponent),
-        canActivate: [authGuard],
-        data: { roles: ['department'] },
-      },
+      // {
+      //   path: 'incentive-applications',
+      //   loadComponent: () =>
+      //     import('./incentive-applications/incentive-applications.component').then((m) => m.IncentiveApplicationsComponent),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department'] }
+      // },
+      // {
+      //   path: 'departmental-inspection',
+      //   loadComponent: () =>
+      //     import('./departmental-inspection/departmental-inspection.component').then(
+      //       (m) => m.DepartmentalInspectionComponent
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department'] },
+      // },
+      // {
+      //   path: 'create-inspection',
+      //   loadComponent: () =>
+      //     import('./add-departmental-inspection/add-departmental-inspection.component').then(
+      //       (m) => m.AddDepartmentalInspectionComponent
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department'] },
+      // },
+      // {
+      //   path: 'departmental-inspection-list',
+      //   loadComponent: () =>
+      //     import('./departmental-inspection-list/departmental-inspection-list.component').then(
+      //       (m) => m.DepartmentalInspectionListComponent
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department'] },
+      // },
+      // {
+      //   path: 'departmental-inspection-request',
+      //   loadComponent: () =>
+      //     import('./departmental-inspection-request/departmental-inspection-request.component').then(
+      //       (m) => m.DepartmentalInspectionRequestComponent
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department'] },
+      // },
+      // {
+      //   path: 'incentive-applications/:id',
+      //   loadComponent: () =>
+      //     import(
+      //       './incentive-application-details/incentive-application-details.component'
+      //     ).then((m) => m.IncentiveApplicationDetailsComponent),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department'] },
+      // },
       {
         path: 'user-payment-list',
         loadComponent: () =>
@@ -482,15 +482,15 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['individual', 'department'] },
       },
-      {
-        path: 'reports/department-user-list',
-        loadComponent: () =>
-          import('./department-user-list/department-user-list.component').then(
-            (m) => m.DepartmentUserListComponent,
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department', 'moderator'] },
-      },
+      // {
+      //   path: 'reports/department-user-list',
+      //   loadComponent: () =>
+      //     import('./department-user-list/department-user-list.component').then(
+      //       (m) => m.DepartmentUserListComponent,
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department', 'moderator'] },
+      // },
       {
         path: 'reports/application-status',
         loadComponent: () =>
@@ -500,24 +500,24 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['individual', 'department'] },
       },
-      {
-        path: 'reports/industry-report-summary',
-        loadComponent: () =>
-          import('./industry-report-summary/industry-report-summary.component').then(
-            (m) => m.IndustryReportSummaryComponent,
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department', 'moderator'] },
-      },
-      {
-        path: 'reports/industry-report-details',
-        loadComponent: () =>
-          import('./industry-report-details/industry-report-details.component').then(
-            (m) => m.IndustryReportDetailsComponent,
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department', 'moderator'] },
-      },
+      // {
+      //   path: 'reports/industry-report-summary',
+      //   loadComponent: () =>
+      //     import('./industry-report-summary/industry-report-summary.component').then(
+      //       (m) => m.IndustryReportSummaryComponent,
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department', 'moderator'] },
+      // },
+      // {
+      //   path: 'reports/industry-report-details',
+      //   loadComponent: () =>
+      //     import('./industry-report-details/industry-report-details.component').then(
+      //       (m) => m.IndustryReportDetailsComponent,
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department', 'moderator'] },
+      // },
       {
         path: 'reports/noc-issue-status',
         loadComponent: () =>
@@ -527,42 +527,42 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['individual', 'department'] },
       },
-      {
-        path: 'reports/cis-summary',
-        loadComponent: () =>
-          import('./cis-summary/cis-summary.component').then(
-            (m) => m.CisSummaryComponent,
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department', 'moderator'] },
-      },
-      {
-        path: 'reports/cis-details',
-        loadComponent: () =>
-          import('./cis-details/cis-details.component').then(
-            (m) => m.CisDetailsComponent,
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department', 'moderator'] },
-      },
-      {
-        path: 'reports/user-list',
-        loadComponent: () =>
-          import('./user-list/user-list.component').then(
-            (m) => m.UserListComponent,
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['moderator', 'department'] },
-      },
-      {
-        path: 'reports/labour-register',
-        loadComponent: () =>
-          import('./labour-register/labour-register.component').then(
-            (m) => m.LabourRegisterComponent,
-          ),
-        canActivate: [authGuard],
-        data: { roles: ['department', 'moderator'] },
-      },
+      // {
+      //   path: 'reports/cis-summary',
+      //   loadComponent: () =>
+      //     import('./cis-summary/cis-summary.component').then(
+      //       (m) => m.CisSummaryComponent,
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department', 'moderator'] },
+      // },
+      // {
+      //   path: 'reports/cis-details',
+      //   loadComponent: () =>
+      //     import('./cis-details/cis-details.component').then(
+      //       (m) => m.CisDetailsComponent,
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department', 'moderator'] },
+      // },
+      // {
+      //   path: 'reports/user-list',
+      //   loadComponent: () =>
+      //     import('./user-list/user-list.component').then(
+      //       (m) => m.UserListComponent,
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['moderator', 'department'] },
+      // },
+      // {
+      //   path: 'reports/labour-register',
+      //   loadComponent: () =>
+      //     import('./labour-register/labour-register.component').then(
+      //       (m) => m.LabourRegisterComponent,
+      //     ),
+      //   canActivate: [authGuard],
+      //   data: { roles: ['department', 'moderator'] },
+      // },
     ],
   },
 ];
