@@ -1,7 +1,7 @@
 
 <!-- HERO SECTION : ONLY FOR BASE ROUTE -->
 <div *ngIf="currentUrl === '/'" class="hero-container">
-  
+
   <!-- Background Video -->
   <video
     autoplay
@@ -82,10 +82,63 @@
 <div [style.padding-top]="isLoggedIn ? '10vh' : '0vh'">
   <router-outlet></router-outlet>
 </div>
+<app-marquee-cards *ngIf="(currentPath === '/' || currentPath === '')" ></app-marquee-cards>
+
+<app-choose-destination *ngIf="(currentPath === '/' || currentPath === '')"
+  [titleMain]="'Choose Your Destination'"
+  [titleSub]="'Live Where You Want'"
+  [cards]="[
+    {
+      id: 1,
+      name: 'Geetanjali Guest House',
+      location: 'Agartala, Tripura',
+      price: 2464,
+      currency: '₹',
+      rating: 4.6,
+      reviews: 1,
+      image: 'assets/images/Bashgram.png',
+      badge: 'Popular'
+    },
+    {
+      id: 2,
+      name: 'Tepania Tourist Log Hut',
+      location: 'Unakoti Hills',
+      price: 2464,
+      currency: '₹',
+      rating: 4.8,
+      reviews: 12,
+      image: 'assets/images/Neermahal-Festival.png',
+      badge: 'Top Rated'
+    },
+    {
+      id: 3,
+      name: 'Eden Tourist Lodge',
+      location: 'Dumboor Lake',
+      price: 1680,
+      currency: '₹',
+      rating: 4.4,
+      reviews: 8,
+      image: 'assets/images/Dumboor-Lake-Dhalai-District.png',
+      badge: ''
+    }
+  ]"
+></app-choose-destination>
+
+<app-image-zoom-card *ngIf="(currentPath === '/' || currentPath === '')"
+  [images]="[
+    { src: 'assets/images/Bashgram.png' },
+    { src: 'assets/images/Durga-Bari.png' },
+    { src: 'assets/images/Neermahal-Festival.png' },
+    { src: 'assets/images/Vanghmun.jpg' },
+    { src: 'assets/images/Laxmi-Narayan-Temple.png' }
+  ]"
+></app-image-zoom-card>
+<app-testimonials *ngIf="(currentPath === '/' || currentPath === '')" [testimonials]="myTestimonials"></app-testimonials>
+
 <!-- Help Components -->
 <!-- Hide floating button when logged in -->
-<!-- <app-help-floating-button 
-    (toggleSidebarEvent)="openHelpSidebar()" 
+<!-- <app-help-floating-button
+    (toggleSidebarEvent)="openHelpSidebar()"
     *ngIf="!helpSidebarOpen">
 </app-help-floating-button>
 <app-help-sidebar [isOpen]="helpSidebarOpen" (closeSidebarEvent)="closeHelpSidebar()"></app-help-sidebar>

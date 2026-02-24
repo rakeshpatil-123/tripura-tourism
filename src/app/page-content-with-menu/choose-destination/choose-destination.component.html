@@ -1,0 +1,47 @@
+<section class="dest-page" role="region" aria-label="Choose your destination">
+  <div class="hero">
+    <h1 class="hero-title">{{ titleMain }}</h1>
+    <p class="hero-sub">{{ titleSub }}</p>
+  </div>
+
+  <div class="cards-wrap" role="list">
+    <article
+      class="dest-card"
+      *ngFor="let c of cards; trackBy: trackById"
+      role="listitem"
+      tabindex="0"
+    >
+      <div class="card-media">
+        <img
+          [src]="c.image"
+          [alt]="c.name"
+          loading="lazy"
+          
+        />
+        <span class="badge" *ngIf="c.badge">{{ c.badge }}</span>
+      </div>
+
+      <div class="card-body">
+        <div class="card-top">
+          <h3 id="title-{{c.id}}" class="card-title">{{ c.name }}</h3>
+          <div class="location">{{ c.location }}</div>
+        </div>
+
+        <div class="card-bottom">
+          <div class="price-rating">
+            <div class="price">{{ priceLabel(c) }} <span class="per-night">/ Night</span></div>
+            <div class="rating" [attr.aria-label]="'Rating ' + (c.rating || 0)">
+              <div class="stars" aria-hidden="true">
+                <!-- visual stars using CSS gradients -->
+                <div class="stars-fill" [style.width.%]="(c.rating ?? 0) / 5 * 100"></div>
+              </div>
+              <div class="reviews">({{ c.reviews ?? 0 }} Reviews)</div>
+            </div>
+          </div>
+
+          <button class="cta" (click)="$event.stopPropagation()" [attr.aria-label]="ctaLabel(c)">Explore Tour</button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>

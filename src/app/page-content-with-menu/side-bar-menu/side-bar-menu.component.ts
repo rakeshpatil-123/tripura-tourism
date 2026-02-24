@@ -85,7 +85,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
     {
       id: 'Admin Services',
-      title: 'Admin Services',
+      title: 'Services',
       icon: 'account_balance',
       route: '/dashboard/admin-services',
       roles: ['admin'],
@@ -103,6 +103,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       icon: 'supervisor_account',
       route: '/dashboard/business-user',
       roles: ['admin'],
+    },
+    {
+      id: 'Departmental User',
+      title: 'My Departmental Users',
+      icon: 'groups',
+      route: '/dashboard/departmental-user',
+      roles: ['admin', 'department'],
     },
     {
       id: 'UserPaymentList',
@@ -182,13 +189,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     //   route: '/dashboard/incentive-applications',
     //   roles: ['department'],
     // },
-       {
-      id: 'Departmental User',
-      title: 'My Departmental Users',
-      icon: 'groups',
-      route: '/dashboard/departmental-user',
-      roles: ['admin', 'department'],
-    },
     // {
     //   id: 'jsontoexcel',
     //   title: 'Json to Excel',
