@@ -1,0 +1,20 @@
+<div class="marquee-wrapper" (mouseenter)="onTrackMouseEnter()" (mouseleave)="onTrackMouseLeave()" role="region" aria-label="Places marquee">
+  <div class="marquee-track" aria-hidden="false">
+    <!-- duplicate blocks for seamless loop -->
+    <ng-container *ngFor="let block of [0,1]">
+      <div class="cards-block">
+        <div class="card" *ngFor="let card of processedCards; trackBy: trackById" tabindex="0" role="article" aria-label="{{ card.name }}">
+          <div class="card-inner">
+            <div class="place-name">{{ card.name }}</div>
+
+            <div class="single-image-viewport" aria-hidden="false">
+              <img [src]="card.src" [alt]="card.name" loading="lazy" />
+            </div>
+
+            <div class="card-footer" *ngIf="card.subtitle">{{ card.subtitle }}</div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

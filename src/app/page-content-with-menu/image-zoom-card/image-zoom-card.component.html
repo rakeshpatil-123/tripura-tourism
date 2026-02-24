@@ -1,0 +1,20 @@
+<div class="zoom-grid">
+  <div
+    class="zoom-card"
+    *ngFor="let img of images; trackBy: trackBySrc"
+    tabindex="0"
+  >
+    <div class="image-wrapper">
+      <img
+        [src]="img.src"
+        [alt]="getTitle(img)"
+        loading="lazy"
+        draggable="false"
+      />
+    </div>
+
+    <div class="image-title">
+      {{ getTitle(img) }}
+    </div>
+  </div>
+</div>

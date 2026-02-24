@@ -1,0 +1,43 @@
+<section class="testimonials-section" role="region" aria-label="Traveler testimonials">
+  <div class="container">
+    <header class="hero-header" [class.revealed]="inView" aria-hidden="false">
+      <h2 class="kicker">Testimonials Of The Traveller</h2>
+      <h1 class="title">Some Good Talk About Us</h1>
+    </header>
+
+    <p class="lead" [class.revealed]="inView" aria-hidden="false">
+      Real stories from real travellers — authentic experiences, local flavours and memories that last.
+    </p>
+
+    <div class="cards" [class.revealed]="inView" role="list" aria-live="polite">
+      <article
+        class="card"
+        *ngFor="let t of testimonials; let i = index"
+        [attr.aria-label]="'Testimonial by ' + t.author"
+        [style.transitionDelay]="(i * 120) + 'ms'"
+        role="listitem"
+      >
+        <div class="card-inner">
+          <figure class="avatar" aria-hidden="true">
+            <!-- If avatar image provided, use it; otherwise initials -->
+            <img *ngIf="t.avatar" [src]="t.avatar" [alt]="t.author + ' avatar'" />
+            <div class="initials" *ngIf="!t.avatar">{{ initials(t.author) }}</div>
+          </figure>
+
+          <blockquote class="quote" cite="">
+            <svg class="quote-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.17 6A5.17 5.17 0 0 0 2 11.17V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4.83A3.17 3.17 0 0 1 11.17 9 3.17 3.17 0 0 1 8 5.83 1.17 1.17 0 0 0 7.17 6zm12 0A5.17 5.17 0 0 0 14 11.17V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4.83A3.17 3.17 0 0 1 23.17 9 3.17 3.17 0 0 1 20 5.83 1.17 1.17 0 0 0 19.17 6z"/></svg>
+            <p class="text">{{ t.text }}</p>
+          </blockquote>
+
+          <footer class="meta">
+            <div class="author">
+              <div class="name">{{ t.author }}</div>
+              <div class="byline">{{ t.byline || 'Traveller' }}</div>
+            </div>
+            <div class="location" *ngIf="t.location">{{ t.location }}</div>
+          </footer>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,271 @@
+/* Google fonts (you can change to brand fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Merriweather:wght@400;700&display=swap');
+
+:host {
+  --bg: linear-gradient(180deg, #f6fbff 0%, #eef6ff 100%);
+  --card-bg: #ffffff;
+  --accent: #2b6cff;
+  --muted: #6b7280;
+  --glass: rgba(255,255,255,0.6);
+  display: block;
+  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  color: #0b1621;
+}
+
+/* page layout */
+.dest-page {
+  padding: clamp(28px, 4vw, 56px);
+  background: var(--bg);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* hero titles centered */
+.hero {
+  max-width: 980px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+.hero-title {
+  font-family: 'Merriweather', serif;
+  font-size: clamp(26px, 4.4vw, 44px);
+  margin: 0;
+  line-height: 1.05;
+  font-weight: 700;
+  background: linear-gradient(90deg, #0b1220, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.02em;
+  transform-origin: center;
+  animation: revealUp 720ms ease both;
+}
+.hero-sub {
+  margin: 8px auto 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.6vw, 18px);
+  opacity: 0.95;
+}
+
+/* cards grid */
+.cards-wrap {
+  max-width: 1100px;
+  margin: 28px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2.2vw, 28px);
+  align-items: stretch;
+  padding: 0 12px;
+}
+
+/* single card */
+.dest-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.95));
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(16, 30, 60, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 320ms cubic-bezier(.2,.9,.2,1), box-shadow 320ms;
+  transform-origin: center;
+  cursor: pointer;
+  border: 1px solid rgba(16, 30, 60, 0.04);
+}
+.dest-card:focus,
+.dest-card:hover {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow: 0 26px 54px rgba(16, 30, 60, 0.12);
+}
+
+/* media area with image */
+.card-media {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f0f7ff, #eaf3ff);
+}
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center;
+  transition: transform 8000ms ease; /* long for slow Ken Burns when hovered or on show */
+  will-change: transform;
+  display: block;
+  filter: saturate(0.98) contrast(0.98);
+  transform: scale(1);
+}
+/* subtle animated zoom across life of card */
+.dest-card:hover .card-media img,
+.dest-card:focus .card-media img {
+  transform: scale(1.08) translateY(-3%);
+}
+
+/* badge */
+.badge {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  background: linear-gradient(90deg, #ff8a65, #ff5f7a);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+}
+
+/* card body */
+.card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+.card-top {
+  margin-bottom: 8px;
+}
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #071122;
+}
+.location {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* bottom: price, rating, cta */
+.card-bottom {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.price-rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.price {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--accent);
+}
+.price .per-night {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+/* rating visuals */
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.stars {
+  --w: 84px; /* width of star bar */
+  width: 84px;
+  height: 14px;
+  background: linear-gradient(90deg, #dfe6ef 0%, #dfe6ef 100%);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  transform: translateY(1px);
+}
+.stars::before {
+  content: '★★★★★';
+  position: absolute;
+  left: 6px;
+  top: -2px;
+  font-size: 14px;
+  color: #ffd166; /* star color */
+  opacity: 0.98;
+  mix-blend-mode: screen;
+}
+/* STAR CONTAINER */
+.stars {
+  position: relative;
+  width: 90px;
+  height: 18px;
+  display: inline-block;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: 3px;
+  color: #e5e7eb; /* empty star color */
+}
+
+/* EMPTY STARS */
+.stars::before {
+  content: '★★★★★';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #d1d5db; /* light gray empty stars */
+}
+
+/* FILLED STARS */
+.stars-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* GOLD STARS */
+.stars-fill::before {
+  content: '★★★★★';
+  color: #fbbf24; /* rich gold */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+}
+
+.reviews { font-size: 12px; color: var(--muted); }
+
+/* CTA */
+.cta {
+  background: linear-gradient(90deg, var(--accent), #4b9bff);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(43,108,255,0.18);
+  transition: transform 160ms ease, box-shadow 160ms;
+}
+.cta:hover,
+.cta:focus {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(43,108,255,0.26);
+}
+
+/* subtle entrance animation */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* responsive */
+@media (max-width: 980px) {
+  .cards-wrap { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .card-media { height: 200px; }
+}
+@media (max-width: 620px) {
+  .cards-wrap { grid-template-columns: 1fr; }
+  .card-media { height: 260px; }
+  .hero { padding: 0 8px; }
+  .dest-page { padding: 20px; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .dest-card, .card-media img, .cta, .dest-card:focus, .dest-card:hover { transition: none !important; animation: none !important; transform: none !important; }
+}

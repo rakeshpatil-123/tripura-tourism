@@ -463,10 +463,19 @@ export class ServiceApplicationComponent implements OnInit {
       group[q.id] = [defaultValue, validators];
     });
 
-    this.sectionGroups.forEach((sectionGroup) => {
+   this.sectionGroups.forEach((sectionGroup) => {
       const initialRow = this.createSectionRow(sectionGroup.questions);
       sectionGroup.formArray.push(initialRow);
+
+      // initialize visibility for section-level conditional questions (hide by default)
+      sectionGroup.questions.forEach((q) => {
+        if (q.display_rule?.depends_on) {
+          const sectionKey = `${sectionGroup.sectionName}_0_${q.id}`;
+          this.questionVisibility[sectionKey] = false;
+        }
+      });
     });
+
 
     this.serviceForm = this.fb.group({
       ...group,
@@ -1357,27 +1366,43 @@ export class ServiceApplicationComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  private evaluateCondition(
+   private evaluateCondition(
     actualValue: any,
     operator: string,
     expectedValue: string
   ): boolean {
-    if (
-      actualValue === null ||
-      actualValue === undefined ||
-      actualValue === ''
-    ) {
+    // treat empty/missing actual as not matching
+    if (actualValue === null || actualValue === undefined || actualValue === '') {
       return false;
     }
 
+    // normalize operator and expected value
+    const op = (operator || '').trim();
+    const expectedRaw = expectedValue == null ? '' : String(expectedValue).trim();
+
+    // handle cases where expected contains multiple allowed values (comma or pipe separated)
+    const expectedList = expectedRaw.split(/\s*[,\|]\s*/).filter((v) => v !== '');
+
+    // if actual is array (checkboxes, multi-select), check inclusion against expected list
+    if (Array.isArray(actualValue)) {
+      const actualStrs = actualValue.map((v) => String(v).trim());
+      const anyMatch = expectedList.some((exp) => actualStrs.includes(exp));
+      if (op === '!=' || op === '<>') {
+        return !anyMatch;
+      }
+      // default equality-like behavior: show if any match
+      return anyMatch;
+    }
+
+    // try numeric comparison if both sides are numeric
     const actualIsNumeric = !isNaN(Number(actualValue));
-    const expectedIsNumeric = !isNaN(Number(expectedValue));
+    const expectedIsNumeric = expectedList.length === 1 && !isNaN(Number(expectedList[0]));
 
     if (actualIsNumeric && expectedIsNumeric) {
       const actualNum = Number(actualValue);
-      const expectedNum = Number(expectedValue);
+      const expectedNum = Number(expectedList[0]);
 
-      switch (operator) {
+      switch (op) {
         case '>':
           return actualNum > expectedNum;
         case '<':
@@ -1386,15 +1411,35 @@ export class ServiceApplicationComponent implements OnInit {
           return actualNum >= expectedNum;
         case '<=':
           return actualNum <= expectedNum;
+        case '!=':
+        case '<>':
+          return actualNum !== expectedNum;
         case '=':
         case '==':
+          return actualNum === expectedNum;
         default:
           return actualNum === expectedNum;
       }
-    } else {
-      return actualValue.toString() === expectedValue;
+    }
+
+    // string comparison: check against any of expectedList
+    const actualStr = String(actualValue).trim();
+
+    const matchesAny = expectedList.some((exp) => actualStr === exp);
+
+    switch (op) {
+      case '!=':
+      case '<>':
+        return !matchesAny;
+      case '=':
+      case '==':
+        return matchesAny;
+      default:
+        // default to strict equality against the full expected string
+        return actualStr === expectedRaw;
     }
   }
+
 
   isQuestionVisible(
     questionId: number,
