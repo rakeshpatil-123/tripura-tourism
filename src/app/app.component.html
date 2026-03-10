@@ -1,90 +1,94 @@
+<!-- HEADER (from router) -->
+<app-header-new></app-header-new>
+
+<!-- NAVIGATION
+<app-new-nav [isLogged]="isLoggedIn"
+    *ngIf="currentUrl === '/' || (currentUrl && currentUrl.startsWith('/page'))"></app-new-nav> -->
 
 <!-- HERO SECTION : ONLY FOR BASE ROUTE -->
-<div *ngIf="currentUrl === '/'" class="hero-container">
-
-  <!-- Background Video -->
-  <video
-    autoplay
-    muted
-    loop
-    playsinline
-    class="bg-video"
-    aria-hidden="true"
-  >
-    <source src="assets/videos/tripura-tourism-video.mp4" type="video/mp4" />
-  </video>
-
-  <!-- Overlay -->
+<section *ngIf="currentUrl === '/'" class="hero" [ngStyle]="{'background-image': 'url(' + heroBackgroundImage + ')', 'margin-top': '10vh'}">
   <div class="hero-overlay"></div>
-
-  <!-- Centered Text -->
-  <div class="hero-content">
-    <div class="site-name-anim">
-      <a
-        [routerLink]="['/']"
-        class="site-name"
-        title="Tripura Tourism Home"
-      >
-        Tripura Tourism
-      </a>
-    </div>
-
-    <div class="site-tagline">
-      Tripura, where culture meets nature
+  <div class="container hero-content">
+    <div class="hero-text">
+      <h1>Empowering Your Tourism Business In Tripura</h1>
+      <p>Streamlined Licensing for a Thriving and Regulated Industry</p>
+      <div class="hero-btns">
+        <button class="btn-apply" (click)="navigateToLogin()">Apply Now</button>
+      </div>
     </div>
   </div>
+</section>
 
-</div>
-
-
-<app-header-new></app-header-new>
-<app-new-nav [isLogged]="isLoggedIn"
-    *ngIf="currentUrl === '/' || (currentUrl && currentUrl.startsWith('/page'))"></app-new-nav>
-<div
-  *ngIf="!isLoggedIn"
-  class="top-gap-space"
-  aria-hidden="false"
->
-  <div class="top-gap-marquee" aria-label="What's New Updates">
-    <div class="marquee-container">
-      <span class="marquee-title">What’s New</span>
-
-      <div class="marquee-track">
-  <div class="marquee-content">
-    <span>
-      Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
-      Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
-      Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
-      Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
-      Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
-      Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
-      Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
-    </span>
-
-    <!-- DUPLICATE FOR SEAMLESS LOOP -->
-    <span>
-      Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
-      Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
-      Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
-      Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
-      Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
-      Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
-      Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
-    </span>
-  </div>
-</div>
-
+<!-- LICENSE CATEGORIES SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="categories-section">
+  <div class="container">
+    <h2 class="section-title">License Categories</h2>
+    <div class="license-grid">
+      <div class="license-card" *ngFor="let category of licenseCategories">
+        <div class="license-icon">
+          <fa-icon [icon]="['fas', category.icon]"></fa-icon>
+        </div>
+        <div class="license-title">{{category.title}}</div>
+        <div class="license-desc">{{category.description}}</div>
+        <a (click)="navigateToLogin()" class="license-link">Apply</a>
+      </div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- PROCESS SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="process">
+  <div class="container">
+    <h2 class="section-title">Simple Step-By-Step Process</h2>
+    <div class="process-flow">
+      <ng-container *ngFor="let step of processSteps; let i = index">
+        <div class="step">
+          <div class="step-icon">
+            <fa-icon [icon]="['fas', step.icon]"></fa-icon>
+          </div>
+          <div class="step-text">{{step.text}}</div>
+        </div>
+        <div class="arrow" *ngIf="i < processSteps.length - 1">&#8594;</div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- WHY LICENSED SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="why-licensed">
+  <div class="container">
+    <h2 class="section-title">Why Get Licensed?</h2>
+    <div class="why-grid">
+      <div class="why-card" *ngFor="let benefit of whyBenefits">
+        <div class="why-icon-box">
+          <fa-icon [icon]="['fas', benefit.icon]"></fa-icon>
+        </div>
+        <div class="why-content">
+          <h3>{{benefit.title}}</h3>
+          <p>{{benefit.description}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="cta">
+  <div class="container">
+    <p>READY TO TAKE THE NEXT STEP? Get your license and join the Tripura Tourism network.</p>
+    <button class="start-btn" (click)="navigateToLogin()">Start Application</button>
+  </div>
+</section>
 
 <!-- MAIN CONTENT -->
 <div [style.padding-top]="isLoggedIn ? '10vh' : '0vh'">
   <router-outlet></router-outlet>
 </div>
-<app-marquee-cards *ngIf="(currentPath === '/' || currentPath === '')" ></app-marquee-cards>
 
-<app-choose-destination *ngIf="(currentPath === '/' || currentPath === '')"
+<!-- OTHER COMPONENTS (only show when not on home page or when needed) -->
+<app-marquee-cards *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents"></app-marquee-cards>
+
+<app-choose-destination *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents"
   [titleMain]="'Choose Your Destination'"
   [titleSub]="'Live Where You Want'"
   [cards]="[
@@ -124,7 +128,7 @@
   ]"
 ></app-choose-destination>
 
-<app-image-zoom-card *ngIf="(currentPath === '/' || currentPath === '')"
+<app-image-zoom-card *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents"
   [images]="[
     { src: 'assets/images/Bashgram.png' },
     { src: 'assets/images/Durga-Bari.png' },
@@ -133,17 +137,8 @@
     { src: 'assets/images/Laxmi-Narayan-Temple.png' }
   ]"
 ></app-image-zoom-card>
-<app-testimonials *ngIf="(currentPath === '/' || currentPath === '')" [testimonials]="myTestimonials"></app-testimonials>
 
-<!-- Help Components -->
-<!-- Hide floating button when logged in -->
-<!-- <app-help-floating-button
-    (toggleSidebarEvent)="openHelpSidebar()"
-    *ngIf="!helpSidebarOpen">
-</app-help-floating-button>
-<app-help-sidebar [isOpen]="helpSidebarOpen" (closeSidebarEvent)="closeHelpSidebar()"></app-help-sidebar>
-<app-logo-footer *ngIf="!isLoggedIn"/>
-<app-footer *ngIf="!isLoggedIn"></app-footer>
+<app-testimonials *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents" [testimonials]="myTestimonials"></app-testimonials>
 
-<app-loader *ngIf="showLoader"></app-loader> -->
+<!-- FOOTER -->
 <app-mini-footer *ngIf="!isLoggedIn"></app-mini-footer>
