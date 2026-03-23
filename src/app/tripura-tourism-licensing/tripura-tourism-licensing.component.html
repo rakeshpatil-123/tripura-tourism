@@ -1,0 +1,99 @@
+<section class="lic-page" role="region" aria-label="Tripura tourism licensing services">
+  <div class="hero-shell">
+    <div class="hero-copy">
+      <div class="eyebrow">Tripura Tourism Development Corporation Limited</div>
+      <h1 class="hero-title">{{ pageTitle }}</h1>
+      <p class="hero-subtitle">{{ pageSubtitle }}</p>
+
+      <div class="hero-actions">
+<button class="primary-btn" type="button" (click)="goTo('/dashboard/home')">Start Application</button>
+<button class="secondary-btn" type="button" (click)="goTo('/dashboard/home')">Check Status</button>
+
+      </div>
+    </div>
+
+    <div class="hero-panel">
+      <div class="panel-title">Portal Highlights</div>
+      <div class="stats-grid">
+        <div class="stat-card" *ngFor="let s of stats">
+          <div class="stat-value">{{ s.value }}</div>
+          <div class="stat-label">{{ s.label }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="main-column">
+      <div class="section-head">
+        <h2>Licensing & Renewal Services</h2>
+        <p>Use this section for tourism-related licensing applications only.</p>
+      </div>
+
+      <div class="services-grid" role="list">
+        <article
+          class="service-card"
+          *ngFor="let service of services; trackBy: trackById"
+          role="listitem"
+          tabindex="0"
+        >
+          <div class="service-top">
+            <div class="service-icon">{{ service.icon }}</div>
+            <div class="service-badges">
+              <span class="chip chip-primary">{{ service.type }}</span>
+              <span class="chip chip-muted" *ngIf="service.badge">{{ service.badge }}</span>
+            </div>
+          </div>
+
+          <h3 class="service-title">{{ service.title }}</h3>
+          <p class="service-subtitle">{{ service.subtitle }}</p>
+
+          <div class="service-meta">
+            <div class="meta-item">
+              <span class="meta-label">Department</span>
+              <span class="meta-value">{{ service.department }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Status</span>
+              <span class="meta-value status-open">{{ service.status || 'Open' }}</span>
+            </div>
+          </div>
+
+        <button
+  class="service-btn"
+  type="button"
+  (click)="goTo(
+    service.title.includes('Guide') ? '/dashboard/home' :
+    service.title.includes('Hotel') ? '/dashboard/home' :
+    service.title.includes('Homestays') ? '/dashboard/home' :
+    service.title.includes('Tour Operators') ? '/dashboard/home' :
+    '/dashboard/home'
+  )"
+>
+  {{ service.actionLabel }}
+</button>
+
+        </article>
+      </div>
+
+      <div class="section-head section-gap">
+        <h2>NOC Service</h2>
+        <p>Separate NOC support for eligible tourism licensing services.</p>
+      </div>
+
+      <div class="noc-card">
+        <div class="noc-icon">📄</div>
+        <div class="noc-content">
+          <h3>{{ nocService.title }}</h3>
+          <p class="noc-subtitle">{{ nocService.subtitle }}</p>
+          <p class="noc-desc">{{ nocService.description }}</p>
+
+          <div class="noc-actions">
+            <button class="primary-btn" type="button">{{ nocService.actionLabel }}</button>
+            <button class="ghost-btn" type="button">View Guidelines</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

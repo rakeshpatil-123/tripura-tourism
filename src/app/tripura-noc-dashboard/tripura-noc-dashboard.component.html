@@ -1,0 +1,290 @@
+<section class="dashboard-page" role="region" aria-label="Tripura tourism NOC admin dashboard">
+  <div class="hero-shell">
+    <div class="hero-copy">
+      <div class="eyebrow">Tripura Tourism Development Corporation Limited</div>
+      <h1 class="hero-title">{{ pageTitle }}</h1>
+      <p class="hero-subtitle">
+        {{ pageSubtitle }}
+      </p>
+
+   <div class="hero-actions">
+  <button class="primary-btn" type="button" (click)="goTo('/dashboard/home')">Create New Query</button>
+  <button class="secondary-btn" type="button" (click)="goTo('/dashboard/home')">Track Applications</button>
+</div>
+
+    </div>
+
+    <div class="hero-panel">
+      <div class="panel-top">
+        <div>
+          <div class="panel-label">NOC Service Summary</div>
+          <div class="panel-title">Live dashboard overview</div>
+        </div>
+        <div class="panel-badge">Admin View</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-value">{{ totalApplications }}</div>
+          <div class="stat-label">Total Applications</div>
+          <div class="stat-sub">{{ approvalRate }}% processed</div>
+        </div>
+
+        <div class="stat-card success">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value">{{ approvedCount }}</div>
+          <div class="stat-label">Approved</div>
+          <div class="stat-sub">{{ approvalRate }}% of total</div>
+        </div>
+
+        <div class="stat-card warning">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value">{{ pendingCount }}</div>
+          <div class="stat-label">Pending</div>
+          <div class="stat-sub">{{ pendingRate }}% of total</div>
+        </div>
+
+        <div class="stat-card danger">
+          <div class="stat-icon">❌</div>
+          <div class="stat-value">{{ rejectedCount }}</div>
+          <div class="stat-label">Rejected</div>
+          <div class="stat-sub">{{ rejectedRate }}% of total</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>Services for NOC Certificate</h2>
+    <p>
+      Designed for Tripura tourism licensing services only, with a clean government-portal style UI.
+    </p>
+  </div>
+
+  <div class="services-grid" role="list" aria-label="NOC services">
+    <article
+      class="service-card"
+      *ngFor="let service of services; trackBy: trackById"
+      role="listitem"
+      tabindex="0"
+    >
+      <div class="service-top">
+        <div class="service-icon">{{ service.icon }}</div>
+        <div class="service-badges">
+          <span class="chip chip-primary">{{ service.badge || 'Service' }}</span>
+        </div>
+      </div>
+
+      <h3 class="service-title">{{ service.title }}</h3>
+      <p class="service-subtitle">{{ service.subtitle }}</p>
+
+      <div class="service-meta">
+        <div class="meta-item">
+          <span class="meta-label">Department</span>
+          <span class="meta-value">{{ service.department }}</span>
+        </div>
+      </div>
+
+      <button
+  class="service-btn"
+  type="button"
+  (click)="goTo(
+    service.title.includes('Guide') ? '/dashboard/home' :
+    service.title.includes('Hotel') ? '/dashboard/home' :
+    service.title.includes('Homestays') ? '/dashboard/home' :
+    service.title.includes('Tour Operators') ? '/dashboard/home' :
+    '/dashboard/home'
+  )"
+>
+  {{ service.actionLabel }}
+</button>
+
+    </article>
+  </div>
+
+  <div class="content-grid">
+    <div class="main-column">
+      <div class="table-card">
+        <div class="card-head">
+          <div>
+            <h2>Applications Status</h2>
+            <p>Review the latest NOC-related service applications.</p>
+          </div>
+          <div class="table-chip">5 Records</div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Service Name</th>
+                <th>Department</th>
+                <th>NOC Type</th>
+                <th>Service Mode</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let app of applications; trackBy: trackById">
+                <td data-label="ID">{{ app.id }}</td>
+                <td data-label="Service Name" class="service-name">{{ app.serviceName }}</td>
+                <td data-label="Department">{{ app.department }}</td>
+                <td data-label="NOC Type">
+                  <span class="pill pill-blue">{{ app.nocType }}</span>
+                </td>
+                <td data-label="Service Mode">{{ app.serviceMode }}</td>
+                <td data-label="Status">
+                  <span class="status-pill" [ngClass]="statusClass(app.status)">{{ app.status }}</span>
+                </td>
+                <td data-label="Actions">
+                  <button class="action-btn" type="button">{{ app.actionLabel || 'Open' }}</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="card-head">
+          <div>
+            <h2>How the NOC process works</h2>
+            <p>Simple service flow for applicants and admins.</p>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <h4>Select service</h4>
+              <p>Choose the right NOC-related tourism service from the portal.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <h4>Submit documents</h4>
+              <p>Upload the required documents and service-specific declarations.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <h4>Department review</h4>
+              <p>The department verifies the details and processes the request.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">04</div>
+            <div class="step-body">
+              <h4>Decision & certificate</h4>
+              <p>Approved applications move toward certificate generation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side-column">
+      <div class="query-card">
+        <div class="card-head">
+          <div>
+            <h2>Feedback & Query</h2>
+            <p>Send a service query or give feedback about NOC support.</p>
+          </div>
+        </div>
+
+        <form class="query-form" (ngSubmit)="submitQuery()">
+          <div class="field-grid">
+            <label class="field">
+              <span>Name</span>
+              <input
+                type="text"
+                name="name"
+                [(ngModel)]="feedbackForm.name"
+                placeholder="Enter your name"
+                required
+              />
+            </label>
+
+            <label class="field">
+              <span>Email</span>
+              <input
+                type="email"
+                name="email"
+                [(ngModel)]="feedbackForm.email"
+                placeholder="Enter your email"
+                required
+              />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Service Category</span>
+            <select name="category" [(ngModel)]="feedbackForm.category">
+              <option *ngFor="let item of queryCategories" [value]="item.value">
+                {{ item.label }}
+              </option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Subject</span>
+            <input
+              type="text"
+              name="subject"
+              [(ngModel)]="feedbackForm.subject"
+              placeholder="Write a short subject"
+              required
+            />
+          </label>
+
+          <label class="field">
+            <span>Message</span>
+            <textarea
+              name="message"
+              rows="6"
+              [(ngModel)]="feedbackForm.message"
+              placeholder="Describe your query, feedback, or issue..."
+              required
+            ></textarea>
+          </label>
+
+          <div class="form-actions">
+           <button class="primary-btn" type="submit">Submit Query</button>
+
+            <button class="secondary-btn" type="button" (click)="resetForm()">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="support-card">
+        <h3>Support Highlights</h3>
+        <div class="support-list">
+          <div class="support-item" *ngFor="let item of supportHighlights">
+            <div class="support-dot"></div>
+            <div>
+              <div class="support-title">{{ item.title }}</div>
+              <div class="support-text">{{ item.text }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="support-card accent">
+        <h3>Important</h3>
+        <p>
+          This page is focused only on Tripura tourism licensing, NOC handling, service queries, and feedback.
+        </p>
+      </div>
+    </aside>
+  </div>
+</section>
