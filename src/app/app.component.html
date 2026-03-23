@@ -1,235 +1,143 @@
-<div *ngIf="currentUrl === '/'" class="hero-container">
-  <div class="hero-bg" aria-hidden="true">
-    <span class="orb orb-1"></span>
-    <span class="orb orb-2"></span>
-    <span class="orb orb-3"></span>
-    <span class="grid-line grid-line-1"></span>
-    <span class="grid-line grid-line-2"></span>
-    <span class="grid-dot dot-1"></span>
-    <span class="grid-dot dot-2"></span>
-    <span class="grid-dot dot-3"></span>
-  </div>
-
-  <section class="hero-shell" aria-label="Tripura Tourism NOC landing section">
-    <div class="hero-copy">
-      <div class="eyebrow">Tripura Tourism Development Corporation Limited</div>
-
-      <h1 class="hero-title">Tourism Licensing &amp; NOC Services</h1>
-
-      <p class="hero-subtitle">
-        Apply, track, and manage Tripura tourism services for homestays, tour operators, tourist guides,
-        and hotels &amp; resorts — all from one trusted government portal.
-      </p>
-
-      <div class="hero-actions">
-        <button class="primary-btn" type="button" (click)="goTo('/dashboard/home')">
-          Start Application
-        </button>
-        <button class="secondary-btn" type="button" (click)="goTo('/dashboard/home')">
-          Check Status
-        </button>
-        <button class="ghost-btn" type="button" (click)="goTo('/dashboard/home')">
-          View Guidelines
-        </button>
-      </div>
-
-      <div class="hero-stats">
-        <div class="stat-card">
-          <div class="stat-icon">📝</div>
-          <div class="stat-copy">
-            <div class="stat-value">5</div>
-            <div class="stat-label">Total Applications</div>
-          </div>
-        </div>
-
-        <div class="stat-card success">
-          <div class="stat-icon">✅</div>
-          <div class="stat-copy">
-            <div class="stat-value">2</div>
-            <div class="stat-label">Approved</div>
-          </div>
-        </div>
-
-        <div class="stat-card warning">
-          <div class="stat-icon">⏳</div>
-          <div class="stat-copy">
-            <div class="stat-value">3</div>
-            <div class="stat-label">Pending</div>
-          </div>
-        </div>
-
-        <div class="stat-card danger">
-          <div class="stat-icon">❌</div>
-          <div class="stat-copy">
-            <div class="stat-value">0</div>
-            <div class="stat-label">Rejected</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero-panel">
-      <div class="panel-top">
-        <div>
-          <div class="panel-kicker">NOC Dashboard</div>
-          <h2 class="panel-title">Quick Access Services</h2>
-        </div>
-        <div class="panel-badge">Live Portal</div>
-      </div>
-
-      <div class="service-list">
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">📄</span>
-            <div class="service-text">
-              <div class="service-name"  type="button" (click)="goTo('/dashboard/home')">Apply for NOC</div>
-              <div class="service-desc"  type="button" (click)="goTo('/dashboard/home')">Submit certificate requests online</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">🎒</span>
-            <div class="service-text">
-              <div class="service-name">Apply as Guide</div>
-              <div class="service-desc">Tourist guide registration and service</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">🏨</span>
-            <div class="service-text">
-              <div class="service-name">Register Hotel / Resort</div>
-              <div class="service-desc">New registration and renewal support</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">🧭</span>
-            <div class="service-text">
-              <div class="service-name">Manage Applications</div>
-              <div class="service-desc">Track, review, and process requests</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-      </div>
-
-      <div class="table-card">
-        <div class="table-head">
-          <div>
-            <h3>Current NOC Services</h3>
-            <p>Official Tripura tourism licensing categories</p>
-          </div>
-          <span class="table-chip">4 Services</span>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Service Name</th>
-                <th>Department</th>
-                <th>NOC Type</th>
-                <th>Service Mode</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label="ID">76</td>
-                <td data-label="Service Name">Registration &amp; Renewal of Homestays</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-              <tr>
-                <td data-label="ID">75</td>
-                <td data-label="Service Name">New / Renewal of Tour Operators / Travel Agents</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-              <tr>
-                <td data-label="ID">74</td>
-                <td data-label="Service Name">Online application form for Tourist Guide service</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-              <tr>
-                <td data-label="ID">73</td>
-                <td data-label="Service Name">Registration &amp; Renewal of Hotels &amp; Resorts</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
-
+<!-- HEADER (from router) -->
 <app-header-new></app-header-new>
 
-<app-new-nav
-  [isLogged]="isLoggedIn"
-  *ngIf="currentUrl === '/' || (currentUrl && currentUrl.startsWith('/page'))"
-></app-new-nav>
+<!-- NAVIGATION
+<app-new-nav [isLogged]="isLoggedIn"
+    *ngIf="currentUrl === '/' || (currentUrl && currentUrl.startsWith('/page'))"></app-new-nav> -->
 
-<div *ngIf="!isLoggedIn" class="top-gap-space" aria-hidden="false">
-  <div class="top-gap-marquee" aria-label="What's New Updates">
-    <div class="marquee-container">
-      <span class="marquee-title">What’s New</span>
+<!-- HERO SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="hero" [ngStyle]="{'background-image': 'url(' + heroBackgroundImage + ')', 'margin-top': '10vh'}">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <div class="hero-text">
+      <h1>Empowering Your Tourism Business In Tripura</h1>
+      <p>Streamlined Licensing for a Thriving and Regulated Industry</p>
+      <div class="hero-btns">
+        <button class="btn-apply" (click)="navigateToLogin()">Apply Now</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <div class="marquee-track">
-        <div class="marquee-content">
-          <span>
-            Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
-            Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
-            Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
-            Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
-            Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
-            Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
-            Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
-          </span>
+<!-- LICENSE CATEGORIES SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="categories-section">
+  <div class="container">
+    <h2 class="section-title">License Categories</h2>
+    <div class="license-grid">
+      <div class="license-card" *ngFor="let category of licenseCategories">
+        <div class="license-icon">
+          <fa-icon [icon]="['fas', category.icon]"></fa-icon>
+        </div>
+        <div class="license-title">{{category.title}}</div>
+        <div class="license-desc">{{category.description}}</div>
+        <a (click)="navigateToLogin()" class="license-link">Apply</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-          <span>
-            Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
-            Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
-            Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
-            Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
-            Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
-            Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
-            Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
-          </span>
+<!-- PROCESS SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="process">
+  <div class="container">
+    <h2 class="section-title">Simple Step-By-Step Process</h2>
+    <div class="process-flow">
+      <ng-container *ngFor="let step of processSteps; let i = index">
+        <div class="step">
+          <div class="step-icon">
+            <fa-icon [icon]="['fas', step.icon]"></fa-icon>
+          </div>
+          <div class="step-text">{{step.text}}</div>
+        </div>
+        <div class="arrow" *ngIf="i < processSteps.length - 1">&#8594;</div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- WHY LICENSED SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="why-licensed">
+  <div class="container">
+    <h2 class="section-title">Why Get Licensed?</h2>
+    <div class="why-grid">
+      <div class="why-card" *ngFor="let benefit of whyBenefits">
+        <div class="why-icon-box">
+          <fa-icon [icon]="['fas', benefit.icon]"></fa-icon>
+        </div>
+        <div class="why-content">
+          <h3>{{benefit.title}}</h3>
+          <p>{{benefit.description}}</p>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- CTA SECTION : ONLY FOR BASE ROUTE -->
+<section *ngIf="currentUrl === '/'" class="cta">
+  <div class="container">
+    <p>READY TO TAKE THE NEXT STEP? Get your license and join the Tripura Tourism network.</p>
+    <button class="start-btn" (click)="navigateToLogin()">Start Application</button>
+  </div>
+</section>
 
 <div>
   <router-outlet></router-outlet>
 </div>
 
-<app-tripura-tourism-licensing *ngIf="(currentPath === '/' || currentPath === '')"></app-tripura-tourism-licensing>
+<!-- OTHER COMPONENTS (only show when not on home page or when needed) -->
+<app-marquee-cards *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents"></app-marquee-cards>
 
-<!-- <app-tripura-noc-dashboard *ngIf="(currentPath === '/' || currentPath === '')"></app-tripura-noc-dashboard> -->
+<app-choose-destination *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents"
+  [titleMain]="'Choose Your Destination'"
+  [titleSub]="'Live Where You Want'"
+  [cards]="[
+    {
+      id: 1,
+      name: 'Geetanjali Guest House',
+      location: 'Agartala, Tripura',
+      price: 2464,
+      currency: '₹',
+      rating: 4.6,
+      reviews: 1,
+      image: 'assets/images/Bashgram.png',
+      badge: 'Popular'
+    },
+    {
+      id: 2,
+      name: 'Tepania Tourist Log Hut',
+      location: 'Unakoti Hills',
+      price: 2464,
+      currency: '₹',
+      rating: 4.8,
+      reviews: 12,
+      image: 'assets/images/Neermahal-Festival.png',
+      badge: 'Top Rated'
+    },
+    {
+      id: 3,
+      name: 'Eden Tourist Lodge',
+      location: 'Dumboor Lake',
+      price: 1680,
+      currency: '₹',
+      rating: 4.4,
+      reviews: 8,
+      image: 'assets/images/Dumboor-Lake-Dhalai-District.png',
+      badge: ''
+    }
+  ]"
+></app-choose-destination>
 
+<app-image-zoom-card *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents"
+  [images]="[
+    { src: 'assets/images/Bashgram.png' },
+    { src: 'assets/images/Durga-Bari.png' },
+    { src: 'assets/images/Neermahal-Festival.png' },
+    { src: 'assets/images/Vanghmun.jpg' },
+    { src: 'assets/images/Laxmi-Narayan-Temple.png' }
+  ]"
+></app-image-zoom-card>
+
+<app-testimonials *ngIf="(currentPath === '/' || currentPath === '') && showOtherComponents" [testimonials]="myTestimonials"></app-testimonials>
+
+<!-- FOOTER -->
 <app-mini-footer *ngIf="!isLoggedIn"></app-mini-footer>
