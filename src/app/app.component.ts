@@ -35,6 +35,8 @@ import { MarqueeCardsComponent } from "./page-content-with-menu/marquee-cards/ma
 import { ImageZoomCardComponent } from "./page-content-with-menu/image-zoom-card/image-zoom-card.component";
 import { ChooseDestinationComponent } from "./page-content-with-menu/choose-destination/choose-destination.component";
 import { TestimonialsComponent } from "./page-content-with-menu/testimonials/testimonials.component";
+import { TripuraTourismLicensingComponent } from "./tripura-tourism-licensing/tripura-tourism-licensing.component";
+import { TripuraNocDashboardComponent } from "./tripura-noc-dashboard/tripura-noc-dashboard.component";
 
 @Component({
   selector: 'app-root',
@@ -56,7 +58,9 @@ import { TestimonialsComponent } from "./page-content-with-menu/testimonials/tes
     MarqueeCardsComponent,
     ImageZoomCardComponent,
     ChooseDestinationComponent,
-    TestimonialsComponent
+    TestimonialsComponent,
+    TripuraTourismLicensingComponent,
+    TripuraNocDashboardComponent
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -255,6 +259,25 @@ export class AppComponent implements OnInit, OnDestroy {
   openHelpSidebar() {
     this.helpService.openHelpSidebar();
   }
+
+  goTo(path: string): void {
+  window.location.href = this.getRedirectUrl(path);
+}
+
+  getRedirectUrl(path: string): string {
+  if (!path) return path;
+
+  // external URLs untouched
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) return path;
+
+  const cleanPath = path.startsWith('/') ? path : '/' + path;
+
+  const baseEl = document.querySelector('base');
+  const baseHref = (baseEl?.getAttribute('href') || '').replace(/\/$/, '');
+
+  return `${baseHref}${cleanPath}`;
+}
+
 
   closeHelpSidebar() {
     this.helpService.closeHelpSidebar();
