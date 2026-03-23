@@ -1,235 +1,149 @@
+
+<!-- HERO SECTION : ONLY FOR BASE ROUTE -->
 <div *ngIf="currentUrl === '/'" class="hero-container">
-  <div class="hero-bg" aria-hidden="true">
-    <span class="orb orb-1"></span>
-    <span class="orb orb-2"></span>
-    <span class="orb orb-3"></span>
-    <span class="grid-line grid-line-1"></span>
-    <span class="grid-line grid-line-2"></span>
-    <span class="grid-dot dot-1"></span>
-    <span class="grid-dot dot-2"></span>
-    <span class="grid-dot dot-3"></span>
+
+  <!-- Background Video -->
+  <video
+    autoplay
+    muted
+    loop
+    playsinline
+    class="bg-video"
+    aria-hidden="true"
+  >
+    <source src="assets/videos/tripura-tourism-video.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Overlay -->
+  <div class="hero-overlay"></div>
+
+  <!-- Centered Text -->
+  <div class="hero-content">
+    <div class="site-name-anim">
+      <a
+        [routerLink]="['/']"
+        class="site-name"
+        title="Tripura Tourism Home"
+      >
+        Tripura Tourism
+      </a>
+    </div>
+
+    <div class="site-tagline">
+      Tripura, where culture meets nature
+    </div>
   </div>
 
-  <section class="hero-shell" aria-label="Tripura Tourism NOC landing section">
-    <div class="hero-copy">
-      <div class="eyebrow">Tripura Tourism Development Corporation Limited</div>
-
-      <h1 class="hero-title">Tourism Licensing &amp; NOC Services</h1>
-
-      <p class="hero-subtitle">
-        Apply, track, and manage Tripura tourism services for homestays, tour operators, tourist guides,
-        and hotels &amp; resorts — all from one trusted government portal.
-      </p>
-
-      <div class="hero-actions">
-        <button class="primary-btn" type="button" (click)="goTo('/dashboard/home')">
-          Start Application
-        </button>
-        <button class="secondary-btn" type="button" (click)="goTo('/dashboard/home')">
-          Check Status
-        </button>
-        <button class="ghost-btn" type="button" (click)="goTo('/dashboard/home')">
-          View Guidelines
-        </button>
-      </div>
-
-      <div class="hero-stats">
-        <div class="stat-card">
-          <div class="stat-icon">📝</div>
-          <div class="stat-copy">
-            <div class="stat-value">5</div>
-            <div class="stat-label">Total Applications</div>
-          </div>
-        </div>
-
-        <div class="stat-card success">
-          <div class="stat-icon">✅</div>
-          <div class="stat-copy">
-            <div class="stat-value">2</div>
-            <div class="stat-label">Approved</div>
-          </div>
-        </div>
-
-        <div class="stat-card warning">
-          <div class="stat-icon">⏳</div>
-          <div class="stat-copy">
-            <div class="stat-value">3</div>
-            <div class="stat-label">Pending</div>
-          </div>
-        </div>
-
-        <div class="stat-card danger">
-          <div class="stat-icon">❌</div>
-          <div class="stat-copy">
-            <div class="stat-value">0</div>
-            <div class="stat-label">Rejected</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero-panel">
-      <div class="panel-top">
-        <div>
-          <div class="panel-kicker">NOC Dashboard</div>
-          <h2 class="panel-title">Quick Access Services</h2>
-        </div>
-        <div class="panel-badge">Live Portal</div>
-      </div>
-
-      <div class="service-list">
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">📄</span>
-            <div class="service-text">
-              <div class="service-name"  type="button" (click)="goTo('/dashboard/home')">Apply for NOC</div>
-              <div class="service-desc"  type="button" (click)="goTo('/dashboard/home')">Submit certificate requests online</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">🎒</span>
-            <div class="service-text">
-              <div class="service-name">Apply as Guide</div>
-              <div class="service-desc">Tourist guide registration and service</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">🏨</span>
-            <div class="service-text">
-              <div class="service-name">Register Hotel / Resort</div>
-              <div class="service-desc">New registration and renewal support</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-
-        <button class="service-item" type="button" (click)="goTo('/dashboard/home')">
-          <div class="service-left">
-            <span class="service-icon">🧭</span>
-            <div class="service-text">
-              <div class="service-name">Manage Applications</div>
-              <div class="service-desc">Track, review, and process requests</div>
-            </div>
-          </div>
-          <span class="service-arrow">→</span>
-        </button>
-      </div>
-
-      <div class="table-card">
-        <div class="table-head">
-          <div>
-            <h3>Current NOC Services</h3>
-            <p>Official Tripura tourism licensing categories</p>
-          </div>
-          <span class="table-chip">4 Services</span>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Service Name</th>
-                <th>Department</th>
-                <th>NOC Type</th>
-                <th>Service Mode</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label="ID">76</td>
-                <td data-label="Service Name">Registration &amp; Renewal of Homestays</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-              <tr>
-                <td data-label="ID">75</td>
-                <td data-label="Service Name">New / Renewal of Tour Operators / Travel Agents</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-              <tr>
-                <td data-label="ID">74</td>
-                <td data-label="Service Name">Online application form for Tourist Guide service</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-              <tr>
-                <td data-label="ID">73</td>
-                <td data-label="Service Name">Registration &amp; Renewal of Hotels &amp; Resorts</td>
-                <td data-label="Department">Tripura Tourism Development Corporation Limited</td>
-                <td data-label="NOC Type"><span class="pill">Special</span></td>
-                <td data-label="Service Mode">Native</td>
-                <td data-label="Status"><span class="status approved">Open</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </section>
 </div>
 
+
 <app-header-new></app-header-new>
-
-<app-new-nav
-  [isLogged]="isLoggedIn"
-  *ngIf="currentUrl === '/' || (currentUrl && currentUrl.startsWith('/page'))"
-></app-new-nav>
-
-<div *ngIf="!isLoggedIn" class="top-gap-space" aria-hidden="false">
+<app-new-nav [isLogged]="isLoggedIn"
+    *ngIf="currentUrl === '/' || (currentUrl && currentUrl.startsWith('/page'))"></app-new-nav>
+<div
+  *ngIf="!isLoggedIn"
+  class="top-gap-space"
+  aria-hidden="false"
+>
   <div class="top-gap-marquee" aria-label="What's New Updates">
     <div class="marquee-container">
       <span class="marquee-title">What’s New</span>
 
       <div class="marquee-track">
-        <div class="marquee-content">
-          <span>
-            Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
-            Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
-            Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
-            Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
-            Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
-            Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
-            Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
-          </span>
+  <div class="marquee-content">
+    <span>
+      Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
+      Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
+      Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
+      Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
+      Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
+      Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
+      Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
+    </span>
 
-          <span>
-            Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
-            Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
-            Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
-            Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
-            Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
-            Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
-            Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
-          </span>
-        </div>
-      </div>
+    <!-- DUPLICATE FOR SEAMLESS LOOP -->
+    <span>
+      Boxanagar Buddhist Stupa || Sepahijala Wildlife Sanctuary || Tripura Sundari Temple || Unokoti ||
+      Bhubaneswari Temple || Chaturdasha Devata Temple || Dumboor Lake || Kasba Kali Temple ||
+      Mahamuni Pagoda || Neermahal || Pilak || Tepania Eco Park || Trishna Wildlife Sanctuary ||
+      Ujjayanta Palace || Chabimura || Jampui Hills || Khumulwng Eco Park || Pocket Book ||
+      Tripura Tourism Department Attendant (Group-D) Recruitment Rules, 2025 ||
+      Notification for RR of ATO || Tripura Tourism Department LDC Recruitment Rules 2025 ||
+      Revised Conference Hall Rates for Geetanjali Tourism Guest House 2025 ||
+    </span>
+  </div>
+</div>
+
     </div>
   </div>
 </div>
 
-<div>
+<!-- MAIN CONTENT -->
+<div [style.padding-top]="isLoggedIn ? '10vh' : '0vh'">
   <router-outlet></router-outlet>
 </div>
+<app-marquee-cards *ngIf="(currentPath === '/' || currentPath === '')" ></app-marquee-cards>
 
-<app-tripura-tourism-licensing *ngIf="(currentPath === '/' || currentPath === '')"></app-tripura-tourism-licensing>
+<app-choose-destination *ngIf="(currentPath === '/' || currentPath === '')"
+  [titleMain]="'Choose Your Destination'"
+  [titleSub]="'Live Where You Want'"
+  [cards]="[
+    {
+      id: 1,
+      name: 'Geetanjali Guest House',
+      location: 'Agartala, Tripura',
+      price: 2464,
+      currency: '₹',
+      rating: 4.6,
+      reviews: 1,
+      image: 'assets/images/Bashgram.png',
+      badge: 'Popular'
+    },
+    {
+      id: 2,
+      name: 'Tepania Tourist Log Hut',
+      location: 'Unakoti Hills',
+      price: 2464,
+      currency: '₹',
+      rating: 4.8,
+      reviews: 12,
+      image: 'assets/images/Neermahal-Festival.png',
+      badge: 'Top Rated'
+    },
+    {
+      id: 3,
+      name: 'Eden Tourist Lodge',
+      location: 'Dumboor Lake',
+      price: 1680,
+      currency: '₹',
+      rating: 4.4,
+      reviews: 8,
+      image: 'assets/images/Dumboor-Lake-Dhalai-District.png',
+      badge: ''
+    }
+  ]"
+></app-choose-destination>
 
-<!-- <app-tripura-noc-dashboard *ngIf="(currentPath === '/' || currentPath === '')"></app-tripura-noc-dashboard> -->
+<app-image-zoom-card *ngIf="(currentPath === '/' || currentPath === '')"
+  [images]="[
+    { src: 'assets/images/Bashgram.png' },
+    { src: 'assets/images/Durga-Bari.png' },
+    { src: 'assets/images/Neermahal-Festival.png' },
+    { src: 'assets/images/Vanghmun.jpg' },
+    { src: 'assets/images/Laxmi-Narayan-Temple.png' }
+  ]"
+></app-image-zoom-card>
+<app-testimonials *ngIf="(currentPath === '/' || currentPath === '')" [testimonials]="myTestimonials"></app-testimonials>
 
+<!-- Help Components -->
+<!-- Hide floating button when logged in -->
+<!-- <app-help-floating-button
+    (toggleSidebarEvent)="openHelpSidebar()"
+    *ngIf="!helpSidebarOpen">
+</app-help-floating-button>
+<app-help-sidebar [isOpen]="helpSidebarOpen" (closeSidebarEvent)="closeHelpSidebar()"></app-help-sidebar>
+<app-logo-footer *ngIf="!isLoggedIn"/>
+<app-footer *ngIf="!isLoggedIn"></app-footer>
+
+<app-loader *ngIf="showLoader"></app-loader> -->
 <app-mini-footer *ngIf="!isLoggedIn"></app-mini-footer>
