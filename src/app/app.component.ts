@@ -7,19 +7,19 @@ import { NewNavComponent } from './page-template/new-nav/new-nav.component';
 import { LoaderComponent } from './page-template/loader/loader.component';
 import { FooterComponent } from './page-template/footer/footer.component';
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { 
-  faMapMarkedAlt, 
-  faHotel, 
-  faUserTie, 
-  faHiking, 
-  faUserPlus, 
-  faFileAlt, 
-  faCloudUploadAlt, 
-  faCreditCard, 
-  faCheckCircle, 
-  faShieldAlt, 
-  faLandmark, 
-  faGlobe 
+import {
+  faMapMarkedAlt,
+  faHotel,
+  faUserTie,
+  faHiking,
+  faUserPlus,
+  faFileAlt,
+  faCloudUploadAlt,
+  faCreditCard,
+  faCheckCircle,
+  faShieldAlt,
+  faLandmark,
+  faGlobe
 } from '@fortawesome/free-solid-svg-icons';
 import { LoaderService } from './_service/loader/loader.service';
 import { HelpService } from './_service/help/help.service';
@@ -73,7 +73,7 @@ export class AppComponent implements OnInit, OnDestroy {
   currentPath: any = '';
   helpSidebarOpen = false;
   showOtherComponents = false; // Toggle to show old components if needed
-  
+
   // Hero background image
   heroBackgroundImage = 'assets/images/Neermahal.jpg';
 
@@ -220,12 +220,12 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe((event: any) => {
         this.currentPath = event.urlAfterRedirects;
       });
-    
+
     this.loaderSubscription = this.loaderService.getLoaderStatus().subscribe((status) => {
       this.showLoader = status;
       this.cdRef.detectChanges();
     });
-    
+
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
