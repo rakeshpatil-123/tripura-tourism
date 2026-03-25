@@ -89,7 +89,7 @@ export class RepeatApplicationsComponent implements OnInit {
   let hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const ampm = hours >= 12 ? 'PM' : 'AM';
-  
+
   hours = hours % 12;
   hours = hours ? hours : 12;
 
@@ -134,9 +134,17 @@ export class RepeatApplicationsComponent implements OnInit {
       type: 'link',
       sortable: true,
       linkHref: (row: any) => {
-        return `/dashboard/user-app-view/${this.serviceId}/${row.application_id}`;
+        const serviceId = this.serviceId ?? '';
+        const applicationId = row?.application_id ?? '';
+
+        if (!serviceId || !applicationId) {
+          return '#';
+        }
+
+        return `/dashboard/user-app-view/${encodeURIComponent(serviceId)}/${encodeURIComponent(applicationId)}`;
       },
     });
+
     allowedKeys.forEach((key) => {
       let label = key
         .replace(/^formatted_/, '')

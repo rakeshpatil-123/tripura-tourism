@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { GenericService } from '../../_service/generic/generic.service';
-import { HelpService } from '../../_service/help/help.service'; 
+import { HelpService } from '../../_service/help/help.service';
 
 export interface MenuItem {
   id: string;
@@ -118,13 +118,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       route: '/dashboard/user-payment-list',
       roles: ['admin'],
     },
-    {
-      id: 'activityLog',
-      title: 'Activity Log',
-      icon: 'history',
-      route: '/dashboard/activity-log',
-      roles: ['admin'],
-    },
+    // {
+    //   id: 'activityLog',
+    //   title: 'Activity Log',
+    //   icon: 'history',
+    //   route: '/dashboard/activity-log',
+    //   roles: ['admin'],
+    // },
     {
       id: 'Holidays',
       title: 'Holidays',
@@ -356,7 +356,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private genericService: GenericService,
-    private helpService: HelpService 
+    private helpService: HelpService
   ) {
     this.currentUserType = localStorage.getItem('userRole') || 'User';
     this.userName = this.genericService.decryptLocalStorageItem('user_name') || 'User';

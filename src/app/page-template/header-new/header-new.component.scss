@@ -10,24 +10,24 @@ $muted-600: #4b5563;
 $muted-300: #e6e9ee;
 $glass: rgba(0,0,0,0.04);
 
-// Base header
 .brand-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 10vh;
-  min-height: 64px;
-  z-index: 1100;
+  background-color: $white;
+  // border-bottom: 1px solid $gray-300;
+  height: 11vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,252,0.98));
-  border-bottom: 1px solid $muted-300;
-  box-shadow: 0 6px 18px rgba(6, 21, 49, 0.06);
-  padding: 0 4vw;
-  overscroll-behavior: none;
+  justify-content: space-between;
+  padding: 0 5vw;
+  max-width: 1440px;
+  min-width: 100vw;
+  margin: 0 auto;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
+
+
 
 /* inner container to center content and allow spacing */
 .brand-inner {
@@ -399,7 +399,7 @@ $muted-600: #4b5563;
   width: min(540px, 94%);
   border-radius: 14px;
   padding: 28px;
-  box-shadow: 
+  box-shadow:
     0 24px 48px rgba(6, 21, 49, 0.32),
     0 0 1px rgba(6, 21, 49, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -490,7 +490,7 @@ $muted-600: #4b5563;
 
 .sr-dialog-actions button:focus {
   outline: none;
-  box-shadow: 
+  box-shadow:
     0 14px 28px rgba(0, 166, 201, 0.36),
     0 0 0 4px rgba(0, 122, 204, 0.15);
   transform: translateY(-4px);
