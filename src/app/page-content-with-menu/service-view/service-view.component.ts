@@ -18,6 +18,19 @@ import { InspectionReportComponent } from '../inspection-report/inspection-repor
 import { EditableCertificateGenerationComponent } from '../editable-certificate-generation/editable-certificate-generation.component';
 import { LoaderService } from '../../_service/loader/loader.service';
 import { finalize } from 'rxjs';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+
+// MAKE SURE THIS RUNS ONCE
+(pdfMake as any).vfs = (pdfFonts as any).vfs || (pdfFonts as any);
+
+// OPTIONAL TYPE HELPERS
+interface PdfFileDoc {
+  question: string;
+  fileUrl: string;
+  fileName: string;
+}
 
 interface StatusActionModal {
   visible: boolean;
@@ -36,13 +49,13 @@ interface StatusActionModal {
 export class ServiceViewComponent implements OnInit {
   applicationId: number | null = null;
   applicationData: any = null;
-  isCertificatePreview: any = null;
-  sampleFilePreview : any = null;
+isCertificatePreview: boolean = false;  sampleFilePreview : any = null;
   isLoading: boolean = false;
   isFinalApproval: boolean = false;
   justBeforeApproval: boolean = false;
-  isCerfitificateGenerated: boolean = false;
+  isCertificateGenerated: boolean = false;
   infoData: any[] = [];
+  application: any = null;
   infoColumns: TableColumn[] = [];
   expandedInfoIndex: number | null = null;
   workflowColumns: TableColumn[] = [];
@@ -52,6 +65,15 @@ export class ServiceViewComponent implements OnInit {
   totalWorkflowCount: number = 0;
   applicationQATableData: any[] = [];
   serviceName: string = '';
+  transactionDetails: any = null;
+   pdfBlobUrl: string | null = null;
+  showPdfPreview = false;
+  now: Date = new Date();
+  pdfZoom = 1;
+  historyDetails: any[] = [];
+  showUploadDialog = false;
+  dialogWidth = '1200px';
+  pdfUrl: SafeResourceUrl | null = null;
   applicationQAColumns: TableColumn[] = [];
   isFinallyApproved: boolean = false;
   statusModal: StatusActionModal = {
@@ -68,6 +90,7 @@ export class ServiceViewComponent implements OnInit {
     private router: Router,
     private apiService: GenericService,
     private fb: FormBuilder,
+    private sanitizer: DomSanitizer,
     public dialog: MatDialog,
     private loaderService : LoaderService,
     private cdr: ChangeDetectorRef
@@ -79,6 +102,9 @@ export class ServiceViewComponent implements OnInit {
     });
   }
 
+  private readonly fileBaseUrl = 'http://tripuratourism.gov.in/onlineservices/storage/';
+
+private lastPdfDefinition: any = null;
   // Opens a file URL in a new tab (used by QA view button)
   openFile(url?: string): void {
     if (!url) return;
@@ -110,42 +136,42 @@ export class ServiceViewComponent implements OnInit {
     });
   }
 
-  fetchApplicationDetails(): void {
-    this.apiService
-      .getByConditions({}, `api/department/applications/${this.applicationId}`)
-      .subscribe({
-        next: (res: any) => {
-          this.isLoading = false;
+  // fetchApplicationDetails(): void {
+  //   this.apiService
+  //     .getByConditions({}, `api/department/applications/${this.applicationId}`)
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         this.isLoading = false;
 
-          if (res?.status === 1 && res.data) {
-            this.applicationData = res.data;
-            this.isCertificatePreview = true;
-            if (res?.data?.history_data?.status_file) {
-              this.sampleFilePreview = res?.data?.history_data?.status_file || null;
-            }
-            this.isFinalApproval = res.data.is_finally_approved;
-            this.justBeforeApproval = res.data.just_before_final_step;
-            this.isCerfitificateGenerated = res.data.is_certificate_generated;
-            this.serviceName = res.data.service_name;
+  //         if (res?.status === 1 && res.data) {
+  //           this.applicationData = res.data;
+  //           this.isCertificatePreview = true;
+  //           if (res?.data?.history_data?.status_file) {
+  //             this.sampleFilePreview = res?.data?.history_data?.status_file || null;
+  //           }
+  //           this.isFinalApproval = res.data.is_finally_approved;
+  //           this.justBeforeApproval = res.data.just_before_final_step;
+  //           this.isCertificateGenerated = res.data.is_certificate_generated;
+  //           this.serviceName = res.data.service_name;
 
-            console.log('Application Data:', this.applicationData.application_data);
-            this.processDataForDisplay();
-          } else {
-            this.apiService.openSnackBar(
-              res?.message || 'Failed to load application details.',
-              'Close'
-            );
-            this.router.navigate(['/departmental-services']);
-          }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          console.error('API Error:', err);
-          this.apiService.openSnackBar('Could not load application.', 'Close');
-          this.router.navigate(['/departmental-services']);
-        },
-      });
-  }
+  //           console.log('Application Data:', this.applicationData.application_data);
+  //           this.processDataForDisplay();
+  //         } else {
+  //           this.apiService.openSnackBar(
+  //             res?.message || 'Failed to load application details.',
+  //             'Close'
+  //           );
+  //           this.router.navigate(['/departmental-services']);
+  //         }
+  //       },
+  //       error: (err) => {
+  //         this.isLoading = false;
+  //         console.error('API Error:', err);
+  //         this.apiService.openSnackBar('Could not load application.', 'Close');
+  //         this.router.navigate(['/departmental-services']);
+  //       },
+  //     });
+  // }
   goBack() {
     window.history.back();
   }
@@ -180,7 +206,7 @@ export class ServiceViewComponent implements OnInit {
     if (!obj.hasOwnProperty(key)) continue;
 
     // Skip workflow, application_data, applied_fee, approved_fee
-    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id', 'just_before_final_step', 'history_data', 'is_finally_approved', 'application_id', 'is_certificate_generated'].includes(key)) {
+    if (['workflow', 'application_data', 'applied_fee', 'approved_fee', 'service_id', 'id', 'just_before_final_step', 'history_data', 'is_finally_approved', 'application_id', 'is_certificate_generated', 'application_data_structured', 'payment_details'].includes(key)) {
       continue;
     }
 
@@ -199,7 +225,7 @@ export class ServiceViewComponent implements OnInit {
           });
         } else {
           flatEntries.push({
-            key: displayKey,  
+            key: displayKey,
             value: String(value),
           });
         }
@@ -448,9 +474,9 @@ if (data.application_data && typeof data.application_data === 'object') {
    */
   private formatDateByType(value: string, type?: string): string {
     if (!value || typeof value !== 'string') return value;
-    
+
     const val = value.trim();
-    
+
     try {
       switch (type?.toLowerCase()) {
         // Format: MMDD -> MM/DD
@@ -511,7 +537,7 @@ if (data.application_data && typeof data.application_data === 'object') {
             const year = date.getFullYear();
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
-            
+
             if (type?.toLowerCase() === 'datetime' || type?.toLowerCase() === 'timestamp') {
               return `${day}/${month}/${year} ${hours}:${minutes}`;
             }
@@ -641,7 +667,7 @@ onSubmitStatus(): void {
   }
 
   if (attachment) {
-    formData.append('status_file', attachment); 
+    formData.append('status_file', attachment);
   }
 
   this.updateApplicationStatus(applicationId, formData, displayAction);
@@ -814,7 +840,7 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
     <p style="margin-bottom: 16px; font-size: 14px;">
       Your certificate preview is ready. Click the button below to open it in a new tab.
     </p>
-    <button id="preview-cert-link" 
+    <button id="preview-cert-link"
       style="padding: 10px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
       📄 View Certificate
     </button>
@@ -979,4 +1005,923 @@ updateApplicationStatus(applicationId: number, payload: any, displayAction: stri
   private toTitleCase(text: string): string {
     return text.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   }
+  printPage(): void {
+  this.printApplication();
+}
+private safeText(value: any): string {
+  if (value === null || value === undefined) return '—';
+  if (Array.isArray(value)) return value.length ? value.join(', ') : '—';
+  const text = String(value).trim();
+  return text ? text : '—';
+}
+
+private sanitizeText(value: any): string {
+  return this.safeText(value)
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+private titleCase(value: any): string {
+  const text = this.safeText(value);
+  if (text === '—') return text;
+  return text
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+private formatPdfDate(value: any): string {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return this.safeText(value);
+  return d.toLocaleString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+private formatPdfDateOnly(value: any): string {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return this.safeText(value);
+  return d.toLocaleDateString('en-GB');
+}
+
+private resolveFileUrl(url: any): string {
+  const raw = this.safeText(url);
+  if (raw === '—') return '—';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return `${this.fileBaseUrl}${raw.replace(/^\/+/, '')}`;
+}
+
+private fileNameFromUrl(url: any): string {
+  const resolved = this.resolveFileUrl(url);
+  if (resolved === '—') return 'View File';
+  return decodeURIComponent(resolved.split('/').pop() || 'View File');
+}
+
+public getApplicationNumber(app: any): string {
+  return this.safeText(
+    app?.application_number ||
+      app?.applicationId ||
+      app?.application_id ||
+      app?.id
+  );
+}
+
+private getApplicantName(app: any, fields: any[] = []): string {
+  const directCandidates = [
+    app?.user?.name,
+    app?.applicant_name,
+    app?.user_name,
+    app?.name,
+  ];
+
+  const fieldCandidates = [
+    this.getFieldValueById(fields, 1213),
+    this.getFieldValueById(fields, 1238),
+    this.getFieldValueById(fields, 1250),
+    this.getFieldValueById(fields, 1246),
+  ];
+
+  const found =
+    [...directCandidates, ...fieldCandidates].find((v) => this.safeText(v) !== '—') ||
+    'Applicant';
+
+  return this.safeText(found);
+}
+
+private getFieldValueById(fields: any[] = [], id: number): string {
+  const found = fields.find((f: any) => Number(f?.id) === Number(id));
+  return this.safeText(found?.answer);
+}
+
+private normalizeApplicationData(input: any): Array<{
+  id: number | string;
+  question: string;
+  answer: any;
+  type?: string;
+  isFile?: boolean;
+  fileUrl?: string;
+  fileName?: string;
+}> {
+  const output: any[] = [];
+  if (!input) return output;
+
+  const fields = Array.isArray(input?.fields) ? input.fields : [];
+
+  fields.forEach((f: any) => {
+    const answer = f?.answer;
+    const isFile =
+      f?.type === 'file' ||
+      (typeof answer === 'string' &&
+        (/^https?:\/\/|^uploads\//i.test(answer) ||
+          /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(answer))) ||
+      /document|photo|photograph|file|license|plan|form/i.test(
+        this.safeText(f?.question)
+      );
+
+    output.push({
+      id: f?.id ?? '',
+      question: this.safeText(f?.question || `Field ${f?.id ?? ''}`),
+      answer,
+      type: f?.type || 'text',
+      isFile,
+      fileUrl: isFile ? this.resolveFileUrl(answer) : undefined,
+      fileName: isFile ? this.fileNameFromUrl(answer) : undefined,
+    });
+  });
+
+  Object.keys(input).forEach((key) => {
+    if (key === 'fields') return;
+    const val = input[key];
+    if (val === null || val === undefined || val === '') return;
+
+    if (Array.isArray(val)) {
+      val.forEach((item: any, idx: number) => {
+        if (item && typeof item === 'object') {
+          Object.keys(item).forEach((subKey) => {
+            const subVal = item[subKey];
+            if (!subVal) return;
+            const isFile =
+              typeof subVal === 'string' &&
+              (/^https?:\/\/|^uploads\//i.test(subVal) ||
+                /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(subVal));
+            output.push({
+              id: `${key}-${idx}-${subKey}`,
+              question: this.titleCase(`${key} ${idx + 1} - ${subKey}`),
+              answer: subVal,
+              type: isFile ? 'file' : 'text',
+              isFile,
+              fileUrl: isFile ? this.resolveFileUrl(subVal) : undefined,
+              fileName: isFile ? this.fileNameFromUrl(subVal) : undefined,
+            });
+          });
+        } else {
+          const isFile =
+            typeof item === 'string' &&
+            (/^https?:\/\/|^uploads\//i.test(item) ||
+              /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(item));
+          output.push({
+            id: `${key}-${idx}`,
+            question: this.titleCase(`${key} ${idx + 1}`),
+            answer: item,
+            type: isFile ? 'file' : 'text',
+            isFile,
+            fileUrl: isFile ? this.resolveFileUrl(item) : undefined,
+            fileName: isFile ? this.fileNameFromUrl(item) : undefined,
+          });
+        }
+      });
+    } else if (typeof val === 'object') {
+      Object.keys(val).forEach((subKey) => {
+        const subVal = val[subKey];
+        if (!subVal) return;
+        const isFile =
+          typeof subVal === 'string' &&
+          (/^https?:\/\/|^uploads\//i.test(subVal) ||
+            /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(subVal));
+        output.push({
+          id: `${key}-${subKey}`,
+          question: this.titleCase(`${key} ${subKey}`),
+          answer: subVal,
+          type: isFile ? 'file' : 'text',
+          isFile,
+          fileUrl: isFile ? this.resolveFileUrl(subVal) : undefined,
+          fileName: isFile ? this.fileNameFromUrl(subVal) : undefined,
+        });
+      });
+    } else {
+      const isFile =
+        typeof val === 'string' &&
+        (/^https?:\/\/|^uploads\//i.test(val) ||
+          /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(val));
+      output.push({
+        id: key,
+        question: this.titleCase(key),
+        answer: val,
+        type: isFile ? 'file' : 'text',
+        isFile,
+        fileUrl: isFile ? this.resolveFileUrl(val) : undefined,
+        fileName: isFile ? this.fileNameFromUrl(val) : undefined,
+      });
+    }
+  });
+
+  return output;
+}
+
+private collectFileDocuments(fields: any[]): PdfFileDoc[] {
+  return (fields || [])
+    .filter((f) => f?.isFile && f?.fileUrl && f.fileUrl !== '—')
+    .map((f) => ({
+      question: this.safeText(f.question),
+      fileUrl: this.resolveFileUrl(f.fileUrl),
+      fileName: this.safeText(f.fileName || this.fileNameFromUrl(f.fileUrl)),
+    }));
+}
+
+private buildSummaryRows(app: any, fields: any[]): any[][] {
+  const paymentDetails = Array.isArray(app?.payment_details) ? app.payment_details : [];
+  const serviceName = this.safeText(app?.service_name || app?.service?.service_title_or_description);
+
+  return [
+    [
+      { text: 'Application Number', style: 'summaryKey' },
+      { text: this.getApplicationNumber(app), style: 'summaryValue' },
+      { text: 'Application Date', style: 'summaryKey' },
+      { text: this.formatPdfDate(app?.application_date || app?.created_at), style: 'summaryValue' },
+    ],
+    [
+      { text: 'Service Name', style: 'summaryKey' },
+      { text: serviceName, style: 'summaryValue' },
+      { text: 'Status', style: 'summaryKey' },
+      { text: this.titleCase(app?.status), style: 'summaryValue' },
+    ],
+    [
+      { text: 'Applicant Name', style: 'summaryKey' },
+      { text: this.getApplicantName(app, fields), style: 'summaryValue' },
+      { text: 'Payment Status', style: 'summaryKey' },
+      { text: this.titleCase(app?.payment_status), style: 'summaryValue' },
+    ],
+    [
+      { text: 'Mobile No.', style: 'summaryKey' },
+      { text: this.safeText(app?.user?.phone), style: 'summaryValue' },
+      { text: 'Email', style: 'summaryKey' },
+      { text: this.safeText(app?.user?.email), style: 'summaryValue' },
+    ],
+    [
+      { text: 'Total Fee', style: 'summaryKey' },
+      { text: this.safeText(app?.total_fee), style: 'summaryValue' },
+      { text: 'Paid Amount', style: 'summaryKey' },
+      { text: this.safeText(app?.paid_amount), style: 'summaryValue' },
+    ],
+    [
+      { text: 'Current Step', style: 'summaryKey' },
+      { text: this.safeText(app?.current_step_number), style: 'summaryValue' },
+      { text: 'Payment Records', style: 'summaryKey' },
+      { text: String(paymentDetails.length), style: 'summaryValue' },
+    ],
+  ];
+}
+
+private buildFieldsTable(fields: any[]): any[] {
+  const body: any[] = [
+    [
+      { text: 'SL', style: 'tableHead' },
+      { text: 'FIELD / QUESTION', style: 'tableHead' },
+      { text: 'ANSWER / DOCUMENT', style: 'tableHead' },
+    ],
+  ];
+
+  fields.forEach((f: any, index: number) => {
+    const q = this.safeText(f?.question || `Field ${f?.id ?? index + 1}`);
+    const answerCell = f?.isFile
+      ? f?.fileUrl && f.fileUrl !== '—'
+        ? {
+            text: f?.fileName || this.fileNameFromUrl(f?.fileUrl),
+            link: this.resolveFileUrl(f?.fileUrl),
+            color: '#1d4ed8',
+            decoration: 'underline',
+            noWrap: false,
+          }
+        : { text: '—', style: 'text' }
+      : { text: this.safeText(f?.answer), style: 'text' };
+
+    body.push([
+      { text: String(index + 1), style: 'text' },
+      { text: q, style: 'text' },
+      answerCell,
+    ]);
+  });
+
+  if (fields.length === 0) {
+    body.push([
+      { text: '—', style: 'text' },
+      { text: 'No fields found', colSpan: 2, style: 'text' },
+      {},
+    ]);
+  }
+
+  return body;
+}
+
+private buildDocumentsTable(files: PdfFileDoc[]): any[] {
+  const body: any[] = [
+    [
+      { text: 'SL', style: 'tableHead' },
+      { text: 'DOCUMENT NAME', style: 'tableHead' },
+      { text: 'FILE LINK', style: 'tableHead' },
+    ],
+  ];
+
+  files.forEach((file, index) => {
+    body.push([
+      { text: String(index + 1), style: 'text' },
+      { text: this.safeText(file.question), style: 'text' },
+      {
+        text: file.fileName,
+        link: file.fileUrl,
+        color: '#1d4ed8',
+        decoration: 'underline',
+        style: 'text',
+      },
+    ]);
+  });
+
+  if (files.length === 0) {
+    body.push([
+      { text: '—', style: 'text' },
+      { text: 'No uploaded documents found', colSpan: 2, style: 'text' },
+      {},
+    ]);
+  }
+
+  return body;
+}
+
+private buildPaymentTable(paymentDetails: any[]): any[] {
+  const body: any[] = [
+    [
+      { text: 'SL', style: 'tableHead' },
+      { text: 'PAYMENT AMOUNT', style: 'tableHead' },
+      { text: 'STATUS', style: 'tableHead' },
+      { text: 'GATEWAY', style: 'tableHead' },
+      { text: 'TRANSACTION ID', style: 'tableHead' },
+      { text: 'GRN NUMBER', style: 'tableHead' },
+      { text: 'PAYMENT DATE/TIME', style: 'tableHead' },
+    ],
+  ];
+
+  paymentDetails.forEach((p: any, index: number) => {
+    body.push([
+      { text: String(index + 1), style: 'text' },
+      { text: this.safeText(p?.payment_amount), style: 'text' },
+      { text: this.titleCase(p?.payment_status), style: 'text' },
+      { text: this.safeText(p?.gateway), style: 'text' },
+      { text: this.safeText(p?.transaction_id), style: 'text' },
+      { text: this.safeText(p?.GRN_number), style: 'text' },
+      { text: this.formatPdfDate(p?.payment_datetime || p?.created_at), style: 'text' },
+    ]);
+  });
+
+  if (paymentDetails.length === 0) {
+    body.push([
+      { text: '—', style: 'text' },
+      { text: 'No payment records found', colSpan: 6, style: 'text' },
+      {},
+      {},
+      {},
+      {},
+      {},
+    ]);
+  }
+
+  return body;
+}
+
+private buildWorkflowTable(workflow: any[]): any[] {
+  const body: any[] = [
+    [
+      { text: 'SL', style: 'tableHead' },
+      { text: 'STEP', style: 'tableHead' },
+      { text: 'TYPE', style: 'tableHead' },
+      { text: 'DEPARTMENT', style: 'tableHead' },
+      { text: 'STATUS', style: 'tableHead' },
+      { text: 'REMARKS', style: 'tableHead' },
+      { text: 'ACTION AT / FILE', style: 'tableHead' },
+    ],
+  ];
+
+  workflow.forEach((w: any, index: number) => {
+    const fileUrl = w?.status_file ? this.resolveFileUrl(w.status_file) : null;
+    body.push([
+      { text: String(index + 1), style: 'text' },
+      { text: this.safeText(w?.step_number), style: 'text' },
+      { text: this.titleCase(w?.step_type), style: 'text' },
+      { text: this.safeText(w?.department), style: 'text' },
+      { text: this.titleCase(w?.status), style: 'text' },
+      { text: this.safeText(w?.remarks), style: 'text' },
+      fileUrl
+        ? {
+            stack: [
+              { text: this.formatPdfDate(w?.action_taken_at), style: 'text' },
+              {
+                text: this.fileNameFromUrl(fileUrl),
+                link: fileUrl,
+                color: '#1d4ed8',
+                decoration: 'underline',
+                style: 'text',
+              },
+            ],
+          }
+        : { text: this.formatPdfDate(w?.action_taken_at), style: 'text' },
+    ]);
+  });
+
+  if (workflow.length === 0) {
+    body.push([
+      { text: '—', style: 'text' },
+      { text: '—', style: 'text' },
+      { text: '—', style: 'text' },
+      { text: '—', style: 'text' },
+      { text: '—', style: 'text' },
+      { text: 'No workflow history found', colSpan: 2, style: 'text' },
+      {},
+    ]);
+  }
+
+  return body;
+}
+
+private buildRenewalRows(app: any): any[][] {
+  const renewal = app?.renewal_details || {};
+  return [
+    [
+      { text: 'Renewal Cycle ID', style: 'summaryKey' },
+      { text: this.safeText(app?.renewal_cycle_id), style: 'summaryValue' },
+      { text: 'Renewal Status', style: 'summaryKey' },
+      { text: this.safeText(app?.renewal), style: 'summaryValue' },
+    ],
+    [
+      { text: 'Renewal Year', style: 'summaryKey' },
+      { text: this.safeText(app?.renewalYear), style: 'summaryValue' },
+      { text: 'Expiry Date', style: 'summaryKey' },
+      { text: this.formatPdfDateOnly(renewal?.expiry_date || app?.NOC_expiry_date), style: 'summaryValue' },
+    ],
+    [
+      { text: 'NOC Application Date', style: 'summaryKey' },
+      { text: this.formatPdfDateOnly(app?.NOC_application_date), style: 'summaryValue' },
+      { text: 'NOC Generation Date', style: 'summaryKey' },
+      { text: this.formatPdfDateOnly(app?.NOC_generationDate), style: 'summaryValue' },
+    ],
+  ];
+}
+
+private buildPdfDefinition(app: any): any {
+  const structuredFields = this.normalizeApplicationData(app?.application_data || {});
+  const paymentDetails = Array.isArray(app?.payment_details) ? app.payment_details : [];
+  const workflow = Array.isArray(app?.workflow) ? app.workflow : [];
+  const history = Array.isArray(app?.history_data) ? app.history_data : [];
+  const files = this.collectFileDocuments(structuredFields);
+
+  const applicantName = this.getApplicantName(app, structuredFields);
+  const applicationNo = this.getApplicationNumber(app);
+  const serviceName = this.safeText(app?.service_name || app?.service?.service_title_or_description);
+  const printableWorkflow = workflow.length ? workflow : history;
+
+  return {
+    info: {
+      title: `${applicantName} - ${applicationNo}`,
+      author: 'Government of Tripura',
+      subject: serviceName,
+    },
+    pageSize: 'A4',
+    pageMargins: [28, 90, 28, 60],
+    defaultStyle: {
+      fontSize: 9,
+      lineHeight: 1.2,
+    },
+    styles: {
+      topGov: { fontSize: 12, bold: true, color: '#0f172a', alignment: 'center' },
+      dept: { fontSize: 10, bold: true, color: '#334155', alignment: 'center' },
+      title: { fontSize: 15, bold: true, color: '#0b3166', alignment: 'center' },
+      subtitle: { fontSize: 9, color: '#475569', alignment: 'center' },
+      section: { fontSize: 11, bold: true, color: '#0b3166', margin: [0, 6, 0, 6] },
+      summaryKey: { bold: true, color: '#0f172a', fontSize: 9 },
+      summaryValue: { color: '#111827', fontSize: 9 },
+      tableHead: { bold: true, color: '#0f172a', fontSize: 9 },
+      text: { color: '#111827', fontSize: 9 },
+      small: { color: '#475569', fontSize: 8 },
+    },
+    header: () => ({
+      margin: [28, 18, 28, 0],
+      stack: [
+        { text: 'GOVERNMENT OF TRIPURA', style: 'topGov' },
+        { text: 'TOURISM DEPARTMENT', style: 'dept' },
+        { text: 'APPLICATION PRINT / PREVIEW', style: 'title' },
+        {
+          text: `${serviceName}  |  ${applicationNo}`,
+          style: 'subtitle',
+          margin: [0, 2, 0, 0],
+        },
+      ],
+    }),
+    footer: (currentPage: number, pageCount: number) => ({
+      margin: [28, 0, 28, 18],
+      columns: [
+        {
+          text: `Printed On: ${this.formatPdfDate(new Date())}`,
+          style: 'small',
+          alignment: 'left',
+        },
+        {
+          text: `Page ${currentPage} of ${pageCount}`,
+          style: 'small',
+          alignment: 'right',
+        },
+      ],
+    }),
+    content: [
+      {
+        table: {
+          widths: ['25%', '25%', '25%', '25%'],
+          body: this.buildSummaryRows(app, structuredFields),
+        },
+        layout: {
+          fillColor: (rowIndex: number) => (rowIndex % 2 === 0 ? '#F8FAFC' : '#FFFFFF'),
+          hLineColor: () => '#D9E2F0',
+          vLineColor: () => '#D9E2F0',
+          paddingLeft: () => 6,
+          paddingRight: () => 6,
+          paddingTop: () => 5,
+          paddingBottom: () => 5,
+        },
+        margin: [0, 2, 0, 10],
+      },
+
+      { text: 'Applicant / Service Details', style: 'section' },
+      {
+        table: {
+          widths: ['40%', '60%'],
+          body: [
+            [{ text: 'Applicant Name', style: 'summaryKey' }, { text: applicantName, style: 'summaryValue' }],
+            [{ text: 'Application No.', style: 'summaryKey' }, { text: applicationNo, style: 'summaryValue' }],
+            [{ text: 'Service Name', style: 'summaryKey' }, { text: serviceName, style: 'summaryValue' }],
+            [{ text: 'Application Status', style: 'summaryKey' }, { text: this.titleCase(app?.status), style: 'summaryValue' }],
+            [{ text: 'Payment Status', style: 'summaryKey' }, { text: this.titleCase(app?.payment_status), style: 'summaryValue' }],
+            [{ text: 'Created At', style: 'summaryKey' }, { text: this.formatPdfDate(app?.created_at), style: 'summaryValue' }],
+            [{ text: 'Updated At', style: 'summaryKey' }, { text: this.formatPdfDate(app?.updated_at), style: 'summaryValue' }],
+          ],
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 10],
+      },
+
+      { text: 'All Form Fields', style: 'section' },
+      {
+        table: {
+          headerRows: 1,
+          widths: [22, '38%', '*'],
+          body: this.buildFieldsTable(structuredFields),
+        },
+        layout: {
+          fillColor: (rowIndex: number) => (rowIndex === 0 ? '#EAF1FB' : null),
+          hLineColor: () => '#D9E2F0',
+          vLineColor: () => '#D9E2F0',
+          paddingLeft: () => 5,
+          paddingRight: () => 5,
+          paddingTop: () => 4,
+          paddingBottom: () => 4,
+        },
+        margin: [0, 0, 0, 10],
+      },
+
+      { text: 'Uploaded Documents', style: 'section' },
+      {
+        table: {
+          headerRows: 1,
+          widths: [22, '46%', '*'],
+          body: this.buildDocumentsTable(files),
+        },
+        layout: {
+          fillColor: (rowIndex: number) => (rowIndex === 0 ? '#EAF1FB' : null),
+          hLineColor: () => '#D9E2F0',
+          vLineColor: () => '#D9E2F0',
+          paddingLeft: () => 5,
+          paddingRight: () => 5,
+          paddingTop: () => 4,
+          paddingBottom: () => 4,
+        },
+        margin: [0, 0, 0, 10],
+      },
+
+      { text: 'Payment Details', style: 'section' },
+      {
+        table: {
+          headerRows: 1,
+          widths: [20, 60, 50, 45, 70, 55, '*'],
+          body: this.buildPaymentTable(paymentDetails),
+        },
+        layout: {
+          fillColor: (rowIndex: number) => (rowIndex === 0 ? '#EAF1FB' : null),
+          hLineColor: () => '#D9E2F0',
+          vLineColor: () => '#D9E2F0',
+          paddingLeft: () => 4,
+          paddingRight: () => 4,
+          paddingTop: () => 4,
+          paddingBottom: () => 4,
+        },
+        margin: [0, 0, 0, 10],
+      },
+
+      { text: 'Renewal / NOC Details', style: 'section' },
+      {
+        table: {
+          widths: ['25%', '25%', '25%', '25%'],
+          body: this.buildRenewalRows(app),
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 10],
+      },
+
+      { text: 'Workflow / History', style: 'section' },
+      {
+        table: {
+          headerRows: 1,
+          widths: [20, 34, 55, 85, 45, '*', 90],
+          body: this.buildWorkflowTable(printableWorkflow),
+        },
+        layout: {
+          fillColor: (rowIndex: number) => (rowIndex === 0 ? '#EAF1FB' : null),
+          hLineColor: () => '#D9E2F0',
+          vLineColor: () => '#D9E2F0',
+          paddingLeft: () => 4,
+          paddingRight: () => 4,
+          paddingTop: () => 4,
+          paddingBottom: () => 4,
+        },
+        margin: [0, 0, 0, 10],
+      },
+
+      {
+        margin: [0, 8, 0, 0],
+        table: {
+          widths: ['*', 180],
+          body: [
+            [
+              {
+                text:
+                  'This is a computer-generated printout prepared from the application data received from the portal.',
+                style: 'small',
+                italics: true,
+              },
+              {
+                text: 'Authorized Signatory',
+                alignment: 'right',
+                style: 'text',
+                margin: [0, 24, 0, 0],
+              },
+            ],
+          ],
+        },
+        layout: 'noBorders',
+      },
+    ],
+  };
+}
+
+private preparePdf(app: any, openPreview = true): void {
+  (pdfMake as any).vfs = (pdfFonts as any)?.vfs || (pdfFonts as any);
+
+  const documentDefinition = this.buildPdfDefinition(app);
+  this.lastPdfDefinition = documentDefinition;
+
+  const pdfDocGenerator = pdfMake.createPdf(documentDefinition);
+  pdfDocGenerator.getBlob((blob: Blob) => {
+    try {
+      if (this.pdfBlobUrl) {
+        URL.revokeObjectURL(this.pdfBlobUrl);
+      }
+    } catch {}
+
+    const url = URL.createObjectURL(blob);
+    this.pdfBlobUrl = url;
+    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    this.pdfZoom = 1;
+    this.showPdfPreview = openPreview;
+  });
+}
+
+printApplication(): void {
+  const app = this.applicationData;
+
+  if (!app) {
+    this.apiService.openSnackBar('No application loaded to print.', 'error');
+    return;
+  }
+
+  (pdfMake as any).vfs = (pdfFonts as any)?.vfs || (pdfFonts as any);
+
+  const documentDefinition = this.buildPdfDefinition(app);
+
+  pdfMake.createPdf(documentDefinition).getBlob((blob: Blob) => {
+    const blobUrl = URL.createObjectURL(blob);
+
+    const printWindow = window.open(blobUrl, '_blank');
+
+    if (!printWindow) {
+      this.apiService.openSnackBar('Popup blocked. Please allow popups.', 'error');
+      return;
+    }
+
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
+  });
+}
+
+
+
+downloadPdf(): void {
+  const app = this.applicationData;
+  if (!app) {
+    this.apiService.openSnackBar('No application loaded to download.', 'error');
+    return;
+  }
+
+  const fields = this.normalizeApplicationData(app?.application_data || {});
+  const applicantName = this.getApplicantName(app, fields);
+  const applicationNo = this.getApplicationNumber(app);
+  const fileName = `${applicantName} - ${applicationNo}.pdf`
+    .replace(/[\\/:*?"<>|]+/g, '_')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const documentDefinition = this.lastPdfDefinition || this.buildPdfDefinition(app);
+  (pdfMake as any).vfs = (pdfFonts as any)?.vfs || (pdfFonts as any);
+
+  pdfMake.createPdf(documentDefinition).download(fileName);
+}
+
+openPdfInNewTab(): void {
+  const app = this.applicationData;
+  if (!app) return;
+
+  if (this.pdfBlobUrl) {
+    window.open(this.pdfBlobUrl, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  const documentDefinition = this.lastPdfDefinition || this.buildPdfDefinition(app);
+  (pdfMake as any).vfs = (pdfFonts as any)?.vfs || (pdfFonts as any);
+  pdfMake.createPdf(documentDefinition).open();
+}
+
+closePdfPreview(): void {
+  this.showPdfPreview = false;
+}
+
+zoomIn(): void {
+  this.pdfZoom = Math.min(2.5, +(this.pdfZoom + 0.1).toFixed(1));
+}
+
+zoomOut(): void {
+  this.pdfZoom = Math.max(0.6, +(this.pdfZoom - 0.1).toFixed(1));
+}
+
+fitToWidth(): void {
+  this.pdfZoom = 1;
+}
+
+fetchApplicationDetails(): void {
+  this.isLoading = true;
+
+  const payload = {
+    application_id: this.applicationId,
+  };
+
+  this.apiService
+    .getByConditions({}, `api/department/applications/${this.applicationId}`)
+    .subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+
+        if (res?.status !== 1 || !res?.data || typeof res.data !== 'object') {
+          this.apiService.openSnackBar(
+            res?.message || 'No application details found.',
+            'Close'
+          );
+          return;
+        }
+
+        const appData = res.data || {};
+        const rawAppData = appData?.application_data || res?.application_data || {};
+        const structuredData = this.normalizeApplicationData(rawAppData);
+
+        const filteredData = structuredData.filter((qa: any) => {
+          if (qa.answer == null) return false;
+          if (qa.answer === '') return false;
+          if (Array.isArray(qa.answer) && qa.answer.length === 0) return false;
+          return true;
+        });
+
+        const historyData = Array.isArray(res?.history_data)
+          ? res.history_data
+          : Array.isArray(appData?.history_data)
+            ? appData.history_data
+            : [];
+
+        const workflowData = Array.isArray(appData?.workflow)
+          ? appData.workflow
+          : Array.isArray(res?.workflow)
+            ? res.workflow
+            : [];
+
+        const paymentDetails = Array.isArray(res?.payment_details)
+          ? res.payment_details
+          : Array.isArray(appData?.payment_details)
+            ? appData.payment_details
+            : [];
+
+        this.transactionDetails = paymentDetails.map((item: any) => ({
+          transaction_id: item?.transaction_id || null,
+          GRN_number: item?.GRN_number || null,
+          gateway: item?.gateway || null,
+          payment_datetime: item?.payment_datetime || null,
+          payment_amount: item?.payment_amount || null,
+          payment_status: item?.payment_status || null,
+        }));
+
+        this.serviceName = res?.service_name || appData?.service_name || '';
+
+        const normalizedApp = {
+          ...appData,
+          service_name: res?.service_name || appData?.service_name || '',
+          application_data: rawAppData,
+          application_data_structured: filteredData,
+          payment_details: paymentDetails,
+          workflow: workflowData,
+          history_data: historyData,
+          renewal_details: res?.renewal_details || appData?.renewal_details || {},
+        };
+
+        this.applicationData = normalizedApp;
+        this.application = normalizedApp;
+
+        this.isCertificatePreview = true;
+        this.isFinalApproval = !!normalizedApp?.is_finally_approved;
+        this.justBeforeApproval = !!normalizedApp?.just_before_final_step;
+        this.isCertificateGenerated = !!normalizedApp?.is_certificate_generated;
+
+        const firstStatusFile =
+          historyData.find((h: any) => !!h?.status_file)?.status_file ||
+          workflowData.find((w: any) => !!w?.status_file)?.status_file ||
+          null;
+
+        this.sampleFilePreview = firstStatusFile || null;
+
+        this.historyDetails = historyData.map((h: any) => ({
+          step_number: h?.step_number,
+          step_type: h?.step_type || '—',
+          status: h?.status || '—',
+          remarks: h?.remarks || '—',
+          action_taken_at: this.formatDateTime(h?.action_taken_at),
+          status_file: h?.status_file || null,
+        }));
+
+        console.log('Application Data:', this.applicationData?.application_data);
+
+        if (typeof this.processDataForDisplay === 'function') {
+          this.processDataForDisplay();
+        }
+
+        if (this.applicationData) {
+          this.preparePdf(this.applicationData, false);
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('API Error:', err);
+        this.apiService.openSnackBar('Could not load application.', 'Close');
+      },
+    });
+}
+
+// ✅ Check if file URL is valid
+checkDownloadUrlAvailability(url: string): boolean {
+  if (!url) return false;
+
+  try {
+    const parsed = new URL(url);
+    return !!parsed;
+  } catch {
+    return false;
+  }
+}
+// ✅ Format date-time (for workflow)
+formatDateTime(date: string | Date): string {
+  if (!date) return '—';
+
+  const d = new Date(date);
+  return d.toLocaleString('en-GB'); // DD/MM/YYYY, HH:mm
+}
+
+openPrintPreview(): void {
+  if (!this.applicationData) {
+    this.apiService.openSnackBar('No application loaded to preview.', 'error');
+    return;
+  }
+
+  // Prepare PDF and open modal
+  this.preparePdf(this.applicationData, true); // 👈 this sets showPdfPreview = true
+}
+
+
+
 }

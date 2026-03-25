@@ -19,10 +19,14 @@
           <mat-icon class="icon-left">visibility</mat-icon>
           <span class="btn-label">CAF</span>
         </button>
+        <button type="button" class="btn-print" (click)="openPrintPreview()" aria-label="Print Application">
+          <mat-icon class="icon-left" aria-hidden="true">print</mat-icon>
+          <span class="btn-label">Print Application</span>
+        </button>
         <button *ngIf="isFinalApproval" mat-raised-button class="btn-gradient primary-action generate-btn"
           (click)="editCertificateGeneration()" aria-label="Generate or re-generate certificate">
           <mat-icon class="icon-left animate-icon">workspace_premium</mat-icon>
-          <span class="btn-label">{{isCerfitificateGenerated ? 'Re-Generate Certificate' : 'Generate Certificate'}}</span>
+          <span class="btn-label">{{isCertificateGenerated ? 'Re-Generate Certificate' : 'Generate Certificate'}}</span>
         </button>
         <button *ngIf="isFinalApproval" type="button" class="btn-gradient pdf-action" (click)="downloadCertificate()"
           aria-label="Download certificate as PDF">
@@ -105,7 +109,7 @@
                   </div>
                 </div>
               </div>
-    
+
               <!-- <div class="action-row">
                 <button class="btn primary" (click)="previewCertificate()">Preview</button>
                 <button class="btn outline" (click)="downloadCertificate()">Download</button>
@@ -127,7 +131,7 @@
               <div class="fee-val">{{ applicationData?.total_fee || '—' }}</div>
             </div>
           </div>
-    
+
         </section>
         <section class="details-accordion" aria-label="Application details">
           <div *ngFor="let item of infoData; let idx = index" class="accordion-card"
@@ -138,13 +142,13 @@
               <div class="preview">{{ item.value && item.value.length > 90 ? (item.value | slice:0:90) + '...' : item.value
                 }}</div>
             </button>
-    
+
             <div class="accordion-body" *ngIf="expandedInfoIndex === idx">
               <div class="full-val">{{ item.value || '—' }}</div>
             </div>
           </div>
         </section>
-    
+
       </div>
     </div>
 
@@ -173,8 +177,8 @@
           Remarks are required and must be at least 2 characters.
         </small>
         <div class="modal-actions">
-         
-<!-- 
+
+<!--
           <button class="btn btn-primary" *ngIf="isCertificatePreview && statusModal.action === 'approved'"
             mat-raised-button class="generate-btn" (click)="editCertificateGeneration()">
             <mat-icon style="color: white;" class="mr-2">workspace_premium</mat-icon>
@@ -190,5 +194,48 @@
         </div>
       </form>
     <!-- </div> -->
+  </div>
+</div>
+
+<div *ngIf="showPdfPreview" class="pdf-overlay" role="dialog" aria-label="Application preview">
+  <div class="pdf-modal">
+    <div class="pdf-header">
+      <div class="pdf-title">
+        <strong>Application Preview</strong>
+        <div class="pdf-subtitle">
+          {{ applicationData?.service_name || serviceName || '' }} —
+          {{ getApplicationNumber(applicationData || applicationId) }}
+        </div>
+      </div>
+
+      <div class="pdf-toolbar" role="toolbar" aria-label="PDF actions">
+        <button class="pdf-tool" type="button" (click)="zoomOut()">−</button>
+        <button class="pdf-tool" type="button" (click)="fitToWidth()">Fit</button>
+        <button class="pdf-tool" type="button" (click)="zoomIn()">+</button>
+        <button class="pdf-tool" type="button" (click)="printApplication()">Print</button>
+        <button class="pdf-tool" type="button" (click)="downloadPdf()">Download</button>
+        <button class="pdf-tool" type="button" (click)="openPdfInNewTab()">Open</button>
+        <button class="pdf-close-btn" type="button" (click)="closePdfPreview()" aria-label="Close preview">✕</button>
+      </div>
+    </div>
+
+    <div class="pdf-body">
+      <div class="pdf-viewport" [style.transform]="'scale(' + pdfZoom + ')'" [style.transformOrigin]="'top left'">
+        <iframe *ngIf="pdfUrl" [src]="pdfUrl" class="pdf-iframe" frameborder="0"></iframe>
+      </div>
+    </div>
+
+    <div class="pdf-footer">
+      <div class="pdf-meta">
+        <span>
+          Printed On:
+          {{
+            (applicationData?.updated_at
+              ? (applicationData?.updated_at | date:'dd/MM/yyyy HH:mm')
+              : (now | date:'dd/MM/yyyy HH:mm'))
+          }}
+        </span>
+      </div>
+    </div>
   </div>
 </div>

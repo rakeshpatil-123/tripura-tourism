@@ -843,8 +843,6 @@ export class ServiceApplicationComponent implements OnInit {
         }
       }
     });
-
-    //  Section fields
     this.sectionGroups.forEach((section) => {
       const sectionData = raw[section.sectionName] || [];
       sectionData.forEach((row: any, rowIndex: number) => {
@@ -858,7 +856,7 @@ export class ServiceApplicationComponent implements OnInit {
             value = Array.isArray(value) ? value.join(', ') : value;
           }
 
-          const fieldName = `application_data[${section.sectionName}][${rowIndex}][${q.id}]`;
+          const fieldName = `application_data[${q.id}][${rowIndex}]`;
 
           if (q.question_type === 'file') {
             if (value instanceof File) {
@@ -877,6 +875,7 @@ export class ServiceApplicationComponent implements OnInit {
         });
       });
     });
+
 
     this.apiCalling = true;
 
@@ -901,11 +900,13 @@ export class ServiceApplicationComponent implements OnInit {
             this.apiCalling = false;
 
           }
+           this.apiCalling = false;
         },
         error: (err) => {
-          console.error('Submission error:', err);
+          // console.error('Submission error:', err);
+           this.apiCalling = false;
           this.apiService.openSnackBar(
-            err?.error?.message || 'Submission failed. Please try again.',
+            err?.error?.message || err?.uri || 'Submission failed. Please try again.',
             'error'
           );
         },
@@ -1227,7 +1228,8 @@ export class ServiceApplicationComponent implements OnInit {
             q.is_required === 'yes' ||
             (value !== null && value !== '' && value !== undefined)
           ) {
-            const fieldName = `application_data[${section.sectionName}][${rowIndex}][${q.id}]`;
+            const fieldName = `application_data[${q.id}][${rowIndex}]`;
+
             if (q.question_type === 'file' && value instanceof File) {
               formData.append(fieldName, value, value.name);
             } else {
@@ -1237,7 +1239,6 @@ export class ServiceApplicationComponent implements OnInit {
         });
       });
     });
-
     this.apiService
       .getByConditions(formData, 'api/user/calculate-fee')
       .subscribe({
