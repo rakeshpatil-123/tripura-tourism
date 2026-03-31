@@ -21,7 +21,7 @@ export class GenericService {
 
   //ng build --configuration production --base-href /onlineservice/ --deploy-url /onlineservice/
  //command for build with base href and deploy url
-  
+
 // <<<<<<< changes-for-landing-page
 //   // Development URLs
 //   // static DEV_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
@@ -29,8 +29,8 @@ export class GenericService {
 //   // static UAT_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
 //   // static CERTIN_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
 //   // static PRODUCTION_BACKEND_URL = 'http://swaagatstaging.tripura.cloud';
-  
-//   //Production URLs 
+
+//   //Production URLs
 //   static DEV_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
 //   static QA_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
 //   static UAT_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
@@ -38,11 +38,17 @@ export class GenericService {
 //   static PRODUCTION_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
 // =======
   // Development / Staging and Production URLs
-  static DEV_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
-  static QA_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
-  static UAT_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
-  static CERTIN_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
-  static PRODUCTION_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  // static DEV_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  // static QA_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  // static UAT_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  // static CERTIN_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  // static PRODUCTION_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  // Development / Staging and Production URLs
+  static DEV_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
+  static QA_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
+  static UAT_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
+  static CERTIN_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
+  static PRODUCTION_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
 
 
   public static BACKEND_URL(): string {
@@ -707,7 +713,7 @@ export class GenericService {
         }).then(() => {
           this.removeSessionData();
           // this.router.navigate(['/']);
-          window.location.href = this.getRedirectUrl('/');//also handle here for the base path /onlineservice 
+          window.location.href = this.getRedirectUrl('/');//also handle here for the base path /onlineservice
         });
       },
       error: (error) => {
