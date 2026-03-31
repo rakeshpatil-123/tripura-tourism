@@ -75,8 +75,7 @@ export class AppComponent implements OnInit, OnDestroy {
   showOtherComponents = false; // Toggle to show old components if needed
 
   // Hero background image
-  heroBackgroundImage = 'assets/images/Neermahal.jpg';
-
+  heroBackgroundImage = 'assets/images/newBanner2.jpeg';
   // License Categories Data
   licenseCategories = [
     {
