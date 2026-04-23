@@ -25,8 +25,8 @@
 
         <div class="row">
           <ng-container *ngFor="let q of groupedQuestions[group]">
-            <div class="mb-3" [style.width]="q.display_width || '100%'" *ngIf="isQuestionVisible(q.id) && 
-              q.question_type !== 'date_mmdd' && 
+            <div class="mb-3" [style.width]="q.display_width || '100%'" *ngIf="isQuestionVisible(q.id) &&
+              q.question_type !== 'date_mmdd' &&
               q.question_type !== 'date_yyyymmdd'">
               <!-- Text / Number / Email / Textarea -->
               <div class="mrg4">
@@ -110,8 +110,8 @@
                       [formGroupName]="i">
                       <td>{{ i + 1 }}</td>
                       <ng-container *ngFor="let q of section.questions">
-                        <td *ngIf="isQuestionVisible(q.id, section.sectionName, i)&& 
-             q.question_type !== 'date_mmdd' && 
+                        <td *ngIf="isQuestionVisible(q.id, section.sectionName, i)&&
+             q.question_type !== 'date_mmdd' &&
              q.question_type !== 'date_yyyymmdd'" class="no-wrap">
                           <!-- Text / Number / Email / Textarea -->
                           <app-ilogi-input *ngIf="
@@ -170,7 +170,6 @@
                     </tr>
                   </tbody>
                 </table>
-
               </div>
             </div>
           </div>
@@ -179,6 +178,7 @@
           </div>
         </div>
       </div>
+      <!-- <button (click)="showSubmitConfirmation()" type="submit">Submit form right now</button> -->
       <div class="btnss  p-4">
         @if((applicationStatus === 'draft' || applicationStatus === null) && !isCalculated) {
         <button type="button" (click)="draft()" class="btn draft calculate-btn submit-btn" [disabled]="apiCalling">Save
@@ -229,7 +229,6 @@
   </ng-template>
   }
 </div>
-
 @if(successFullySubmitted === true){
 <div class="popup-overlay">
   <div class="popup-content">
@@ -245,10 +244,8 @@
     </div>
 
     <button class="btn btn-success popup-btn" (click)="goTo()">
-      Go to Services
+      {{ successRedirectUrl ? 'Go to SWAAGAT again' : 'Go to Services' }}
     </button>
   </div>
 </div>
-
-
 }

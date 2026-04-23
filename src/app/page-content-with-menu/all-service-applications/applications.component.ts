@@ -241,7 +241,7 @@ export class ApplicationsComponent implements OnInit {
       //   type: 'link',
       //   linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`,
       // },
-      application_number: { label: 'Application Number', width: '190px', type: 'link', linkHref: (row: any) => `/dashboard/service-view/${row.application_id}`},
+      application_number: { label: 'Application Number', width: '190px', type: 'link', linkHref: (row: any) => this.getRedirectUrl(`/dashboard/service-view/${row.application_id}`)},
       // service_name: { label: 'Service', width: '180px' },
       applicant_name: { label: 'Applicant Name', width: '180px' },
       applicant_email: { label: 'Email', width: '200px' },
@@ -289,6 +289,13 @@ export class ApplicationsComponent implements OnInit {
     });
 
     return columns;
+  }
+
+  private getRedirectUrl(path: string): string {
+    const { origin, pathname } = window.location;
+    const basePath = pathname.startsWith('/onlineservice') ? '/onlineservice' : '';
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `${origin}${basePath}${normalized}`;
   }
 
 formatDateTime(dateTimeString: string): string {
