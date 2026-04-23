@@ -39,7 +39,6 @@ export class DepartmentalServicesComponent implements OnInit {
       this.apiService.openSnackBar('Department ID not found.', 'Close');
       return;
     }
-    
     this.selectedDepartmentId = Number(departmentId); // Store it for later use
     this.services = [];
     this.isLoading = true;
@@ -87,7 +86,6 @@ export class DepartmentalServicesComponent implements OnInit {
   let column: TableColumn;
 
   if (key === 'service_name') {
-    // ✅ Make service_name a clickable link (full page reload is fine)
     column = {
       key: 'service_name',
       label: 'Service Name',
@@ -99,7 +97,6 @@ export class DepartmentalServicesComponent implements OnInit {
           this.apiService.openSnackBar('Missing required IDs.', 'Close');
           return '#';
         }
-        // ✅ Return full URL path — will cause reload, but that's fine for now
         return `/dashboard/all-service-application/${deptId}/${row.service_id}`;
       },
     };

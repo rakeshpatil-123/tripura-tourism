@@ -25,6 +25,7 @@ import { IlogiInputDateComponent } from '../../../customInputComponents/ilogi-in
 import { IlogiCheckboxComponent } from '../../../customInputComponents/ilogi-checkbox/ilogi-checkbox.component';
 import { ConfirmationModalComponent } from '../../../shared/component/confirmation-modal/confirmation-modal.component';
 import { LoaderComponent } from '../../../page-template/loader/loader.component';
+import Swal from 'sweetalert2';
 
 interface ValidationRule {
   type: string;
@@ -107,6 +108,7 @@ interface succesRes{
 export class ServiceApplicationComponent implements OnInit {
   formModifiedAfterFeeCalculation = false;
   showConfirmModal = false;
+  successRedirectUrl: string | null = null;
   modalConfig = {
     title: 'Confirm Submission',
     message: 'Are you sure you want to submit this application?',
@@ -170,7 +172,17 @@ export class ServiceApplicationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.serviceId = Number(this.route.snapshot.paramMap.get('id'));
+    let isThirdPartyService = null;
+    let thirdPartyServiceId: any = null;
+    this.route.queryParams.subscribe((params: any) => {
+      isThirdPartyService = !!params['returnUrl'];
+      thirdPartyServiceId = params['service_id'];
+    })
+    if (isThirdPartyService) {
+      this.serviceId = thirdPartyServiceId;
+    } else {
+      this.serviceId = Number(this.route.snapshot.paramMap.get('id'));
+    }
     const queryParams = this.route.snapshot.queryParams;
     const appIdParam = queryParams['application_id'];
     const appStatus = queryParams['application_status'];
@@ -728,9 +740,11 @@ export class ServiceApplicationComponent implements OnInit {
     this.onSubmit();
   }
 
-  onSubmit(): void {
+onSubmit(): void {
+  const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+  const isThirdParty = !!returnUrl;
+  const thirdPartyServiceId = this.route.snapshot.queryParams['service_id'];
     this.serviceForm.markAllAsTouched();
-
     const validationErrors = this.getFormValidationErrors();
     if (validationErrors.length > 0) {
       const message =
@@ -748,7 +762,7 @@ export class ServiceApplicationComponent implements OnInit {
     const raw = this.serviceForm.getRawValue();
     const preparedRaw = this.prepareRawDataForSubmission(raw);
 
-    this.submitWithFiles(userId, preparedRaw, false);
+    this.submitWithFiles(userId, preparedRaw, false, isThirdParty, returnUrl, thirdPartyServiceId);
   }
 
   private getSubmissionEndpoint(): string {
@@ -799,11 +813,21 @@ export class ServiceApplicationComponent implements OnInit {
   private submitWithFiles(
     userId: string,
     raw: any,
-    saveAsDraft: boolean = false
+    saveAsDraft: boolean = false,
+    isThirdParty: boolean = false,
+    returnUrl: string | null = null,
+    thirdPartyServiceId: string | null = null
   ): void {
     const formData = new FormData();
+    if (isThirdParty) {
+      formData.append('is_third_party', "1");
+    }
     formData.append('user_id', userId);
-    formData.append('service_id', this.serviceId.toString());
+    if (thirdPartyServiceId && isThirdParty) {
+      formData.append('service_id', thirdPartyServiceId);
+    } else {
+      formData.append('service_id', this.serviceId.toString());
+    }
     formData.append('save_data', saveAsDraft ? '1' : '0');
     const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
     if (actualAppId !== null) {
@@ -879,29 +903,30 @@ export class ServiceApplicationComponent implements OnInit {
 
     this.apiCalling = true;
 
-    this.apiService
-      .getByConditions(formData, this.getSubmissionEndpoint())
+    this.apiService.getByConditions(formData, this.getSubmissionEndpoint())
       .subscribe({
         next: (res) => {
-          if (res?.status === 1) {
-            this.apiService.openSnackBar(
-              'Application saved successfully!',
-              'success'
-            );
-            // this.router.navigate(['/dashboard/services']);
-            this.successFullySubmitted = true;
-            this.succesResponse = res ;
-            this.apiCalling = false;
-          } else {
-            this.apiService.openSnackBar(
-              res?.message || 'Submission failed.',
-              'error'
-            );
-            this.apiCalling = false;
+  if (res?.status === 1) {
+    this.apiService.openSnackBar(
+      'Application saved successfully!',
+      'success'
+    );
 
-          }
-           this.apiCalling = false;
-        },
+    this.successFullySubmitted = true;
+    this.succesResponse = res;
+    this.successRedirectUrl = isThirdParty && returnUrl ? returnUrl : null;
+    this.apiCalling = false;
+  } else {
+    this.apiService.openSnackBar(
+      res?.message || 'Submission failed.',
+      'error'
+    );
+    this.apiCalling = false;
+  }
+
+  this.apiCalling = false;
+},
+
         error: (err) => {
           // console.error('Submission error:', err);
            this.apiCalling = false;
@@ -914,9 +939,15 @@ export class ServiceApplicationComponent implements OnInit {
   }
 
   goTo() {
+    if (this.successRedirectUrl) {
+      window.location.href = this.successRedirectUrl;
+      return;
+    }
+
     this.router.navigate(['/dashboard/services']);
     this.successFullySubmitted = false;
   }
+
 
   draft(): void {
     const userId = this.apiService.getDecryptedUserId();

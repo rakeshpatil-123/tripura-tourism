@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { DynamicTableComponent } from '../../../shared/component/table/table.component';
 import { GenericService } from '../../../_service/generic/generic.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LoaderComponent } from '../../../page-template/loader/loader.component';
 import { IlogiSelectComponent } from '../../../customInputComponents/ilogi-select/ilogi-select.component';
 import { FormsModule } from '@angular/forms';
@@ -32,7 +32,7 @@ export class ServicesComponent {
   selectedNocType: string | null = null;
   selectedDepartment: string | null = null;
   isLoading: boolean = false;
-  constructor(private apiService: GenericService, private router: Router) {}
+  constructor(private apiService: GenericService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.allServices();
@@ -176,7 +176,7 @@ export class ServicesComponent {
       } else if (key.includes('email') || key.includes('href')) {
         type = 'link';
       } else if (['target_days'].includes(key)) {
-        type = 'number';
+        type = 'text';
       } else if (key === 'allow_repeat_application_display') {
         type = 'text';
       } else {
@@ -204,7 +204,6 @@ export class ServicesComponent {
       },
       width: '60px',
       onClick: (row: any) => {
-        
         if (row.is_caf_filled === true) {
           this.onApply(row);
         } else  {
@@ -302,7 +301,7 @@ export class ServicesComponent {
             if (form) form.submit();
           },
           error: (err) => {
-            this.apiService.openSnackBar('Redirect failed.', 'error');
+            this.apiService.openSnackBar(err.error.message || err.message || 'Redirect failed.', 'error');
           },
         });
       return;
@@ -316,7 +315,11 @@ export class ServicesComponent {
     if (row.application_id !== null && row.allow_repeat_application === 'no') {
       queryParams.appid2 = row.application_id;
     }
-
+    if (localStorage.getItem('service_id')) {
+      this.router.navigate(['dashboard/service-application', row.id], {
+        queryParams: queryParams,
+      });
+    }
     this.router.navigate(['dashboard/service-application', row.id], {
       queryParams: queryParams,
     });
@@ -329,6 +332,6 @@ export class ServicesComponent {
   close(){
     this.showPopup = false;
    this.router.navigate(['/dashboard/caf'])
-    
+
   }
 }
