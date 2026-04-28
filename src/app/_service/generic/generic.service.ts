@@ -44,11 +44,11 @@ export class GenericService {
   // static CERTIN_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
   // static PRODUCTION_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
   // Development / Staging and Production URLs
-  static DEV_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
-  static QA_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
-  static UAT_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
-  static CERTIN_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
-  static PRODUCTION_BACKEND_URL = 'https://tourismservicebackend.tripura.cloud';
+  static DEV_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static QA_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static UAT_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static CERTIN_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
+  static PRODUCTION_BACKEND_URL = 'https://tripuratourism.gov.in/onlineservices';
 
 
   public static BACKEND_URL(): string {
