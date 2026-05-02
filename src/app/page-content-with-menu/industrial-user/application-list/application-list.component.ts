@@ -64,7 +64,7 @@ export class ApplicationSearchPageComponent implements OnInit {
   error: string = '';
 currentPageSize = 5;
   fromDate: string = '';
-  toDate: string = ''; 
+  toDate: string = '';
   department: string = '';
   applicationType: string = '';
 
@@ -201,8 +201,6 @@ currentPageSize = 5;
       });
   }
 
- 
-
   getApplications(page: number = 1, perPage: number = 5): void {
     this.loading = true;
     const user_id = localStorage.getItem('userId') || '';
@@ -304,7 +302,7 @@ currentPageSize = 5;
         this.skipNextPageSizeUpdate = true;
       this.serverPagination = {
         currentPage: page,
-        pageSize: perPage, 
+        pageSize: perPage,
         totalItems: meta.total || 0,
       };
       } else {
@@ -448,6 +446,7 @@ private formatDateForBackend(input: string): string {
           },
           {
             label: (row: any) => {
+              if (row.status === 'extra_payment') return 'Pay Now';
               return row.status === 'draft' ? 'Edit Draft' : 'Re-submit';
             },
             action: 'view',
@@ -457,8 +456,12 @@ private formatDateForBackend(input: string): string {
               row.status === 'send_back' ||
               row.status === 'draft',
             handler: (row: ApplicationDataItem) => {
-              const queryParams: any = { application_status: row.status, application_id: row.nocDetailsId };
-             
+              if (row.status === 'extra_payment') {
+                this.router.navigate(['/dashboard/payments']);
+                return;
+              }
+              const queryParams: any = { application_status: row.status, application_id: row.nocDetailsId,
+              };
 
               this.router.navigate(
                 [`/dashboard/service-application`, row.service_id],

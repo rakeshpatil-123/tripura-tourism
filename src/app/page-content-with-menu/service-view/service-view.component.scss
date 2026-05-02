@@ -1519,3 +1519,12 @@ button[color='accent'] {
   display: flex;
   align-items: center;
 }
+.file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.view-file-btn {
+  margin: 0;
+}

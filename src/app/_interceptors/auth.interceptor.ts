@@ -1,53 +1,40 @@
-// // File: src/app/_interceptors/auth.interceptor.ts
-// import { Injectable } from '@angular/core';
-// import {
-//     HttpEvent,
-//     HttpHandler,
-//     HttpInterceptor,
-//     HttpRequest,
-//     HttpErrorResponse
-// } from '@angular/common/http';
-// import { Observable, throwError } from 'rxjs';
-// import { catchError } from 'rxjs/operators';
-// import { Router } from '@angular/router';
-// import { GenericService } from '../_service/generic/generic.service';
+import { Injectable } from '@angular/core';
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { GenericService } from '../_service/generic/generic.service';
 
-// @Injectable()
-// export class AuthInterceptor implements HttpInterceptor {
-//     constructor(private router: Router, private genericService: GenericService) { }
+@Injectable()
+export class SessionExpiryInterceptor implements HttpInterceptor {
 
-//     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-//         let token: string | null = null;
+  constructor(private genericService: GenericService) { }
 
-//         // 1️⃣ Priority: SessionStorage token (used in switch-user tab)
-//         if (sessionStorage.getItem('token')) {
-//             token = sessionStorage.getItem('token');
-//         }
-//         // 2️⃣ Fallback: LocalStorage token (used in admin or normal user session)
-//         else if (localStorage.getItem('token')) {
-//             token = localStorage.getItem('token');
-//         }
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    return next.handle(req).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 0) {
+          this.genericService.openSnackBar?.('Network issue. Please check your internet connection.', 'info');
+          return throwError(() => error);
+        }
 
-//         // 3️⃣ Clone request and add Authorization header if token is found
-//         let authReq = req;
-//         if (token) {
-//             authReq = req.clone({
-//                 setHeaders: {
-//                     Authorization: `Bearer ${token}`
-//                 }
-//             });
-//         }
-
-//         // 4️⃣ Handle responses globally
-//         return next.handle(authReq).pipe(
-//             catchError((error: HttpErrorResponse) => {
-//                 if (error.status === 401 || error.status === 403) {
-//                     console.warn('Unauthorized or forbidden, logging out.');
-//                     this.genericService.removeSessionData();
-//                     this.router.navigate(['/unauthorized']);
-//                 }
-//                 return throwError(() => error);
-//             })
-//         );
-//     }
-// }
+        if (error.status === 504) {
+          this.genericService.openSnackBar?.('Server is taking too long to respond. Please try again later.', 'info');
+          return throwError(() => error);
+        }
+        const message = error?.error?.message || error?.message;
+        if (error.status === 401) {
+          const msg = (error?.error?.message || '').toLowerCase();
+          if (
+            msg.includes('unauthenticated') ||
+            msg.includes('session expired') ||
+            msg.includes('token expired') ||
+            msg === ''
+          ) {
+            this.genericService.autoLogout();
+          }
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+}

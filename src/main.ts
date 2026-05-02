@@ -5,7 +5,14 @@ import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@a
 import { SessionExpiryInterceptor } from './app/_interceptors/session-expiry.interceptor';
 
 bootstrapApplication(AppComponent, {
-  providers: [appConfig.providers, provideHttpClient(withInterceptorsFromDi()), { provide: HTTP_INTERCEPTORS, useClass: SessionExpiryInterceptor, multi: true }
+  providers: [
+    ...appConfig.providers,
+    provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: SessionExpiryInterceptor,
+      multi: true
+    }
   ]
 })
   .catch(err => console.error(err));

@@ -607,3 +607,15 @@
   justify-items: center;
   gap: 20px;
 }
+.file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.file-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

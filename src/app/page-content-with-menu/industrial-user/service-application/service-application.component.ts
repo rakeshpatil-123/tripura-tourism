@@ -33,6 +33,8 @@ interface ValidationRule {
   maxLength?: number | string;
   pattern?: string;
   errorMessage?: string;
+  mimes?: string[];
+  max_size_mb?: number | string;
 }
 
 interface ServiceQuestion {
@@ -143,26 +145,121 @@ export class ServiceApplicationComponent implements OnInit {
   serviceName: string | null = null;
   successFullySubmitted: boolean = false;
   succesResponse!: succesRes;
-  private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const value = control.value;
-      if (value == null || value === '') {
-        return null;
-      }
-      const stringValue = String(value).replace(/[^0-9]/g, '');
-      if (min !== undefined && stringValue.length < min) {
-        return {
-          minLength: { requiredLength: min, actualLength: stringValue.length },
-        };
-      }
-      if (max !== undefined && stringValue.length > max) {
-        return {
-          maxLength: { requiredLength: max, actualLength: stringValue.length },
-        };
-      }
+private static digitLengthValidator(min?: number, max?: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (value == null || value === '') {
       return null;
-    };
+    }
+    const stringValue = String(value).replace(/[^0-9]/g, '');
+    if (min !== undefined && stringValue.length < min) {
+      return {
+        minLength: { requiredLength: min, actualLength: stringValue.length },
+      };
+    }
+    if (max !== undefined && stringValue.length > max) {
+      return {
+        maxLength: { requiredLength: max, actualLength: stringValue.length },
+      };
+    }
+    return null;
+  };
+}
+
+private static fileTypeAndSizeValidator(
+  allowedMimes: string[] = [],
+  maxSizeMb?: number
+): ValidatorFn {
+  const normalize = (value: string) =>
+    String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/^\./, '');
+
+  const allowed = allowedMimes.map(normalize).filter(Boolean);
+
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (!(value instanceof File)) {
+      return null;
+    }
+    if ((value as any)?._isFake) {
+      return null;
+    }
+
+    if (allowed.length > 0) {
+      const fileName = normalize(value.name || '');
+      const extension = fileName.includes('.') ? fileName.split('.').pop() || '' : '';
+      const mime = normalize(value.type || '');
+      const isAllowed = allowed.some((item) => {
+        if (item === 'jpg' || item === 'jpeg') {
+          return extension === item || mime === 'image/jpeg';
+        }
+        if (item === 'png') {
+          return extension === 'png' || mime === 'image/png';
+        }
+        if (item === 'pdf') {
+          return extension === 'pdf' || mime === 'application/pdf';
+        }
+        return extension === item || mime.includes(item);
+      });
+
+      if (!isAllowed) {
+        return {
+          invalidFileType: {
+            allowedTypes: allowedMimes,
+          },
+        };
+      }
+    }
+
+    if (maxSizeMb !== undefined && !isNaN(maxSizeMb)) {
+      const maxBytes = maxSizeMb * 1024 * 1024;
+      if (value.size > maxBytes) {
+        return {
+          fileTooLarge: {
+            requiredSizeMb: maxSizeMb,
+            actualSizeMb: +(value.size / 1024 / 1024).toFixed(2),
+          },
+        };
+      }
+    }
+
+    return null;
+  };
+}
+
+getFileAllowedExtensions(question: ServiceQuestion): string[] {
+  const mimes = question.validation_rule?.mimes;
+  if (!Array.isArray(mimes)) return [];
+  return mimes.map((m) => String(m).trim().toLowerCase()).filter(Boolean);
+}
+
+getFileAcceptAttribute(question: ServiceQuestion): string {
+  const allowed = this.getFileAllowedExtensions(question);
+  if (allowed.length === 0) return '*/*';
+  return allowed.map((ext) => `.${ext}`).join(',');
+}
+
+getFileMaxBytes(question: ServiceQuestion): number {
+  const maxMb = Number(question.validation_rule?.max_size_mb ?? 5);
+  return !isNaN(maxMb) && maxMb > 0 ? maxMb * 1024 * 1024 : 5 * 1024 * 1024;
+}
+
+getFileHintText(question: ServiceQuestion): string {
+  const allowed = this.getFileAllowedExtensions(question);
+  const maxMb = question.validation_rule?.max_size_mb ?? 5;
+
+  const parts: string[] = [];
+  if (allowed.length > 0) {
+    parts.push(`Allowed: ${allowed.map((ext) => `.${ext}`).join(', ')}`);
   }
+  if (maxMb !== null && maxMb !== undefined && String(maxMb).trim() !== '') {
+    parts.push(`Max size: ${maxMb} MB`);
+  }
+
+  return parts.join(' | ');
+}
   constructor(
     private route: ActivatedRoute,
     private fb: FormBuilder,
@@ -440,6 +537,23 @@ export class ServiceApplicationComponent implements OnInit {
             console.warn(`Invalid regex for ${q.id}:`, rule.pattern);
           }
         }
+
+        if (q.question_type === 'file') {
+          const allowedMimes = Array.isArray(rule.mimes) ? rule.mimes : [];
+          const maxSizeMb =
+            rule.max_size_mb != null && rule.max_size_mb !== ''
+              ? Number(rule.max_size_mb)
+              : undefined;
+
+          if (allowedMimes.length > 0 || maxSizeMb !== undefined) {
+            validators.push(
+              ServiceApplicationComponent.fileTypeAndSizeValidator(
+                allowedMimes,
+                maxSizeMb
+              )
+            );
+          }
+        }
       }
 
       let defaultValue: any = q.default_value || '';
@@ -566,6 +680,22 @@ export class ServiceApplicationComponent implements OnInit {
             );
           }
         }
+        if (q.question_type === 'file') {
+          const allowedMimes = Array.isArray(rule.mimes) ? rule.mimes : [];
+          const maxSizeMb =
+            rule.max_size_mb != null && rule.max_size_mb !== ''
+              ? Number(rule.max_size_mb)
+              : undefined;
+
+          if (allowedMimes.length > 0 || maxSizeMb !== undefined) {
+            validators.push(
+              ServiceApplicationComponent.fileTypeAndSizeValidator(
+                allowedMimes,
+                maxSizeMb
+              )
+            );
+          }
+        }
       }
 
       let defaultValue: any = q.default_value || '';
@@ -671,6 +801,14 @@ export class ServiceApplicationComponent implements OnInit {
             question.validation_rule?.errorMessage ||
               `${label} has invalid format`
           );
+        } else if (control.hasError('invalidFileType')) {
+          const allowed = control.getError('invalidFileType')?.allowedTypes || [];
+          errors.push(
+            `${label} allows only ${allowed.map((ext: string) => `.${ext}`).join(', ')} files`
+          );
+        } else if (control.hasError('fileTooLarge')) {
+          const err = control.getError('fileTooLarge');
+          errors.push(`${label} must be <= ${err.requiredSizeMb} MB`);
         } else if (
           control.hasError('minLength') ||
           control.hasError('maxLength')
@@ -710,6 +848,14 @@ export class ServiceApplicationComponent implements OnInit {
                 question.validation_rule?.errorMessage ||
                   `${label} has invalid format`
               );
+            } else if (control.hasError('invalidFileType')) {
+              const allowed = control.getError('invalidFileType')?.allowedTypes || [];
+              errors.push(
+                `${label} allows only ${allowed.map((ext: string) => `.${ext}`).join(', ')} files`
+              );
+            } else if (control.hasError('fileTooLarge')) {
+              const err = control.getError('fileTooLarge');
+              errors.push(`${label} must be <= ${err.requiredSizeMb} MB`);
             } else if (
               control.hasError('minLength') ||
               control.hasError('maxLength')

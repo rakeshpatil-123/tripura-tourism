@@ -49,13 +49,34 @@
           <div *ngIf="item.isSection" class="qa-section-header">
             <h5 class="section-title">{{ item.question }}</h5>
           </div>
-          <div *ngIf="!item.isSection" class="qa-item">
-            <div class="qa-question">{{ item.question }}</div>
-            <div class="qa-answer" *ngIf="item.isFile">
-              <button type="button" class="view-file-btn" (click)="openFile(item.fileUrl)">{{ item.fileName }}</button>
-            </div>
-            <div class="qa-answer" *ngIf="!item.isFile">{{ item.answer }}</div>
-          </div>
+       <div class="qa-item">
+  <div class="qa-question">{{ item.question }}</div>
+
+  <div class="qa-answer" *ngIf="item.isFile; else textAnswer">
+   <ng-container *ngIf="item.fileUrls?.length > 0; else singleFile">
+  <div class="file-list">
+    <button
+      type="button"
+      class="view-file-btn"
+      *ngFor="let file of item.fileUrls; let i = index"
+      (click)="openFile(file)">
+      {{ item.fileNames?.[i] || ('View File ' + (i + 1)) }}
+    </button>
+  </div>
+</ng-container>
+
+
+    <ng-template #singleFile>
+      <button type="button" class="view-file-btn" (click)="openFile(item.fileUrl)">
+        {{ item.fileName }}
+      </button>
+    </ng-template>
+  </div>
+
+  <ng-template #textAnswer>
+    <div class="qa-answer">{{ item.answer }}</div>
+  </ng-template>
+</div>
         </ng-container>
       </div>
     </ng-container>
