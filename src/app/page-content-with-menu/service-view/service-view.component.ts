@@ -252,27 +252,33 @@ if (data.application_data && typeof data.application_data === 'object') {
     const value = data.application_data[key];
 
     if (typeof value === 'object' && !Array.isArray(value) && value.question && value.answer !== undefined) {
-      const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(value.answer, value.type);
-      qaData.push({
-        question: this.sanitizeHtmlTags(value.question || '—'),
-        answer: formattedAnswer,
-        isFile,
-        fileUrl,
-        fileName,
-      });
+     const { formattedAnswer, isFile, fileUrl, fileName, fileUrls, fileNames } =
+  this.processAnswer(value.answer, value.type);
+qaData.push({
+  question: this.sanitizeHtmlTags(value.question || '—'),
+  answer: formattedAnswer,
+  isFile,
+  fileUrl,
+  fileName,
+  fileUrls,
+  fileNames,
+});
     }
     else if (Array.isArray(value) && key === 'fields') {
       for (const field of value) {
         if (field && typeof field === 'object' && field.question && field.answer !== undefined) {
-          const { formattedAnswer, isFile, fileUrl, fileName } = this.processAnswer(field.answer, field.type);
+         const { formattedAnswer, isFile, fileUrl, fileName, fileUrls, fileNames } =
+  this.processAnswer(field.answer, field.type);
 
-          qaData.push({
-            question: this.sanitizeHtmlTags(field.question || '—'),
-            answer: formattedAnswer,
-            isFile,
-            fileUrl,
-            fileName,
-          });
+qaData.push({
+  question: this.sanitizeHtmlTags(field.question || '—'),
+  answer: formattedAnswer,
+  isFile,
+  fileUrl,
+  fileName,
+  fileUrls,
+  fileNames,
+});
         }
       }
     }
@@ -556,88 +562,111 @@ if (data.application_data && typeof data.application_data === 'object') {
     }
   }
 
-  /**
-   * Detects if a string is a file URL based on extension
-   * Returns the URL if it's a file, null otherwise
-   */
-  private detectFileFromString(ansStr: string): string | null {
-    if (!ansStr || typeof ansStr !== 'string') return null;
-    const urlRegex = /^https?:\/\//i;
-    const fileExtRegex = /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i;
-    if (urlRegex.test(ansStr) && fileExtRegex.test(ansStr)) {
-      return ansStr;
+/**
+ * Detects if a string is a file URL or file path based on extension
+ * Returns the resolved URL if it's a file, null otherwise
+ */
+private detectFileFromString(ansStr: string): string | null {
+  if (!ansStr || typeof ansStr !== 'string') return null;
+  const trimmed = ansStr.trim();
+  const fileExtRegex = /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i;
+  const looksLikeFile =
+    /^https?:\/\//i.test(trimmed) ||
+    /^uploads\//i.test(trimmed) ||
+    fileExtRegex.test(trimmed);
+
+  if (!looksLikeFile) return null;
+
+  return this.resolveFileUrl(trimmed);
+}
+
+/**
+ * Processes answer field and returns formatted answer with file detection
+ * Handles string, array, and object types
+ * Supports multiple files and relative uploads/ paths
+ * Also handles date formatting based on type field
+ */
+private processAnswer(
+  answer: any,
+  type?: string
+): {
+  formattedAnswer: string;
+  isFile: boolean;
+  fileUrl?: string;
+  fileName?: string;
+  fileUrls?: string[];
+  fileNames?: string[];
+} {
+  let formattedAnswer = '—';
+  let isFile = false;
+  let fileUrl: string | undefined;
+  let fileName: string | undefined;
+  const fileUrls: string[] = [];
+  const fileNames: string[] = [];
+  const textValues: string[] = [];
+
+  const pushTextValue = (val: any) => {
+    if (val === null || val === undefined) return;
+    const text = String(val).trim();
+    if (!text) return;
+
+    const maybeFile = this.detectFileFromString(text);
+    if (maybeFile) {
+      isFile = true;
+      fileUrls.push(maybeFile);
+      fileNames.push(decodeURIComponent(maybeFile.split('/').pop() || maybeFile));
+    } else {
+      textValues.push(type && type.toLowerCase().includes('date') ? this.formatDateByType(text, type) : text);
     }
-    return null;
-  }
+  };
 
-  /**
-   * Processes answer field and returns formatted answer with file detection
-   * Handles string, array, and object types
-   * Also handles date formatting based on type field
-   */
-  private processAnswer(answer: any, type?: string): { formattedAnswer: string; isFile: boolean; fileUrl?: string; fileName?: string } {
-    let formattedAnswer = '—';
-    let isFile = false;
-    let fileUrl: string | undefined;
-    let fileName: string | undefined;
+  const collectValues = (val: any): void => {
+    if (val === null || val === undefined) return;
 
-    if (Array.isArray(answer)) {
-      if (answer.length === 0) {
-        formattedAnswer = '—';
-      } else {
-        const allValues: string[] = [];
-        for (const ans of answer) {
-          if (ans === null || ans === undefined) continue;
-          if (typeof ans === 'string') {
-            if (ans.trim()) allValues.push(ans);
-          } else if (typeof ans === 'object') {
-            for (const k in ans) {
-              if (ans.hasOwnProperty(k)) {
-                const v = ans[k];
-                if (v !== null && v !== undefined && v !== '') {
-                  allValues.push(String(v));
-                }
-              }
-            }
-          }
-        }
-        if (allValues.length > 0) {
-          // If single value and it is a file URL, mark as file
-          if (allValues.length === 1) {
-            const maybe = this.detectFileFromString(allValues[0]);
-            if (maybe) {
-              isFile = true;
-              fileUrl = maybe;
-              fileName = maybe.split('/').pop() || maybe;
-              formattedAnswer = '';
-            } else {
-              // Apply date formatting if type is date-related
-              const isDateType = type && type.toLowerCase().includes('date');
-              formattedAnswer = isDateType ? this.formatDateByType(allValues[0], type) : allValues[0];
-            }
-          } else {
-            formattedAnswer = allValues.join(', ');
-          }
-        } else {
-          formattedAnswer = '—';
-        }
-      }
-    } else if (typeof answer === 'string' && answer.trim()) {
-      const maybeFile = this.detectFileFromString(answer);
-      if (maybeFile) {
-        isFile = true;
-        fileUrl = maybeFile;
-        fileName = maybeFile.split('/').pop() || maybeFile;
-        formattedAnswer = '';
-      } else {
-        // Apply date formatting if type is date-related
-        const isDateType = type && type.toLowerCase().includes('date');
-        formattedAnswer = isDateType ? this.formatDateByType(answer, type) : answer;
-      }
+    if (Array.isArray(val)) {
+      val.forEach(collectValues);
+      return;
     }
 
-    return { formattedAnswer, isFile, fileUrl, fileName };
+    if (typeof val === 'object') {
+      Object.keys(val).forEach((k) => collectValues(val[k]));
+      return;
+    }
+
+    pushTextValue(val);
+  };
+
+  collectValues(answer);
+
+  if (fileUrls.length > 0) {
+    fileUrl = fileUrls[0];
+    fileName = fileNames[0];
+    formattedAnswer = fileNames.join(', ');
+  } else if (textValues.length > 0) {
+    formattedAnswer = textValues.join(', ');
   }
+
+  return { formattedAnswer, isFile, fileUrl, fileName, fileUrls, fileNames };
+}
+
+private resolveFileUrl(url: any): string {
+  const raw = this.safeText(url);
+  if (raw === '—') return '—';
+  if (/^https?:\/\//i.test(raw)) return raw;
+
+  const baseUrl =
+    ((this as any).fileBaseUrl || 'http://tripuratourism.gov.in/onlineservices/storage/')
+      .toString()
+      .replace(/\/?$/, '/');
+  return `${baseUrl}${raw.replace(/^\/+/, '')}`;
+}
+
+private fileNameFromUrl(url: any): string {
+  const resolved = this.resolveFileUrl(url);
+  if (resolved === '—') return 'View File';
+  return decodeURIComponent(resolved.split('/').pop() || 'View File');
+}
+
 
   closeModal(): void {
       this.statusModal.visible = false;
@@ -1051,18 +1080,6 @@ private formatPdfDateOnly(value: any): string {
   return d.toLocaleDateString('en-GB');
 }
 
-private resolveFileUrl(url: any): string {
-  const raw = this.safeText(url);
-  if (raw === '—') return '—';
-  if (/^https?:\/\//i.test(raw)) return raw;
-  return `${this.fileBaseUrl}${raw.replace(/^\/+/, '')}`;
-}
-
-private fileNameFromUrl(url: any): string {
-  const resolved = this.resolveFileUrl(url);
-  if (resolved === '—') return 'View File';
-  return decodeURIComponent(resolved.split('/').pop() || 'View File');
-}
 
 public getApplicationNumber(app: any): string {
   return this.safeText(

@@ -30,12 +30,17 @@ interface ApplicationDetail {
   applicationId: string;
   application_date: string;
   status: string;
-  application_data: Record<string, string>;
+  application_data: Record<string, any>;
   application_data_structured?: {
-    id: number;
+    id: number | string;
     question: string;
-    answer: string;
+    answer: any;
     type: string;
+    isFile?: boolean;
+    fileUrl?: string;
+    fileUrls?: string[];
+    fileName?: string;
+    fileNames?: string[];
   }[];
   payment_status: string | null;
   final_fee: string;
@@ -250,25 +255,31 @@ private lastPdfDefinition: any = null;
   //     });
   // }
 
-  getFileNameFromUrl(url: string | null | undefined): string {
-    if (!url) return '';
-    try {
-      const urlWithoutParams = url.split('?')[0];
-      return (
-        decodeURIComponent(
-          urlWithoutParams.substring(urlWithoutParams.lastIndexOf('/') + 1)
-        ) || 'document.pdf'
-      );
-    } catch {
-      return 'document.pdf';
-    }
+getFileNameFromUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  try {
+    const resolved = this.resolveFileUrl(url);
+    const urlWithoutParams = resolved.split('?')[0];
+    return (
+      decodeURIComponent(
+        urlWithoutParams.substring(urlWithoutParams.lastIndexOf('/') + 1)
+      ) || 'document.pdf'
+    );
+  } catch {
+    return 'document.pdf';
   }
+}
 
-  previewFile(url: string): void {
-    if (url) {
-      window.open(url, '_blank');
-    }
+previewFile(url: string): void {
+  const resolved = this.resolveFileUrl(url);
+  if (resolved && resolved !== '—') {
+    window.open(resolved, '_blank');
   }
+}
+
+openFile(url: string): void {
+  this.previewFile(url);
+}
 
   getLabel(key: string): string {
     return this.fieldLabelMap[key] || `Field ${key}`;
@@ -328,35 +339,41 @@ private lastPdfDefinition: any = null;
       },
     });
   }
-  formatAnswerForDisplay(answer: any): string {
-    if (!answer) return '—';
+formatAnswerForDisplay(answer: any): string {
+  if (answer === null || answer === undefined || answer === '') return '—';
 
-    if (typeof answer === 'string') {
-      if (answer.startsWith('http') || answer.includes('uploads/')) {
-        const url = new URL(answer, 'http://dummy.base');
-        return url.pathname.split('/').pop() || answer;
+  if (Array.isArray(answer)) {
+    const fileUrls = this.extractFileUrls(answer);
+    if (fileUrls.length > 0) {
+      return fileUrls.map((u) => this.getFileNameFromUrl(u)).join(', ');
+    }
+    const flatValues: string[] = [];
+    for (const item of answer) {
+      if (item === null || item === undefined || item === '') continue;
+      if (typeof item === 'object') {
+        flatValues.push(...Object.values(item).map((v) => String(v)));
+      } else {
+        flatValues.push(String(item));
       }
-      return answer;
     }
-
-    if (Array.isArray(answer)) {
-      const flatValues: string[] = [];
-      for (const item of answer) {
-        if (typeof item === 'object' && item !== null) {
-          flatValues.push(...Object.values(item).map((v) => String(v)));
-        } else {
-          flatValues.push(String(item));
-        }
-      }
-      return flatValues.join(', ');
-    }
-
-    if (typeof answer === 'object') {
-      return Object.values(answer).join(', ');
-    }
-
-    return String(answer);
+    return flatValues.length ? flatValues.join(', ') : '—';
   }
+
+  if (typeof answer === 'string') {
+    const resolved = this.resolveFileUrl(answer);
+    if (resolved !== answer || /^https?:\/\//i.test(answer) || /^uploads\//i.test(answer)) {
+      return this.getFileNameFromUrl(resolved);
+    }
+    return answer;
+  }
+
+  if (typeof answer === 'object') {
+    const values = Object.values(answer).filter((v) => v !== null && v !== undefined && v !== '');
+    return values.length ? values.map((v) => String(v)).join(', ') : '—';
+  }
+
+  return String(answer);
+}
 
   // private normalizeApplicationData(
   //   data: any
@@ -439,7 +456,9 @@ private resolveFileUrl(url: any): string {
   const raw = this.safeText(url);
   if (raw === '—') return '—';
   if (/^https?:\/\//i.test(raw)) return raw;
-  return `${this.fileBaseUrl}${raw.replace(/^\/+/, '')}`;
+
+  const base = this.fileBaseUrl.endsWith('/') ? this.fileBaseUrl : `${this.fileBaseUrl}/`;
+  return `${base}${raw.replace(/^\/+/, '')}`;
 }
 
 private fileNameFromUrl(url: any): string {
@@ -447,6 +466,42 @@ private fileNameFromUrl(url: any): string {
   if (resolved === '—') return 'View File';
   const last = resolved.split('/').pop() || 'View File';
   return decodeURIComponent(last);
+}
+
+private extractFileUrls(answer: any): string[] {
+  const urls: string[] = [];
+
+  const walk = (value: any): void => {
+    if (value === null || value === undefined || value === '') return;
+
+    if (Array.isArray(value)) {
+      value.forEach(walk);
+      return;
+    }
+
+    if (typeof value === 'object') {
+      Object.values(value).forEach(walk);
+      return;
+    }
+
+    if (typeof value === 'string') {
+      const text = value.trim();
+      if (!text) return;
+
+      const isFile =
+        /^https?:\/\//i.test(text) ||
+        /^uploads\//i.test(text) ||
+        /\.(pdf|docx?|xlsx?|xls|png|jpe?g|gif|txt|csv)(\?.*)?$/i.test(text);
+
+      if (isFile) {
+        urls.push(this.resolveFileUrl(text));
+      }
+    }
+  };
+
+  walk(answer);
+
+  return Array.from(new Set(urls.filter((u) => u && u !== '—')));
 }
 
 private getFieldValueById(fields: any[] = [], id: number): string {
@@ -478,118 +533,99 @@ public getApplicationNumber(app: any): string {
   );
 }
 
-private normalizeApplicationData(input: any): Array<{
+private normalizeApplicationData(
+  data: any
+): {
   id: number | string;
   question: string;
   answer: any;
   type?: string;
   isFile?: boolean;
   fileUrl?: string;
+  fileUrls?: string[];
   fileName?: string;
-}> {
-  const output: any[] = [];
-  if (!input) return output;
+  fileNames?: string[];
+}[] {
+  const result: {
+    id: number | string;
+    question: string;
+    answer: any;
+    type?: string;
+    isFile?: boolean;
+    fileUrl?: string;
+    fileUrls?: string[];
+    fileName?: string;
+    fileNames?: string[];
+  }[] = [];
 
-  const fields = Array.isArray(input?.fields) ? input.fields : [];
-  fields.forEach((f: any) => {
-    const answer = f?.answer;
-    const isFile =
-      f?.type === 'file' ||
-      (typeof answer === 'string' && /^https?:\/\/|^uploads\//i.test(answer)) ||
-      /document|photo|photograph|file|license|plan|form/i.test(
-        this.safeText(f?.question)
-      );
+  const addField = (field: any, fallbackKey?: string): void => {
+    if (!field || typeof field !== 'object') return;
 
-    output.push({
-      id: f?.id ?? '',
-      question: this.safeText(f?.question || `Field ${f?.id ?? ''}`),
+    const question = this.safeText(field.question || fallbackKey || 'Field');
+    const answer = field.answer;
+    const type = field.type || 'text';
+
+    const fileUrls = this.extractFileUrls(answer);
+    const isFile = type === 'file' || fileUrls.length > 0;
+
+    result.push({
+      id: field.id ?? fallbackKey ?? '',
+      question,
       answer,
-      type: f?.type || 'text',
+      type,
       isFile,
-      fileUrl: isFile ? this.resolveFileUrl(answer) : undefined,
-      fileName: isFile ? this.fileNameFromUrl(answer) : undefined,
+      fileUrl: fileUrls[0],
+      fileUrls: fileUrls.length ? fileUrls : undefined,
+      fileName: fileUrls[0] ? this.fileNameFromUrl(fileUrls[0]) : undefined,
+      fileNames: fileUrls.length ? fileUrls.map((u) => this.fileNameFromUrl(u)) : undefined,
     });
-  });
+  };
 
-  Object.keys(input).forEach((key) => {
-    if (key === 'fields') return;
-    const val = input[key];
-    if (val === null || val === undefined || val === '') return;
+  const traverse = (obj: any, parentKey = ''): void => {
+    if (!obj || typeof obj !== 'object') return;
 
-    if (Array.isArray(val)) {
-      val.forEach((item: any, idx: number) => {
-        if (item && typeof item === 'object') {
-          Object.keys(item).forEach((subKey) => {
-            const subVal = item[subKey];
-            if (!subVal) return;
-            const isFile =
-              typeof subVal === 'string' &&
-              (/^https?:\/\/|^uploads\//i.test(subVal) ||
-                /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(subVal));
-            output.push({
-              id: `${key}-${idx}-${subKey}`,
-              question: this.titleCase(
-                `${key} ${idx + 1}${subKey ? ` - ${subKey}` : ''}`
-              ),
-              answer: subVal,
-              type: isFile ? 'file' : 'text',
-              isFile,
-              fileUrl: isFile ? this.resolveFileUrl(subVal) : undefined,
-              fileName: isFile ? this.fileNameFromUrl(subVal) : undefined,
-            });
-          });
-        } else {
-          const isFile =
-            typeof item === 'string' &&
-            (/^https?:\/\/|^uploads\//i.test(item) ||
-              /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(item));
-          output.push({
-            id: `${key}-${idx}`,
-            question: this.titleCase(`${key} ${idx + 1}`),
-            answer: item,
-            type: isFile ? 'file' : 'text',
-            isFile,
-            fileUrl: isFile ? this.resolveFileUrl(item) : undefined,
-            fileName: isFile ? this.fileNameFromUrl(item) : undefined,
-          });
-        }
-      });
-    } else if (typeof val === 'object') {
-      Object.keys(val).forEach((subKey) => {
-        const subVal = val[subKey];
-        if (!subVal) return;
-        const isFile =
-          typeof subVal === 'string' &&
-          (/^https?:\/\/|^uploads\//i.test(subVal) ||
-            /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(subVal));
-        output.push({
-          id: `${key}-${subKey}`,
-          question: this.titleCase(`${key} ${subKey}`),
-          answer: subVal,
-          type: isFile ? 'file' : 'text',
-          isFile,
-          fileUrl: isFile ? this.resolveFileUrl(subVal) : undefined,
-          fileName: isFile ? this.fileNameFromUrl(subVal) : undefined,
-        });
-      });
-    } else {
-      const isFile =
-        typeof val === 'string' &&
-        (/^https?:\/\/|^uploads\//i.test(val) ||
-          /\.pdf$|\.png$|\.jpg$|\.jpeg$/i.test(val));
-      output.push({
+    if (Array.isArray(obj)) {
+      obj.forEach((item) => traverse(item, parentKey));
+      return;
+    }
+
+    if (obj.id !== undefined && obj.question !== undefined && obj.answer !== undefined) {
+      addField(obj, parentKey);
+      return;
+    }
+
+    Object.keys(obj).forEach((key) => {
+      const value = obj[key];
+
+      if (key === 'fields' && Array.isArray(value)) {
+        value.forEach((field: any) => addField(field));
+        return;
+      }
+
+      if (value && typeof value === 'object') {
+        traverse(value, key);
+        return;
+      }
+
+      const fileUrls = this.extractFileUrls(value);
+      const isFile = fileUrls.length > 0;
+
+      result.push({
         id: key,
-        question: this.titleCase(key),
-        answer: val,
+        question: this.getLabel(key),
+        answer: value,
         type: isFile ? 'file' : 'text',
         isFile,
-        fileUrl: isFile ? this.resolveFileUrl(val) : undefined,
-        fileName: isFile ? this.fileNameFromUrl(val) : undefined,
+        fileUrl: fileUrls[0],
+        fileUrls: fileUrls.length ? fileUrls : undefined,
+        fileName: fileUrls[0] ? this.fileNameFromUrl(fileUrls[0]) : undefined,
+        fileNames: fileUrls.length ? fileUrls.map((u) => this.fileNameFromUrl(u)) : undefined,
       });
-    }
-  });
+    });
+  };
 
-  return output;
+  traverse(data);
+  return result;
 }
 
 private collectFileDocuments(fields: any[]): Array<{
@@ -597,13 +633,32 @@ private collectFileDocuments(fields: any[]): Array<{
   fileUrl: string;
   fileName: string;
 }> {
-  return (fields || [])
-    .filter((f) => f?.isFile && f?.fileUrl && f.fileUrl !== '—')
-    .map((f) => ({
-      question: this.safeText(f.question),
-      fileUrl: this.resolveFileUrl(f.fileUrl),
-      fileName: this.safeText(f.fileName || this.fileNameFromUrl(f.fileUrl)),
-    }));
+  const docs: Array<{ question: string; fileUrl: string; fileName: string }> = [];
+
+  (fields || []).forEach((f) => {
+    const question = this.safeText(f?.question);
+
+    if (Array.isArray(f?.fileUrls) && f.fileUrls.length > 0) {
+      f.fileUrls.forEach((url: string, index: number) => {
+        docs.push({
+          question,
+          fileUrl: this.resolveFileUrl(url),
+          fileName: this.safeText(f?.fileNames?.[index] || this.fileNameFromUrl(url)),
+        });
+      });
+      return;
+    }
+
+    if (f?.isFile && f?.fileUrl && f.fileUrl !== '—') {
+      docs.push({
+        question,
+        fileUrl: this.resolveFileUrl(f.fileUrl),
+        fileName: this.safeText(f.fileName || this.fileNameFromUrl(f.fileUrl)),
+    });
+  }
+});
+
+  return docs;
 }
 
 private buildSummaryRows(app: any, structuredFields: any[]): any[][] {
@@ -1167,14 +1222,22 @@ fetchApplicationDetails(): void {
 
         const appData = res.data || {};
         const rawAppData = res.application_data || appData.application_data || {};
-        const structuredData = this.normalizeApplicationData(rawAppData);
+       const structuredData = this.normalizeApplicationData(
+  res.application_data
+);
 
-        const filteredData = structuredData.filter((qa) => {
-          if (qa.answer == null) return false;
-          if (qa.answer === '') return false;
-          if (Array.isArray(qa.answer) && qa.answer.length === 0) return false;
-          return true;
-        });
+const filteredData = structuredData.filter((qa) => {
+  if (qa.answer == null) return false;
+  if (qa.answer === '') return false;
+  if (Array.isArray(qa.answer) && qa.answer.length === 0) return false;
+
+  if (qa.isFile) {
+    if (Array.isArray(qa.fileUrls) && qa.fileUrls.length === 0) return false;
+    if (!qa.fileUrl && !Array.isArray(qa.fileUrls)) return false;
+  }
+
+  return true;
+});
 
         this.transactionDetails = Array.isArray(res.payment_details)
           ? res.payment_details.map((item: any) => ({

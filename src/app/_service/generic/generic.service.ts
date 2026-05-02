@@ -746,37 +746,80 @@ export class GenericService {
       },
     });
   }
-
-  autoLogout(): void {
-    localStorage.clear();
-    sessionStorage.clear();
-    this.setLoginStatus(false);
-    Swal.fire({
-      title: 'Session Expired!',
-      html: `<strong>Your session has ended. Please log in again to continue.</strong>`,
-      icon: 'warning',
-      iconColor: '#f59e0b',
-      background: '#fff7ed',
-      color: '#b45309',
-      timer: 3500,
-      timerProgressBar: true,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      showClass: {
-        popup: 'animate__animated animate__fadeInDown animate__faster',
-      },
-      hideClass: {
-        popup: 'animate__animated animate__fadeOutUp animate__faster',
-      },
-    }).then(() => {
-      // this.router.navigate(['/page/login']);
-      // window.location.href = '/page/login';
-      window.location.href = this.getRedirectUrl('/');
-    });
+  clearRedirectData(): void {
+  try {
+    sessionStorage.removeItem('returnUrl');
+    sessionStorage.removeItem('returnUrl_timestamp');
+  } catch (error) {
+    console.warn('Failed to clear redirect data:', error);
   }
+}
+
+autoLogout(): void {
+  const currentUrl = window.location.pathname;
+  this.clearRedirectData();
+  let storedReturnUrl: string | null = null;
+  if (
+    currentUrl &&
+    !currentUrl.startsWith('/page/') &&
+    !currentUrl.startsWith('/unauthorized') &&
+    currentUrl !== '/'
+  ) {
+    try {
+      storedReturnUrl = currentUrl;
+    } catch (error) {
+      console.warn('Could not store route for recovery:', error);
+    }
+  }
+  localStorage.clear();
+  if (storedReturnUrl) {
+    try {
+      sessionStorage.setItem('returnUrl', storedReturnUrl);
+      sessionStorage.setItem('returnUrl_timestamp', Date.now().toString());
+    } catch (error) {
+      console.warn('Could not store return URL:', error);
+    }
+  }
+  this.setLoginStatus(false);
+
+  Swal.fire({
+    title: 'Session Expired!',
+    html: `<strong>Your session has ended. Please log in again to continue.</strong>`,
+    icon: 'warning',
+    iconColor: '#f59e0b',
+    background: '#fff7ed',
+    color: '#b45309',
+    timer: 3500,
+    timerProgressBar: true,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster',
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster',
+    },
+  }).then(() => {
+   const { origin, pathname } = window.location;
+const firstSegment = pathname.split('/')[1];
+const basePath = firstSegment === 'onlineservice' ? '/onlineservice' : '';
+
+    const returnUrl = sessionStorage.getItem('returnUrl');
+    let loginUrl = `${origin}${basePath}/page/login`;
+
+    if (returnUrl) {
+      loginUrl += `?returnUrl=${encodeURIComponent(returnUrl)}`;
+    }
+
+    sessionStorage.removeItem('returnUrl');
+    sessionStorage.removeItem('returnUrl_timestamp');
+
+    window.location.href = loginUrl;
+  });
+}
   getRedirectUrl(path: string): string {
     if (!path) return path;
     if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(path)) {

@@ -49,16 +49,25 @@
 
 
               <!-- File Upload -->
-              <ng-container *ngIf="q.question_type === 'file'">
-                <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
-                  [accept]="q.validation_rule?.pattern || '*'" [maxFileSize]="5 * 1024 * 1024"
-                  [fileUrl]="getDefaultFileUrl(q.id)" [mandatory]="q.is_required === 'yes'">
-                </app-ilogi-file-upload>
-                <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button" class="sample"
-                  (click)="downloadSample(q.sample_format)">
-                  Download Sample
-                </button>
-              </ng-container>
+           <ng-container *ngIf="q.question_type === 'file'">
+<app-ilogi-file-upload
+[formControlName]="q.id"
+[label]="q.question_label"
+[accept]="getFileAcceptAttribute(q)"
+[maxFileSize]="getFileMaxBytes(q)"
+[fileUrl]="getDefaultFileUrl(q.id)"
+[mandatory]="q.is_required === 'yes'">
+</app-ilogi-file-upload>
+<small
+class="text-muted d-block mt-1"
+*ngIf="getFileHintText(q)">
+{{ getFileHintText(q) }}
+</small>
+  <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button" class="sample"
+    (click)="downloadSample(q.sample_format)">
+    Download Sample
+  </button>
+</ng-container>
 
               <!-- Radio -->
               <app-ilogi-radio *ngIf="q.question_type === 'radio'" [formControlName]="q.id"
@@ -129,17 +138,18 @@
                             [fieldLabel]="q.question_label" [mandatory]="q.is_required === 'yes'"
                             [submitted]="serviceForm.touched"></app-ilogi-input-date>
 
-
-                          <ng-container *ngIf="q.question_type === 'file'">
-                            <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label"
-                              [fileUrl]="getDefaultFileUrl(q.id)" [accept]="q.validation_rule?.pattern || '*'"
-                              [maxFileSize]="5 * 1024 * 1024" [mandatory]="q.is_required === 'yes'">
-                            </app-ilogi-file-upload>
-                            <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button"
-                              class="sample" (click)="downloadSample(q.sample_format)">
-                              Download Sample
-                            </button>
-                          </ng-container>
+<ng-container *ngIf="q.question_type === 'file'">
+  <app-ilogi-file-upload [formControlName]="q.id" [label]="q.question_label" [fileUrl]="getDefaultFileUrl(q.id)"
+    [accept]="getFileAcceptAttribute(q)" [maxFileSize]="getFileMaxBytes(q)" [mandatory]="q.is_required === 'yes'">
+  </app-ilogi-file-upload>
+  <small class="text-muted d-block mt-1" *ngIf="getFileHintText(q)">
+    {{ getFileHintText(q) }}
+  </small>
+  <button *ngIf="q.sample_format && q.sample_format.trim() !== ''" type="button" class="sample"
+    (click)="downloadSample(q.sample_format)">
+    Download Sample
+  </button>
+</ng-container>
 
                           <!-- Radio -->
                           <app-ilogi-radio *ngIf="q.question_type === 'radio'" [formControlName]="q.id"

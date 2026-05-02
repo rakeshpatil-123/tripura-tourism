@@ -118,17 +118,35 @@
       </div>
     </section>
 
-    <section class="section" *ngIf="!isThirdParty && application?.application_data_structured?.length">
-      <h2>Applicant Information</h2>
-      <div class="grid">
-        <div class="field" *ngFor="let qa of application.application_data_structured">
-          @if(qa.type === 'file') {
-          <div class="file-display">
-            <label [innerHTML]="qa.question"></label>
-            <span>{{ getFileNameFromUrl(qa.answer) }}</span>
-            <button type="button" class="btn-view btn-success btn-sm" (click)="previewFile(qa.answer)">
-              View
-            </button>
+<section class="section" *ngIf="!isThirdParty && application?.application_data_structured?.length">
+  <h2>Applicant Information</h2>
+  <div class="grid">
+    <div class="field" *ngFor="let qa of application.application_data_structured">
+      @if (qa.isFile || qa.type === 'file') {
+      <div class="file-display">
+        <label [innerHTML]="qa.question"></label>
+
+   <ng-container *ngIf="qa.fileUrls?.length as count; else singleFileView">
+  <div class="file-list" *ngIf="count > 0">
+    <button
+      type="button"
+      class="btn-view btn-success btn-sm"
+      *ngFor="let file of qa.fileUrls!; let i = index"
+      (click)="previewFile(file)">
+      {{ qa.fileNames?.[i] || getFileNameFromUrl(file) }}
+    </button>
+  </div>
+</ng-container>
+
+
+        <ng-template #singleFileView>
+          <button
+            type="button"
+            class="btn-view btn-success btn-sm"
+            (click)="previewFile(qa.fileUrl || qa.answer)">
+            {{ qa.fileName || getFileNameFromUrl(qa.fileUrl || qa.answer) }}
+          </button>
+            </ng-template>
           </div>
           } @else {
           <label [innerHTML]="qa.question"></label>
