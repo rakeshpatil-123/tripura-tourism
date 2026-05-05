@@ -2053,8 +2053,8 @@ export class RegistrationComponent implements OnInit, OnChanges {
     const basePath =
       pathname === '/' || pathname === ''
         ? ''
-        : pathname.startsWith('/new')
-        ? '/new'
+        : pathname.startsWith('/onlineservice')
+        ? '/onlineservice'
         : '';
     const normalized = path.startsWith('/') ? path : `/${path}`;
     return `${origin}${basePath}${normalized}`;

@@ -191,6 +191,7 @@ export class RepeatApplicationsComponent implements OnInit {
         },
         {
           label: (row: any) => {
+            if (row.status == 'extra_payment' || row.status === 'Extra Payment') return 'Pay Now';
             return row.status === 'draft' ? 'Edit Draft' : 'Re-Submit';
           },
           color: 'warn',
@@ -199,6 +200,10 @@ export class RepeatApplicationsComponent implements OnInit {
             row.status === 'extra_payment' ||
             row.status === 'draft',
           onClick: (row: any) => {
+            if (row.status === 'extra_payment') {
+              this.router.navigate(['/dashboard/payments']);
+              return;
+            }
             this.router.navigate(
               ['/dashboard/service-application', this.serviceId],
               {
