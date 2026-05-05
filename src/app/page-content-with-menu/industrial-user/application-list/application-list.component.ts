@@ -446,7 +446,7 @@ private formatDateForBackend(input: string): string {
           },
           {
             label: (row: any) => {
-              if (row.status === 'extra_payment') return 'Pay Now';
+              if (row.status === 'extra_payment' || row.status === 'Extra Payment') return 'Pay Now';
               return row.status === 'draft' ? 'Edit Draft' : 'Re-submit';
             },
             action: 'view',

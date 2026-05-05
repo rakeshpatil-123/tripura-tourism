@@ -1,0 +1,61 @@
+<div class="popup-overlay" role="dialog" aria-modal="true" aria-labelledby="payment-status-title">
+  <div class="popup-card" [class.success]="status === 'success'" [class.failed]="status === 'failed'">
+    <button type="button" class="close-btn" (click)="goHome()" aria-label="Close dialog">
+      ×
+    </button>
+
+    <div class="status-header" [class.success]="status === 'success'" [class.failed]="status === 'failed'">
+      <div class="status-badge">
+        <span class="status-badge-icon">
+          {{ status === 'success' ? '✓' : '!' }}
+        </span>
+        <span class="status-badge-text">
+          {{ status === 'success' ? 'Completed' : 'Not Completed' }}
+        </span>
+      </div>
+
+      <div class="icon-wrap">
+        <div class="icon-glow"></div>
+        <div class="icon-circle">
+          <span class="icon">{{ status === 'success' ? '✓' : '✕' }}</span>
+        </div>
+      </div>
+
+      <h2 id="payment-status-title" class="status-title">
+        {{ status === 'success' ? 'Payment Successful' : 'Payment Failed' }}
+      </h2>
+
+      <p class="status-subtitle">
+        {{
+        status === 'success'
+        ? 'Your transaction has been completed successfully.'
+        : 'Something went wrong while processing your payment.'
+        }}
+      </p>
+    </div>
+
+    <div class="details-section">
+      <div *ngIf="message" class="detail-item">
+        <span class="detail-label">Message</span>
+        <p class="detail-value">{{ message }}</p>
+      </div>
+
+      <div *ngIf="orderId" class="detail-item">
+        <span class="detail-label">Order ID</span>
+        <p class="detail-value hash-value">#{{ orderId }}</p>
+      </div>
+
+      <div *ngIf="amount" class="detail-item amount">
+        <span class="detail-label">Amount</span>
+        <p class="detail-value amount-value">₹{{ amount }}</p>
+      </div>
+    </div>
+
+    <div class="action-footer">
+      <button type="button" class="btn-home" (click)="goHome()">
+        <span class="btn-icon">⌂</span>
+        Back to Home
+      </button>
+    </div>
+  </div>
+</div>

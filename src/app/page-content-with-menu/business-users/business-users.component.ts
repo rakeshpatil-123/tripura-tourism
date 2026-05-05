@@ -336,7 +336,7 @@ export class BusinessUsersComponent implements OnInit {
       return anyWin.__BASE_PATH__.replace(/\/$/, '');
     }
     const { pathname } = window.location;
-    return pathname.startsWith('/new') ? '/new' : '';
+    return pathname.startsWith('/onlineservice') ? '/onlineservice' : '';
   }
 
   private escapeHtml(unsafe: string | null | undefined): string {

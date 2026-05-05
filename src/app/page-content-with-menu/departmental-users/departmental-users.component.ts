@@ -107,7 +107,7 @@ export class DepartmentalUsersComponent implements OnInit {
       return anyWin.__BASE_PATH__.replace(/\/$/, '');
     }
     const { pathname } = window.location;
-    return pathname.startsWith('/new') ? '/new' : '';
+    return pathname.startsWith('/onlineservice') ? '/onlineservice' : '';
   }
   applyFilters() {
     this.pagination.current_page = 1;
@@ -339,7 +339,7 @@ export class DepartmentalUsersComponent implements OnInit {
       this.genericService.logoutUser();
     }
 
-   
+
   private mapUsersAndForms(rawArray: any[]) {
     this.users = rawArray.map((user: any) => ({
       id: user.id,

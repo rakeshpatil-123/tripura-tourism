@@ -18,7 +18,7 @@ export class UnauthorizeddComponent {
 private getRedirectUrl(path: string): string {
   const { origin } = window.location;
 
-  // Replace old '/new' logic with '/onlineservice'
+  // Replace old '/onlineservice' logic with '/onlineservice'
   const basePath = '/onlineservice';
 
   // Ensure the path starts with '/'
@@ -27,7 +27,7 @@ private getRedirectUrl(path: string): string {
   // Return full URL
   return `${origin}${basePath}${normalized}`;
 }
- 
+
   goBack() {
     this.location.back();
   }
