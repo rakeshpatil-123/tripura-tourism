@@ -65,6 +65,8 @@ isCertificatePreview: boolean = false;  sampleFilePreview : any = null;
   totalWorkflowCount: number = 0;
   applicationQATableData: any[] = [];
   serviceName: string = '';
+  paymentsDetails: any = '';
+  showAllGRNStatus: boolean = false;
   transactionDetails: any = null;
    pdfBlobUrl: string | null = null;
   showPdfPreview = false;
@@ -187,6 +189,7 @@ private lastPdfDefinition: any = null;
       'application_fee': 'Application Fee',
       'extra_payment': 'Extra payment raised by departmental user',
       'total_fee': 'Total Fee',
+      'GRN_number': 'GRN Number',
       'payment_status': 'Payment Status',
       'user.name': 'Name',
       'user.phone': 'Phone No.',
@@ -1820,7 +1823,19 @@ fetchApplicationDetails(): void {
         const appData = res.data || {};
         const rawAppData = appData?.application_data || res?.application_data || {};
         const structuredData = this.normalizeApplicationData(rawAppData);
-
+        this.paymentsDetails = res.data.payment_details || [
+            {
+                "id": 5243,
+                "payment_amount": "31650",
+                "payment_status": "paid",
+                "gateway": "egras",
+                "gateway_order_id": "SW5243",
+                "transaction_id": "613181502971",
+                "GRN_number": "26131BF555",
+                "payment_datetime": "2026-05-11 21:55:15",
+                "created_at": "2026-05-11T16:24:52.000000Z"
+            }
+        ];
         const filteredData = structuredData.filter((qa: any) => {
           if (qa.answer == null) return false;
           if (qa.answer === '') return false;
@@ -1939,6 +1954,43 @@ openPrintPreview(): void {
   this.preparePdf(this.applicationData, true); // 👈 this sets showPdfPreview = true
 }
 
-
+  getAllGRNStatus(): void {
+    this.showAllGRNStatus = true;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      const panel = document.querySelector('.grn-panel') as HTMLElement | null;
+      if (panel) { panel.focus(); }
+    }, 60);
+  }
+  closeGRN(): void {
+    this.showAllGRNStatus = false;
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      const opener = document.querySelector('[aria-label="Open GRN Number Dialog"]') as HTMLElement | null;
+      if (opener) { opener.focus(); }
+    }, 60);
+  }
+  getGRNInfo(event: Event, user: any): void {
+    event.preventDefault();
+    if (!user?.GRN_number) {
+      return;
+    }
+    this.loaderService.showLoader();
+    const payload = { grn_no: user.GRN_number };
+    this.apiService
+      .getByConditions(payload, 'api/user/get-grn-status')
+      .pipe(finalize(() => this.loaderService.hideLoader()))
+      .subscribe({
+        next: (res: any) => {
+          const url = res?.url || res?.result?.url || res?.data?.url;
+          if (url) {
+            window.open(url, '_blank');
+          }
+        },
+        error: (err: any) => {
+          this.apiService.openSnackBar(err.error.message || err.message || 'Something Went Wrong! Please Try Again Later', 'error');
+        }
+      });
+  }
 
 }

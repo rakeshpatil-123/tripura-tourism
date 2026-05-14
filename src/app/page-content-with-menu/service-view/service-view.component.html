@@ -15,7 +15,8 @@
   </div>
     <div class="header-side header-right">
       <div class="btn-group-right">
-        <button type="button" class="btn-gradient ghost-action" (click)="navigateToCAF()" aria-label="Open CAF">
+        <div class="btn-gap">
+        <button type="button" class="btn-gradient action-btn view ghost-action" (click)="navigateToCAF()" aria-label="Open CAF">
           <mat-icon class="icon-left">visibility</mat-icon>
           <span class="btn-label">CAF</span>
         </button>
@@ -28,6 +29,11 @@
           <mat-icon class="icon-left animate-icon">workspace_premium</mat-icon>
           <span class="btn-label">{{isCertificateGenerated ? 'Re-Generate Certificate' : 'Generate Certificate'}}</span>
         </button>
+        <button type="button" *ngIf="paymentsDetails.length > 0" class="ghost-action btn-professional--ghost btn"
+          (click)="getAllGRNStatus()" aria-label="Open GRN Number Dialog">
+          <mat-icon class="icon-left" aria-hidden="true">currency_rupee</mat-icon>
+          <span class="btn-label">Know GRN status</span>
+        </button>
         <button *ngIf="isFinalApproval" type="button" class="btn-gradient pdf-action" (click)="downloadCertificate()"
           aria-label="Download certificate as PDF">
           <mat-icon class="icon-left animate-pulse">picture_as_pdf</mat-icon>
@@ -36,6 +42,7 @@
       <!-- <button mat-raised-button color="primary" class="submit-btn" *ngIf="sampleFilePreview" (click)="previewSampleFile()">
           Preview Sample File
         </button> -->
+         </div>
     </div>
   </div>
 </div>
@@ -258,5 +265,66 @@
         </span>
       </div>
     </div>
+  </div>
+</div>
+<div *ngIf="showAllGRNStatus" class="grn-overlay" role="dialog" aria-modal="true" aria-label="All GRN Status"
+  (keydown.escape)="closeGRN()" tabindex="-1">
+  <div class="grn-backdrop" (click)="closeGRN()" aria-hidden="true"></div>
+  <div class="grn-panel" (click)="$event.stopPropagation()" role="document" tabindex="0">
+    <header class="grn-header">
+      <div class="grn-title">
+        <h2>GRN Transactions</h2>
+        <div class="grn-sub">Showing latest Transaction Detail</div>
+      </div>
+      <button class="grn-close" (click)="closeGRN()" aria-label="Close GRN dialog">✕</button>
+    </header>
+    <div class="grn-body">
+      <div class="grn-table-wrap" role="region" aria-label="GRN table">
+        <table class="grn-table">
+          <thead>
+            <tr>
+              <th>S. No.</th>
+              <th class="align-right">Amount</th>
+              <th>Status</th>
+              <th>Gateway</th>
+              <th class="mono">Trans. ID</th>
+              <th class="mono">Date</th>
+              <th>GRN</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let payment of paymentsDetails; let i = index" class="grn-row"
+              [attr.data-status]="payment.payment_status">
+              <td class="cell-index">{{ i + 1 }}</td>
+              <td class="align-right cell-amount">₹{{ payment.payment_amount }}</td>
+              <td>
+                <span class="status-pill" [ngClass]="payment.payment_status">
+                  {{ payment.payment_status | titlecase }}
+                </span>
+              </td>
+              <td>{{ payment.gateway }}</td>
+              <td class="mono">{{ payment.transaction_id }}</td>
+              <td class="mono">{{ payment.payment_datetime | date }}</td>
+              <td>
+                <a role="button" class="grn-link" (click)="getGRNInfo($event, payment)">
+                  {{ payment.GRN_number }}
+                </a>
+              </td>
+            </tr>
+            <tr *ngIf="paymentsDetails?.length === 0">
+              <td colspan="7" class="empty">No records found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <footer class="grn-footer">
+      <div class="footer-left">
+        <small class="muted">Click GRN number to open GRN status in a new tab.</small>
+      </div>
+      <div class="footer-actions">
+        <button class="btn btn-outline" type="button" (click)="closeGRN()">Close</button>
+      </div>
+    </footer>
   </div>
 </div>
