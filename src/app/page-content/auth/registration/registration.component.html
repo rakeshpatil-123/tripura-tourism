@@ -60,8 +60,8 @@
               <!-- Mobile -->
               <app-ilogi-input fieldId="mobile_no" fieldLabel="Mobile Number" [mandatory]="true"
                 formControlName="mobile_no" placeholder="Enter mobile number" type="text"></app-ilogi-input>
-              <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched 
-                       && registrationForm.get('mobile_no')?.invalid 
+              <small class="error-text" *ngIf="registrationForm.get('mobile_no')?.touched
+                       && registrationForm.get('mobile_no')?.invalid
                        && !registrationForm.get('mobile_no')?.hasError('taken')">
                 Please enter a valid 10-digit mobile number.
               </small>
@@ -155,17 +155,32 @@
           formControlName="hierarchy_level" [selectOptions]="hierarchyLevels" placeholder="Select hierarchy level">
         </app-ilogi-select>
           </div>
+          <div *ngIf="sourcePage !== 'departmental-users'" class="location-type-wrap">
+            <label class="location-label">Location Type</label>
+
+            <div class="radio-options">
+              <label class="radio-item">
+                <input type="radio" formControlName="location_type" value="in_state" />
+                <span>In-State</span>
+              </label>
+
+              <label class="radio-item">
+                <input type="radio" formControlName="location_type" value="out_state" />
+                <span>Out-State</span>
+              </label>
+            </div>
+          </div>
+
           <!-- District -->
-          <app-ilogi-select *ngIf="shouldShow('district')" [multiple]="sourcePage === 'departmental-users'"
-            fieldId="district_id" fieldLabel="District" [mandatory]="true" formControlName="district_id"
-            [selectOptions]="districts" placeholder="Select district">
+          <app-ilogi-select *ngIf="shouldShow('district')" [multiple]="sourcePage === 'departmental-users'" fieldId="district_id"
+            fieldLabel="District" [mandatory]="true" formControlName="district_id" [selectOptions]="districts"
+            placeholder="Select district">
           </app-ilogi-select>
 
           <!-- Subdivision -->
           <app-ilogi-select *ngIf="shouldShow('subdivision')" [multiple]="sourcePage === 'departmental-users'"
             fieldId="subdivision_id" fieldLabel="Subdivision" [mandatory]="true" formControlName="subdivision_id"
-            [selectOptions]="subdivisions" placeholder="Select subdivision"
-            [disabled]="!districts.length || loadingDistricts">
+            [selectOptions]="subdivisions" placeholder="Select subdivision" [disabled]="!districts.length || loadingDistricts">
           </app-ilogi-select>
 
           <!-- ULB -->
