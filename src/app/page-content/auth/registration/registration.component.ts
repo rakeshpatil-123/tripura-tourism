@@ -139,12 +139,12 @@ export class RegistrationComponent implements OnInit, OnChanges {
         name_of_enterprise: ['', []],
         authorized_person_name: ['', []],
         email_id: ['', []],
-        // pan: ['', [Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]],
         mobile_no: [''],
         user_name: ['', []],
         registered_enterprise_address: ['', []],
         registered_enterprise_city: ['', []],
         user_type: ['individual', []],
+        location_type: ['in_state', []],
         password: ['', []],
         confirmPassword: ['', []],
         district_id: ['', []],
@@ -178,22 +178,22 @@ export class RegistrationComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.loadDistricts();
     this.getAllDepartmentList();
+
     if (this.sourcePage === 'departmental-users') {
       this.registrationForm.patchValue({ user_type: 'department' });
+
       ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'].forEach((ctrl) => {
         if (this.registrationForm.contains(ctrl)) {
           this.registrationForm.removeControl(ctrl);
         }
         this.registrationForm.addControl(ctrl, this.fb.control([]));
       });
+
       if (!this.registrationForm.contains('inspector')) {
         this.registrationForm.addControl('inspector', this.fb.control('0'));
       }
       if (!this.registrationForm.contains('hierarchy_level')) {
-        this.registrationForm.addControl(
-          'hierarchy_level',
-          this.fb.control('')
-        );
+        this.registrationForm.addControl('hierarchy_level', this.fb.control(''));
       }
       if (!this.registrationForm.contains('department_id')) {
         this.registrationForm.addControl('department_id', this.fb.control(''));
@@ -202,104 +202,55 @@ export class RegistrationComponent implements OnInit, OnChanges {
         this.registrationForm.addControl('designation', this.fb.control(''));
       }
     } else {
-      this.registrationForm.patchValue({ user_type: 'individual' });
-      ['hierarchy_level', 'inspector', 'department_id', 'designation'].forEach(
-        (ctrl) => {
-          if (this.registrationForm.contains(ctrl)) {
-            this.registrationForm.removeControl(ctrl);
-          }
+      this.registrationForm.patchValue({
+        user_type: 'individual',
+        location_type: 'in_state',
+      });
+
+      ['hierarchy_level', 'inspector', 'department_id', 'designation'].forEach((ctrl) => {
+        if (this.registrationForm.contains(ctrl)) {
+          this.registrationForm.removeControl(ctrl);
         }
-      );
+      });
+
       ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'].forEach((ctrl) => {
         if (this.registrationForm.contains(ctrl)) {
           this.registrationForm.removeControl(ctrl);
         }
         this.registrationForm.addControl(ctrl, this.fb.control(''));
       });
+
+      this.registrationForm
+        .get('location_type')
+        ?.valueChanges.subscribe((type) => {
+          if (type === 'out_state') {
+            this.applyOutStateDefaults();
+          }
+        });
+
+      if (this.registrationForm.get('location_type')?.value === 'out_state') {
+        this.applyOutStateDefaults();
+      }
     }
+
     this.setupCascadingDropdowns();
+
     this.registrationForm.get('hierarchy_level')?.valueChanges.subscribe(() => {
       this.onHierarchyChange();
     });
 
-    // this.registrationForm
-    //   .get('pan')
-    //   ?.valueChanges.pipe(
-    //     map((v: string) => (v || '').toString().toUpperCase()),
-    //     distinctUntilChanged(),
-    //     tap((upper) => {
-    //       const ctrl = this.registrationForm.get('pan');
-    //       if (ctrl && ctrl.value !== upper) {
-    //         ctrl.setValue(upper, { emitEvent: false });
-    //       }
-    //     }),
-    //     debounceTime(500),
-    //     tap((value: string) => {
-    //       const panCtrl = this.registrationForm.get('pan');
-    //       const panValue = value?.toString().trim();
-
-    //       // CLEAR message & error immediately when PAN is empty or invalid
-    //       if (!panValue || !this.PAN_REGEX.test(panValue)) {
-    //         this.panStatusMessage = '';
-    //         this.panStatusType = '';
-    //         if (panCtrl?.hasError('registered')) {
-    //           panCtrl.setErrors(null);
-    //         }
-    //       }
-    //     }),
-    //     filter((value: string) => this.PAN_REGEX.test(value)),
-    //     switchMap((value: string) => {
-    //       return this.genericService
-    //         .getByConditions(
-    //           { pan_no: value },
-    //           'api/user/check-pan-resgistered'
-    //         )
-    //         .pipe(
-    //           finalize(() => this.loaderService.hideLoader()),
-    //           catchError((err) => {
-    //             console.error('PAN check failed', err);
-    //             return of(null);
-    //           })
-    //         );
-    //     })
-    //   )
-    //   .subscribe((res: any) => {
-    //     const panCtrl = this.registrationForm.get('pan');
-    //     const panValue = panCtrl?.value?.toString().trim();
-    //     if (!res) {
-    //       this.panStatusMessage = '';
-    //       this.panStatusType = '';
-    //       const panCtrl = this.registrationForm.get('pan');
-    //       if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
-    //       return;
-    //     }
-
-    //     if (res.is_registered && panValue) {
-    //       const message =
-    //         res.message || 'Account already exists with this PAN number.';
-    //       this.panStatusMessage = message;
-    //       this.panStatusType = 'error';
-    //       panCtrl?.setErrors({ registered: true });
-    //     } else {
-    //       this.panStatusMessage = res.message || '';
-    //       this.panStatusType =
-    //         res.status === 1 ? 'success' : res.status === 0 ? 'info' : '';
-    //       const panCtrl = this.registrationForm.get('pan');
-    //       if (panCtrl?.hasError('registered')) panCtrl.setErrors(null);
-    //     }
-    //   });
     const mobileCtrl = this.registrationForm.get('mobile_no');
-    if (mobileCtrl && !(this.editMode && this.sourcePage === 'departmental-users' && this.editData)) {
-      // immediate behavior on user edit (preserve existing behavior)
-      mobileCtrl.valueChanges.subscribe((val: any) => {
+    if (
+      mobileCtrl &&
+      !(this.editMode && this.sourcePage === 'departmental-users' && this.editData)
+    ) {
+      mobileCtrl.valueChanges.subscribe(() => {
         this.hideSendOtp = false;
         this.hideVerify = false;
 
-        // clear mobile inline message when user edits (optional)
         this.mobileStatusMessage = '';
         this.mobileStatusType = '';
 
-        // reset otp flags so user can request again
         this.otpSent = false;
         this.otpVerified = false;
 
@@ -307,7 +258,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
           this.otpControl.reset();
         }
       });
-      // validation pipeline: debounce + pattern + API check (runtime "is taken" feedback)
+
       mobileCtrl.valueChanges
         .pipe(
           map((v: any) => (v || '').toString().trim()),
@@ -329,7 +280,6 @@ export class RegistrationComponent implements OnInit, OnChanges {
           })
         )
         .subscribe((res: any) => {
-          // If API didn't return a useful payload, clear inline state and mark as not-checked
           if (!res) {
             this.mobileChecked = false;
             this.mobileStatusMessage = '';
@@ -338,7 +288,6 @@ export class RegistrationComponent implements OnInit, OnChanges {
             return;
           }
 
-          // mark that we've got a definitive response for this value
           this.mobileChecked = true;
 
           const taken = !!(
@@ -346,6 +295,7 @@ export class RegistrationComponent implements OnInit, OnChanges {
             res.exists ||
             (res.status === 0 && !res.is_available)
           );
+
           if (taken) {
             const message =
               res.message || 'Account already exists with this mobile number.';
@@ -353,17 +303,13 @@ export class RegistrationComponent implements OnInit, OnChanges {
             this.mobileStatusType = 'error';
             mobileCtrl.setErrors({ taken: true });
 
-            // hide OTP UI and reset any OTP state
             this.hideSendOtp = true;
             this.hideVerify = true;
             this.otpSent = false;
 
-            // show one snackbar so user is aware
             this.genericService.openSnackBar(message, 'Close');
           } else {
-            // available — show inline success/info and enable OTP UI
-            this.mobileStatusMessage =
-              res.message || 'Mobile number available.';
+            this.mobileStatusMessage = res.message || 'Mobile number available.';
             this.mobileStatusType = res.status === 1 ? 'success' : 'info';
 
             this.hideSendOtp = false;
@@ -1332,8 +1278,6 @@ export class RegistrationComponent implements OnInit, OnChanges {
           this.loadingWards = false;
         },
         error: (err: any) => {
-          console.error('Failed to load wards:', err);
-          this.genericService.openSnackBar('Failed to load wards', 'Error');
           this.loadingWards = false;
         },
       });
@@ -1481,24 +1425,26 @@ export class RegistrationComponent implements OnInit, OnChanges {
         delete payload.hierarchy_level;
         delete payload.inspector;
       }
-      const hierarchyFields = [
-        'district_id',
-        'subdivision_id',
-        'ulb_id',
-        'ward_id',
-      ];
+      const hierarchyFields = ['district_id', 'subdivision_id', 'ulb_id', 'ward_id'];
       const fieldToCheck: Record<string, string> = {
         district_id: 'district',
         subdivision_id: 'subdivision',
         ulb_id: 'block',
         ward_id: 'ward',
       };
-      hierarchyFields.forEach((field) => {
-        const check = fieldToCheck[field];
-        if (!this.shouldShow(check) && payload.hasOwnProperty(field)) {
-          delete payload[field];
-        }
-      });
+
+      const isOutState = this.registrationForm.get('location_type')?.value === 'out_state';
+
+      if (isOutState) {
+        Object.assign(payload, this.getOutStateDefaults());
+      } else {
+        hierarchyFields.forEach((field) => {
+          const check = fieldToCheck[field];
+          if (!this.shouldShow(check) && payload.hasOwnProperty(field)) {
+            delete payload[field];
+          }
+        });
+      }
       if (this.sourcePage === 'departmental-users' && payload.pan === '') {
         delete payload.pan;
       }
@@ -1834,8 +1780,21 @@ export class RegistrationComponent implements OnInit, OnChanges {
   shouldShow(field: string): boolean {
     const h = this.registrationForm.get('hierarchy_level')?.value;
     const u = this.registrationForm.get('user_type')?.value;
+    const locationType = this.registrationForm.get('location_type')?.value;
+
     if (field === 'ulb') field = 'block';
-    if (u === 'individual') return true;
+
+    if (u === 'individual') {
+      if (locationType === 'out_state' && ['district', 'subdivision', 'block', 'ward'].includes(field)) {
+        return false;
+      }
+      return true;
+    }
+
+    if (locationType === 'out_state' && ['district', 'subdivision', 'block', 'ward'].includes(field)) {
+      return false;
+    }
+
     if (['state1', 'state2', 'state3'].includes(h)) {
       return false;
     }
@@ -2032,22 +1991,47 @@ export class RegistrationComponent implements OnInit, OnChanges {
       });
   }
 
-  toggleWhatsappSameAsMobile(event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    this.whatsappSameAsMobile = checked;
+private getOutStateDefaults(): any {
+  const districtId =
+    this.districts.find((d) => d.name === 'West Tripura')?.id ?? '272';
+  const subdivisionId =
+    this.subdivisions.find((s) => s.name === 'Sadar')?.id ?? '6696';
+  const ulbId =
+    this.ulbs.find((u) => u.name === 'Agartala Municipal Corporation')?.id ??
+    '249785';
+  const wardId =
+    this.wards.find((w) => w.name === 'Ward No.1')?.id ?? '37153';
 
-    if (checked) {
-      this.registrationForm.removeControl('whatsapp_no');
-    } else {
-      this.registrationForm.addControl(
-        'whatsapp_no',
-        this.fb.control('', [
-          Validators.required,
-          Validators.pattern(/^\d{10}$/),
-        ])
-      );
-    }
+  return {
+    district_id: districtId,
+    subdivision_id: subdivisionId,
+    ulb_id: ulbId,
+    ward_id: wardId,
+  };
+}
+
+private applyOutStateDefaults(): void {
+  const defaults = this.getOutStateDefaults();
+  this.registrationForm.patchValue(defaults, { emitEvent: false });
+  this.registrationForm.updateValueAndValidity({ emitEvent: false });
+}
+
+toggleWhatsappSameAsMobile(event: Event): void {
+  const checked = (event.target as HTMLInputElement).checked;
+  this.whatsappSameAsMobile = checked;
+
+  if (checked) {
+    this.registrationForm.removeControl('whatsapp_no');
+  } else {
+    this.registrationForm.addControl(
+      'whatsapp_no',
+      this.fb.control('', [
+        Validators.required,
+        Validators.pattern(/^\d{10}$/),
+      ])
+    );
   }
+}
   private getRedirectUrl(path: string): string {
     const { origin, pathname } = window.location;
     const basePath =

@@ -533,3 +533,36 @@ $shadow: 0 25px 60px rgba(2,12,27,.35);
     padding: 18px;
   }
 }
+.location-type-wrap {
+  margin-bottom: 18px;
+}
+
+.location-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.radio-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.radio-item input[type='radio'] {
+  cursor: pointer;
+}
