@@ -4,7 +4,9 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
   forwardRef,
 } from '@angular/core';
@@ -29,7 +31,7 @@ import { MatIcon } from '@angular/material/icon';
     },
   ],
 })
-export class IlogiFileUploadComponent implements ControlValueAccessor {
+export class IlogiFileUploadComponent implements ControlValueAccessor, OnChanges {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   localFileUrl: string | null = null;
   @Input() name: string = 'file';
@@ -39,7 +41,6 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
   @Input() disabled: boolean = false;
   @Input() mandatory: boolean = false;
   @Input() fileUrl: string | null = null;
-
   @Output() fileSelected = new EventEmitter<File>();
   @Output() fileCleared = new EventEmitter<void>();
   @Output() onRemove = new EventEmitter<string>();
@@ -47,11 +48,35 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
   selectedFile: File | null = null;
   error: string | null = null;
 
-  onChange = (file: File | null) => {};
-  onTouched = () => {};
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['fileUrl']) {
+      this.updateDisplayedFileUrl();
+    }
+  }
+  private updateDisplayedFileUrl(): void {
+    if (this.fileUrl) {
+      this.localFileUrl = this.fileUrl;
+    } else if (!this.selectedFile) {
+      this.localFileUrl = null;
+    }
+  }
+  onChange = (file: File | null) => { };
+  onTouched = () => { };
 
   writeValue(file: File | null): void {
-    this.selectedFile = file;
+    if (file instanceof File) {
+      this.selectedFile = file;
+      const fakeUrl = (file as any)?._url;
+      if (fakeUrl) {
+        this.fileUrl = fakeUrl;
+        this.localFileUrl = fakeUrl;
+      }
+    } else {
+      this.selectedFile = null;
+      if (!this.fileUrl) {
+        this.localFileUrl = null;
+      }
+    }
   }
 
   registerOnChange(fn: (file: File | null) => void): void {
@@ -68,10 +93,11 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
 
   onButtonClick(): void {
     if (this.disabled) return;
-    this.fileInput?.nativeElement.click(); // ✅ Safe call
+    this.fileInput?.nativeElement.click();
   }
 
   onFileSelected(event: Event): void {
+    if (this.disabled) return;
     const input = event.target as HTMLInputElement;
     this.error = null;
 
@@ -84,7 +110,7 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
         input.value = ''; // reset input
         return;
       }
-      if (this.localFileUrl) {
+      if (this.localFileUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(this.localFileUrl);
       }
       this.localFileUrl = URL.createObjectURL(file);
@@ -95,26 +121,31 @@ export class IlogiFileUploadComponent implements ControlValueAccessor {
     }
   }
 
- clearFile(): void {
+clearFile(): void {
   if (this.fileInput?.nativeElement) {
     this.fileInput.nativeElement.value = '';
   }
 
-  if (this.localFileUrl) {
+  if (this.localFileUrl?.startsWith('blob:')) {
     URL.revokeObjectURL(this.localFileUrl);
-    this.localFileUrl = null;
   }
+  this.localFileUrl = null;
 
   this.selectedFile = null;
+  this.fileUrl = null;
   this.onChange(null);
   this.onTouched();
   this.fileCleared.emit();
   this.onRemove.emit(this.name);
 }
- previewFile(): void {
+previewFile(): void {
   const urlToOpen = this.localFileUrl || this.fileUrl;
   if (urlToOpen) {
     window.open(urlToOpen, '_blank');
   }
+}
+
+getFileNameFromUrl(url: string): string {
+  return url.split('/').pop() || 'file';
 }
 }

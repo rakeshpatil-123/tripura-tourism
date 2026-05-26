@@ -1,43 +1,15 @@
 <div class="ilogi-file-upload" [class.disabled]="disabled">
 
-  <!-- Display Mode -->
-<!-- <div *ngIf="selectedFile; else uploadMode" class="file-display">
-  <span class="filename" [title]="selectedFile.name">
-    {{ selectedFile.name }}
-  </span>
- <span *ngIf="mandatory" class="mandatory-star">*</span>
-  <button
-    *ngIf="fileUrl || selectedFile"
-    type="button"
-    class="preview-btn"
-    title="Preview File"
-    (click)="previewFile()"
-    [disabled]="disabled"
-    aria-label="Preview file"
-  >
-    <mat-icon>visibility</mat-icon>
-  </button>
-
-  <button
-    type="button"
-    class="remove-btn"
-    (click)="clearFile()"
-    [disabled]="disabled"
-    aria-label="Remove file"
-  >
-    ✕
-  </button>
-</div> -->
 
 <!-- Display Mode -->
-<div *ngIf="selectedFile; else uploadMode" class="file-display">
+<div *ngIf="selectedFile || fileUrl; else uploadMode" class="file-display">
   <span class="filename-wrapper">
-    <span class="filename" [title]="selectedFile.name">
-      {{ selectedFile.name }}
+    <span class="filename" [title]="selectedFile?.name || (fileUrl ? getFileNameFromUrl(fileUrl) : 'File')">
+      {{ selectedFile?.name  || (fileUrl ? getFileNameFromUrl(fileUrl) : 'File')}}
     </span>
     <span *ngIf="mandatory" class="mandatory-star">*</span>
   </span>
-
+<div class="btn-grp" >
   <button
     *ngIf="fileUrl || selectedFile"
     type="button"
@@ -59,6 +31,7 @@
   >
     ✕
   </button>
+  </div>
 </div>
 
   <!-- Upload Mode -->

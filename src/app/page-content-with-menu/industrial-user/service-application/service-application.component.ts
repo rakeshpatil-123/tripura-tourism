@@ -104,7 +104,7 @@ interface succesRes{
     LoaderComponent,
   ],
   templateUrl: './service-application.component.html',
-  styleUrl: './service-application.component.scss',
+  styleUrls: ['./service-application.component.scss'],
   standalone: true,
 })
 export class ServiceApplicationComponent implements OnInit {
@@ -927,10 +927,9 @@ onSubmit(): void {
         const currentVal = prepared[key];
         if (
           currentVal instanceof File &&
-          (currentVal as any)._isFake &&
-          this.fileUrls[Number(key)]
+          (currentVal as any)._isFake
         ) {
-          prepared[key] = this.fileUrls[Number(key)];
+          prepared[key] = (currentVal as any)._url || this.fileUrls[key];
         }
       }
     });
@@ -944,10 +943,9 @@ onSubmit(): void {
             const fileKey = this.getFileUrlKey(q.id, section.sectionName, rowIndex);
             if (
               currentVal instanceof File &&
-              (currentVal as any)._isFake &&
-              this.fileUrls[fileKey]
+              (currentVal as any)._isFake
             ) {
-              row[q.id] = this.fileUrls[fileKey];
+              row[q.id] = (currentVal as any)._url || this.fileUrls[fileKey];
             }
           }
         });
@@ -1129,7 +1127,19 @@ onSubmit(): void {
     sectionName?: string,
     rowIndex?: number
   ): string | null {
-    return this.fileUrls[this.getFileUrlKey(questionId, sectionName, rowIndex)] || null;
+    const key = this.getFileUrlKey(questionId, sectionName, rowIndex);
+    if (sectionName !== undefined && rowIndex !== undefined) {
+      return this.fileUrls[key] || null;
+    }
+    return this.fileUrls[key] || null;
+  }
+  clearDefaultFileUrl(
+    questionId: number,
+    sectionName?: string,
+    rowIndex?: number
+  ): void {
+    const key = this.getFileUrlKey(questionId, sectionName, rowIndex);
+    delete this.fileUrls[key];
   }
   private getFileMimeType(fileName: string): string {
     const ext = fileName.split('.').pop()?.toLowerCase();
@@ -1165,11 +1175,14 @@ onSubmit(): void {
       )
       .subscribe({
         next: (res: any) => {
-          if (res?.status === 1 && res.data?.application_data) {
+          if (res?.status === 1) {
             if (res.data?.extra_payment) {
               this.extraPayment = res.data.extra_payment;
             }
-            this.patchFormWithExistingData(res.data.application_data);
+            const applicationData = res.application_data ?? res.data?.application_data ?? res.data;
+            if (applicationData) {
+              this.patchFormWithExistingData(applicationData);
+            }
           }
         },
         error: (err) => {
@@ -1254,6 +1267,16 @@ onSubmit(): void {
             });
             return rowObj;
           }
+          if (typeof row === 'string') {
+            const section = this.sectionGroups.find(
+              (sectionGroup) => sectionGroup.sectionName === key
+            );
+            const fileQuestion = section?.questions.find(
+              (question) => question.question_type === 'file'
+            );
+
+            return fileQuestion ? { [String(fileQuestion.id)]: row } : {};
+          }
 
           return {};
         });
@@ -1269,135 +1292,133 @@ onSubmit(): void {
   }
 
   private patchFormWithExistingData(applicationData: any): void {
+    if (!applicationData || !this.serviceForm) return;
     const normalizedData = this.normalizeExistingApplicationData(applicationData);
 
     Object.keys(normalizedData).forEach((key) => {
-      const value = normalizedData[key];
-
-      if (this.sectionGroups.some((section) => section.sectionName === key)) {
-        if (Array.isArray(value) && value.length > 0) {
-          const section = this.sectionGroups.find((s) => s.sectionName === key);
-          if (section) {
-            while (section.formArray.length > 1) {
-              section.formArray.removeAt(0);
-            }
-
-            value.forEach((row: any, index: number) => {
-                const rowObj = row && typeof row === 'object' ? row : {};
-                const rowGroup =
-                  index === 0
-                    ? (section.formArray.at(0) as FormGroup)
-                    : this.createSectionRow(section.questions);
-
-                section.questions.forEach((q) => {
-                  const rowValue = rowObj[String(q.id)];
-                  const fileKey = this.getFileUrlKey(q.id, section.sectionName, index);
-
-                  if (
-                    q.question_type === 'file' &&
-                    typeof rowValue === 'string' &&
-                    rowValue.trim() !== ''
-                  ) {
-                    this.fileUrls[fileKey] = rowValue;
-                    const fileName = decodeURIComponent(
-                      rowValue.split('/').pop() || 'file.pdf'
-                    );
-                    const fakeFile = new File([], fileName, {
-                      type: this.getFileMimeType(fileName),
-                    });
-                    (fakeFile as any)._isFake = true;
-                    rowGroup.get(q.id.toString())?.setValue(fakeFile);
-                  } else {
-                    const finalValue =
-                      Array.isArray(rowValue) && rowValue.length === 0
-                        ? null
-                        : rowValue ?? '';
-                    rowGroup.get(q.id.toString())?.setValue(finalValue);
-                  }
-                });
-
-                if (index !== 0) {
-                  section.formArray.push(rowGroup);
-              }
-            });
-          }
+      const section = this.sectionGroups.find((s) => s.sectionName === key);
+      if (section) {
+        const rows = normalizedData[key];
+        if (!Array.isArray(rows) || rows.length === 0) {
+          return;
         }
+
+        this.ensureSectionRowCount(section, rows.length);
+
+        rows.forEach((rowValues: any, rowIndex: number) => {
+          const rowGroup = section.formArray.at(rowIndex) as FormGroup;
+          section.questions.forEach((q) => {
+            const control = rowGroup.get(String(q.id));
+            if (!control) return;
+            this.patchExistingControlValue(
+              control,
+              q,
+              rowValues[q.id],
+              section.sectionName,
+              rowIndex
+            );
+          });
+        });
+
         return;
       }
 
       const question = this.questions.find((q) => q.id.toString() === key);
-      if (!question) {return; }
+      if (!question) return;
 
-      if (question.question_type === 'file') {
-        if (typeof value === 'string' && value.trim() !== '') {
-          this.fileUrls[String(question.id)] = value;
-          const fileName = decodeURIComponent(
-            value.split('/').pop() || 'file.pdf'
-          );
-          const fakeFile = new File([], fileName, {
-            type: this.getFileMimeType(fileName),
-          });
-          (fakeFile as any)._isFake = true;
-          this.serviceForm.get(key)?.setValue(fakeFile);
-        } else {
-          const finalValue =
-            Array.isArray(value) && value.length === 0 ? null : value ?? '';
-          this.serviceForm.get(key)?.setValue(finalValue);
-        }
-      } else {
-        let formValue: any;
-        if (Array.isArray(value)) {
-          if (question.question_type === 'checkbox') {
-            formValue = value;
-          } else {
-            formValue = value.length > 0 ? value[0] : '';
-          }
-        } else if (
-          typeof value === 'string' ||
-          typeof value === 'number' ||
-          value === null
-        ) {
-          formValue = value;
-        } else {
-          formValue = '';
-        }
-        this.serviceForm.get(key)?.setValue(formValue);
-      }
+      const control = this.serviceForm.get(key);
+      if (!control) return;
+
+      this.patchExistingControlValue(control, question, normalizedData[key]);
     });
 
     this.cdr.detectChanges();
+  }
 
-    this.questions.forEach((q) => {
-      if (
-        q.children_id &&
-        q.children_id.length > 0 &&
-        !q.display_rule?.depends_on
-      ) {
-        const control = this.serviceForm.get(q.id.toString());
-        if (control) {
-          this.updateChildVisibility(q.id, control.value);
+  private normalizeSectionRows(sectionValue: any): Array<Record<string, any>> {
+  if (!Array.isArray(sectionValue)) return [];
+
+  return sectionValue.map((row: any) => {
+    // tourism shape: [ [ {id, answer, type}, ... ] ]
+    if (Array.isArray(row)) {
+      return row.reduce((acc: Record<string, any>, field: any) => {
+        if (field && field.id !== undefined) {
+          acc[field.id] = field.answer;
         }
-      }
-    });
+        return acc;
+      }, {});
+    }
+    if (row && typeof row === 'object') {
+      return row;
+    }
 
-    this.sectionGroups.forEach((section) => {
-      const formArray = this.getSectionFormArray(section.sectionName);
-      formArray.controls.forEach((rowGroup, rowIndex) => {
-        section.questions.forEach((q) => {
-          if (q.children_id && q.children_id.length > 0) {
-            const control = (rowGroup as FormGroup).get(q.id.toString());
-            if (control) {
-              this.updateChildVisibilityInSection(
-                section.sectionName,
-                rowIndex,
-                q.id,
-                control.value
-              );
-            }
-          }
+    return {};
+  });
+}
+
+private ensureSectionRowCount(section: any, rowCount: number): void {
+  while (section.formArray.length < rowCount) {
+    section.formArray.push(this.createSectionRow(section.questions));
+  }
+
+  while (section.formArray.length > rowCount) {
+    section.formArray.removeAt(section.formArray.length - 1);
+  }
+}
+
+  private patchExistingControlValue(
+    control: any,
+    question: ServiceQuestion,
+    value: any,
+    sectionName?: string,
+    rowIndex?: number,
+  ): void {
+    if (!control) return;
+
+    if (question.question_type === 'file') {
+      if (typeof value === 'string' && value.trim() !== '') {
+        const fileName = decodeURIComponent(value.split('/').pop() || 'file.pdf');
+        const fakeFile = new File([], fileName, {
+          type: this.getFileMimeType(fileName),
         });
-      });
-    });
+        (fakeFile as any)._isFake = true;
+        (fakeFile as any)._url = value;
+        control.setValue(fakeFile);
+        const key = this.getFileUrlKey(question.id, sectionName, rowIndex);
+        this.fileUrls[key] = value;
+      } else {
+        control.setValue(null);
+      }
+      return;
+    }
+
+    if (question.question_type === 'date' && typeof value === 'string' && value.trim() !== '') {
+      const date = new Date(value);
+      control.setValue(isNaN(date.getTime()) ? value : date);
+      return;
+    }
+
+    if (question.question_type === 'checkbox') {
+      if (Array.isArray(value)) {
+        control.setValue(value);
+      } else if (typeof value === 'string') {
+        control.setValue(
+          value
+            .split(',')
+            .map((item: string) => item.trim())
+            .filter((item: string) => item !== '')
+        );
+      } else {
+        control.setValue([]);
+      }
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      control.setValue(value.length > 0 ? value[0] : '');
+      return;
+    }
+    control.setValue(value ?? '');
   }
 
   calFee(): void {
