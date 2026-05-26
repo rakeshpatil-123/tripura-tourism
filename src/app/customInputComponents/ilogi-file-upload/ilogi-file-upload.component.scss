@@ -10,6 +10,7 @@
     padding: 6px 8px;
     background-color: #f8f9fa;
     border: 1px dashed #ccc;
+    justify-content: space-between;
     border-radius: 4px;
     max-width: 100%;
     box-sizing: border-box;
@@ -110,7 +111,7 @@
   display: flex;
   align-items: center;
   gap: 8px; /* or use margin */
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
 }
 
 .filename-wrapper {
@@ -142,4 +143,11 @@
     color: #ccc;
     cursor: not-allowed;
   }
+}
+
+.btn-grp{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
 }

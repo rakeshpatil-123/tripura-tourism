@@ -1823,19 +1823,7 @@ fetchApplicationDetails(): void {
         const appData = res.data || {};
         const rawAppData = appData?.application_data || res?.application_data || {};
         const structuredData = this.normalizeApplicationData(rawAppData);
-        this.paymentsDetails = res.data.payment_details || [
-            {
-                "id": 5243,
-                "payment_amount": "31650",
-                "payment_status": "paid",
-                "gateway": "egras",
-                "gateway_order_id": "SW5243",
-                "transaction_id": "613181502971",
-                "GRN_number": "26131BF555",
-                "payment_datetime": "2026-05-11 21:55:15",
-                "created_at": "2026-05-11T16:24:52.000000Z"
-            }
-        ];
+        this.paymentsDetails = res.data.payment_details || [];
         const filteredData = structuredData.filter((qa: any) => {
           if (qa.answer == null) return false;
           if (qa.answer === '') return false;
