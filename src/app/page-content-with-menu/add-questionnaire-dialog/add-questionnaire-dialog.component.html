@@ -66,7 +66,7 @@
             <mat-icon class="custom-icon">view_list</mat-icon>
             <span>{{ section }}</span>
           </mat-option>
-          
+
           <mat-divider></mat-divider>
           <ng-container *ngIf="!isAddingNewSection">
             <button mat-button class="add-new-btn" (click)="showAddNewSectionInput($event)">
@@ -110,6 +110,7 @@
           <mat-option value="unit_details">Unit Details</mat-option>
           <mat-option value="enterprise_details">Enterprise Details</mat-option>
           <mat-option value="management_details">Management Details</mat-option>
+          <mat-option value="users">User Details</mat-option>
           <mat-option value="line_of_activities">Line of Activity</mat-option>
           <mat-option value="general_attachments">General Attachments</mat-option>
           <mat-option value="clearances">Clearances</mat-option>

@@ -968,11 +968,15 @@ onSubmit(): void {
       formData.append('is_third_party', "1");
     }
     formData.append('user_id', userId);
+    if (thirdPartyServiceId) {
+      formData.append('third_party', 'swaagat');
+    }
     if (thirdPartyServiceId && isThirdParty) {
       formData.append('service_id', thirdPartyServiceId);
     } else {
       formData.append('service_id', this.serviceId.toString());
     }
+    debugger;
     formData.append('save_data', saveAsDraft ? '1' : '0');
     const actualAppId = this.appId2 !== null ? this.appId2 : this.applicationId;
     if (actualAppId !== null) {
