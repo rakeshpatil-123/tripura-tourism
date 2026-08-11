@@ -81,7 +81,7 @@
   </div>
 </section>
 <section>
-  <div class="container">
+  <div *ngIf="(currentPath === '/' || currentPath === '')" class="container">
     <app-acts-rules></app-acts-rules>
   </div>
 </section>
