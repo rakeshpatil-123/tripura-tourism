@@ -1,0 +1,1285 @@
+/* =========================================================
+   PAGE
+========================================================= */
+
+.acts-rules-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 28px;
+  box-sizing: border-box;
+  // background:
+  //   linear-gradient(
+  //     180deg,
+  //     #f8fafc 0%,
+  //     #ffffff 55%,
+  //     #f8fafc 100%
+  //   );
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 28px;
+  padding: 24px 26px;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 30px rgba(15, 23, 42, 0.06);
+
+  box-sizing: border-box;
+}
+
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+
+.header-icon {
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(135deg,
+      #2563eb,
+      #1d4ed8);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 20px rgba(37, 99, 235, 0.22);
+}
+
+
+.header-icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+
+.header-text {
+  min-width: 0;
+}
+
+
+.header-text h1 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 750;
+  letter-spacing: -0.3px;
+}
+
+
+.header-text p {
+  margin: 6px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   DOCUMENT COUNT
+========================================================= */
+
+.document-count {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 14px;
+
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+
+  color: #1d4ed8;
+}
+
+
+.count-number {
+  font-size: 18px;
+  font-weight: 750;
+}
+
+
+.count-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   DOCUMENT GRID
+========================================================= */
+
+.documents-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+
+  align-items: stretch;
+}
+
+
+/* =========================================================
+   DOCUMENT CARD
+========================================================= */
+
+.document-card {
+  position: relative;
+
+  min-width: 0;
+  min-height: 245px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 5px 18px rgba(15, 23, 42, 0.055);
+
+  opacity: 0;
+  transform: translateY(14px);
+
+  animation:
+    cardFadeIn 420ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
+  animation-delay:
+    calc(var(--card-index) * 60ms);
+
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+
+.document-card::before {
+  content: '';
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 3px;
+
+  background:
+    linear-gradient(90deg,
+      #2563eb,
+      #60a5fa);
+
+  transform: scaleX(0);
+  transform-origin: left;
+
+  transition: transform 240ms ease;
+}
+
+
+.document-card:hover {
+  transform: translateY(-5px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 15px 35px rgba(15, 23, 42, 0.11);
+}
+
+
+.document-card:hover::before {
+  transform: scaleX(1);
+}
+
+
+/* =========================================================
+   CARD TOP
+========================================================= */
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 20px 0;
+}
+
+
+.document-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(135deg,
+      #3b82f6,
+      #2563eb);
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 7px 16px rgba(37, 99, 235, 0.18);
+
+  transition:
+    transform 220ms ease;
+}
+
+
+.document-card:hover .document-icon {
+  transform: translateY(-2px) rotate(-2deg);
+}
+
+
+.document-icon svg {
+  width: 25px;
+  height: 25px;
+}
+
+
+.document-number {
+  color: #cbd5e1;
+
+  font-size: 12px;
+  font-weight: 750;
+
+  letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   DOCUMENT CONTENT
+========================================================= */
+
+.document-content {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  padding: 16px 20px 18px;
+}
+
+
+.document-type {
+  width: fit-content;
+
+  display: inline-flex;
+  align-items: center;
+
+  margin-bottom: 9px;
+  padding: 4px 10px;
+
+  color: #1d4ed8;
+
+  background: #eff6ff;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 650;
+}
+
+
+.document-name {
+  display: block;
+
+  width: 100%;
+
+  padding: 0;
+  margin: 0;
+
+  border: 0;
+  outline: none;
+
+  background: transparent;
+
+  color: #123f95;
+
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 700;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    color 180ms ease;
+}
+
+
+.document-name:hover {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+.document-name:focus-visible {
+  border-radius: 5px;
+
+  outline:
+    3px solid rgba(37, 99, 235, 0.18);
+
+  outline-offset: 4px;
+}
+
+
+.file-name {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin-top: 12px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+
+.file-name svg {
+  flex: 0 0 auto;
+
+  width: 14px;
+  height: 14px;
+}
+
+
+.file-name span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   CARD FOOTER
+========================================================= */
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 13px 20px;
+
+  border-top: 1px solid #f1f5f9;
+
+  background: #fafcff;
+}
+
+
+.preview-button,
+.open-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  height: 36px;
+
+  padding: 0 12px;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+
+.preview-button {
+  border: 1px solid #dbeafe;
+
+  background: #eff6ff;
+
+  color: #1d4ed8;
+}
+
+
+.preview-button:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+
+.open-button {
+  border: 1px solid #2563eb;
+
+  background: #2563eb;
+
+  color: #ffffff;
+}
+
+
+.open-button:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+
+  transform: translateY(-1px);
+}
+
+
+.preview-button svg,
+.open-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 18px;
+}
+
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 15px;
+
+  color: #64748b;
+
+  background: #f8fafc;
+
+  border-radius: 16px;
+}
+
+
+.empty-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+
+.empty-state h3 {
+  margin: 0;
+
+  color: #334155;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+
+.empty-state p {
+  max-width: 420px;
+
+  margin: 7px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   PDF OVERLAY
+========================================================= */
+
+.pdf-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 999999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+
+  background: rgba(7, 14, 32, 0.76);
+
+  backdrop-filter: blur(8px);
+
+  animation:
+    overlayFadeIn 220ms ease-out forwards;
+}
+
+
+.pdf-overlay.closing {
+  animation:
+    overlayFadeOut 220ms ease-in forwards;
+}
+
+
+/* =========================================================
+   PDF MODAL
+========================================================= */
+
+.pdf-modal {
+  width: min(1200px, 96vw);
+  height: min(90vh, 920px);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.42);
+
+  animation:
+    modalPopIn 240ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+
+.pdf-overlay.closing .pdf-modal {
+  animation:
+    modalPopOut 200ms ease-in forwards;
+}
+
+
+/* =========================================================
+   PDF HEADER
+========================================================= */
+
+.pdf-header {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 14px 18px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(135deg,
+      #0f172a,
+      #1d4ed8);
+}
+
+
+.pdf-title-wrapper {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.pdf-header-icon {
+  flex: 0 0 40px;
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  border-radius: 10px;
+}
+
+
+.pdf-header-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+
+.pdf-title {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.pdf-title strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.pdf-title span {
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   PDF TOOLBAR
+========================================================= */
+
+.pdf-toolbar {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+
+.pdf-tool,
+.pdf-open-btn,
+.pdf-close-btn {
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+
+  color: #ffffff;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+
+.pdf-tool {
+  min-width: 38px;
+
+  padding: 0 9px;
+
+  font-size: 18px;
+  font-weight: 500;
+}
+
+
+.fit-tool {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+.pdf-tool:hover,
+.pdf-open-btn:hover,
+.pdf-close-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+
+  transform: translateY(-1px);
+}
+
+
+.pdf-open-btn {
+  gap: 6px;
+
+  margin-left: 4px;
+
+  padding: 0 11px;
+
+  font-size: 11px;
+  font-weight: 650;
+}
+
+
+.pdf-open-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+
+.pdf-close-btn {
+  width: 36px;
+
+  margin-left: 3px;
+
+  font-size: 24px;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   PDF BODY
+========================================================= */
+
+.pdf-body {
+  flex: 1;
+
+  min-height: 0;
+
+  padding: 18px;
+
+  overflow: auto;
+
+  background:
+    linear-gradient(180deg,
+      #f8fafc,
+      #eef2ff);
+}
+
+
+.pdf-viewport {
+  width: 100%;
+  max-width: 1080px;
+
+  min-height: 100%;
+
+  margin: 0 auto;
+
+  background: #ffffff;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 12px 35px rgba(15, 23, 42, 0.12);
+
+  transition:
+    transform 200ms ease;
+}
+
+
+.pdf-iframe {
+  display: block;
+
+  width: 100%;
+  height: 72vh;
+
+  min-height: 500px;
+
+  border: 0;
+
+  background: #ffffff;
+}
+
+
+/* =========================================================
+   PDF FOOTER
+========================================================= */
+
+.pdf-footer {
+  flex: 0 0 auto;
+
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 10px 18px;
+
+  background: #ffffff;
+
+  border-top: 1px solid #e2e8f0;
+}
+
+
+.pdf-footer span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.footer-open-button {
+  flex: 0 0 auto;
+
+  padding: 6px 10px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #2563eb;
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.footer-open-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(14px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0) scale(1);
+  }
+}
+
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+@keyframes overlayFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.965) translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1) translateY(0);
+  }
+}
+
+
+@keyframes modalPopOut {
+  from {
+    opacity: 1;
+
+    transform:
+      scale(1) translateY(0);
+  }
+
+  to {
+    opacity: 0;
+
+    transform:
+      scale(0.965) translateY(10px);
+  }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .acts-rules-page {
+    padding: 22px;
+  }
+
+  .documents-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .acts-rules-page {
+    padding: 15px;
+  }
+
+
+  .page-header {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 16px;
+
+    padding: 18px;
+  }
+
+
+  .header-content {
+    align-items: flex-start;
+  }
+
+
+  .header-icon {
+    flex: 0 0 44px;
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 11px;
+  }
+
+
+  .header-icon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+
+  .header-text h1 {
+    font-size: 20px;
+  }
+
+
+  .header-text p {
+    font-size: 12px;
+  }
+
+
+  .document-count {
+    width: fit-content;
+  }
+
+
+  .documents-grid {
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+  }
+
+
+  .document-card {
+    min-height: 225px;
+  }
+
+
+  .document-name {
+    font-size: 16px;
+  }
+
+
+  /* PDF */
+
+  .pdf-overlay {
+    padding: 8px;
+  }
+
+
+  .pdf-modal {
+    width: 100%;
+    height: 94vh;
+
+    border-radius: 14px;
+  }
+
+
+  .pdf-header {
+    padding: 11px 12px;
+
+    gap: 10px;
+  }
+
+
+  .pdf-title-wrapper {
+    gap: 8px;
+  }
+
+
+  .pdf-header-icon {
+    display: none;
+  }
+
+
+  .pdf-title strong {
+    max-width: 180px;
+
+    font-size: 13px;
+  }
+
+
+  .pdf-title span {
+    font-size: 10px;
+  }
+
+
+  .pdf-toolbar {
+    gap: 4px;
+  }
+
+
+  .pdf-tool {
+    min-width: 32px;
+    height: 32px;
+
+    padding: 0 7px;
+  }
+
+
+  .pdf-open-btn {
+    width: 34px;
+    height: 32px;
+
+    padding: 0;
+
+    margin-left: 0;
+  }
+
+
+  .pdf-open-btn span {
+    display: none;
+  }
+
+
+  .pdf-close-btn {
+    width: 32px;
+    height: 32px;
+
+    margin-left: 0;
+  }
+
+
+  .pdf-body {
+    padding: 8px;
+  }
+
+
+  .pdf-iframe {
+    height: 76vh;
+    min-height: 420px;
+  }
+
+
+  .pdf-footer {
+    padding: 9px 12px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+  .acts-rules-page {
+    padding: 10px;
+  }
+
+
+  .page-header {
+    padding: 15px;
+  }
+
+
+  .header-text h1 {
+    font-size: 18px;
+  }
+
+
+  .header-text p {
+    font-size: 11px;
+  }
+
+
+  .card-top {
+    padding: 16px 16px 0;
+  }
+
+
+  .document-content {
+    padding: 14px 16px 16px;
+  }
+
+
+  .card-footer {
+    padding: 11px 16px;
+  }
+
+
+  .preview-button,
+  .open-button {
+    flex: 1;
+
+    padding: 0 8px;
+  }
+
+
+  .pdf-title strong {
+    max-width: 135px;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .document-card,
+  .pdf-overlay,
+  .pdf-modal {
+    animation: none !important;
+
+    opacity: 1 !important;
+
+    transform: none !important;
+  }
+
+  .document-card,
+  .document-icon,
+  .preview-button,
+  .open-button,
+  .pdf-tool,
+  .pdf-open-btn,
+  .pdf-close-btn {
+    transition: none !important;
+  }
+
+}

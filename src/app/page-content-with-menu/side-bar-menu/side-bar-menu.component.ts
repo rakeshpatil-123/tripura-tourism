@@ -140,6 +140,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
     //   roles: ['individual', 'user', 'moderator', 'guest'],
     // },
     {
+      id: 'acts-rules',
+      title: 'Acts & Rules',
+      icon: 'gavel',
+      route: '/dashboard/acts-rules',
+      roles: ['individual'],
+    },
+    {
       id: 'services',
       title: 'Services',
       icon: 'work',
@@ -466,8 +473,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
       .map((item) => {
         const children = item.children
           ? item.children.filter((child) =>
-              child.roles.includes(this.userRole!)
-            )
+            child.roles.includes(this.userRole!)
+          )
           : [];
 
         return { ...item, children };
