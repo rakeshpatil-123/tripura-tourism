@@ -87,24 +87,24 @@ export class ActsRulesComponent implements OnInit, OnDestroy {
         error: (err: any) => {
           // this.listOfActsAndRules = [
           //   {
-          //     rule_name: 'SWAAGAT Rule e-Gazette Notification',
+          //     rule_name: 'Tripura Rule e-Gazette Notification',
           //     file_url:
           //       'https://swaagatbackend.tripura.gov.in/new/storage/uploads/docs_swaagat/SWAAGAT_Rule_e_Gazette_notification.pdf'
           //   },
           //   {
           //     rule_name:
-          //       'Tripura Industries Facilitation (Amendment) Act',
+          //       'Tripura Tourism Facilitation (Amendment) Act',
           //     file_url:
           //       'https://swaagatbackend.tripura.gov.in/new/storage/uploads/docs_swaagat/Tripura%20Industries%20Faciltation%20%28Amendment%29%20Act.pdf'
           //   },
           //   {
           //     rule_name:
-          //       'The Tripura Industries (Facilitation) Act',
+          //       'The Tourism (Facilitation) Act',
           //     file_url:
           //       'https://swaagatbackend.tripura.gov.in/new/storage/uploads/docs_swaagat/The_Tripura_Industries_Facilitation_Act.pdf'
           //   }
           // ];
-          this.genericService.openSnackBar(err?.error?.message || err?.message || 'Something Went Wrong! please do again later.', 'error');
+          // this.genericService.openSnackBar(err?.error?.message || err?.message || 'Something Went Wrong! please do again later.', 'error');
         }
       });
 
