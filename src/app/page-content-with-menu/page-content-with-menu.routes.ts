@@ -48,12 +48,6 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         data: { roles: ['individual'] }
       },
       {
-        path: 'acts-rules',
-        loadComponent: () => import('./acts-rules/acts-rules.component').then(m => m.ActsRulesComponent),
-        canActivate: [authGuard, profileCompletionGuard],
-        data: { roles: ['individual'] },
-      },
-      {
         path: 'renewal-list/:serviceId/:appId',
         loadComponent: () =>
           import(
@@ -152,6 +146,7 @@ export const PAGE_CONTENT_WITH_MENU_ROUTES: Routes = [
         canActivate: [authGuard],
         data: { roles: ['department', 'individual'] }
       },
+  
       {
         path: 'user-app-view/:serviceId/:appId',
         loadComponent: () =>
