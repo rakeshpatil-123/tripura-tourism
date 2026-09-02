@@ -1,0 +1,60 @@
+<section class="info-wizard-section">
+  <div class="container">
+    <h2 class="section-title">Tripura Tourism Information Wizard</h2>
+    <form [formGroup]="filterForm" class="filter-bar">
+      <app-ilogi-select fieldId="service_filter" fieldLabel="Filter by Service" [mandatory]="true"
+        formControlName="service_filter" [selectOptions]="serviceFilters" placeholder="Select service">
+      </app-ilogi-select>
+    </form>
+    <ng-container *ngIf="hasSelection; else selectPrompt">
+      <div class="wizard-cards" *ngIf="filteredServices.length; else noResults">
+        <div class="wizard-card" *ngFor="let service of filteredServices; trackBy: trackByServiceId">
+          <h3 class="service-name">{{ service.name }}</h3>
+          <div class="info-row">
+            <span class="info-label">Timeline</span>
+            <span class="info-value">{{ service.timeline }}</span>
+          </div>
+          <div class="info-block">
+            <h4>Process</h4>
+            <ol>
+              <li *ngFor="let step of service.process">{{ step }}</li>
+            </ol>
+          </div>
+          <div class="info-block">
+            <h4>Required Documents</h4>
+            <ul>
+              <li *ngFor="let doc of service.requiredDocuments">{{ doc }}</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Fees Payable</h4>
+            <table class="fee-table" *ngIf="service.feeType === 'table'">
+              <thead>
+                <tr>
+                  <th>Sl</th>
+                  <th>Classes of Home Stay</th>
+                  <th>Registration Fees</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of service.feeTable">
+                  <td>{{ row.sl }}</td>
+                  <td>{{ row.className }}</td>
+                  <td>{{ row.fee }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="fee-text" *ngIf="service.feeType === 'text'">{{ service.feeText }}</p>
+            <p class="fee-free" *ngIf="service.feeType === 'free'">No fee</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #selectPrompt>
+      <p class="select-prompt">Select a service above to view its details.</p>
+    </ng-template>
+    <ng-template #noResults>
+      <p class="no-results">No service information found for the selected filter.</p>
+    </ng-template>
+  </div>
+</section>
