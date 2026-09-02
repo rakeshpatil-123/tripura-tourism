@@ -85,6 +85,9 @@
     <app-acts-rules></app-acts-rules>
   </div>
 </section>
+<section *ngIf="(currentPath === '/' || currentPath === '')">
+  <app-information-wizard></app-information-wizard>
+</section>
 <div>
   <router-outlet></router-outlet>
 </div>

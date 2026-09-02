@@ -38,6 +38,7 @@ import { TestimonialsComponent } from "./page-content-with-menu/testimonials/tes
 import { TripuraTourismLicensingComponent } from "./tripura-tourism-licensing/tripura-tourism-licensing.component";
 import { TripuraNocDashboardComponent } from "./tripura-noc-dashboard/tripura-noc-dashboard.component";
 import { ActsRulesComponent } from './page-content-with-menu/acts-rules/acts-rules.component';
+import { InformationWizardComponent } from "./page-content-with-menu/information-wizard/information-wizard.component";
 
 @Component({
   selector: 'app-root',
@@ -62,7 +63,8 @@ import { ActsRulesComponent } from './page-content-with-menu/acts-rules/acts-rul
     TestimonialsComponent,
     TripuraTourismLicensingComponent,
     TripuraNocDashboardComponent,
-    ActsRulesComponent
+    ActsRulesComponent,
+    InformationWizardComponent
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
